@@ -29,3 +29,17 @@ governance, maintainership, contribution conduct, support, roadmap, release,
 development, threat, dependency, licensing, notice, and initial-commit operation.
 Twenty accepted ADRs make the highest-risk design decisions explicit and testable.
 No parallel runtime, packet shape, or ownership system was introduced.
+
+## Executive-audit remediation alignment
+
+| ID | Confirmed finding | Resolution |
+|---|---|---|
+| REM-001 | Public commit omitted `.github` and `.l9` while evidence claimed them | Restored complete hidden surfaces and added exact Git-tree/manifest validation |
+| REM-002 | Reuse identity omitted output-affecting policies | Complete compilation fingerprint now covers all semantic profiles, schemas, adapters, inputs, and compiler build identity |
+| REM-003 | Packet could select callback destination and worker secret | Dispatch carries only a callback ID; worker-local policy owns destination, credential, redirects, DNS, and address safety |
+| REM-004 | Publication verification accepted any valid bundle at a URI | Digest-qualified references and exact expected packet/manifest verification |
+| REM-005 | Input diagnostics were normalized and then discarded | Typed diagnostics payload and conservation invariant |
+| REM-006 | Bundle publication and local registry lacked transaction scope | Atomic staged-directory publication and SQLite WAL registry |
+| REM-007 | Validation receipts overstated independent schema validation | Separate runtime model, JSON Schema, invariant, evidence, and cross-packet layers |
+
+The unsafe callback payload shape is intentionally rejected. This is a security correction, not an architecture expansion.

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from .diagnostic import DiagnosticRecord
 from l9_constellation_topology.run.evidence import EvidenceRecord
 
 from .artifact import ArtifactRecord
@@ -24,5 +25,6 @@ class TopologyState(FrozenModel):
     maturity: tuple[MaturityAssessment, ...] = ()
     impact_indexes: tuple[ImpactIndex, ...] = ()
     evidence: tuple[EvidenceRecord, ...] = ()
+    diagnostics: tuple[DiagnosticRecord, ...] = ()
     unknowns: tuple[UnknownRecord, ...] = ()
     conflicts: tuple[ConflictRecord, ...] = ()

@@ -73,3 +73,57 @@ changes:
     validation:
       - repository-wide internal Markdown link check
     status: implemented
+  - id: REM-001
+    source: Git index, MANIFEST.md, .github/, .l9/
+    defect: validated package and committed repository tree diverged
+    fix: restore hidden repository surfaces and validate manifest equality against git ls-tree with exact commit and tree evidence
+    validation:
+      - scripts/validate_git_integrity.py
+      - .github/workflows/l9-pr-validate.yml
+    status: implemented
+  - id: REM-002
+    source: src/l9_constellation_topology/compiler.py
+    defect: idempotency omitted risk, maturity, packet, report, and output policy changes
+    fix: hash a complete semantic compilation fingerprint
+    validation:
+      - tests/test_confirmed_findings_remediation.py::test_idempotency_fingerprint_changes_for_every_semantic_policy
+      - tests/test_confirmed_findings_remediation.py::test_idempotency_fingerprint_changes_for_schema_and_build_identity
+    status: implemented
+  - id: REM-003
+    source: src/l9_constellation_topology/worker/callback.py
+    defect: dispatch could select an arbitrary callback URL and worker environment secret
+    fix: callback ID resolved through worker-local destination and credential policy with redirect and network controls
+    validation:
+      - tests/test_worker_v5.py::test_callback_contract_rejects_packet_selected_url_and_secret
+      - tests/test_worker_v5.py::test_callback_id_must_exist_in_local_policy
+    status: implemented
+  - id: REM-004
+    source: src/l9_constellation_topology/worker/packet_store.py
+    defect: publication verification accepted any internally valid bundle at the supplied URI
+    fix: require digest-qualified OCI references and compare retrieved content with the exact expected PacketRef and manifest digests
+    validation:
+      - tests/test_packet_store_v5.py::test_verify_published_binds_uri_to_expected_packet
+      - tests/test_packet_store_v5.py::test_oci_verification_rejects_mutable_tag_before_pull
+    status: implemented
+  - id: REM-005
+    source: repository model adapter, TopologyState, packet schemas, topology validator
+    defect: accepted upstream diagnostics disappeared during compilation
+    fix: preserve typed diagnostics with source lineage and enforce a conservation invariant
+    validation:
+      - tests/test_confirmed_findings_remediation.py::test_input_diagnostics_are_preserved_and_round_trip
+    status: implemented
+  - id: REM-006
+    source: PacketBundleOutputSink and LocalPacketRegistry
+    defect: multi-file bundle visibility and local recovery writes were not transaction-safe
+    fix: atomic staged-directory publication and SQLite WAL local registry transactions
+    validation:
+      - tests/test_confirmed_findings_remediation.py::test_packet_bundle_commit_is_atomic_on_staging_failure
+      - tests/test_confirmed_findings_remediation.py::test_local_registry_is_transaction_safe_under_concurrent_writers
+    status: implemented
+  - id: REM-007
+    source: src/l9_constellation_topology/validation/topology_validator.py
+    defect: validation receipts conflated model construction with independent schema verification
+    fix: report separate model-construction, JSON Schema, invariant, evidence, and cross-packet layers
+    validation:
+      - tests/test_confirmed_findings_remediation.py::test_independent_json_schema_validation_can_block_compilation
+    status: implemented

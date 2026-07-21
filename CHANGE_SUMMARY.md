@@ -15,6 +15,20 @@ This hardening pass applies the repository's no-stub, gap-filling, no-regression
 7. Required operator and release artifacts were added: manifest, final tree, traceability map, Unknown register, regression guard, alignment audit, fix map, convergence report, and validation records.
 8. Versioned runtime and packet identities remain at `2.0.0`; this patch changes validation and hardening behavior without altering packet contracts.
 
+
+## Confirmed executive-audit remediation
+
+1. **Delivery integrity:** `.github` and `.l9` are part of the tracked repository surface. `scripts/validate_git_integrity.py` compares the committed Git tree with `MANIFEST.md` and records the exact commit and tree identities.
+2. **Semantic reuse:** idempotency now uses a complete compilation fingerprint, including aggregate configuration, schemas, active contract versions, adapter mode, exact compiler build identity, and sorted parent semantic hashes.
+3. **Callback trust:** dispatch packets carry only a callback ID. URLs, credentials, redirect policy, path policy, DNS resolution, and private-address restrictions are worker-local.
+4. **Immutable publication:** OCI references must be digest-qualified, and verification compares the fetched packet, validation subject, bundle manifest, and registry digest with the expected publication identity.
+5. **Diagnostic conservation:** upstream diagnostics are normalized into typed records and must be preserved or explicitly dispositioned.
+6. **Atomic persistence:** packet bundles become visible through one validated directory rename. Local recovery state uses SQLite WAL transactions instead of JSON read-modify-write.
+7. **Validation precision:** receipts distinguish runtime model construction from independent JSON Schema and semantic invariant checks.
+8. **Regression proof:** adversarial tests cover every confirmed P0, P1, and P2 finding.
+
+The architecture remains packet-native and authority-separated. No direct graph writes, source mutation, parallel transport envelope, or new orchestration authority was introduced.
+
 ## Architecture impact
 
 No topology, packet, evidence, orchestration, or sink ownership boundary changed. The patch strengthens validation around the existing design.

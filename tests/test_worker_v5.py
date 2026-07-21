@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import ClassVar
 
 import pytest
+from pydantic import ValidationError
 
 from l9_constellation_topology.compiler import calculate_idempotency_key
 from l9_constellation_topology.config import resolve_configuration
@@ -32,6 +33,7 @@ from l9_constellation_topology.worker import (
     validate_stage_dispatch,
     verify_transport_packet,
 )
+from l9_constellation_topology.worker.callback import send_callback
 
 ROOT = Path(__file__).resolve().parents[1]
 INPUTS = (
@@ -95,9 +97,10 @@ def _input_refs() -> tuple[PacketRef, ...]:
     return tuple(refs)
 
 
-def _dispatch(callback_url: str, output: Path, *, revision: str | None = None) -> TransportPacket:
+def _dispatch(output: Path, *, revision: str | None = None) -> TransportPacket:
     configuration = resolve_configuration(ROOT)
     refs = _input_refs()
+    target_revision = revision or _git_revision()
     payload = StageDispatchPayload(
         data=StageDispatchData(
             run_id="run:test",
@@ -105,14 +108,14 @@ def _dispatch(callback_url: str, output: Path, *, revision: str | None = None) -
             workflow_id="foundational-repository-intelligence",
             action="compile-topology",
             target_repository="Quantum-L9/l9-constellation-topology",
-            target_revision=revision or _git_revision(),
+            target_revision=target_revision,
             input_packets=refs,
             profile=StageProfileRef(
                 id=configuration.profile_id,
                 version=configuration.profile_version,
                 hash=semantic_hash(configuration.topology_profile),
             ),
-            callback=CallbackRef(url=callback_url),
+            callback=CallbackRef(callback_id="local-integration-test"),
             output_uri=output.resolve().as_uri(),
         )
     )
@@ -120,7 +123,11 @@ def _dispatch(callback_url: str, output: Path, *, revision: str | None = None) -
         payload=payload,
         packet_type="command",
         action="compile-topology",
-        idempotency_key=calculate_idempotency_key(refs, configuration),
+        idempotency_key=calculate_idempotency_key(
+            refs,
+            configuration,
+            compiler_build_identity=target_revision.removeprefix("git:"),
+        ),
         trace_id="trace:test",
         correlation_id="correlation:test",
         workflow_id="foundational-repository-intelligence",
@@ -130,11 +137,14 @@ def _dispatch(callback_url: str, output: Path, *, revision: str | None = None) -
     )
 
 
-def test_worker_compiles_callbacks_and_reuses_registered_packet(tmp_path: Path) -> None:
-    registry = LocalPacketRegistry(tmp_path / "registry.json")
+def test_worker_compiles_callbacks_and_reuses_registered_packet(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    registry = LocalPacketRegistry(tmp_path / "registry.sqlite3")
     output = tmp_path / "published-packet"
     with callback_server() as (callback_url, received):
-        dispatch = _dispatch(callback_url, output)
+        monkeypatch.setenv("L9_TEST_CALLBACK_URL", callback_url)
+        dispatch = _dispatch(output)
         first = execute_stage(
             dispatch,
             repository_root=ROOT,
@@ -147,7 +157,10 @@ def test_worker_compiles_callbacks_and_reuses_registered_packet(tmp_path: Path) 
         materialized, validation = load_topology_bundle(output)
         assert validation.status == "passed"
         assert materialized.packet.packet_id == first.payload.output_packet.packet_id
-        assert registry.get(dispatch.header.idempotency_key).status == "acknowledged"
+        entry = registry.get(dispatch.header.idempotency_key)
+        assert entry is not None
+        assert entry.status == "acknowledged"
+        assert entry.metadata["bundle_manifest_digest"].startswith("sha256:")
 
         assert len(received) == 1
         callback_packet = TransportPacket.model_validate(received[0])
@@ -174,87 +187,98 @@ def test_worker_compiles_callbacks_and_reuses_registered_packet(tmp_path: Path) 
 
 
 def test_preflight_validates_signature_before_checkout_revision(tmp_path: Path) -> None:
-    with callback_server() as (callback_url, received):
-        configuration = resolve_configuration(ROOT)
-        dispatch = _dispatch(
-            callback_url,
-            tmp_path / "out",
-            revision="git:" + "a" * 40,
-        )
-        validated = validate_stage_dispatch(
-            dispatch,
+    configuration = resolve_configuration(ROOT)
+    dispatch = _dispatch(tmp_path / "out", revision="git:" + "a" * 40)
+    validated = validate_stage_dispatch(
+        dispatch,
+        configuration=configuration,
+        repository_root=ROOT,
+        hmac_key=KEY,
+        enforce_source_revision=False,
+    )
+    assert validated.data.target_revision == "git:" + "a" * 40
+
+
+def test_preflight_rejects_non_object_revision(tmp_path: Path) -> None:
+    configuration = resolve_configuration(ROOT)
+    dispatch = _dispatch(tmp_path / "out")
+    payload = StageDispatchPayload.model_validate(dispatch.payload).model_copy(
+        update={
+            "data": StageDispatchPayload.model_validate(dispatch.payload).data.model_copy(
+                update={"target_revision": "main\nmalicious"}
+            )
+        }
+    )
+    tampered = build_transport_packet(
+        payload=payload,
+        packet_type="command",
+        action="compile-topology",
+        idempotency_key=dispatch.header.idempotency_key,
+        trace_id="trace:test",
+        correlation_id="correlation:test",
+        workflow_id="foundational-repository-intelligence",
+        key=KEY,
+        key_id=KEY_ID,
+        provenance={"resolved_by_gate": False, "resolver": "l9-ci-core"},
+    )
+    with pytest.raises(WorkerError, match="target-revision-invalid"):
+        validate_stage_dispatch(
+            tampered,
             configuration=configuration,
             repository_root=ROOT,
             hmac_key=KEY,
             enforce_source_revision=False,
         )
-        assert validated.data.target_revision == "git:" + "a" * 40
-        assert received == []
-
-
-def test_preflight_rejects_non_object_revision(tmp_path: Path) -> None:
-    with callback_server() as (callback_url, _):
-        configuration = resolve_configuration(ROOT)
-        dispatch = _dispatch(callback_url, tmp_path / "out")
-        payload = StageDispatchPayload.model_validate(dispatch.payload).model_copy(
-            update={
-                "data": StageDispatchPayload.model_validate(dispatch.payload).data.model_copy(
-                    update={"target_revision": "main\nmalicious"}
-                )
-            }
-        )
-        tampered = build_transport_packet(
-            payload=payload,
-            packet_type="command",
-            action="compile-topology",
-            idempotency_key=dispatch.header.idempotency_key,
-            trace_id="trace:test",
-            correlation_id="correlation:test",
-            workflow_id="foundational-repository-intelligence",
-            key=KEY,
-            key_id=KEY_ID,
-            provenance={"resolved_by_gate": False, "resolver": "l9-ci-core"},
-        )
-        with pytest.raises(WorkerError, match="target-revision-invalid"):
-            validate_stage_dispatch(
-                tampered,
-                configuration=configuration,
-                repository_root=ROOT,
-                hmac_key=KEY,
-                enforce_source_revision=False,
-            )
 
 
 def test_worker_blocks_wrong_checkout_revision(tmp_path: Path) -> None:
-    with callback_server() as (callback_url, _):
-        dispatch = _dispatch(callback_url, tmp_path / "out", revision="git:" + "d" * 40)
-        with pytest.raises(WorkerError, match="target-revision-mismatch"):
-            execute_stage(
-                dispatch,
-                repository_root=ROOT,
-                workspace=tmp_path / "workspace",
-                hmac_key=KEY,
-                registry=LocalPacketRegistry(tmp_path / "registry.json"),
-            )
+    dispatch = _dispatch(tmp_path / "out", revision="git:" + "d" * 40)
+    with pytest.raises(WorkerError, match="target-revision-mismatch"):
+        execute_stage(
+            dispatch,
+            repository_root=ROOT,
+            workspace=tmp_path / "workspace",
+            hmac_key=KEY,
+            registry=LocalPacketRegistry(tmp_path / "registry.sqlite3"),
+        )
 
 
 def test_worker_blocks_tampered_dispatch_before_callback(tmp_path: Path) -> None:
-    with callback_server() as (callback_url, received):
-        dispatch = _dispatch(callback_url, tmp_path / "out")
-        tampered = dispatch.model_copy(
-            update={
-                "payload": {
-                    **dispatch.payload,
-                    "data": {**dispatch.payload["data"], "run_id": "run:tampered"},
-                }
+    dispatch = _dispatch(tmp_path / "out")
+    tampered = dispatch.model_copy(
+        update={
+            "payload": {
+                **dispatch.payload,
+                "data": {**dispatch.payload["data"], "run_id": "run:tampered"},
+            }
+        }
+    )
+    with pytest.raises(WorkerError, match="transport-signature-invalid"):
+        execute_stage(
+            tampered,
+            repository_root=ROOT,
+            workspace=tmp_path / "workspace",
+            hmac_key=KEY,
+            registry=LocalPacketRegistry(tmp_path / "registry.sqlite3"),
+        )
+
+
+def test_callback_contract_rejects_packet_selected_url_and_secret() -> None:
+    with pytest.raises(ValidationError):
+        CallbackRef.model_validate(
+            {
+                "callback_id": "topology-control-plane",
+                "url": "https://attacker.invalid/callback",
+                "token_ref": "env:SECRET",
             }
         )
-        with pytest.raises(WorkerError, match="transport-signature-invalid"):
-            execute_stage(
-                tampered,
-                repository_root=ROOT,
-                workspace=tmp_path / "workspace",
-                hmac_key=KEY,
-                registry=LocalPacketRegistry(tmp_path / "registry.json"),
-            )
-        assert received == []
+
+
+def test_callback_id_must_exist_in_local_policy() -> None:
+    with pytest.raises(WorkerError, match="callback-id-forbidden"):
+        send_callback(
+            CallbackRef(callback_id="not-allowlisted"),
+            {"status": "test"},
+            callback_policy=resolve_configuration(ROOT).callback_policy,
+            attempts=1,
+        )

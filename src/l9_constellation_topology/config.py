@@ -19,6 +19,7 @@ class ResolvedConfiguration(FrozenModel):
     report_profile: dict[str, Any]
     packet_profile: dict[str, Any]
     output_policy: dict[str, Any]
+    callback_policy: dict[str, Any]
     profile_hash: str
     schema_contract_hash: str
     active_contract_versions: dict[str, str] = Field(default_factory=dict)
@@ -61,6 +62,7 @@ def resolve_configuration(root: Path) -> ResolvedConfiguration:
         "packet_profile": _load_yaml(root / ".l9" / "packet-profile.yaml"),
         "output_policy": _load_yaml(root / ".l9" / "output-policy.yaml"),
     }
+    callback_policy = _load_yaml(root / ".l9" / "callback-policy.yaml")
     for name, profile in profiles.items():
         if "id" not in profile and name != "output_policy":
             raise ValueError(f"{name} is missing id")
@@ -69,6 +71,7 @@ def resolve_configuration(root: Path) -> ResolvedConfiguration:
     profile_hash = semantic_hash(profiles)
     return ResolvedConfiguration(
         **profiles,
+        callback_policy=callback_policy,
         profile_hash=profile_hash,
         schema_contract_hash=_contract_hash(root),
         active_contract_versions={

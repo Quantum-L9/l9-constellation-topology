@@ -404,8 +404,7 @@ Stage success requires:
 
 ## 23. Idempotency, replay, and recovery
 
-The idempotency key derives from sorted parent semantic hashes, compiler version,
-topology profile hash, schema-contract hash, and output packet type.
+The idempotency key is the semantic hash of a complete compilation fingerprint: sorted parent semantic hashes, compiler name/version/build identity, aggregate topology/risk/maturity/report/packet/output configuration hash, schema-contract hash, active contract versions, adapter mode, and output packet type/version.
 
 An existing validated result is reused and emits a reuse receipt. Retryable failures
 include temporary packet-store, runner-capacity, and callback errors. Contract,
@@ -421,8 +420,16 @@ Manual replay is authorized by the control plane and preserves lineage.
 2. Build a frozen non-editable environment.
 3. Decode but do not trust dispatch fields.
 4. Verify signature, key ID, transport version, payload schema, action, repository,
-   profile, parent status, idempotency key, callback, output URI, and exact object ID.
+   profile, parent status, idempotency key, approved callback ID, digest-qualified output URI, and exact object ID.
 5. Check out the signed target revision only after preflight passes.
+
+### 24.1 Callback trust boundary
+
+The dispatch packet carries only an approved callback ID. Worker-local policy resolves the destination and dedicated credential, rejects redirects, enforces path and scheme rules, and blocks unsafe DNS results. Packet content cannot select an environment-variable name or arbitrary destination.
+
+### 24.2 Immutable publication verification
+
+Production OCI references are digest-qualified. Publication and reuse re-fetch the bundle and compare it against the expected PacketRef, validation subject, bundle-manifest digest, and registry manifest digest. A different but internally valid packet is rejected.
 6. Build the exact-revision environment from its lockfile.
 7. Revalidate and execute.
 

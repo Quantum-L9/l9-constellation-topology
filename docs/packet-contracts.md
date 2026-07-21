@@ -9,9 +9,12 @@ A packet bundle contains:
 ```text
 manifest.json
 packet.json
-payloads/*.json
+payload/*.json
 receipts/validation-receipt.json
-receipts/commit-receipt.json
 ```
 
 The bundle manifest lists exact byte hashes and sizes for every member.
+
+Diagnostics from Repository Model Packets are normalized into typed `DiagnosticRecord` payloads. The topology validator enforces conservation: each accepted input diagnostic must remain represented in the output or be rejected through explicit validation.
+
+Validation Receipts distinguish runtime model construction, independent checked-in JSON Schema evaluation, semantic invariants, evidence rules, and cross-packet checks.

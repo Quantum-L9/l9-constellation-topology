@@ -1,9 +1,12 @@
-"""Packet-store adapters for local files and GHCR-compatible OCI artifacts."""
+"""Packet-store adapters with identity-bound local and OCI verification."""
 
 from __future__ import annotations
 
+import json
 import shutil
 import subprocess
+import tempfile
+from dataclasses import dataclass
 from pathlib import Path
 from urllib.parse import unquote, urlparse
 
@@ -12,8 +15,16 @@ from l9_constellation_topology.packets import (
     load_repository_model_bundle,
     load_topology_bundle,
 )
+from l9_constellation_topology.run import artifact_hash
 
 from .errors import WorkerError
+
+
+@dataclass(frozen=True)
+class PublishedPacket:
+    uri: str
+    bundle_manifest_digest: str
+    registry_manifest_digest: str | None = None
 
 
 def file_uri_to_path(uri: str) -> Path:
@@ -28,6 +39,80 @@ def file_uri_to_path(uri: str) -> Path:
 
 def path_to_file_uri(path: Path) -> str:
     return path.resolve().as_uri()
+
+
+def _bundle_manifest_digest(bundle_path: Path) -> str:
+    manifest = bundle_path / "manifest.json"
+    if not manifest.is_file():
+        raise WorkerError(
+            "packet-bundle-manifest-missing",
+            f"published bundle lacks manifest.json: {bundle_path}",
+            blocked=True,
+        )
+    return artifact_hash(manifest.read_bytes())
+
+
+def _oci_repository(reference: str) -> str:
+    value = reference.removeprefix("oci://").split("@", 1)[0]
+    slash = value.rfind("/")
+    colon = value.rfind(":")
+    if colon > slash:
+        value = value[:colon]
+    return value
+
+
+def _extract_digest(value: object) -> str | None:
+    if isinstance(value, dict):
+        for key in ("digest", "manifestDigest", "manifest_digest"):
+            candidate = value.get(key)
+            if isinstance(candidate, str) and candidate.startswith("sha256:"):
+                return candidate
+        for child in value.values():
+            candidate = _extract_digest(child)
+            if candidate:
+                return candidate
+    if isinstance(value, list):
+        for child in value:
+            candidate = _extract_digest(child)
+            if candidate:
+                return candidate
+    return None
+
+
+def _assert_expected_topology(
+    bundle_path: Path,
+    *,
+    expected: PacketRef,
+    expected_bundle_manifest_digest: str,
+) -> None:
+    materialized, receipt = load_topology_bundle(bundle_path)
+    packet = materialized.packet
+    actual_manifest_digest = _bundle_manifest_digest(bundle_path)
+    mismatches: list[str] = []
+    if packet.packet_id != expected.packet_id:
+        mismatches.append("packet_id")
+    if packet.packet_type != expected.packet_type:
+        mismatches.append("packet_type")
+    if packet.packet_version != expected.packet_version:
+        mismatches.append("packet_version")
+    if packet.semantic_hash != expected.semantic_hash:
+        mismatches.append("semantic_hash")
+    if expected.artifact_hash is not None and packet.artifact_hash != expected.artifact_hash:
+        mismatches.append("artifact_hash")
+    if expected.validation_status != "passed" or receipt.status != "passed":
+        mismatches.append("validation_status")
+    if receipt.subject_packet_id != expected.packet_id:
+        mismatches.append("validation_receipt_packet")
+    if receipt.subject_semantic_hash != expected.semantic_hash:
+        mismatches.append("validation_receipt_semantic_hash")
+    if actual_manifest_digest != expected_bundle_manifest_digest:
+        mismatches.append("bundle_manifest_digest")
+    if mismatches:
+        raise WorkerError(
+            "published-packet-reference-mismatch",
+            f"{expected.packet_id}: {', '.join(mismatches)}",
+            blocked=True,
+        )
 
 
 class PacketStoreClient:
@@ -56,6 +141,12 @@ class PacketStoreClient:
         if parsed.scheme in {"", "file"}:
             path = file_uri_to_path(reference.uri)
         elif parsed.scheme == "oci":
+            if "@sha256:" not in reference.uri:
+                raise WorkerError(
+                    "packet-uri-not-immutable",
+                    f"production OCI input must be digest-qualified: {reference.uri}",
+                    blocked=True,
+                )
             path = workspace / "inputs" / reference.packet_id.replace(":", "_")
             path.mkdir(parents=True, exist_ok=True)
             command = [
@@ -95,10 +186,7 @@ class PacketStoreClient:
             mismatches.append("packet_version")
         if reference.artifact_hash is not None and packet.artifact_hash != reference.artifact_hash:
             mismatches.append("artifact_hash")
-        if (
-            reference.subject_id is not None
-            and packet.subject.repository_id != reference.subject_id
-        ):
+        if reference.subject_id is not None and packet.subject.repository_id != reference.subject_id:
             mismatches.append("subject_id")
         if packet.source_snapshot.revision != reference.source_revision:
             mismatches.append("source_revision")
@@ -112,8 +200,9 @@ class PacketStoreClient:
             )
         return path
 
-    def publish(self, bundle_path: Path, output_uri: str) -> str:
+    def publish(self, bundle_path: Path, output_uri: str) -> PublishedPacket:
         parsed = urlparse(output_uri)
+        bundle_manifest_digest = _bundle_manifest_digest(bundle_path)
         if parsed.scheme in {"", "file"}:
             expected = file_uri_to_path(output_uri)
             if bundle_path.resolve() != expected:
@@ -123,7 +212,10 @@ class PacketStoreClient:
                     blocked=True,
                 )
             load_topology_bundle(expected)
-            return path_to_file_uri(expected)
+            return PublishedPacket(
+                uri=path_to_file_uri(expected),
+                bundle_manifest_digest=bundle_manifest_digest,
+            )
         if parsed.scheme != "oci":
             raise WorkerError(
                 "packet-uri-unsupported",
@@ -135,15 +227,17 @@ class PacketStoreClient:
             for path in sorted(bundle_path.rglob("*"))
             if path.is_file()
         )
+        target = output_uri.removeprefix("oci://")
         command = [
             self._oras(),
             "push",
-            output_uri,
+            target,
+            "--format",
+            "json",
             "--artifact-type",
             "application/vnd.quantum-l9.packet.bundle.v1+json",
             *[f"{path}:application/octet-stream" for path in files],
         ]
-        command[2] = output_uri.removeprefix("oci://")
         completed = subprocess.run(
             command,
             cwd=bundle_path,
@@ -158,12 +252,44 @@ class PacketStoreClient:
                 completed.stderr.strip() or completed.stdout.strip(),
                 retryable=True,
             )
-        return output_uri
+        try:
+            output = json.loads(completed.stdout or "{}")
+        except json.JSONDecodeError as exc:
+            raise WorkerError(
+                "packet-publication-digest-missing",
+                "ORAS publication did not return machine-readable digest evidence",
+                blocked=True,
+            ) from exc
+        registry_digest = _extract_digest(output)
+        if registry_digest is None:
+            raise WorkerError(
+                "packet-publication-digest-missing",
+                "ORAS publication result did not contain a sha256 manifest digest",
+                blocked=True,
+            )
+        immutable_uri = f"oci://{_oci_repository(output_uri)}@{registry_digest}"
+        return PublishedPacket(
+            uri=immutable_uri,
+            bundle_manifest_digest=bundle_manifest_digest,
+            registry_manifest_digest=registry_digest,
+        )
 
-    def verify_published(self, output_uri: str, *, workspace: Path) -> None:
+    def verify_published(
+        self,
+        output_uri: str,
+        *,
+        expected: PacketRef,
+        expected_bundle_manifest_digest: str,
+        expected_registry_manifest_digest: str | None,
+        workspace: Path,
+    ) -> None:
         parsed = urlparse(output_uri)
         if parsed.scheme in {"", "file"}:
-            load_topology_bundle(file_uri_to_path(output_uri))
+            _assert_expected_topology(
+                file_uri_to_path(output_uri),
+                expected=expected,
+                expected_bundle_manifest_digest=expected_bundle_manifest_digest,
+            )
             return
         if parsed.scheme != "oci":
             raise WorkerError(
@@ -171,8 +297,23 @@ class PacketStoreClient:
                 f"unsupported output packet URI scheme: {parsed.scheme}",
                 blocked=True,
             )
-        verification_path = workspace / "verify-published"
-        verification_path.mkdir(parents=True, exist_ok=True)
+        if "@sha256:" not in output_uri:
+            raise WorkerError(
+                "packet-uri-not-immutable",
+                f"published OCI packet must be digest-qualified: {output_uri}",
+                blocked=True,
+            )
+        uri_digest = output_uri.rsplit("@", 1)[1]
+        if expected_registry_manifest_digest is None or uri_digest != expected_registry_manifest_digest:
+            raise WorkerError(
+                "registry-manifest-digest-mismatch",
+                "published OCI URI digest does not match registry evidence",
+                blocked=True,
+            )
+        workspace.mkdir(parents=True, exist_ok=True)
+        verification_path = Path(
+            tempfile.mkdtemp(prefix="verify-published-", dir=workspace)
+        )
         completed = subprocess.run(
             [
                 self._oras(),
@@ -192,4 +333,8 @@ class PacketStoreClient:
                 completed.stderr.strip() or completed.stdout.strip(),
                 retryable=True,
             )
-        load_topology_bundle(verification_path)
+        _assert_expected_topology(
+            verification_path,
+            expected=expected,
+            expected_bundle_manifest_digest=expected_bundle_manifest_digest,
+        )

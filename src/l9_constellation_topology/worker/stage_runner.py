@@ -235,7 +235,11 @@ def validate_stage_dispatch(
                 f"input packet lacks source revision: {reference.packet_id}",
                 blocked=True,
             )
-    expected_idempotency = calculate_idempotency_key(data.input_packets, configuration)
+    expected_idempotency = calculate_idempotency_key(
+        data.input_packets,
+        configuration,
+        compiler_build_identity=target_revision,
+    )
     if packet.header.idempotency_key != expected_idempotency:
         raise WorkerError(
             "idempotency-key-mismatch",
@@ -280,22 +284,28 @@ def _bundle_output_location(
     )
 
 
-def _persist_commit_receipt(bundle_path: Path, receipt: object) -> None:
+def _persist_commit_receipt(
+    workspace: Path,
+    packet_id: str,
+    receipt: object,
+) -> str:
     content = canonical_bytes(receipt) + b"\n"
+    directory = workspace / "execution-receipts"
+    destination = f"{packet_id.replace(':', '_')}-commit-receipt.json"
     artifact = RenderedArtifact(
         logical_id="stage-commit-receipt",
-        destination_path="receipts/commit-receipt.json",
+        destination_path=destination,
         artifact_kind="commit-receipt",
         media_type="application/json",
         content=content,
         content_hash=artifact_hash(content),
     )
     sink = FileSystemOutputSink(
-        bundle_path,
+        directory,
         WritePolicy(
             allowed_output_roots=(".",),
             allowed_artifact_kinds=("commit-receipt",),
-            allow_overwrite=True,
+            allow_overwrite=False,
             require_expected_hash_for_replace=False,
             atomic_writes=True,
         ),
@@ -308,6 +318,7 @@ def _persist_commit_receipt(bundle_path: Path, receipt: object) -> None:
             write_receipt.model_dump_json(),
             retryable=True,
         )
+    return path_to_file_uri(directory / destination)
 
 
 def _send_signed_callback(
@@ -316,6 +327,7 @@ def _send_signed_callback(
     payload: object,
     *,
     hmac_key: bytes,
+    callback_policy: dict[str, object],
 ) -> None:
     signed = build_callback_transport_packet(
         request_packet,
@@ -323,7 +335,7 @@ def _send_signed_callback(
         key=hmac_key,
         key_id=_response_key_id(request_packet),
     )
-    send_callback(callback, signed)
+    send_callback(callback, signed, callback_policy=callback_policy)
 
 
 def _execute_validated_stage(
@@ -335,13 +347,24 @@ def _execute_validated_stage(
     hmac_key: bytes,
     registry: LocalPacketRegistry,
     packet_store: PacketStoreClient,
+    configuration: ResolvedConfiguration,
 ) -> StageExecutionOutcome:
     data = dispatch.data
     idempotency_key = packet.header.idempotency_key
     existing = registry.get(idempotency_key)
     if existing is not None:
+        bundle_manifest_digest = existing.metadata.get("bundle_manifest_digest")
+        if not bundle_manifest_digest:
+            raise WorkerError(
+                "registry-publication-evidence-missing",
+                "registry entry lacks bundle manifest digest",
+                blocked=True,
+            )
         packet_store.verify_published(
             existing.packet_ref.uri,
+            expected=existing.packet_ref,
+            expected_bundle_manifest_digest=bundle_manifest_digest,
+            expected_registry_manifest_digest=existing.metadata.get("registry_manifest_digest"),
             workspace=workspace / "reuse-verify",
         )
         reuse = ReuseReceipt(
@@ -349,7 +372,13 @@ def _execute_validated_stage(
             reused_packet=existing.packet_ref,
         )
         if data.callback is not None:
-            _send_signed_callback(packet, data.callback, reuse, hmac_key=hmac_key)
+            _send_signed_callback(
+                packet,
+                data.callback,
+                reuse,
+                hmac_key=hmac_key,
+                callback_policy=configuration.callback_policy,
+            )
             registry.acknowledge(idempotency_key)
         return StageExecutionOutcome(payload=reuse, reused=True, output_bundle=None)
 
@@ -373,7 +402,7 @@ def _execute_validated_stage(
     )
     commit_receipt = commit_compilation(
         compilation,
-        PacketBundleOutputSink(bundle_path, allow_overwrite=True),
+        PacketBundleOutputSink(bundle_path, allow_overwrite=False),
     )
     if commit_receipt.status != "passed":
         raise WorkerError(
@@ -381,26 +410,28 @@ def _execute_validated_stage(
             commit_receipt.model_dump_json(),
             blocked=True,
         )
-    _persist_commit_receipt(bundle_path, commit_receipt)
-    published_uri = packet_store.publish(bundle_path, publish_uri)
-    packet_store.verify_published(
-        published_uri,
-        workspace=workspace / "publish-verify",
-    )
-
+    commit_uri = _persist_commit_receipt(workspace, packet_id, commit_receipt)
+    published = packet_store.publish(bundle_path, publish_uri)
     output_packet = PacketRef(
         packet_id=packet_id,
         packet_type=compilation.materialized.packet.packet_type,
         packet_version=compilation.materialized.packet.packet_version,
-        uri=published_uri,
+        uri=published.uri,
         semantic_hash=compilation.materialized.packet.semantic_hash,
         artifact_hash=compilation.materialized.packet.artifact_hash,
         validation_status="passed",
         subject_id="constellation:foundational-repository-intelligence",
         source_revision=data.target_revision,
     )
-    validation_uri = f"{published_uri}#receipts/validation-receipt.json"
-    commit_uri = f"{published_uri}#receipts/commit-receipt.json"
+    packet_store.verify_published(
+        published.uri,
+        expected=output_packet,
+        expected_bundle_manifest_digest=published.bundle_manifest_digest,
+        expected_registry_manifest_digest=published.registry_manifest_digest,
+        workspace=workspace / "publish-verify",
+    )
+
+    validation_uri = f"{published.uri}#receipts/validation-receipt.json"
     registry.register(
         RegistryEntry(
             idempotency_key=idempotency_key,
@@ -411,6 +442,12 @@ def _execute_validated_stage(
                 "run_id": data.run_id,
                 "stage_id": data.stage_id,
                 "compiler_version": COMPILER_VERSION,
+                "bundle_manifest_digest": published.bundle_manifest_digest,
+                **(
+                    {"registry_manifest_digest": published.registry_manifest_digest}
+                    if published.registry_manifest_digest
+                    else {}
+                ),
             },
         )
     )
@@ -423,7 +460,13 @@ def _execute_validated_stage(
         idempotency_key=idempotency_key,
     )
     if data.callback is not None:
-        _send_signed_callback(packet, data.callback, result, hmac_key=hmac_key)
+        _send_signed_callback(
+            packet,
+            data.callback,
+            result,
+            hmac_key=hmac_key,
+            callback_policy=configuration.callback_policy,
+        )
         registry.acknowledge(idempotency_key)
     return StageExecutionOutcome(payload=result, reused=False, output_bundle=bundle_path)
 
@@ -455,6 +498,7 @@ def execute_stage(
         hmac_key=hmac_key,
         registry=registry,
         packet_store=packet_store or PacketStoreClient(),
+        configuration=configuration,
     )
 
 
@@ -524,7 +568,7 @@ def run_worker(argv: Sequence[str] | None = None) -> int:
             return 0
         registry_path = Path(
             args.registry_file
-            or os.environ.get("L9_PACKET_REGISTRY_FILE", str(workspace / "packet-registry.json"))
+            or os.environ.get("L9_PACKET_REGISTRY_FILE", str(workspace / "packet-registry.sqlite3"))
         )
         outcome = _execute_validated_stage(
             packet,
@@ -534,6 +578,7 @@ def run_worker(argv: Sequence[str] | None = None) -> int:
             hmac_key=key_value.encode("utf-8"),
             registry=LocalPacketRegistry(registry_path),
             packet_store=PacketStoreClient(),
+            configuration=configuration,
         )
         print(canonical_json(outcome.payload))
         return 0
@@ -555,6 +600,7 @@ def run_worker(argv: Sequence[str] | None = None) -> int:
                         dispatch.data.callback,
                         failure,
                         hmac_key=key_value.encode("utf-8"),
+                        callback_policy=configuration.callback_policy,
                     )
                 except WorkerError as callback_error:
                     print(str(callback_error), file=sys.stderr)

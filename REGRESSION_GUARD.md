@@ -12,6 +12,11 @@
 - Legacy read-only scanner compatibility ingress
 - Signed TransportPacket preflight and exact-revision worker execution
 - Local and OCI packet-store adapters
+- Typed upstream diagnostic conservation
+- Complete semantic compilation fingerprints
+- Digest-bound packet publication and reuse
+- Locally governed callback destinations and credentials
+- Transactional local recovery registry
 - Idempotent packet reuse and signed callbacks
 
 ## Guard commands
@@ -23,6 +28,7 @@ PYTHONPATH=src python scripts/validate_contracts.py
 PYTHONPATH=src python scripts/validate_workflows.py
 PYTHONPATH=src python scripts/architecture_boundary_check.py
 PYTHONPATH=src python scripts/validate_release_readiness.py
+PYTHONPATH=src python scripts/validate_git_integrity.py
 PYTHONPATH=src python scripts/verify_determinism.py
 ```
 
@@ -36,6 +42,11 @@ PYTHONPATH=src python scripts/verify_determinism.py
 - Validation mutating the packet under review
 - Silent malformed-manifest handling
 - Removal of required release evidence without a manifest update
+- A manifest that differs from `git ls-tree`
+- Packet-selected callback URLs or environment-variable names
+- Tag-only OCI references in production paths
+- Reuse keys that omit any output-affecting profile, schema, adapter, or compiler build identity
+- Dropped input diagnostics
 
 ## Governance and decision-memory guards
 

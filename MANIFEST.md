@@ -6,7 +6,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 
 ## Inventory
 
-**Tracked delivery files:** 329
+**Tracked delivery files:** 335
 
 - `.editorconfig` — editor encoding, indentation, and whitespace policy
 - `.env.example` — documented worker and control-plane environment variables
@@ -20,6 +20,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `.github/workflows/l9-pr-validate.yml` — immutable-pinned GitHub Actions workflow
 - `.github/workflows/l9-stage-worker.yml` — immutable-pinned GitHub Actions workflow
 - `.gitignore` — generated, secret, cache, and build exclusions
+- `.l9/callback-policy.yaml` — local callback destination, credential, redirect, and network trust policy
 - `.l9/maturity-profile.yaml` — versioned compiler, policy, packet, output, or pipeline profile
 - `.l9/output-policy.yaml` — versioned compiler, policy, packet, output, or pipeline profile
 - `.l9/packet-profile.yaml` — versioned compiler, policy, packet, output, or pipeline profile
@@ -126,6 +127,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `pyproject.toml` — Python package metadata, entrypoints, and quality configuration
 - `schemas/artifact-record.schema.json` — canonical or compatibility domain JSON Schema
 - `schemas/capability-record.schema.json` — canonical or compatibility domain JSON Schema
+- `schemas/diagnostic-record.schema.json` — typed conserved upstream diagnostic JSON Schema
 - `schemas/edge-record.schema.json` — canonical or compatibility domain JSON Schema
 - `schemas/edge_card.schema.json` — canonical or compatibility domain JSON Schema
 - `schemas/evidence-record.schema.json` — canonical or compatibility domain JSON Schema
@@ -146,6 +148,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `scripts/generate_schemas.py` — operator, build, generation, or validation command
 - `scripts/render_topology_reports.py` — operator, build, generation, or validation command
 - `scripts/validate_contracts.py` — operator, build, generation, or validation command
+- `scripts/validate_git_integrity.py` — commit SHA, tree SHA, clean-state, and Git-index manifest validator
 - `scripts/validate_nuclear_execution.py` — operator, build, generation, or validation command
 - `scripts/validate_release_readiness.py` — operator, build, generation, or validation command
 - `scripts/validate_workflows.py` — operator, build, generation, or validation command
@@ -163,6 +166,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `src/l9_constellation_topology/domain/base.py` — production Python package implementation
 - `src/l9_constellation_topology/domain/capability.py` — production Python package implementation
 - `src/l9_constellation_topology/domain/confidence.py` — production Python package implementation
+- `src/l9_constellation_topology/domain/diagnostic.py` — typed diagnostic conservation domain model
 - `src/l9_constellation_topology/domain/edge.py` — production Python package implementation
 - `src/l9_constellation_topology/domain/flow.py` — production Python package implementation
 - `src/l9_constellation_topology/domain/repository.py` — production Python package implementation
@@ -297,6 +301,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `tests/fixtures/topology_packets/foundational-two-repo/payload/artifact-records.json` — deterministic packet, source, or regression fixture
 - `tests/fixtures/topology_packets/foundational-two-repo/payload/capability-records.json` — deterministic packet, source, or regression fixture
 - `tests/fixtures/topology_packets/foundational-two-repo/payload/conflicts.json` — deterministic packet, source, or regression fixture
+- `tests/fixtures/topology_packets/foundational-two-repo/payload/diagnostics.json` — deterministic conserved-diagnostic payload fixture
 - `tests/fixtures/topology_packets/foundational-two-repo/payload/edge-records.json` — deterministic packet, source, or regression fixture
 - `tests/fixtures/topology_packets/foundational-two-repo/payload/evidence.json` — deterministic packet, source, or regression fixture
 - `tests/fixtures/topology_packets/foundational-two-repo/payload/flow-records.json` — deterministic packet, source, or regression fixture
@@ -310,6 +315,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `tests/test_architecture_boundary_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_assessments_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_cli_v5.py` — unit, contract, integration, regression, or governance test
+- `tests/test_confirmed_findings_remediation.py` — adversarial regression tests for every confirmed audit finding
 - `tests/test_dependency_scanner.py` — unit, contract, integration, regression, or governance test
 - `tests/test_direct_observation_adapter_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_evidence_v5.py` — unit, contract, integration, regression, or governance test

@@ -10,6 +10,8 @@ from pathlib import Path
 
 from pydantic import BaseModel
 
+from l9_constellation_topology.compiler import calculate_idempotency_key
+from l9_constellation_topology.config import resolve_configuration
 from l9_constellation_topology.io import (
     FileSystemOutputSink,
     RenderedArtifact,
@@ -65,6 +67,7 @@ def run(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--correlation-id", required=True)
     parser.add_argument("--workflow-id")
     parser.add_argument("--out", required=True)
+    parser.add_argument("--repo-root", default=".")
     parser.add_argument(
         "--key-id", default=os.environ.get("L9_DISPATCH_HMAC_KEY_ID", "foundational-hmac-v1")
     )
@@ -74,7 +77,17 @@ def run(argv: Sequence[str] | None = None) -> int:
     if not key:
         raise ValueError("L9_DISPATCH_HMAC_KEY is required")
     payload = _load_payload(Path(args.payload_file))
-    idempotency_key = args.idempotency_key or semantic_hash(payload)
+    if args.idempotency_key:
+        idempotency_key = args.idempotency_key
+    elif isinstance(payload, StageDispatchPayload):
+        configuration = resolve_configuration(Path(args.repo_root))
+        idempotency_key = calculate_idempotency_key(
+            payload.data.input_packets,
+            configuration,
+            compiler_build_identity=payload.data.target_revision.removeprefix("git:"),
+        )
+    else:
+        idempotency_key = semantic_hash(payload)
     packet = build_transport_packet(
         payload=payload,
         packet_type=args.packet_type,

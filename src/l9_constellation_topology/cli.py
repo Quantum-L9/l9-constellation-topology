@@ -108,7 +108,12 @@ def cmd_validate_packet(args: argparse.Namespace) -> int:
         input_bundles = tuple(
             load_repository_model_bundle(Path(path)) for path in args.repository_bundle
         )
-        receipt = validate_topology(materialized.packet, materialized.state, input_bundles)
+        receipt = validate_topology(
+            materialized.packet,
+            materialized.state,
+            input_bundles,
+            schema_root=Path(args.repo_root),
+        )
     else:
         receipt = stored_receipt
     _print_json(

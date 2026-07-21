@@ -1,0 +1,91 @@
+name: l9-ingress
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  declare-task:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout source authority
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install pinned uv
+        run: python -m pip install --disable-pip-version-check uv==0.10.0
+
+      - name: Synchronize frozen runtime environment
+        run: uv sync --frozen --no-dev --no-editable
+
+      - name: Build typed ingress payload
+        env:
+          L9_EVENT_NAME: ${{ github.event_name }}
+          L9_TARGET_REPOSITORY: ${{ github.repository }}
+          L9_TARGET_REVISION: ${{ github.sha }}
+        run: |
+          .venv/bin/python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          from l9_constellation_topology.config import resolve_configuration
+          from l9_constellation_topology.packets import GitHubIngressData, GitHubIngressPayload, StageProfileRef
+          from l9_constellation_topology.run import semantic_hash
+
+          config = resolve_configuration(Path("."))
+          payload = GitHubIngressPayload(
+              data=GitHubIngressData(
+                  event_name=os.environ["L9_EVENT_NAME"],
+                  target_repository=os.environ["L9_TARGET_REPOSITORY"],
+                  target_revision=os.environ["L9_TARGET_REVISION"],
+                  profile=StageProfileRef(
+                      id=config.profile_id,
+                      version=config.profile_version,
+                      hash=semantic_hash(config.topology_profile),
+                  ),
+              )
+          )
+          Path("ingress-payload.json").write_text(
+              json.dumps(payload.model_dump(mode="json"), sort_keys=True),
+              encoding="utf-8",
+          )
+          PY
+
+      - name: Sign canonical TransportPacket
+        env:
+          L9_DISPATCH_HMAC_KEY: ${{ secrets.L9_DISPATCH_HMAC_KEY }}
+          L9_DISPATCH_HMAC_KEY_ID: ${{ vars.L9_DISPATCH_HMAC_KEY_ID || 'foundational-hmac-v1' }}
+        run: |
+          .venv/bin/l9-topology-control-packet \
+            --payload-file ingress-payload.json \
+            --packet-type event \
+            --action compile-topology \
+            --trace-id "github:${GITHUB_RUN_ID}:${GITHUB_RUN_ATTEMPT}" \
+            --correlation-id "github:${GITHUB_REPOSITORY}:${GITHUB_SHA}" \
+            --workflow-id foundational-repository-intelligence \
+            --out ingress-transport-packet.json
+
+      - name: Submit task declaration to control plane
+        env:
+          L9_CONTROL_API_URL: ${{ secrets.L9_CONTROL_API_URL }}
+          L9_CONTROL_API_TOKEN: ${{ secrets.L9_CONTROL_API_TOKEN }}
+        run: |
+          test -n "$L9_CONTROL_API_URL"
+          test -n "$L9_CONTROL_API_TOKEN"
+          curl --fail-with-body --retry 3 --retry-all-errors \
+            --connect-timeout 10 --max-time 60 \
+            -H "Authorization: Bearer ${L9_CONTROL_API_TOKEN}" \
+            -H "Content-Type: application/json" \
+            --data-binary @ingress-transport-packet.json \
+            "$L9_CONTROL_API_URL"

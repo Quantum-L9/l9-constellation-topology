@@ -4,7 +4,7 @@
 
 | ID | Unknown | Why unresolved | Required proof |
 |---|---|---|---|
-| U-001 | Canonical Python 3.12 results for this initial commit | Local environment provides Python 3.13 and cannot download 3.12 because outbound DNS is unavailable | GitHub Actions `l9-pr-validate` on the pushed initial commit |
+| U-001 | Canonical Python 3.12 results for the remediation commit | Local environment provides Python 3.13 and cannot download 3.12 because outbound DNS is unavailable | GitHub Actions `l9-pr-validate` on the exact remediation commit |
 | U-002 | Live GHCR/ORAS publication behavior | No registry credentials or live publication target were used locally | Staging push, pull, digest verification, and permission drill |
 | U-003 | Live Postgres scheduling, callback reconciliation, and dead-letter operation | Control-plane services are external to this repository | Staging Model B execution plus forced callback-loss and retry-exhaustion recovery |
 | U-004 | Real upstream and downstream packet compatibility | Only checked-in packet fixtures were available locally | Real `l9-meta-injector` Repository Model Packet through topology into `l9-topology-ingestion-bridge` |
@@ -19,3 +19,9 @@
 - Final public release eligibility remains owner-controlled. The repository includes an explicit proprietary source license and package metadata preventing accidental public publication.
 
 No unsupported value was invented to close these Unknowns.
+
+## Remediation release gates
+
+- The prior `APPROVED_INITIAL_COMMIT_WITH_EXTERNAL_UNKNOWNS` conclusion is superseded because its evidence was not bound to the committed tree.
+- Production remains blocked until the exact remediation commit passes GitHub Actions on Python 3.12 and completes a real digest-qualified OCI, Postgres registry, callback-loss, duplicate-delivery, and three-repository staging drill.
+- The checked-in local callback policy contains environment-variable names only. Production endpoint values and credentials remain external.

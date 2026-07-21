@@ -11,7 +11,7 @@ Large packet bundles do not belong in dispatch payloads, and ephemeral runners c
 
 ## Decision
 
-- Publish immutable bundles to GHCR-compatible OCI storage through ORAS.
+- Publish immutable bundles to GHCR-compatible OCI storage through ORAS and retain digest-qualified references.
 - Carry only packet references, hashes, versions, and validation status in control messages.
 - Keep durable registry state in the external Postgres control plane.
 
@@ -34,7 +34,8 @@ Large packet bundles do not belong in dispatch payloads, and ephemeral runners c
 
 ## Compliance and validation
 
-- Worker publication re-fetches and validates the bundle.
+- Worker publication and reuse re-fetch the digest-qualified object and validate it against the exact expected PacketRef and manifest digests.
+- Valid-object substitution and mutable-tag tests must fail closed.
 - Deployment gates require real GHCR permission and digest drills.
 
 ## Related artifacts

@@ -2,67 +2,63 @@
 
 ## Executive decision
 
-**Status: APPROVED_INITIAL_COMMIT_WITH_EXTERNAL_UNKNOWNS**
+**Status: APPROVED_REMEDIATION_CANDIDATE_WITH_EXTERNAL_GATES**
 
-The enriched repository passes every check executable in the current local environment and is structurally ready to become the initial Git commit. Canonical Python 3.12, Ruff, mypy, live GitHub Actions, OCI publication, Postgres orchestration, and the real three-repository chain remain external validation items and are not claimed as passed.
+The prior `APPROVED_INITIAL_COMMIT_WITH_EXTERNAL_UNKNOWNS` conclusion is superseded. Its evidence described a delivery tree containing `.github` and `.l9`, while the public commit omitted those directories. This remediation restores the complete repository surface, fixes every confirmed P0/P1/P2 audit finding, and adds commit-bound Git-tree validation.
 
-## Baseline before enrichment
+Local validation supports a pull request and review. Production deployment remains blocked until the exact remediation commit passes canonical Python 3.12 CI and the external OCI/Postgres pipeline drills in `UNKNOWN_REGISTER.md`.
 
-The hardened v5 source baseline provided:
+## Confirmed findings remediated
 
-- 83 passing tests on Python 3.13;
-- 82.40% branch coverage, above the configured 80% gate;
-- 30 passing schema and contract checks;
-- four passing workflow-contract checks;
-- zero architecture-boundary findings;
-- deterministic Topology Packet semantic identity;
-- executable wheel and CLI smoke validation.
+- Git-tree and validation-package divergence
+- Incomplete semantic idempotency fingerprint
+- Packet-selected callback destination and worker secret
+- Publication verification not bound to the expected packet
+- Lost upstream diagnostics
+- Per-file rather than per-bundle atomic publication
+- Concurrent local registry update loss
+- Validation receipt ambiguity between model construction and independent schema evaluation
 
-The remaining initial-commit gaps were governance and architectural decision memory: complete root authority files, licensing and notice text, development and release policy, threat and dependency policy, collaboration templates, the full source build specification, and explicit ADRs.
-
-## Final executable checks
-
-The detailed command outcomes are recorded in `validation/validation_checks.jsonl` and summarized in `validation/validation_report.yaml`.
+## Local executable checks
 
 | Check | Status | Evidence summary |
 |---|---|---|
-| Python syntax compilation | PASS | `src`, `tests`, and `scripts` compiled on Python 3.13.5 |
-| Full test suite | PASS | 87 tests passed |
-| Coverage floor | PASS | 82.40% branch coverage against an 80% gate |
-| Contract and schema validation | PASS | 30 schemas and fixture contracts passed |
+| Python syntax compilation | PASS | `src`, `tests`, and `scripts` compile on Python 3.13.5 |
+| Full test suite | PASS | 97 tests passed |
+| Branch coverage | PASS | 81.66%, above the configured 80% floor |
+| Contract and schema validation | PASS | 31 checked-in schemas passed |
 | GitHub workflow contract validation | PASS | four workflows passed |
-| Architecture boundary validation | PASS | 110 source files, zero violations |
-| Release-readiness and no-stub validation | PASS | 329 delivery files checked, zero findings |
-| Deterministic semantic identity | PASS | semantic and payload hashes stable across permitted volatile changes |
+| Architecture boundary validation | PASS | 111 source files, zero violations |
+| Release-readiness validation | PASS | 335 tracked delivery files, zero findings |
+| Deterministic semantic identity | PASS | semantic and payload hashes stable; `sha256:b3c3194984b8b2a8d2e14cfe4830436cc5f5cb01e97dbde4b43918c226317101` |
 | Frozen lock consistency | PASS | `uv lock --check --offline --python 3.13` |
-| Metadata parsing | PASS | TOML, JSON, and YAML parsed |
-| Internal Markdown links | PASS | all repository-local links resolved |
-| Wheel build | PASS | package wheel built without network access |
-| Installed wheel import and CLI | PASS | isolated installation compiled and validated fixture packets |
-| Ruff formatting and lint | BLOCKED | tools unavailable locally; outbound DNS unavailable |
-| Strict mypy | BLOCKED | tool unavailable locally; outbound DNS unavailable |
-| Canonical Python 3.12 execution | BLOCKED | interpreter unavailable and managed download blocked by DNS |
-| Live GitHub Actions and deployment chain | BLOCKED | external credentials and services unavailable |
+| Wheel build | PASS | wheel built locally without build isolation |
+| Installed package and CLI smoke | PASS | wheel imported and both console entry points resolved using the validated runtime dependency set |
+| Ruff | BLOCKED | tool environment could not be materialized offline because a locked wheel was absent from cache |
+| Strict mypy | BLOCKED | tool environment could not be materialized offline because a locked wheel was absent from cache |
+| Canonical Python 3.12 | BLOCKED | interpreter unavailable locally and managed download unavailable offline |
+| Live GitHub Actions, OCI, Postgres, and three-repository chain | BLOCKED | external credentials and services unavailable locally |
 
-## Determinism evidence
+Detailed structured evidence is in `validation/validation_checks.jsonl` and `validation/validation_report.yaml`. CI additionally emits `validation/commit-bound-validation.json` for the exact commit under review.
 
-Repeated compilation of the same fixture Repository Model Packets produced the same semantic identity:
+## Commit-bound integrity rule
 
-```text
-sha256:d5fc229e37c3139b9ca6d5499094362ddd43fdd63fd5609604f763a359c164b4
+The authoritative release check is:
+
+```bash
+git add -A
+PYTHONPATH=src python scripts/validate_git_integrity.py
 ```
 
-Semantic and payload hashes matched across runs. Artifact hashes differed only where exact emitted bytes legitimately included non-semantic execution metadata.
+It verifies:
 
-## Packaging decision
+- exact commit SHA and tree SHA;
+- clean worktree;
+- `MANIFEST.md` SHA-256;
+- exact equality between manifest paths and `git ls-tree HEAD`.
 
-The delivery ZIP:
+A release claim without this evidence is invalid.
 
-- contains exactly one top-level directory: `l9-constellation-topology/`;
-- contains no `.git`, virtual environments, caches, build directories, coverage residue, nested archives, or operating-system metadata;
-- includes the complete implementation, 20 ADRs, full build specification, root governance surface, tests, fixtures, schemas, workflows, operator documentation, and validation evidence;
-- is intended to be extracted and committed as one initial repository commit.
+## Release decision
 
-## Final decision
-
-The repository is **ready for an initial Git commit and draft push**. Production deployment remains blocked until the external Unknowns in `UNKNOWN_REGISTER.md` are resolved through canonical Python 3.12 CI and staging integration drills.
+The repository is suitable for a remediation pull request. It is not approved for production deployment until the external gates are attached to the exact release commit.

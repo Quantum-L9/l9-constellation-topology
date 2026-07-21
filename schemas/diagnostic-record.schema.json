@@ -1,0 +1,87 @@
+{
+  "$id": "https://quantum-l9.dev/schemas/diagnostic-record.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "category": {
+      "default": "upstream",
+      "title": "Category",
+      "type": "string"
+    },
+    "code": {
+      "title": "Code",
+      "type": "string"
+    },
+    "details": {
+      "additionalProperties": true,
+      "title": "Details",
+      "type": "object"
+    },
+    "diagnostic_id": {
+      "title": "Diagnostic Id",
+      "type": "string"
+    },
+    "disposition": {
+      "default": "preserved",
+      "enum": [
+        "preserved",
+        "translated",
+        "suppressed",
+        "rejected"
+      ],
+      "title": "Disposition",
+      "type": "string"
+    },
+    "evidence_refs": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Evidence Refs",
+      "type": "array"
+    },
+    "message": {
+      "title": "Message",
+      "type": "string"
+    },
+    "severity": {
+      "enum": [
+        "info",
+        "warning",
+        "error"
+      ],
+      "title": "Severity",
+      "type": "string"
+    },
+    "source_packet_id": {
+      "title": "Source Packet Id",
+      "type": "string"
+    },
+    "stage": {
+      "title": "Stage",
+      "type": "string"
+    },
+    "subject_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Subject Id"
+    }
+  },
+  "required": [
+    "diagnostic_id",
+    "source_packet_id",
+    "stage",
+    "severity",
+    "code",
+    "message"
+  ],
+  "title": "DiagnosticRecord",
+  "type": "object"
+}

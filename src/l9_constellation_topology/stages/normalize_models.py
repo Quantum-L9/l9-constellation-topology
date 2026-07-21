@@ -11,7 +11,7 @@ from l9_constellation_topology.domain import (
     RepositoryRecord,
 )
 from l9_constellation_topology.packets.adapters import NormalizedRepositoryModel
-from l9_constellation_topology.run import EvidenceRecord
+from l9_constellation_topology.run import Diagnostic, EvidenceRecord
 
 
 @dataclass(frozen=True)
@@ -21,7 +21,7 @@ class NormalizedInputs:
     capabilities: tuple[CapabilityRecord, ...]
     relationships: tuple[EdgeRecord, ...]
     evidence: tuple[EvidenceRecord, ...]
-    diagnostics: tuple[dict[str, object], ...]
+    diagnostics: tuple[Diagnostic, ...]
 
 
 def run(models: tuple[NormalizedRepositoryModel, ...]) -> NormalizedInputs:

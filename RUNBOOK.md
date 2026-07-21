@@ -121,7 +121,7 @@ The dispatch must reference local `file://` parent bundles and a local output UR
 
 ```bash
 export L9_DISPATCH_HMAC_KEY='runtime-secret'
-export L9_PACKET_REGISTRY_FILE='outputs/worker/packet-registry.json'
+export L9_PACKET_REGISTRY_FILE='outputs/worker/packet-registry.sqlite3'
 
 uv run l9-topology-worker \
   --dispatch-file signed-stage-dispatch.json \
@@ -157,3 +157,23 @@ The gate rejects executable pass statements, ellipsis-only function bodies, unfi
 A stage is not successful until its bundle is committed, published, reloaded, hash-verified, accompanied by a passed Validation Receipt, and acknowledged by the control plane. A published packet with a failed callback must be reconciled by idempotency key rather than republished blindly.
 
 See [docs/recovery.md](docs/recovery.md) and [docs/deployment.md](docs/deployment.md).
+
+
+## Commit-bound integrity validation
+
+Run after staging every intended file, including dot-directories:
+
+```bash
+git add -A
+PYTHONPATH=src python scripts/validate_git_integrity.py
+```
+
+The check fails when the Git worktree is dirty or when `MANIFEST.md` differs from `git ls-tree HEAD`. CI emits the exact commit SHA, tree SHA, and manifest digest as a workflow artifact.
+
+## Callback policy
+
+Dispatch packets use an approved `callback_id`. Configure destinations and credentials only through the environment variables referenced by `.l9/callback-policy.yaml`. Never add packet-selected URLs or secret variable names.
+
+## Publication verification
+
+Production OCI references must contain `@sha256:<digest>`. Reuse and fresh publication both verify the retrieved bundle against the exact expected packet and manifest identities.

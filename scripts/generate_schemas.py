@@ -11,6 +11,7 @@ from pydantic import BaseModel
 from l9_constellation_topology.domain import (
     ArtifactRecord,
     CapabilityRecord,
+    DiagnosticRecord,
     EdgeRecord,
     FlowRecord,
     GraphRecord,
@@ -135,6 +136,10 @@ def main() -> int:
         "graph-record.schema.json": (
             GraphRecord,
             "https://quantum-l9.dev/schemas/graph-record.schema.json",
+        ),
+        "diagnostic-record.schema.json": (
+            DiagnosticRecord,
+            "https://quantum-l9.dev/schemas/diagnostic-record.schema.json",
         ),
         "evidence-record.schema.json": (
             EvidenceRecord,

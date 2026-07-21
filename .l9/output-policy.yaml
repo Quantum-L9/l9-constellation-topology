@@ -1,0 +1,20 @@
+mode: write
+allowed_output_roots: [outputs]
+allowed_artifact_kinds:
+  - topology-packet
+  - validation-receipt
+  - report-manifest
+  - human-report
+  - graph-export
+  - risk-report
+  - maturity-report
+  - diagram
+  - debug-artifact
+  - commit-receipt
+allow_overwrite: true
+require_expected_hash_for_replace: false
+enforce_path_containment: true
+reject_collisions: true
+atomic_writes: true
+maximum_output_count: 1000
+maximum_output_bytes: 268435456

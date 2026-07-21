@@ -2,13 +2,13 @@
 
 ## Idempotency
 
-The topology idempotency key is derived from sorted parent semantic hashes, compiler version, topology profile hash, schema-contract hash, and output packet type.
+The topology idempotency key is the semantic hash of a complete compilation fingerprint: sorted parent semantic hashes, compiler name/version/build identity, aggregate configuration hash, schema-contract hash, active contract versions, adapter mode, and output packet type/version.
 
 A semantically identical retry carries the same key. The production control plane must resolve that key before dispatch and return the existing validated packet when present.
 
 ## Local registry
 
-`LocalPacketRegistry` stores:
+`LocalPacketRegistry` uses SQLite WAL transactions and stores:
 
 - idempotency key;
 - output `PacketRef`;
@@ -17,7 +17,7 @@ A semantically identical retry carries the same key. The production control plan
 - publication or acknowledgement state;
 - run and stage metadata.
 
-It supports deterministic local tests and same-host recovery. It is not a substitute for Postgres because GitHub-hosted runners are ephemeral.
+It supports deterministic local tests, concurrent local writers, and same-host recovery. It is not a substitute for Postgres because GitHub-hosted runners are ephemeral.
 
 ## Callback loss
 
@@ -25,7 +25,7 @@ Publication occurs before callback delivery. If the packet is published and call
 
 1. the worker reports a retryable callback failure;
 2. the control-plane reconciler searches the packet registry or immutable store by idempotency key;
-3. the published bundle is fetched and verified;
+3. the digest-qualified published bundle is fetched and verified against the registry's exact expected PacketRef and manifest digests;
 4. stage completion is repaired atomically;
 5. duplicate publication is avoided.
 

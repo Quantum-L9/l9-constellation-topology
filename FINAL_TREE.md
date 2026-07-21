@@ -2,22 +2,19 @@
 
 ```text
 l9-constellation-topology/
-├── .editorconfig
-├── .env.example
-├── .gitattributes
 ├── .github
 │   ├── ISSUE_TEMPLATE
 │   │   ├── architecture_change.yml
 │   │   ├── bug_report.yml
 │   │   └── config.yml
-│   ├── PULL_REQUEST_TEMPLATE.md
-│   └── workflows
-│       ├── l9-ingress.yml
-│       ├── l9-manual-replay.yml
-│       ├── l9-pr-validate.yml
-│       └── l9-stage-worker.yml
-├── .gitignore
+│   ├── workflows
+│   │   ├── l9-ingress.yml
+│   │   ├── l9-manual-replay.yml
+│   │   ├── l9-pr-validate.yml
+│   │   └── l9-stage-worker.yml
+│   └── PULL_REQUEST_TEMPLATE.md
 ├── .l9
+│   ├── callback-policy.yaml
 │   ├── maturity-profile.yaml
 │   ├── output-policy.yaml
 │   ├── packet-profile.yaml
@@ -25,41 +22,6 @@ l9-constellation-topology/
 │   ├── report-profile.yaml
 │   ├── risk-profile.yaml
 │   └── topology-profile.yaml
-├── .python-version
-├── ADR_INDEX.md
-├── AGENTS.md
-├── ALIGNMENT_AUDIT.md
-├── ARCHITECTURE.md
-├── BUILD_SPECIFICATION.md
-├── CHANGELOG.md
-├── CHANGE_SUMMARY.md
-├── CODE_OF_CONDUCT.md
-├── CONTRIBUTING.md
-├── CONVERGENCE_REPORT.yaml
-├── DEPENDENCY_POLICY.md
-├── DEVELOPMENT.md
-├── FINAL_TREE.md
-├── FIX_MAP.md
-├── GOVERNANCE.md
-├── INITIAL_COMMIT.md
-├── LICENSE
-├── MAINTAINERS.md
-├── MANIFEST.md
-├── Makefile
-├── NOTICE.md
-├── README.md
-├── REGRESSION_GUARD.md
-├── RELEASING.md
-├── ROADMAP.md
-├── RUNBOOK.md
-├── SECURITY.md
-├── SPECIFICATION.md
-├── STUB_TODO_THIN_FILE_AUDIT.md
-├── SUPPORT.md
-├── THREAT_MODEL.md
-├── TRACEABILITY_MAP.yaml
-├── UNKNOWN_REGISTER.md
-├── VALIDATION.md
 ├── config
 │   ├── repo_sources.yaml
 │   ├── report_profiles.yaml
@@ -82,7 +44,6 @@ l9-constellation-topology/
 │   ├── validation-receipt.schema.json
 │   └── validation-request.schema.json
 ├── docs
-│   ├── acceptance-matrix.md
 │   ├── adr
 │   │   ├── 0001-packet-native-middle-end-compiler-boundary.md
 │   │   ├── 0002-transportpacket-is-the-only-control-plane-envelope.md
@@ -105,7 +66,6 @@ l9-constellation-topology/
 │   │   ├── 0019-use-idempotency-reuse-replay-and-reconciliation.md
 │   │   ├── 0020-delegate-publication-planning-to-the-ingestion-bridge.md
 │   │   └── README.md
-│   ├── architecture.md
 │   ├── archive
 │   │   └── v4
 │   │       ├── 01_SPEC_ATTACK.md
@@ -117,6 +77,8 @@ l9-constellation-topology/
 │   │       ├── README.md
 │   │       ├── architecture.md
 │   │       └── machine-summary.json
+│   ├── acceptance-matrix.md
+│   ├── architecture.md
 │   ├── deployment.md
 │   ├── evidence-model.md
 │   ├── migration-v4-to-v5.md
@@ -128,10 +90,10 @@ l9-constellation-topology/
 │   └── worker-contract.md
 ├── outputs
 │   └── .gitkeep
-├── pyproject.toml
 ├── schemas
 │   ├── artifact-record.schema.json
 │   ├── capability-record.schema.json
+│   ├── diagnostic-record.schema.json
 │   ├── edge-record.schema.json
 │   ├── edge_card.schema.json
 │   ├── evidence-record.schema.json
@@ -153,20 +115,17 @@ l9-constellation-topology/
 │   ├── generate_schemas.py
 │   ├── render_topology_reports.py
 │   ├── validate_contracts.py
+│   ├── validate_git_integrity.py
 │   ├── validate_nuclear_execution.py
 │   ├── validate_release_readiness.py
 │   ├── validate_workflows.py
 │   └── verify_determinism.py
 ├── src
 │   └── l9_constellation_topology
-│       ├── __init__.py
-│       ├── cli.py
 │       ├── compatibility
 │       │   ├── __init__.py
 │       │   ├── repo_card_adapter.py
 │       │   └── v4_models.py
-│       ├── compiler.py
-│       ├── config.py
 │       ├── domain
 │       │   ├── __init__.py
 │       │   ├── artifact.py
@@ -174,11 +133,11 @@ l9-constellation-topology/
 │       │   ├── base.py
 │       │   ├── capability.py
 │       │   ├── confidence.py
+│       │   ├── diagnostic.py
 │       │   ├── edge.py
 │       │   ├── flow.py
 │       │   ├── repository.py
 │       │   └── topology.py
-│       ├── evidence.py
 │       ├── io
 │       │   ├── __init__.py
 │       │   ├── composite_output_sink.py
@@ -190,12 +149,11 @@ l9-constellation-topology/
 │       │   ├── write_intent.py
 │       │   ├── write_plan.py
 │       │   └── write_policy.py
-│       ├── models.py
 │       ├── packets
-│       │   ├── __init__.py
 │       │   ├── adapters
 │       │   │   ├── __init__.py
 │       │   │   └── repository_model_v1.py
+│       │   ├── __init__.py
 │       │   ├── bundle.py
 │       │   ├── common.py
 │       │   ├── control.py
@@ -210,7 +168,6 @@ l9-constellation-topology/
 │       │   ├── transport.py
 │       │   ├── validation_receipt.py
 │       │   └── validator.py
-│       ├── py.typed
 │       ├── renderers
 │       │   ├── __init__.py
 │       │   ├── common.py
@@ -272,19 +229,25 @@ l9-constellation-topology/
 │       │   ├── schema_validator.py
 │       │   ├── topology_validator.py
 │       │   └── validation_report.py
-│       └── worker
-│           ├── __init__.py
-│           ├── callback.py
-│           ├── control_packet.py
-│           ├── errors.py
-│           ├── failure.py
-│           ├── packet_store.py
-│           ├── registry.py
-│           ├── signature.py
-│           ├── stage_runner.py
-│           └── transport_factory.py
+│       ├── worker
+│       │   ├── __init__.py
+│       │   ├── callback.py
+│       │   ├── control_packet.py
+│       │   ├── errors.py
+│       │   ├── failure.py
+│       │   ├── packet_store.py
+│       │   ├── registry.py
+│       │   ├── signature.py
+│       │   ├── stage_runner.py
+│       │   └── transport_factory.py
+│       ├── __init__.py
+│       ├── cli.py
+│       ├── compiler.py
+│       ├── config.py
+│       ├── evidence.py
+│       ├── models.py
+│       └── py.typed
 ├── tests
-│   ├── __init__.py
 │   ├── fixtures
 │   │   ├── legacy_v4_outputs
 │   │   │   ├── 07_VALIDATION_REPORT.md
@@ -303,46 +266,45 @@ l9-constellation-topology/
 │   │   │   └── topology_report.md
 │   │   ├── repository_model_packets
 │   │   │   ├── l9-gate-sdk
+│   │   │   │   ├── receipts
+│   │   │   │   │   └── validation-receipt.json
 │   │   │   │   ├── manifest.json
-│   │   │   │   ├── packet.json
-│   │   │   │   └── receipts
-│   │   │   │       └── validation-receipt.json
+│   │   │   │   └── packet.json
 │   │   │   └── l9-mcp-server
+│   │   │       ├── receipts
+│   │   │       │   └── validation-receipt.json
 │   │   │       ├── manifest.json
-│   │   │       ├── packet.json
-│   │   │       └── receipts
-│   │   │           └── validation-receipt.json
+│   │   │       └── packet.json
 │   │   ├── sample_constellation
 │   │   │   ├── l9-gate-sdk
 │   │   │   │   ├── .github
-│   │   │   │   │   ├── CODEOWNERS
-│   │   │   │   │   └── workflows
-│   │   │   │   │       └── ci.yml
-│   │   │   │   ├── README.md
+│   │   │   │   │   ├── workflows
+│   │   │   │   │   │   └── ci.yml
+│   │   │   │   │   └── CODEOWNERS
 │   │   │   │   ├── docs
 │   │   │   │   │   └── adr
 │   │   │   │   │       └── adr-001-transport-protocol.md
-│   │   │   │   ├── pyproject.toml
-│   │   │   │   └── src
-│   │   │   │       └── l9_gate_sdk
-│   │   │   │           └── __init__.py
+│   │   │   │   ├── src
+│   │   │   │   │   └── l9_gate_sdk
+│   │   │   │   │       └── __init__.py
+│   │   │   │   ├── README.md
+│   │   │   │   └── pyproject.toml
 │   │   │   └── l9-mcp-server
 │   │   │       ├── .github
 │   │   │       │   └── workflows
 │   │   │       │       └── deploy.yml
+│   │   │       ├── src
+│   │   │       │   └── l9_mcp_server
+│   │   │       │       └── __init__.py
 │   │   │       ├── README.md
-│   │   │       ├── pyproject.toml
-│   │   │       └── src
-│   │   │           └── l9_mcp_server
-│   │   │               └── __init__.py
+│   │   │       └── pyproject.toml
 │   │   └── topology_packets
 │   │       └── foundational-two-repo
-│   │           ├── manifest.json
-│   │           ├── packet.json
 │   │           ├── payload
 │   │           │   ├── artifact-records.json
 │   │           │   ├── capability-records.json
 │   │           │   ├── conflicts.json
+│   │           │   ├── diagnostics.json
 │   │           │   ├── edge-records.json
 │   │           │   ├── evidence.json
 │   │           │   ├── flow-records.json
@@ -352,11 +314,15 @@ l9-constellation-topology/
 │   │           │   ├── repository-records.json
 │   │           │   ├── risks.json
 │   │           │   └── unknowns.json
-│   │           └── receipts
-│   │               └── validation-receipt.json
+│   │           ├── receipts
+│   │           │   └── validation-receipt.json
+│   │           ├── manifest.json
+│   │           └── packet.json
+│   ├── __init__.py
 │   ├── test_architecture_boundary_v5.py
 │   ├── test_assessments_v5.py
 │   ├── test_cli_v5.py
+│   ├── test_confirmed_findings_remediation.py
 │   ├── test_dependency_scanner.py
 │   ├── test_direct_observation_adapter_v5.py
 │   ├── test_evidence_v5.py
@@ -380,9 +346,49 @@ l9-constellation-topology/
 │   ├── test_validation.py
 │   ├── test_worker_v5.py
 │   └── test_workflow_contracts_v5.py
-├── uv.lock
-└── validation
-    ├── validation_checks.jsonl
-    ├── validation_findings.jsonl
-    └── validation_report.yaml
+├── validation
+│   ├── validation_checks.jsonl
+│   ├── validation_findings.jsonl
+│   └── validation_report.yaml
+├── .editorconfig
+├── .env.example
+├── .gitattributes
+├── .gitignore
+├── .python-version
+├── ADR_INDEX.md
+├── AGENTS.md
+├── ALIGNMENT_AUDIT.md
+├── ARCHITECTURE.md
+├── BUILD_SPECIFICATION.md
+├── CHANGELOG.md
+├── CHANGE_SUMMARY.md
+├── CODE_OF_CONDUCT.md
+├── CONTRIBUTING.md
+├── CONVERGENCE_REPORT.yaml
+├── DEPENDENCY_POLICY.md
+├── DEVELOPMENT.md
+├── FINAL_TREE.md
+├── FIX_MAP.md
+├── GOVERNANCE.md
+├── INITIAL_COMMIT.md
+├── LICENSE
+├── MAINTAINERS.md
+├── MANIFEST.md
+├── Makefile
+├── NOTICE.md
+├── README.md
+├── REGRESSION_GUARD.md
+├── RELEASING.md
+├── ROADMAP.md
+├── RUNBOOK.md
+├── SECURITY.md
+├── SPECIFICATION.md
+├── STUB_TODO_THIN_FILE_AUDIT.md
+├── SUPPORT.md
+├── THREAT_MODEL.md
+├── TRACEABILITY_MAP.yaml
+├── UNKNOWN_REGISTER.md
+├── VALIDATION.md
+├── pyproject.toml
+└── uv.lock
 ```
