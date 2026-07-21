@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "risk_register.schema.json",
+  "title": "RiskRegister",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["risk_id","repo_id","severity","category","description"],
+    "properties": {
+      "risk_id": {"type": "string"},
+      "repo_id": {"type": "string"},
+      "severity": {"type": "string", "enum": ["low","medium","high","critical"]},
+      "category": {"type": "string"},
+      "description": {"type": "string"},
+      "evidence": {"type": "array"}
+    }
+  }
+}

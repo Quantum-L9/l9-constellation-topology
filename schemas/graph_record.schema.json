@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "graph_record.schema.json",
+  "title": "GraphRecord",
+  "type": "object",
+  "required": ["record_type", "label", "id", "properties", "confidence"],
+  "properties": {
+    "record_type": {"type": "string", "enum": ["node","edge"]},
+    "label": {"type": "string"},
+    "id": {"type": "string"},
+    "properties": {"type": "object"},
+    "evidence": {"type": "array"},
+    "source_file": {"type": "string"},
+    "confidence": {"type": "string", "enum": ["low","medium","high"]}
+  }
+}

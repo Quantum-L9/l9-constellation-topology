@@ -1,0 +1,21 @@
+# Scanner configuration rules.
+scanner_rules:
+  manifest_scanner:
+    enabled: true
+    depth: 3
+  ci_scanner:
+    enabled: true
+    providers: ["github_actions", "gitlab_ci", "circleci", "jenkins", "drone"]
+  adr_scanner:
+    enabled: true
+    dirs: ["docs/adr", "doc/adr", "adr", "docs/decisions", "decisions"]
+  dependency_scanner:
+    enabled: true
+    files: ["pyproject.toml", "requirements.txt", "package.json"]
+  governance_scanner:
+    enabled: true
+    files: ["CODEOWNERS", ".github/CODEOWNERS", "OWNERS", "MAINTAINERS", "GOVERNANCE.md"]
+  graphiti_scanner:
+    enabled: true
+    read_only: true
+    signals: ["graphiti", "graphiti_client", "graphiti_core", "episode_id"]

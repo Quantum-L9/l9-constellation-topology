@@ -1,0 +1,48 @@
+{
+  "$id": "https://quantum-l9.dev/contracts/render-result.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "commit_receipt_uri": {
+      "title": "Commit Receipt Uri",
+      "type": "string"
+    },
+    "payload_schema": {
+      "const": "l9.render-result/1.0.0",
+      "default": "l9.render-result/1.0.0",
+      "title": "Payload Schema",
+      "type": "string"
+    },
+    "report_manifest_uri": {
+      "title": "Report Manifest Uri",
+      "type": "string"
+    },
+    "run_id": {
+      "title": "Run Id",
+      "type": "string"
+    },
+    "source_packet_id": {
+      "title": "Source Packet Id",
+      "type": "string"
+    },
+    "stage_id": {
+      "title": "Stage Id",
+      "type": "string"
+    },
+    "status": {
+      "const": "succeeded",
+      "default": "succeeded",
+      "title": "Status",
+      "type": "string"
+    }
+  },
+  "required": [
+    "run_id",
+    "stage_id",
+    "source_packet_id",
+    "report_manifest_uri",
+    "commit_receipt_uri"
+  ],
+  "title": "RenderResult",
+  "type": "object"
+}

@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "topology_report.schema.json",
+  "title": "TopologyReport",
+  "type": "object",
+  "required": ["constellation_name","generated_at","repo_inventory"],
+  "properties": {
+    "constellation_name": {"type": "string"},
+    "generated_at": {"type": "string"},
+    "repo_inventory": {"type": "array"},
+    "dependency_graph": {"type": "array"},
+    "intelligence_flows": {"type": "array"},
+    "governance_topology": {"type": "array"},
+    "runtime_topology": {"type": "array"},
+    "graphiti_memory_topology": {"type": "array"},
+    "neo4j_topology_boundary": {"type": "array"},
+    "risk_register": {"type": "array"},
+    "maturity_scorecard": {"type": "array"},
+    "graph_records": {"type": "array"},
+    "unknowns": {"type": "array", "items": {"type": "string"}}
+  }
+}

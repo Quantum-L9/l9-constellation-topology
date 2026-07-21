@@ -1,0 +1,179 @@
+{
+  "$defs": {
+    "CallbackRef": {
+      "additionalProperties": false,
+      "properties": {
+        "token_ref": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Token Ref"
+        },
+        "url": {
+          "title": "Url",
+          "type": "string"
+        }
+      },
+      "required": [
+        "url"
+      ],
+      "title": "CallbackRef",
+      "type": "object"
+    },
+    "PacketRef": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_hash": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Artifact Hash"
+        },
+        "packet_id": {
+          "title": "Packet Id",
+          "type": "string"
+        },
+        "packet_type": {
+          "title": "Packet Type",
+          "type": "string"
+        },
+        "packet_version": {
+          "title": "Packet Version",
+          "type": "string"
+        },
+        "semantic_hash": {
+          "title": "Semantic Hash",
+          "type": "string"
+        },
+        "source_revision": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Revision"
+        },
+        "subject_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Subject Id"
+        },
+        "uri": {
+          "title": "Uri",
+          "type": "string"
+        },
+        "validation_status": {
+          "enum": [
+            "passed",
+            "failed",
+            "not_run",
+            "blocked"
+          ],
+          "title": "Validation Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "packet_id",
+        "packet_type",
+        "packet_version",
+        "uri",
+        "semantic_hash",
+        "validation_status"
+      ],
+      "title": "PacketRef",
+      "type": "object"
+    },
+    "RenderRequestData": {
+      "additionalProperties": false,
+      "properties": {
+        "callback": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CallbackRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "output_uri": {
+          "title": "Output Uri",
+          "type": "string"
+        },
+        "report_profile_id": {
+          "title": "Report Profile Id",
+          "type": "string"
+        },
+        "report_profile_version": {
+          "title": "Report Profile Version",
+          "type": "string"
+        },
+        "run_id": {
+          "title": "Run Id",
+          "type": "string"
+        },
+        "source_packet": {
+          "$ref": "#/$defs/PacketRef"
+        },
+        "stage_id": {
+          "title": "Stage Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "run_id",
+        "stage_id",
+        "source_packet",
+        "report_profile_id",
+        "report_profile_version",
+        "output_uri"
+      ],
+      "title": "RenderRequestData",
+      "type": "object"
+    }
+  },
+  "$id": "https://quantum-l9.dev/contracts/render-request.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "data": {
+      "$ref": "#/$defs/RenderRequestData"
+    },
+    "payload_schema": {
+      "const": "l9.render-request/1.0.0",
+      "default": "l9.render-request/1.0.0",
+      "title": "Payload Schema",
+      "type": "string"
+    }
+  },
+  "required": [
+    "data"
+  ],
+  "title": "RenderRequestPayload",
+  "type": "object"
+}

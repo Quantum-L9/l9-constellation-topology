@@ -1,0 +1,101 @@
+{
+  "$defs": {
+    "CommitArtifactResult": {
+      "additionalProperties": false,
+      "properties": {
+        "content_hash": {
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "destination_path": {
+          "title": "Destination Path",
+          "type": "string"
+        },
+        "logical_id": {
+          "title": "Logical Id",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "written",
+            "skipped",
+            "failed"
+          ],
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "logical_id",
+        "destination_path",
+        "status",
+        "content_hash",
+        "message"
+      ],
+      "title": "CommitArtifactResult",
+      "type": "object"
+    }
+  },
+  "$id": "https://quantum-l9.dev/contracts/commit-receipt.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "packet_type": {
+      "const": "l9.commit-receipt",
+      "default": "l9.commit-receipt",
+      "title": "Packet Type",
+      "type": "string"
+    },
+    "packet_version": {
+      "default": "1.0.0",
+      "title": "Packet Version",
+      "type": "string"
+    },
+    "plan_id": {
+      "title": "Plan Id",
+      "type": "string"
+    },
+    "receipt_id": {
+      "title": "Receipt Id",
+      "type": "string"
+    },
+    "results": {
+      "items": {
+        "$ref": "#/$defs/CommitArtifactResult"
+      },
+      "title": "Results",
+      "type": "array"
+    },
+    "semantic_hash": {
+      "title": "Semantic Hash",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "passed",
+        "failed",
+        "blocked"
+      ],
+      "title": "Status",
+      "type": "string"
+    }
+  },
+  "required": [
+    "receipt_id",
+    "plan_id",
+    "status",
+    "results",
+    "semantic_hash"
+  ],
+  "title": "CommitReceipt",
+  "type": "object"
+}

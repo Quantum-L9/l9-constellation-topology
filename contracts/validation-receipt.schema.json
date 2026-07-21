@@ -1,0 +1,186 @@
+{
+  "$defs": {
+    "Producer": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "version": {
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "version"
+      ],
+      "title": "Producer",
+      "type": "object"
+    },
+    "ValidationCheck": {
+      "additionalProperties": false,
+      "properties": {
+        "check_class": {
+          "enum": [
+            "schema",
+            "invariant",
+            "evidence",
+            "cross-reference"
+          ],
+          "title": "Check Class",
+          "type": "string"
+        },
+        "check_id": {
+          "title": "Check Id",
+          "type": "string"
+        },
+        "details": {
+          "additionalProperties": true,
+          "title": "Details",
+          "type": "object"
+        },
+        "evidence_refs": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Path"
+        },
+        "rule": {
+          "title": "Rule",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "passed",
+            "failed",
+            "blocked",
+            "not_run"
+          ],
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "check_id",
+        "check_class",
+        "rule",
+        "status",
+        "message"
+      ],
+      "title": "ValidationCheck",
+      "type": "object"
+    }
+  },
+  "$id": "https://quantum-l9.dev/contracts/validation-receipt.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "cross_reference_results": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/ValidationCheck"
+      },
+      "title": "Cross Reference Results",
+      "type": "array"
+    },
+    "evidence_results": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/ValidationCheck"
+      },
+      "title": "Evidence Results",
+      "type": "array"
+    },
+    "invariant_results": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/ValidationCheck"
+      },
+      "title": "Invariant Results",
+      "type": "array"
+    },
+    "packet_type": {
+      "const": "l9.validation-receipt",
+      "default": "l9.validation-receipt",
+      "title": "Packet Type",
+      "type": "string"
+    },
+    "packet_version": {
+      "default": "1.0.0",
+      "title": "Packet Version",
+      "type": "string"
+    },
+    "receipt_id": {
+      "title": "Receipt Id",
+      "type": "string"
+    },
+    "schema_results": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/ValidationCheck"
+      },
+      "title": "Schema Results",
+      "type": "array"
+    },
+    "semantic_hash": {
+      "title": "Semantic Hash",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "passed",
+        "failed",
+        "not_run",
+        "blocked"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "subject_packet_id": {
+      "title": "Subject Packet Id",
+      "type": "string"
+    },
+    "subject_semantic_hash": {
+      "title": "Subject Semantic Hash",
+      "type": "string"
+    },
+    "validator": {
+      "$ref": "#/$defs/Producer"
+    }
+  },
+  "required": [
+    "receipt_id",
+    "subject_packet_id",
+    "subject_semantic_hash",
+    "validator",
+    "status",
+    "semantic_hash"
+  ],
+  "title": "ValidationReceipt",
+  "type": "object"
+}

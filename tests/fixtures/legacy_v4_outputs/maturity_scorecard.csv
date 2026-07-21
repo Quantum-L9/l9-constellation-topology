@@ -1,0 +1,2 @@
+repo_id,score,band,has_package_manifest,has_ci_workflow,has_adr,has_governance,has_readme,has_dependencies,high_confidence
+sample_constellation,15,nascent,0,0,15,0,0,0,0

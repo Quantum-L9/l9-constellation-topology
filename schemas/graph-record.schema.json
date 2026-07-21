@@ -1,0 +1,141 @@
+{
+  "$defs": {
+    "Authority": {
+      "enum": [
+        "source",
+        "validated-machine",
+        "derived",
+        "candidate",
+        "unknown"
+      ],
+      "title": "Authority",
+      "type": "string"
+    },
+    "Completeness": {
+      "enum": [
+        "partial",
+        "sufficient",
+        "complete"
+      ],
+      "title": "Completeness",
+      "type": "string"
+    },
+    "ConfidenceAssessment": {
+      "additionalProperties": false,
+      "properties": {
+        "authority": {
+          "$ref": "#/$defs/Authority"
+        },
+        "completeness": {
+          "$ref": "#/$defs/Completeness"
+        },
+        "conflict_status": {
+          "$ref": "#/$defs/ConflictStatus",
+          "default": "none"
+        },
+        "derivation_method": {
+          "$ref": "#/$defs/DerivationMethod"
+        },
+        "evidence_strength": {
+          "$ref": "#/$defs/EvidenceStrength"
+        },
+        "level": {
+          "$ref": "#/$defs/ConfidenceLevel"
+        }
+      },
+      "required": [
+        "level",
+        "evidence_strength",
+        "derivation_method",
+        "authority",
+        "completeness"
+      ],
+      "title": "ConfidenceAssessment",
+      "type": "object"
+    },
+    "ConfidenceLevel": {
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "title": "ConfidenceLevel",
+      "type": "string"
+    },
+    "ConflictStatus": {
+      "enum": [
+        "none",
+        "possible",
+        "confirmed"
+      ],
+      "title": "ConflictStatus",
+      "type": "string"
+    },
+    "DerivationMethod": {
+      "enum": [
+        "declared",
+        "deterministic",
+        "cross-record",
+        "heuristic",
+        "model-assisted",
+        "unknown"
+      ],
+      "title": "DerivationMethod",
+      "type": "string"
+    },
+    "EvidenceStrength": {
+      "enum": [
+        "none",
+        "weak",
+        "corroborated",
+        "direct"
+      ],
+      "title": "EvidenceStrength",
+      "type": "string"
+    }
+  },
+  "$id": "https://quantum-l9.dev/schemas/graph-record.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "confidence": {
+      "$ref": "#/$defs/ConfidenceAssessment"
+    },
+    "entity_id": {
+      "title": "Entity Id",
+      "type": "string"
+    },
+    "evidence_refs": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Evidence Refs",
+      "type": "array"
+    },
+    "label": {
+      "title": "Label",
+      "type": "string"
+    },
+    "properties": {
+      "additionalProperties": true,
+      "title": "Properties",
+      "type": "object"
+    },
+    "record_type": {
+      "enum": [
+        "node",
+        "edge"
+      ],
+      "title": "Record Type",
+      "type": "string"
+    }
+  },
+  "required": [
+    "record_type",
+    "label",
+    "entity_id"
+  ],
+  "title": "GraphRecord",
+  "type": "object"
+}

@@ -1,0 +1,229 @@
+{
+  "$defs": {
+    "CallbackRef": {
+      "additionalProperties": false,
+      "properties": {
+        "token_ref": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Token Ref"
+        },
+        "url": {
+          "title": "Url",
+          "type": "string"
+        }
+      },
+      "required": [
+        "url"
+      ],
+      "title": "CallbackRef",
+      "type": "object"
+    },
+    "PacketRef": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_hash": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Artifact Hash"
+        },
+        "packet_id": {
+          "title": "Packet Id",
+          "type": "string"
+        },
+        "packet_type": {
+          "title": "Packet Type",
+          "type": "string"
+        },
+        "packet_version": {
+          "title": "Packet Version",
+          "type": "string"
+        },
+        "semantic_hash": {
+          "title": "Semantic Hash",
+          "type": "string"
+        },
+        "source_revision": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Revision"
+        },
+        "subject_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Subject Id"
+        },
+        "uri": {
+          "title": "Uri",
+          "type": "string"
+        },
+        "validation_status": {
+          "enum": [
+            "passed",
+            "failed",
+            "not_run",
+            "blocked"
+          ],
+          "title": "Validation Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "packet_id",
+        "packet_type",
+        "packet_version",
+        "uri",
+        "semantic_hash",
+        "validation_status"
+      ],
+      "title": "PacketRef",
+      "type": "object"
+    },
+    "StageDispatchData": {
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "const": "compile-topology",
+          "title": "Action",
+          "type": "string"
+        },
+        "callback": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CallbackRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "input_packets": {
+          "items": {
+            "$ref": "#/$defs/PacketRef"
+          },
+          "title": "Input Packets",
+          "type": "array"
+        },
+        "output_uri": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Output Uri"
+        },
+        "profile": {
+          "$ref": "#/$defs/StageProfileRef"
+        },
+        "run_id": {
+          "title": "Run Id",
+          "type": "string"
+        },
+        "stage_id": {
+          "title": "Stage Id",
+          "type": "string"
+        },
+        "target_repository": {
+          "title": "Target Repository",
+          "type": "string"
+        },
+        "target_revision": {
+          "title": "Target Revision",
+          "type": "string"
+        },
+        "workflow_id": {
+          "title": "Workflow Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "run_id",
+        "stage_id",
+        "workflow_id",
+        "action",
+        "target_repository",
+        "target_revision",
+        "input_packets",
+        "profile"
+      ],
+      "title": "StageDispatchData",
+      "type": "object"
+    },
+    "StageProfileRef": {
+      "additionalProperties": false,
+      "properties": {
+        "hash": {
+          "title": "Hash",
+          "type": "string"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "version": {
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "hash"
+      ],
+      "title": "StageProfileRef",
+      "type": "object"
+    }
+  },
+  "$id": "https://quantum-l9.dev/contracts/stage-dispatch.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "data": {
+      "$ref": "#/$defs/StageDispatchData"
+    },
+    "payload_schema": {
+      "const": "l9.stage-dispatch/1.0.0",
+      "default": "l9.stage-dispatch/1.0.0",
+      "title": "Payload Schema",
+      "type": "string"
+    }
+  },
+  "required": [
+    "data"
+  ],
+  "title": "StageDispatchPayload",
+  "type": "object"
+}

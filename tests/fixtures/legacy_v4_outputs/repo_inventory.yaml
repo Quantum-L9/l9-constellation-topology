@@ -1,0 +1,8 @@
+repo_inventory:
+  - repo_id: sample_constellation
+    name: sample_constellation
+    path: /home/user/l9-constellation-topology/tests/fixtures/sample_constellation
+    primary_role: topology
+    owner: UNKNOWN
+    confidence: medium
+    languages: [Python]

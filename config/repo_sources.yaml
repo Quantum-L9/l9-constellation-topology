@@ -1,0 +1,22 @@
+# Operator-populated L9 repo registry.
+# Fill local_path with the actual filesystem path for each repo.
+# remote_url and group_id are optional — leave as UNKNOWN if not available.
+repo_sources:
+  - repo_id: "l9-gate-sdk"
+    name: "l9-gate-sdk"
+    local_path: "UNKNOWN"
+    remote_url: "UNKNOWN"
+    group_id: "l9-core"
+    expected_role: "library"
+  - repo_id: "l9-constellation-topology"
+    name: "l9-constellation-topology"
+    local_path: "."
+    remote_url: "UNKNOWN"
+    group_id: "l9-core"
+    expected_role: "topology"
+  - repo_id: "l9-mcp-server"
+    name: "l9-mcp-server"
+    local_path: "UNKNOWN"
+    remote_url: "UNKNOWN"
+    group_id: "l9-core"
+    expected_role: "service"

@@ -1,0 +1,197 @@
+{
+  "$defs": {
+    "TransportAttachment": {
+      "additionalProperties": false,
+      "properties": {
+        "attachment_id": {
+          "title": "Attachment Id",
+          "type": "string"
+        },
+        "content_hash": {
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "encrypted": {
+          "default": false,
+          "title": "Encrypted",
+          "type": "boolean"
+        },
+        "media_type": {
+          "title": "Media Type",
+          "type": "string"
+        },
+        "size_bytes": {
+          "title": "Size Bytes",
+          "type": "integer"
+        },
+        "uri": {
+          "title": "Uri",
+          "type": "string"
+        }
+      },
+      "required": [
+        "attachment_id",
+        "uri",
+        "media_type",
+        "content_hash",
+        "size_bytes"
+      ],
+      "title": "TransportAttachment",
+      "type": "object"
+    },
+    "TransportHeader": {
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "title": "Action",
+          "type": "string"
+        },
+        "correlation_id": {
+          "title": "Correlation Id",
+          "type": "string"
+        },
+        "created_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Created At"
+        },
+        "idempotency_key": {
+          "title": "Idempotency Key",
+          "type": "string"
+        },
+        "packet_id": {
+          "title": "Packet Id",
+          "type": "string"
+        },
+        "packet_type": {
+          "enum": [
+            "command",
+            "event",
+            "result",
+            "failure"
+          ],
+          "title": "Packet Type",
+          "type": "string"
+        },
+        "schema_version": {
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "trace_id": {
+          "title": "Trace Id",
+          "type": "string"
+        },
+        "workflow_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Workflow Id"
+        }
+      },
+      "required": [
+        "packet_id",
+        "packet_type",
+        "action",
+        "schema_version",
+        "idempotency_key",
+        "trace_id",
+        "correlation_id"
+      ],
+      "title": "TransportHeader",
+      "type": "object"
+    },
+    "TransportSecurity": {
+      "additionalProperties": false,
+      "properties": {
+        "signatures": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/TransportSignature"
+          },
+          "title": "Signatures",
+          "type": "array"
+        }
+      },
+      "title": "TransportSecurity",
+      "type": "object"
+    },
+    "TransportSignature": {
+      "additionalProperties": false,
+      "properties": {
+        "algorithm": {
+          "title": "Algorithm",
+          "type": "string"
+        },
+        "key_id": {
+          "title": "Key Id",
+          "type": "string"
+        },
+        "value": {
+          "title": "Value",
+          "type": "string"
+        }
+      },
+      "required": [
+        "algorithm",
+        "key_id",
+        "value"
+      ],
+      "title": "TransportSignature",
+      "type": "object"
+    }
+  },
+  "$id": "https://quantum-l9.dev/contracts/transport-packet.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "attachments": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/TransportAttachment"
+      },
+      "title": "Attachments",
+      "type": "array"
+    },
+    "governance": {
+      "additionalProperties": true,
+      "title": "Governance",
+      "type": "object"
+    },
+    "header": {
+      "$ref": "#/$defs/TransportHeader"
+    },
+    "payload": {
+      "additionalProperties": true,
+      "title": "Payload",
+      "type": "object"
+    },
+    "provenance": {
+      "additionalProperties": true,
+      "title": "Provenance",
+      "type": "object"
+    },
+    "security": {
+      "$ref": "#/$defs/TransportSecurity"
+    }
+  },
+  "required": [
+    "header",
+    "payload"
+  ],
+  "title": "TransportPacket",
+  "type": "object"
+}

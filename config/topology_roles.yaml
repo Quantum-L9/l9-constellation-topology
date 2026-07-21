@@ -1,0 +1,32 @@
+# Topology role taxonomy for the L9 constellation.
+topology_roles:
+  - role: "api_gateway"
+    description: "Routes external requests into the constellation"
+    signals: ["gateway", "api-gateway", "ingress"]
+  - role: "agent"
+    description: "Autonomous AI agent or worker node"
+    signals: ["agent", "bot", "worker"]
+  - role: "library"
+    description: "Shared SDK or utility library"
+    signals: ["lib", "sdk", "shared", "common"]
+  - role: "service"
+    description: "Domain microservice"
+    signals: ["service", "svc", "microservice"]
+  - role: "infrastructure"
+    description: "Infrastructure as code or deployment tooling"
+    signals: ["infra", "terraform", "helm", "k8s", "docker"]
+  - role: "data_pipeline"
+    description: "Data ingestion or ETL pipeline"
+    signals: ["pipeline", "etl", "ingestion"]
+  - role: "frontend"
+    description: "User-facing web or UI application"
+    signals: ["frontend", "ui", "web", "app"]
+  - role: "topology"
+    description: "Topology and constellation mapping tooling"
+    signals: ["topology", "constellation", "map"]
+  - role: "memory"
+    description: "Knowledge graph or Graphiti memory integration"
+    signals: ["memory", "graphiti", "knowledge"]
+  - role: "documentation"
+    description: "Documentation or wiki repository"
+    signals: ["docs", "documentation", "wiki"]

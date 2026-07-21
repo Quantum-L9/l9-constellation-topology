@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "edge_card.schema.json",
+  "title": "EdgeCard",
+  "type": "object",
+  "required": ["source", "target", "edge_type", "direction", "confidence"],
+  "properties": {
+    "source": {"type": "string"},
+    "target": {"type": "string"},
+    "edge_type": {"type": "string", "enum": ["dependency","governance","ci","memory","topology","runtime","documentation"]},
+    "direction": {"type": "string", "enum": ["outbound","inbound","bidirectional"]},
+    "evidence": {"type": "array"},
+    "confidence": {"type": "string", "enum": ["low","medium","high"]}
+  }
+}

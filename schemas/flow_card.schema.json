@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "flow_card.schema.json",
+  "title": "FlowCard",
+  "type": "object",
+  "required": ["flow_id", "name", "source_repo", "target_repo"],
+  "properties": {
+    "flow_id": {"type": "string"},
+    "name": {"type": "string"},
+    "source_repo": {"type": "string"},
+    "target_repo": {"type": "string"},
+    "flow_type": {"type": "string"},
+    "description": {"type": "string"},
+    "evidence": {"type": "array"},
+    "confidence": {"type": "string", "enum": ["low","medium","high"]}
+  }
+}

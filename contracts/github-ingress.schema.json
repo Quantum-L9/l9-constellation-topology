@@ -1,0 +1,118 @@
+{
+  "$defs": {
+    "CallbackRef": {
+      "additionalProperties": false,
+      "properties": {
+        "token_ref": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Token Ref"
+        },
+        "url": {
+          "title": "Url",
+          "type": "string"
+        }
+      },
+      "required": [
+        "url"
+      ],
+      "title": "CallbackRef",
+      "type": "object"
+    },
+    "GitHubIngressData": {
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "const": "compile-topology",
+          "default": "compile-topology",
+          "title": "Action",
+          "type": "string"
+        },
+        "callback": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CallbackRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "event_name": {
+          "title": "Event Name",
+          "type": "string"
+        },
+        "profile": {
+          "$ref": "#/$defs/StageProfileRef"
+        },
+        "target_repository": {
+          "title": "Target Repository",
+          "type": "string"
+        },
+        "target_revision": {
+          "title": "Target Revision",
+          "type": "string"
+        }
+      },
+      "required": [
+        "event_name",
+        "target_repository",
+        "target_revision",
+        "profile"
+      ],
+      "title": "GitHubIngressData",
+      "type": "object"
+    },
+    "StageProfileRef": {
+      "additionalProperties": false,
+      "properties": {
+        "hash": {
+          "title": "Hash",
+          "type": "string"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "version": {
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "hash"
+      ],
+      "title": "StageProfileRef",
+      "type": "object"
+    }
+  },
+  "$id": "https://quantum-l9.dev/contracts/github-ingress.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "data": {
+      "$ref": "#/$defs/GitHubIngressData"
+    },
+    "payload_schema": {
+      "const": "l9.github-ingress/1.0.0",
+      "default": "l9.github-ingress/1.0.0",
+      "title": "Payload Schema",
+      "type": "string"
+    }
+  },
+  "required": [
+    "data"
+  ],
+  "title": "GitHubIngressPayload",
+  "type": "object"
+}

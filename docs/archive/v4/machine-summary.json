@@ -1,0 +1,102 @@
+{
+  "contract_id": "l9_constellation_topology_nuclear_coding_contract",
+  "contract_version": "4.0.0",
+  "status": "complete",
+  "generated_at": "2026-07-05T21:04:00-04:00",
+  "milestones": {
+    "M1.1": {
+      "state": "passed",
+      "evidence": "01_SPEC_ATTACK.md — all blockers resolved or labeled UNKNOWN",
+      "phase": "Adversarial Spec Attack"
+    },
+    "M1.2": {
+      "state": "passed",
+      "evidence": "02_IMPLEMENTATION_CONTRACT.md — sealed implementation contract",
+      "phase": "Implementation Contract Seal"
+    },
+    "M1.3": {
+      "state": "passed",
+      "evidence": "03_DEPENDENCY_DAG.md — 22-node DAG acyclic, dependency_dag_valid: true",
+      "phase": "Dependency DAG"
+    },
+    "M2.1": {
+      "state": "passed",
+      "evidence": "45 files generated; compileall src tests -q exit 0",
+      "phase": "File Generation"
+    },
+    "M2.2": {
+      "state": "passed",
+      "evidence": "34/34 pytest tests pass; scan CLI produces output from fixture repos",
+      "phase": "Scanner Integration"
+    },
+    "M2.3": {
+      "state": "passed",
+      "evidence": "outputs/test-topology/graph_records.jsonl — node and edge records emitted",
+      "phase": "Graph Builder"
+    },
+    "M2.4": {
+      "state": "passed",
+      "evidence": "test_impact.py 4/4 pass; blast_radius traversal verified on chain and leaf nodes",
+      "phase": "Impact Engine"
+    },
+    "M2.5": {
+      "state": "passed",
+      "evidence": "13 output artifacts: topology_report.json, .md, maturity_scorecard.csv, architecture_diagrams.mmd, neo4j_import.jsonl, repo_inventory.yaml, edge_cards.yaml, flow_cards.yaml, dependency_graph.json, 07_VALIDATION_REPORT.md, risk_register.md, evidence_hashes.json, graph_records.jsonl",
+      "phase": "Report Renderer"
+    },
+    "M2.6": {
+      "state": "passed",
+      "evidence": "evidence.py: canonical_json, sha256_hash, deep_freeze, hash_artifact — evidence_hashes.json produced with per-artifact SHA-256",
+      "phase": "Evidence Hashing"
+    },
+    "M3.1": {
+      "state": "passed",
+      "evidence": "07_VALIDATION_REPORT.md — 5 contract validation commands with captured output, all PASS",
+      "phase": "Validation Report"
+    },
+    "M3.2": {
+      "state": "passed",
+      "evidence": "08_EXECUTION_CHECKLIST_REPORT.md — all milestones marked with state and evidence",
+      "phase": "Execution Checklist"
+    },
+    "M3.3": {
+      "state": "passed",
+      "evidence": "machine-summary.json — this file",
+      "phase": "Machine Summary"
+    }
+  },
+  "success_criteria": {
+    "deterministic": true,
+    "tests_pass": true,
+    "no_stubs": true,
+    "schema_valid_outputs": true,
+    "graphable_outputs_created": true,
+    "evidence_attached_to_claims": true,
+    "unknowns_labeled": true,
+    "impact_analysis_available": true,
+    "neo4j_import_export_available": true,
+    "report_generation_available": true,
+    "no_direct_repo_mutation": true
+  },
+  "post_execution_validation": {
+    "checklist_complete": true,
+    "all_milestones_evidenced": true,
+    "machine_summary_status": "complete",
+    "promotion_decision": "promote",
+    "block_reason": ""
+  },
+  "convergence_block": {
+    "convergence_status": "converged",
+    "recursive_passes_run": 2,
+    "align_improve_cycles_run": 1,
+    "same_output_after_multiple_passes": true,
+    "remaining_unknowns": [
+      "actual local paths for all L9 repos",
+      "final Neo4j AuraDB schema if different from exported graph_records",
+      "Graphiti episode ID availability for provenance links"
+    ],
+    "source_intent_preserved": true,
+    "scope_drift_detected": false,
+    "execution_readiness": "pass"
+  }
+}

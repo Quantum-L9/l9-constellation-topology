@@ -1,0 +1,899 @@
+{
+  "$defs": {
+    "ArtifactRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_id": {
+          "title": "Artifact Id",
+          "type": "string"
+        },
+        "artifact_type": {
+          "title": "Artifact Type",
+          "type": "string"
+        },
+        "body_hash": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Body Hash"
+        },
+        "capabilities": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Capabilities",
+          "type": "array"
+        },
+        "confidence": {
+          "$ref": "#/$defs/ConfidenceAssessment"
+        },
+        "content_hash": {
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "dependencies": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Dependencies",
+          "type": "array"
+        },
+        "evidence_refs": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "family": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Family"
+        },
+        "packet_ref": {
+          "title": "Packet Ref",
+          "type": "string"
+        },
+        "repository_id": {
+          "title": "Repository Id",
+          "type": "string"
+        },
+        "source_path": {
+          "title": "Source Path",
+          "type": "string"
+        }
+      },
+      "required": [
+        "artifact_id",
+        "repository_id",
+        "source_path",
+        "artifact_type",
+        "content_hash",
+        "packet_ref"
+      ],
+      "title": "ArtifactRecord",
+      "type": "object"
+    },
+    "Authority": {
+      "enum": [
+        "source",
+        "validated-machine",
+        "derived",
+        "candidate",
+        "unknown"
+      ],
+      "title": "Authority",
+      "type": "string"
+    },
+    "CapabilityRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "capability_id": {
+          "title": "Capability Id",
+          "type": "string"
+        },
+        "confidence": {
+          "$ref": "#/$defs/ConfidenceAssessment"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "evidence_refs": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "exposed_by": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Exposed By",
+          "type": "array"
+        },
+        "governed_by": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Governed By",
+          "type": "array"
+        },
+        "implemented_by": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Implemented By",
+          "type": "array"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "validated_by": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Validated By",
+          "type": "array"
+        }
+      },
+      "required": [
+        "capability_id",
+        "name",
+        "description"
+      ],
+      "title": "CapabilityRecord",
+      "type": "object"
+    },
+    "Completeness": {
+      "enum": [
+        "partial",
+        "sufficient",
+        "complete"
+      ],
+      "title": "Completeness",
+      "type": "string"
+    },
+    "ConfidenceAssessment": {
+      "additionalProperties": false,
+      "properties": {
+        "authority": {
+          "$ref": "#/$defs/Authority"
+        },
+        "completeness": {
+          "$ref": "#/$defs/Completeness"
+        },
+        "conflict_status": {
+          "$ref": "#/$defs/ConflictStatus",
+          "default": "none"
+        },
+        "derivation_method": {
+          "$ref": "#/$defs/DerivationMethod"
+        },
+        "evidence_strength": {
+          "$ref": "#/$defs/EvidenceStrength"
+        },
+        "level": {
+          "$ref": "#/$defs/ConfidenceLevel"
+        }
+      },
+      "required": [
+        "level",
+        "evidence_strength",
+        "derivation_method",
+        "authority",
+        "completeness"
+      ],
+      "title": "ConfidenceAssessment",
+      "type": "object"
+    },
+    "ConfidenceLevel": {
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "title": "ConfidenceLevel",
+      "type": "string"
+    },
+    "ConflictStatus": {
+      "enum": [
+        "none",
+        "possible",
+        "confirmed"
+      ],
+      "title": "ConflictStatus",
+      "type": "string"
+    },
+    "DerivationMethod": {
+      "enum": [
+        "declared",
+        "deterministic",
+        "cross-record",
+        "heuristic",
+        "model-assisted",
+        "unknown"
+      ],
+      "title": "DerivationMethod",
+      "type": "string"
+    },
+    "Direction": {
+      "enum": [
+        "outbound",
+        "inbound",
+        "bidirectional"
+      ],
+      "title": "Direction",
+      "type": "string"
+    },
+    "EdgeRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "confidence": {
+          "$ref": "#/$defs/ConfidenceAssessment"
+        },
+        "direction": {
+          "$ref": "#/$defs/Direction",
+          "default": "outbound"
+        },
+        "edge_id": {
+          "title": "Edge Id",
+          "type": "string"
+        },
+        "edge_type": {
+          "$ref": "#/$defs/EdgeType"
+        },
+        "evidence_refs": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "properties": {
+          "additionalProperties": true,
+          "title": "Properties",
+          "type": "object"
+        },
+        "source_id": {
+          "title": "Source Id",
+          "type": "string"
+        },
+        "target_id": {
+          "title": "Target Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "edge_id",
+        "source_id",
+        "target_id",
+        "edge_type"
+      ],
+      "title": "EdgeRecord",
+      "type": "object"
+    },
+    "EdgeType": {
+      "enum": [
+        "CONTAINS",
+        "DEPENDS_ON",
+        "IMPLEMENTS",
+        "EXPOSES",
+        "VALIDATED_BY",
+        "GOVERNED_BY",
+        "OWNED_BY",
+        "DOCUMENTED_BY",
+        "PRODUCES",
+        "CONSUMES",
+        "DERIVED_FROM",
+        "SUPERSEDES",
+        "ROUTES_TO",
+        "PUBLISHES_TO",
+        "MEMBER_OF"
+      ],
+      "title": "EdgeType",
+      "type": "string"
+    },
+    "EvidenceRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "confidence": {
+          "$ref": "#/$defs/ConfidenceAssessment"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "evidence_class": {
+          "enum": [
+            "observed",
+            "declared",
+            "derived",
+            "assisted",
+            "projected",
+            "validated",
+            "committed"
+          ],
+          "title": "Evidence Class",
+          "type": "string"
+        },
+        "evidence_id": {
+          "title": "Evidence Id",
+          "type": "string"
+        },
+        "field": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Field"
+        },
+        "producer": {
+          "title": "Producer",
+          "type": "string"
+        },
+        "producer_version": {
+          "title": "Producer Version",
+          "type": "string"
+        },
+        "source_ref": {
+          "$ref": "#/$defs/EvidenceSourceRef"
+        },
+        "source_type": {
+          "enum": [
+            "file",
+            "packet",
+            "inference",
+            "validation",
+            "unknown"
+          ],
+          "title": "Source Type",
+          "type": "string"
+        },
+        "stage": {
+          "title": "Stage",
+          "type": "string"
+        },
+        "subject_id": {
+          "title": "Subject Id",
+          "type": "string"
+        },
+        "value": {
+          "title": "Value"
+        }
+      },
+      "required": [
+        "evidence_id",
+        "subject_id",
+        "stage",
+        "evidence_class",
+        "source_type",
+        "source_ref",
+        "value",
+        "confidence",
+        "producer",
+        "producer_version"
+      ],
+      "title": "EvidenceRecord",
+      "type": "object"
+    },
+    "EvidenceSourceRef": {
+      "additionalProperties": false,
+      "properties": {
+        "content_hash": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Content Hash"
+        },
+        "line_number": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Line Number"
+        },
+        "packet_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Packet Id"
+        },
+        "source_path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Path"
+        },
+        "source_revision": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Revision"
+        },
+        "uri": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Uri"
+        }
+      },
+      "title": "EvidenceSourceRef",
+      "type": "object"
+    },
+    "EvidenceStrength": {
+      "enum": [
+        "none",
+        "weak",
+        "corroborated",
+        "direct"
+      ],
+      "title": "EvidenceStrength",
+      "type": "string"
+    },
+    "PacketValidationRef": {
+      "additionalProperties": false,
+      "properties": {
+        "receipt_ref": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Receipt Ref"
+        },
+        "status": {
+          "enum": [
+            "passed",
+            "failed",
+            "not_run",
+            "blocked"
+          ],
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "title": "PacketValidationRef",
+      "type": "object"
+    },
+    "Producer": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "version": {
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "version"
+      ],
+      "title": "Producer",
+      "type": "object"
+    },
+    "ProfileRef": {
+      "additionalProperties": false,
+      "properties": {
+        "hash": {
+          "title": "Hash",
+          "type": "string"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "version": {
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "hash"
+      ],
+      "title": "ProfileRef",
+      "type": "object"
+    },
+    "RepositoryModelPayload": {
+      "additionalProperties": false,
+      "properties": {
+        "artifacts": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ArtifactRecord"
+          },
+          "title": "Artifacts",
+          "type": "array"
+        },
+        "capabilities": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/CapabilityRecord"
+          },
+          "title": "Capabilities",
+          "type": "array"
+        },
+        "diagnostics": {
+          "default": [],
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Diagnostics",
+          "type": "array"
+        },
+        "evidence": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/EvidenceRecord"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "relationships": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/EdgeRecord"
+          },
+          "title": "Relationships",
+          "type": "array"
+        },
+        "repositories": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/RepositoryRecord"
+          },
+          "title": "Repositories",
+          "type": "array"
+        }
+      },
+      "title": "RepositoryModelPayload",
+      "type": "object"
+    },
+    "RepositoryRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "adr_refs": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Adr Refs",
+          "type": "array"
+        },
+        "artifact_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Artifact Ids",
+          "type": "array"
+        },
+        "capability_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Capability Ids",
+          "type": "array"
+        },
+        "confidence": {
+          "$ref": "#/$defs/ConfidenceAssessment"
+        },
+        "downstream_repository_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Downstream Repository Ids",
+          "type": "array"
+        },
+        "entrypoints": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Entrypoints",
+          "type": "array"
+        },
+        "evidence_refs": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "governance_refs": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Governance Refs",
+          "type": "array"
+        },
+        "languages": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Languages",
+          "type": "array"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "owner_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Owner Ids",
+          "type": "array"
+        },
+        "package_managers": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Package Managers",
+          "type": "array"
+        },
+        "packet_ref": {
+          "title": "Packet Ref",
+          "type": "string"
+        },
+        "primary_role": {
+          "default": "unknown",
+          "title": "Primary Role",
+          "type": "string"
+        },
+        "repository_id": {
+          "title": "Repository Id",
+          "type": "string"
+        },
+        "secondary_roles": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Secondary Roles",
+          "type": "array"
+        },
+        "source_revision": {
+          "title": "Source Revision",
+          "type": "string"
+        },
+        "unresolved_dependencies": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Unresolved Dependencies",
+          "type": "array"
+        },
+        "upstream_repository_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Upstream Repository Ids",
+          "type": "array"
+        },
+        "workflows": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Workflows",
+          "type": "array"
+        }
+      },
+      "required": [
+        "repository_id",
+        "name",
+        "source_revision",
+        "packet_ref"
+      ],
+      "title": "RepositoryRecord",
+      "type": "object"
+    },
+    "RepositorySubject": {
+      "additionalProperties": false,
+      "properties": {
+        "repository_id": {
+          "title": "Repository Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "repository_id"
+      ],
+      "title": "RepositorySubject",
+      "type": "object"
+    },
+    "SourceSnapshot": {
+      "additionalProperties": false,
+      "properties": {
+        "revision": {
+          "title": "Revision",
+          "type": "string"
+        },
+        "semantic_hash": {
+          "title": "Semantic Hash",
+          "type": "string"
+        }
+      },
+      "required": [
+        "revision",
+        "semantic_hash"
+      ],
+      "title": "SourceSnapshot",
+      "type": "object"
+    }
+  },
+  "$id": "https://quantum-l9.dev/contracts/repository-model-packet.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "artifact_hash": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Artifact Hash"
+    },
+    "packet_id": {
+      "title": "Packet Id",
+      "type": "string"
+    },
+    "packet_type": {
+      "const": "l9.repository-model",
+      "default": "l9.repository-model",
+      "title": "Packet Type",
+      "type": "string"
+    },
+    "packet_version": {
+      "title": "Packet Version",
+      "type": "string"
+    },
+    "payload": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/RepositoryModelPayload"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "payload_refs": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Payload Refs",
+      "type": "object"
+    },
+    "producer": {
+      "$ref": "#/$defs/Producer"
+    },
+    "profile": {
+      "$ref": "#/$defs/ProfileRef"
+    },
+    "schema_hash": {
+      "title": "Schema Hash",
+      "type": "string"
+    },
+    "semantic_hash": {
+      "title": "Semantic Hash",
+      "type": "string"
+    },
+    "source_snapshot": {
+      "$ref": "#/$defs/SourceSnapshot"
+    },
+    "subject": {
+      "$ref": "#/$defs/RepositorySubject"
+    },
+    "validation": {
+      "$ref": "#/$defs/PacketValidationRef"
+    }
+  },
+  "required": [
+    "packet_version",
+    "packet_id",
+    "subject",
+    "source_snapshot",
+    "validation",
+    "producer",
+    "profile",
+    "schema_hash",
+    "semantic_hash"
+  ],
+  "title": "RepositoryModelPacket",
+  "type": "object"
+}

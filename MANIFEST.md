@@ -1,0 +1,347 @@
+# Manifest
+
+## Purpose
+
+Complete final file inventory and responsibility map for the enriched v5 initial repository. Build products, caches, local environments, coverage files, nested archives, and Git metadata are excluded.
+
+## Inventory
+
+**Tracked delivery files:** 329
+
+- `.editorconfig` — editor encoding, indentation, and whitespace policy
+- `.env.example` — documented worker and control-plane environment variables
+- `.gitattributes` — Git text normalization and binary-file policy
+- `.github/ISSUE_TEMPLATE/architecture_change.yml` — structured GitHub issue intake contract
+- `.github/ISSUE_TEMPLATE/bug_report.yml` — structured GitHub issue intake contract
+- `.github/ISSUE_TEMPLATE/config.yml` — structured GitHub issue intake contract
+- `.github/PULL_REQUEST_TEMPLATE.md` — pull-request evidence and architecture checklist
+- `.github/workflows/l9-ingress.yml` — immutable-pinned GitHub Actions workflow
+- `.github/workflows/l9-manual-replay.yml` — immutable-pinned GitHub Actions workflow
+- `.github/workflows/l9-pr-validate.yml` — immutable-pinned GitHub Actions workflow
+- `.github/workflows/l9-stage-worker.yml` — immutable-pinned GitHub Actions workflow
+- `.gitignore` — generated, secret, cache, and build exclusions
+- `.l9/maturity-profile.yaml` — versioned compiler, policy, packet, output, or pipeline profile
+- `.l9/output-policy.yaml` — versioned compiler, policy, packet, output, or pipeline profile
+- `.l9/packet-profile.yaml` — versioned compiler, policy, packet, output, or pipeline profile
+- `.l9/pipeline.yaml` — versioned compiler, policy, packet, output, or pipeline profile
+- `.l9/report-profile.yaml` — versioned compiler, policy, packet, output, or pipeline profile
+- `.l9/risk-profile.yaml` — versioned compiler, policy, packet, output, or pipeline profile
+- `.l9/topology-profile.yaml` — versioned compiler, policy, packet, output, or pipeline profile
+- `.python-version` — canonical Python runtime declaration
+- `ADR_INDEX.md` — accepted architecture decision index
+- `AGENTS.md` — agent operating constraints and architecture law
+- `ALIGNMENT_AUDIT.md` — architecture and repository alignment evidence
+- `ARCHITECTURE.md` — root architecture authority and system map
+- `BUILD_SPECIFICATION.md` — complete source-aligned v5 build specification
+- `CHANGELOG.md` — versioned repository change history
+- `CHANGE_SUMMARY.md` — current enrichment and hardening change summary
+- `CODE_OF_CONDUCT.md` — contributor conduct and enforcement policy
+- `CONTRIBUTING.md` — contribution workflow and validation expectations
+- `CONVERGENCE_REPORT.yaml` — convergence state and stop-condition evidence
+- `DEPENDENCY_POLICY.md` — runtime, development, action, and service dependency policy
+- `DEVELOPMENT.md` — developer environment, layout, and command guide
+- `FINAL_TREE.md` — deterministic final repository tree
+- `FIX_MAP.md` — confirmed finding to fix and validation mapping
+- `GOVERNANCE.md` — authority, approval, ADR, branch, and release governance
+- `INITIAL_COMMIT.md` — clean initial-commit and push handoff
+- `LICENSE` — proprietary repository license terms
+- `MAINTAINERS.md` — maintainer roles and ownership responsibilities
+- `MANIFEST.md` — complete delivery inventory and responsibility map
+- `Makefile` — canonical local validation and build command surface
+- `NOTICE.md` — third-party and generated-artifact notice
+- `README.md` — repository overview and operator entrypoint
+- `REGRESSION_GUARD.md` — preserved capabilities and no-regression gates
+- `RELEASING.md` — versioning, validation, build, and release procedure
+- `ROADMAP.md` — evidence-gated integration and deployment roadmap
+- `RUNBOOK.md` — operator execution, validation, and recovery procedures
+- `SECURITY.md` — security reporting and implementation controls
+- `SPECIFICATION.md` — concise governing specification summary
+- `STUB_TODO_THIN_FILE_AUDIT.md` — no-incomplete-implementation audit evidence
+- `SUPPORT.md` — support intake and ownership boundaries
+- `THREAT_MODEL.md` — assets, trust boundaries, threats, controls, and residual risks
+- `TRACEABILITY_MAP.yaml` — source-to-gap-to-fix-to-validation traceability
+- `UNKNOWN_REGISTER.md` — explicit unresolved external decisions and validation gaps
+- `VALIDATION.md` — baseline and final validation record
+- `config/repo_sources.yaml` — legacy compatibility or renderer/scanner configuration
+- `config/report_profiles.yaml` — legacy compatibility or renderer/scanner configuration
+- `config/scanner_rules.yaml` — legacy compatibility or renderer/scanner configuration
+- `config/topology_roles.yaml` — legacy compatibility or renderer/scanner configuration
+- `contracts/commit-receipt.schema.json` — control-plane or packet JSON Schema contract
+- `contracts/execution-failure.schema.json` — control-plane or packet JSON Schema contract
+- `contracts/github-ingress.schema.json` — control-plane or packet JSON Schema contract
+- `contracts/packet-bundle-manifest.schema.json` — control-plane or packet JSON Schema contract
+- `contracts/render-request.schema.json` — control-plane or packet JSON Schema contract
+- `contracts/render-result.schema.json` — control-plane or packet JSON Schema contract
+- `contracts/replay-request.schema.json` — control-plane or packet JSON Schema contract
+- `contracts/report-manifest.schema.json` — control-plane or packet JSON Schema contract
+- `contracts/repository-model-packet.schema.json` — control-plane or packet JSON Schema contract
+- `contracts/stage-dispatch.schema.json` — control-plane or packet JSON Schema contract
+- `contracts/stage-result.schema.json` — control-plane or packet JSON Schema contract
+- `contracts/topology-packet.schema.json` — control-plane or packet JSON Schema contract
+- `contracts/transport-packet.schema.json` — control-plane or packet JSON Schema contract
+- `contracts/validation-receipt.schema.json` — control-plane or packet JSON Schema contract
+- `contracts/validation-request.schema.json` — control-plane or packet JSON Schema contract
+- `docs/acceptance-matrix.md` — architecture, contract, deployment, recovery, or model documentation
+- `docs/adr/0001-packet-native-middle-end-compiler-boundary.md` — accepted architecture decision record
+- `docs/adr/0002-transportpacket-is-the-only-control-plane-envelope.md` — accepted architecture decision record
+- `docs/adr/0003-repository-model-packets-are-canonical-inputs.md` — accepted architecture decision record
+- `docs/adr/0004-topology-packet-is-the-canonical-output.md` — accepted architecture decision record
+- `docs/adr/0005-validation-receipts-remain-separate-and-immutable.md` — accepted architecture decision record
+- `docs/adr/0006-use-a-run-scoped-signal-plane.md` — accepted architecture decision record
+- `docs/adr/0007-outputsink-is-the-only-write-boundary.md` — accepted architecture decision record
+- `docs/adr/0008-separate-semantic-hashes-from-artifact-hashes.md` — accepted architecture decision record
+- `docs/adr/0009-preserve-evidence-authority-conflicts-and-unknowns.md` — accepted architecture decision record
+- `docs/adr/0010-use-decomposed-confidence-assessment.md` — accepted architecture decision record
+- `docs/adr/0011-permit-only-bounded-read-only-fallback-observation.md` — accepted architecture decision record
+- `docs/adr/0012-use-stable-repository-and-entity-identity.md` — accepted architecture decision record
+- `docs/adr/0013-keep-graph-construction-pure-and-edge-taxonomy-versioned.md` — accepted architecture decision record
+- `docs/adr/0014-drive-maturity-and-risk-from-versioned-profiles.md` — accepted architecture decision record
+- `docs/adr/0015-treat-reports-as-lazy-projections.md` — accepted architecture decision record
+- `docs/adr/0016-use-postgres-model-b-orchestration-with-github-actions-workers.md` — accepted architecture decision record
+- `docs/adr/0017-require-signed-exact-revision-worker-execution.md` — accepted architecture decision record
+- `docs/adr/0018-use-immutable-oci-packet-storage-and-an-external-registry.md` — accepted architecture decision record
+- `docs/adr/0019-use-idempotency-reuse-replay-and-reconciliation.md` — accepted architecture decision record
+- `docs/adr/0020-delegate-publication-planning-to-the-ingestion-bridge.md` — accepted architecture decision record
+- `docs/adr/README.md` — ADR directory governance and navigation
+- `docs/architecture.md` — architecture, contract, deployment, recovery, or model documentation
+- `docs/archive/v4/01_SPEC_ATTACK.md` — superseded v4 historical artifact retained for migration evidence
+- `docs/archive/v4/02_IMPLEMENTATION_CONTRACT.md` — superseded v4 historical artifact retained for migration evidence
+- `docs/archive/v4/03_DEPENDENCY_DAG.md` — superseded v4 historical artifact retained for migration evidence
+- `docs/archive/v4/07_VALIDATION_REPORT.md` — superseded v4 historical artifact retained for migration evidence
+- `docs/archive/v4/08_EXECUTION_CHECKLIST_REPORT.md` — superseded v4 historical artifact retained for migration evidence
+- `docs/archive/v4/MANIFEST.md` — superseded v4 historical artifact retained for migration evidence
+- `docs/archive/v4/README.md` — superseded v4 historical artifact retained for migration evidence
+- `docs/archive/v4/architecture.md` — superseded v4 historical artifact retained for migration evidence
+- `docs/archive/v4/machine-summary.json` — superseded v4 historical artifact retained for migration evidence
+- `docs/deployment.md` — architecture, contract, deployment, recovery, or model documentation
+- `docs/evidence-model.md` — architecture, contract, deployment, recovery, or model documentation
+- `docs/migration-v4-to-v5.md` — architecture, contract, deployment, recovery, or model documentation
+- `docs/output-sink.md` — architecture, contract, deployment, recovery, or model documentation
+- `docs/packet-contracts.md` — architecture, contract, deployment, recovery, or model documentation
+- `docs/recovery.md` — architecture, contract, deployment, recovery, or model documentation
+- `docs/report-lifecycle.md` — architecture, contract, deployment, recovery, or model documentation
+- `docs/topology-model.md` — architecture, contract, deployment, recovery, or model documentation
+- `docs/worker-contract.md` — architecture, contract, deployment, recovery, or model documentation
+- `outputs/.gitkeep` — tracked output-directory marker only
+- `pyproject.toml` — Python package metadata, entrypoints, and quality configuration
+- `schemas/artifact-record.schema.json` — canonical or compatibility domain JSON Schema
+- `schemas/capability-record.schema.json` — canonical or compatibility domain JSON Schema
+- `schemas/edge-record.schema.json` — canonical or compatibility domain JSON Schema
+- `schemas/edge_card.schema.json` — canonical or compatibility domain JSON Schema
+- `schemas/evidence-record.schema.json` — canonical or compatibility domain JSON Schema
+- `schemas/flow-record.schema.json` — canonical or compatibility domain JSON Schema
+- `schemas/flow_card.schema.json` — canonical or compatibility domain JSON Schema
+- `schemas/graph-record.schema.json` — canonical or compatibility domain JSON Schema
+- `schemas/graph_record.schema.json` — canonical or compatibility domain JSON Schema
+- `schemas/maturity-assessment.schema.json` — canonical or compatibility domain JSON Schema
+- `schemas/repo_card.schema.json` — canonical or compatibility domain JSON Schema
+- `schemas/repository-record.schema.json` — canonical or compatibility domain JSON Schema
+- `schemas/risk-record.schema.json` — canonical or compatibility domain JSON Schema
+- `schemas/risk_register.schema.json` — canonical or compatibility domain JSON Schema
+- `schemas/topology_report.schema.json` — canonical or compatibility domain JSON Schema
+- `scripts/architecture_boundary_check.py` — operator, build, generation, or validation command
+- `scripts/build_control_packet.py` — operator, build, generation, or validation command
+- `scripts/compile_topology_packet.py` — operator, build, generation, or validation command
+- `scripts/generate_fixture_packets.py` — operator, build, generation, or validation command
+- `scripts/generate_schemas.py` — operator, build, generation, or validation command
+- `scripts/render_topology_reports.py` — operator, build, generation, or validation command
+- `scripts/validate_contracts.py` — operator, build, generation, or validation command
+- `scripts/validate_nuclear_execution.py` — operator, build, generation, or validation command
+- `scripts/validate_release_readiness.py` — operator, build, generation, or validation command
+- `scripts/validate_workflows.py` — operator, build, generation, or validation command
+- `scripts/verify_determinism.py` — operator, build, generation, or validation command
+- `src/l9_constellation_topology/__init__.py` — production Python package implementation
+- `src/l9_constellation_topology/cli.py` — production Python package implementation
+- `src/l9_constellation_topology/compatibility/__init__.py` — production Python package implementation
+- `src/l9_constellation_topology/compatibility/repo_card_adapter.py` — production Python package implementation
+- `src/l9_constellation_topology/compatibility/v4_models.py` — production Python package implementation
+- `src/l9_constellation_topology/compiler.py` — production Python package implementation
+- `src/l9_constellation_topology/config.py` — production Python package implementation
+- `src/l9_constellation_topology/domain/__init__.py` — production Python package implementation
+- `src/l9_constellation_topology/domain/artifact.py` — production Python package implementation
+- `src/l9_constellation_topology/domain/assessment.py` — production Python package implementation
+- `src/l9_constellation_topology/domain/base.py` — production Python package implementation
+- `src/l9_constellation_topology/domain/capability.py` — production Python package implementation
+- `src/l9_constellation_topology/domain/confidence.py` — production Python package implementation
+- `src/l9_constellation_topology/domain/edge.py` — production Python package implementation
+- `src/l9_constellation_topology/domain/flow.py` — production Python package implementation
+- `src/l9_constellation_topology/domain/repository.py` — production Python package implementation
+- `src/l9_constellation_topology/domain/topology.py` — production Python package implementation
+- `src/l9_constellation_topology/evidence.py` — production Python package implementation
+- `src/l9_constellation_topology/io/__init__.py` — production Python package implementation
+- `src/l9_constellation_topology/io/composite_output_sink.py` — production Python package implementation
+- `src/l9_constellation_topology/io/filesystem_output_sink.py` — production Python package implementation
+- `src/l9_constellation_topology/io/memory_output_sink.py` — production Python package implementation
+- `src/l9_constellation_topology/io/output_sink.py` — production Python package implementation
+- `src/l9_constellation_topology/io/packet_bundle_output_sink.py` — production Python package implementation
+- `src/l9_constellation_topology/io/rendered_artifact.py` — production Python package implementation
+- `src/l9_constellation_topology/io/write_intent.py` — production Python package implementation
+- `src/l9_constellation_topology/io/write_plan.py` — production Python package implementation
+- `src/l9_constellation_topology/io/write_policy.py` — production Python package implementation
+- `src/l9_constellation_topology/models.py` — production Python package implementation
+- `src/l9_constellation_topology/packets/__init__.py` — production Python package implementation
+- `src/l9_constellation_topology/packets/adapters/__init__.py` — production Python package implementation
+- `src/l9_constellation_topology/packets/adapters/repository_model_v1.py` — production Python package implementation
+- `src/l9_constellation_topology/packets/bundle.py` — production Python package implementation
+- `src/l9_constellation_topology/packets/common.py` — production Python package implementation
+- `src/l9_constellation_topology/packets/control.py` — production Python package implementation
+- `src/l9_constellation_topology/packets/loader.py` — production Python package implementation
+- `src/l9_constellation_topology/packets/payloads.py` — production Python package implementation
+- `src/l9_constellation_topology/packets/refs.py` — production Python package implementation
+- `src/l9_constellation_topology/packets/report_manifest.py` — production Python package implementation
+- `src/l9_constellation_topology/packets/repository_bundle.py` — production Python package implementation
+- `src/l9_constellation_topology/packets/repository_model.py` — production Python package implementation
+- `src/l9_constellation_topology/packets/stage_result.py` — production Python package implementation
+- `src/l9_constellation_topology/packets/topology_packet.py` — production Python package implementation
+- `src/l9_constellation_topology/packets/transport.py` — production Python package implementation
+- `src/l9_constellation_topology/packets/validation_receipt.py` — production Python package implementation
+- `src/l9_constellation_topology/packets/validator.py` — production Python package implementation
+- `src/l9_constellation_topology/py.typed` — production Python package implementation
+- `src/l9_constellation_topology/renderers/__init__.py` — production Python package implementation
+- `src/l9_constellation_topology/renderers/common.py` — production Python package implementation
+- `src/l9_constellation_topology/renderers/csv_export.py` — production Python package implementation
+- `src/l9_constellation_topology/renderers/json_export.py` — production Python package implementation
+- `src/l9_constellation_topology/renderers/markdown_report.py` — production Python package implementation
+- `src/l9_constellation_topology/renderers/mermaid_export.py` — production Python package implementation
+- `src/l9_constellation_topology/renderers/report_renderer.py` — production Python package implementation
+- `src/l9_constellation_topology/renderers/risk_report.py` — production Python package implementation
+- `src/l9_constellation_topology/run/__init__.py` — production Python package implementation
+- `src/l9_constellation_topology/run/context.py` — production Python package implementation
+- `src/l9_constellation_topology/run/diagnostics.py` — production Python package implementation
+- `src/l9_constellation_topology/run/evidence.py` — production Python package implementation
+- `src/l9_constellation_topology/run/receipts.py` — production Python package implementation
+- `src/l9_constellation_topology/scanners/__init__.py` — production Python package implementation
+- `src/l9_constellation_topology/scanners/adr_scanner.py` — production Python package implementation
+- `src/l9_constellation_topology/scanners/ci_scanner.py` — production Python package implementation
+- `src/l9_constellation_topology/scanners/dependency_scanner.py` — production Python package implementation
+- `src/l9_constellation_topology/scanners/governance_scanner.py` — production Python package implementation
+- `src/l9_constellation_topology/scanners/graphiti_scanner.py` — production Python package implementation
+- `src/l9_constellation_topology/scanners/manifest_scanner.py` — production Python package implementation
+- `src/l9_constellation_topology/scanners/repo_scanner.py` — production Python package implementation
+- `src/l9_constellation_topology/scanners/repository_model_scanner.py` — production Python package implementation
+- `src/l9_constellation_topology/sources/__init__.py` — production Python package implementation
+- `src/l9_constellation_topology/sources/filesystem_reader.py` — production Python package implementation
+- `src/l9_constellation_topology/sources/reader.py` — production Python package implementation
+- `src/l9_constellation_topology/sources/repository_registry.py` — production Python package implementation
+- `src/l9_constellation_topology/sources/source_snapshot.py` — production Python package implementation
+- `src/l9_constellation_topology/stages/__init__.py` — production Python package implementation
+- `src/l9_constellation_topology/stages/aggregate_capabilities.py` — production Python package implementation
+- `src/l9_constellation_topology/stages/aggregate_repositories.py` — production Python package implementation
+- `src/l9_constellation_topology/stages/assess_impact.py` — production Python package implementation
+- `src/l9_constellation_topology/stages/assess_maturity.py` — production Python package implementation
+- `src/l9_constellation_topology/stages/assess_risk.py` — production Python package implementation
+- `src/l9_constellation_topology/stages/build_graph.py` — production Python package implementation
+- `src/l9_constellation_topology/stages/classify_roles.py` — production Python package implementation
+- `src/l9_constellation_topology/stages/ingest_packets.py` — production Python package implementation
+- `src/l9_constellation_topology/stages/normalize_models.py` — production Python package implementation
+- `src/l9_constellation_topology/stages/observe_fallbacks.py` — production Python package implementation
+- `src/l9_constellation_topology/stages/reconcile_evidence.py` — production Python package implementation
+- `src/l9_constellation_topology/stages/resolve_config.py` — production Python package implementation
+- `src/l9_constellation_topology/stages/validate_topology.py` — production Python package implementation
+- `src/l9_constellation_topology/topology/__init__.py` — production Python package implementation
+- `src/l9_constellation_topology/topology/capability_builder.py` — production Python package implementation
+- `src/l9_constellation_topology/topology/classifier.py` — production Python package implementation
+- `src/l9_constellation_topology/topology/flow_builder.py` — production Python package implementation
+- `src/l9_constellation_topology/topology/graph_builder.py` — production Python package implementation
+- `src/l9_constellation_topology/topology/impact.py` — production Python package implementation
+- `src/l9_constellation_topology/topology/maturity.py` — production Python package implementation
+- `src/l9_constellation_topology/topology/risk.py` — production Python package implementation
+- `src/l9_constellation_topology/validation/__init__.py` — production Python package implementation
+- `src/l9_constellation_topology/validation/invariant_validator.py` — production Python package implementation
+- `src/l9_constellation_topology/validation/schema_validator.py` — production Python package implementation
+- `src/l9_constellation_topology/validation/topology_validator.py` — production Python package implementation
+- `src/l9_constellation_topology/validation/validation_report.py` — production Python package implementation
+- `src/l9_constellation_topology/worker/__init__.py` — production Python package implementation
+- `src/l9_constellation_topology/worker/callback.py` — production Python package implementation
+- `src/l9_constellation_topology/worker/control_packet.py` — production Python package implementation
+- `src/l9_constellation_topology/worker/errors.py` — production Python package implementation
+- `src/l9_constellation_topology/worker/failure.py` — production Python package implementation
+- `src/l9_constellation_topology/worker/packet_store.py` — production Python package implementation
+- `src/l9_constellation_topology/worker/registry.py` — production Python package implementation
+- `src/l9_constellation_topology/worker/signature.py` — production Python package implementation
+- `src/l9_constellation_topology/worker/stage_runner.py` — production Python package implementation
+- `src/l9_constellation_topology/worker/transport_factory.py` — production Python package implementation
+- `tests/__init__.py` — unit, contract, integration, regression, or governance test
+- `tests/fixtures/legacy_v4_outputs/07_VALIDATION_REPORT.md` — deterministic packet, source, or regression fixture
+- `tests/fixtures/legacy_v4_outputs/architecture_diagrams.mmd` — deterministic packet, source, or regression fixture
+- `tests/fixtures/legacy_v4_outputs/dependency_graph.json` — deterministic packet, source, or regression fixture
+- `tests/fixtures/legacy_v4_outputs/edge_cards.yaml` — deterministic packet, source, or regression fixture
+- `tests/fixtures/legacy_v4_outputs/evidence_hashes.json` — deterministic packet, source, or regression fixture
+- `tests/fixtures/legacy_v4_outputs/flow_cards.yaml` — deterministic packet, source, or regression fixture
+- `tests/fixtures/legacy_v4_outputs/graph_records.jsonl` — deterministic packet, source, or regression fixture
+- `tests/fixtures/legacy_v4_outputs/maturity_scorecard.csv` — deterministic packet, source, or regression fixture
+- `tests/fixtures/legacy_v4_outputs/neo4j_import.jsonl` — deterministic packet, source, or regression fixture
+- `tests/fixtures/legacy_v4_outputs/repo_inventory.yaml` — deterministic packet, source, or regression fixture
+- `tests/fixtures/legacy_v4_outputs/report.md` — deterministic packet, source, or regression fixture
+- `tests/fixtures/legacy_v4_outputs/risk_register.md` — deterministic packet, source, or regression fixture
+- `tests/fixtures/legacy_v4_outputs/topology_report.json` — deterministic packet, source, or regression fixture
+- `tests/fixtures/legacy_v4_outputs/topology_report.md` — deterministic packet, source, or regression fixture
+- `tests/fixtures/repository_model_packets/l9-gate-sdk/manifest.json` — deterministic packet, source, or regression fixture
+- `tests/fixtures/repository_model_packets/l9-gate-sdk/packet.json` — deterministic packet, source, or regression fixture
+- `tests/fixtures/repository_model_packets/l9-gate-sdk/receipts/validation-receipt.json` — deterministic packet, source, or regression fixture
+- `tests/fixtures/repository_model_packets/l9-mcp-server/manifest.json` — deterministic packet, source, or regression fixture
+- `tests/fixtures/repository_model_packets/l9-mcp-server/packet.json` — deterministic packet, source, or regression fixture
+- `tests/fixtures/repository_model_packets/l9-mcp-server/receipts/validation-receipt.json` — deterministic packet, source, or regression fixture
+- `tests/fixtures/sample_constellation/l9-gate-sdk/.github/CODEOWNERS` — deterministic packet, source, or regression fixture
+- `tests/fixtures/sample_constellation/l9-gate-sdk/.github/workflows/ci.yml` — deterministic packet, source, or regression fixture
+- `tests/fixtures/sample_constellation/l9-gate-sdk/README.md` — deterministic packet, source, or regression fixture
+- `tests/fixtures/sample_constellation/l9-gate-sdk/docs/adr/adr-001-transport-protocol.md` — deterministic packet, source, or regression fixture
+- `tests/fixtures/sample_constellation/l9-gate-sdk/pyproject.toml` — deterministic packet, source, or regression fixture
+- `tests/fixtures/sample_constellation/l9-gate-sdk/src/l9_gate_sdk/__init__.py` — deterministic packet, source, or regression fixture
+- `tests/fixtures/sample_constellation/l9-mcp-server/.github/workflows/deploy.yml` — deterministic packet, source, or regression fixture
+- `tests/fixtures/sample_constellation/l9-mcp-server/README.md` — deterministic packet, source, or regression fixture
+- `tests/fixtures/sample_constellation/l9-mcp-server/pyproject.toml` — deterministic packet, source, or regression fixture
+- `tests/fixtures/sample_constellation/l9-mcp-server/src/l9_mcp_server/__init__.py` — deterministic packet, source, or regression fixture
+- `tests/fixtures/topology_packets/foundational-two-repo/manifest.json` — deterministic packet, source, or regression fixture
+- `tests/fixtures/topology_packets/foundational-two-repo/packet.json` — deterministic packet, source, or regression fixture
+- `tests/fixtures/topology_packets/foundational-two-repo/payload/artifact-records.json` — deterministic packet, source, or regression fixture
+- `tests/fixtures/topology_packets/foundational-two-repo/payload/capability-records.json` — deterministic packet, source, or regression fixture
+- `tests/fixtures/topology_packets/foundational-two-repo/payload/conflicts.json` — deterministic packet, source, or regression fixture
+- `tests/fixtures/topology_packets/foundational-two-repo/payload/edge-records.json` — deterministic packet, source, or regression fixture
+- `tests/fixtures/topology_packets/foundational-two-repo/payload/evidence.json` — deterministic packet, source, or regression fixture
+- `tests/fixtures/topology_packets/foundational-two-repo/payload/flow-records.json` — deterministic packet, source, or regression fixture
+- `tests/fixtures/topology_packets/foundational-two-repo/payload/graph-records.json` — deterministic packet, source, or regression fixture
+- `tests/fixtures/topology_packets/foundational-two-repo/payload/impact-indexes.json` — deterministic packet, source, or regression fixture
+- `tests/fixtures/topology_packets/foundational-two-repo/payload/maturity.json` — deterministic packet, source, or regression fixture
+- `tests/fixtures/topology_packets/foundational-two-repo/payload/repository-records.json` — deterministic packet, source, or regression fixture
+- `tests/fixtures/topology_packets/foundational-two-repo/payload/risks.json` — deterministic packet, source, or regression fixture
+- `tests/fixtures/topology_packets/foundational-two-repo/payload/unknowns.json` — deterministic packet, source, or regression fixture
+- `tests/fixtures/topology_packets/foundational-two-repo/receipts/validation-receipt.json` — deterministic packet, source, or regression fixture
+- `tests/test_architecture_boundary_v5.py` — unit, contract, integration, regression, or governance test
+- `tests/test_assessments_v5.py` — unit, contract, integration, regression, or governance test
+- `tests/test_cli_v5.py` — unit, contract, integration, regression, or governance test
+- `tests/test_dependency_scanner.py` — unit, contract, integration, regression, or governance test
+- `tests/test_direct_observation_adapter_v5.py` — unit, contract, integration, regression, or governance test
+- `tests/test_evidence_v5.py` — unit, contract, integration, regression, or governance test
+- `tests/test_graph_builder.py` — unit, contract, integration, regression, or governance test
+- `tests/test_impact.py` — unit, contract, integration, regression, or governance test
+- `tests/test_maturity.py` — unit, contract, integration, regression, or governance test
+- `tests/test_output_sink_v5.py` — unit, contract, integration, regression, or governance test
+- `tests/test_packet_ingress_v5.py` — unit, contract, integration, regression, or governance test
+- `tests/test_packet_models_v5.py` — unit, contract, integration, regression, or governance test
+- `tests/test_packet_store_v5.py` — unit, contract, integration, regression, or governance test
+- `tests/test_release_readiness.py` — unit, contract, integration, regression, or governance test
+- `tests/test_renderers.py` — unit, contract, integration, regression, or governance test
+- `tests/test_repo_scanner.py` — unit, contract, integration, regression, or governance test
+- `tests/test_report_projection_v5.py` — unit, contract, integration, regression, or governance test
+- `tests/test_repository_aggregation_v5.py` — unit, contract, integration, regression, or governance test
+- `tests/test_repository_governance.py` — unit, contract, integration, regression, or governance test
+- `tests/test_runtime_boundaries_v5.py` — unit, contract, integration, regression, or governance test
+- `tests/test_topology_compiler_v5.py` — unit, contract, integration, regression, or governance test
+- `tests/test_topology_graph_v5.py` — unit, contract, integration, regression, or governance test
+- `tests/test_transport_signature_v5.py` — unit, contract, integration, regression, or governance test
+- `tests/test_validation.py` — unit, contract, integration, regression, or governance test
+- `tests/test_worker_v5.py` — unit, contract, integration, regression, or governance test
+- `tests/test_workflow_contracts_v5.py` — unit, contract, integration, regression, or governance test
+- `uv.lock` — frozen Python dependency resolution
+- `validation/validation_checks.jsonl` — captured validation evidence or structured check output
+- `validation/validation_findings.jsonl` — captured validation evidence or structured check output
+- `validation/validation_report.yaml` — captured validation evidence or structured check output
+
+## Packaging invariants
+
+- One top-level directory: `l9-constellation-topology/`.
+- No Git metadata, caches, local environments, build products, secrets, or nested archives.
+- `BUILD_SPECIFICATION.md` preserves the full source-aligned build authority.
+- `ADR_INDEX.md` indexes 20 accepted initial ADRs.
+- `FINAL_TREE.md` and this manifest are generated from the packaged file set.

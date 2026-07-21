@@ -1,0 +1,58 @@
+{
+  "$id": "https://quantum-l9.dev/schemas/maturity-assessment.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "band": {
+      "title": "Band",
+      "type": "string"
+    },
+    "dimensions": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Dimensions",
+      "type": "object"
+    },
+    "evidence_refs": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Evidence Refs",
+      "type": "array"
+    },
+    "maximum_score": {
+      "exclusiveMinimum": 0,
+      "title": "Maximum Score",
+      "type": "integer"
+    },
+    "profile_id": {
+      "title": "Profile Id",
+      "type": "string"
+    },
+    "profile_version": {
+      "title": "Profile Version",
+      "type": "string"
+    },
+    "score": {
+      "minimum": 0,
+      "title": "Score",
+      "type": "integer"
+    },
+    "subject_id": {
+      "title": "Subject Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "subject_id",
+    "profile_id",
+    "profile_version",
+    "score",
+    "maximum_score",
+    "band"
+  ],
+  "title": "MaturityAssessment",
+  "type": "object"
+}

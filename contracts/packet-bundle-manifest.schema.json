@@ -1,0 +1,86 @@
+{
+  "$defs": {
+    "PacketFileEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "content_hash": {
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "media_type": {
+          "title": "Media Type",
+          "type": "string"
+        },
+        "path": {
+          "title": "Path",
+          "type": "string"
+        },
+        "size_bytes": {
+          "minimum": 0,
+          "title": "Size Bytes",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "path",
+        "media_type",
+        "content_hash",
+        "size_bytes"
+      ],
+      "title": "PacketFileEntry",
+      "type": "object"
+    }
+  },
+  "$id": "https://quantum-l9.dev/contracts/packet-bundle-manifest.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "artifact_hash": {
+      "title": "Artifact Hash",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "files": {
+      "items": {
+        "$ref": "#/$defs/PacketFileEntry"
+      },
+      "title": "Files",
+      "type": "array"
+    },
+    "manifest_version": {
+      "default": "1.0.0",
+      "title": "Manifest Version",
+      "type": "string"
+    },
+    "packet_id": {
+      "title": "Packet Id",
+      "type": "string"
+    },
+    "packet_type": {
+      "title": "Packet Type",
+      "type": "string"
+    },
+    "packet_version": {
+      "title": "Packet Version",
+      "type": "string"
+    },
+    "semantic_hash": {
+      "title": "Semantic Hash",
+      "type": "string"
+    }
+  },
+  "required": [
+    "packet_id",
+    "packet_type",
+    "packet_version",
+    "semantic_hash",
+    "artifact_hash",
+    "files"
+  ],
+  "title": "PacketBundleManifest",
+  "type": "object"
+}

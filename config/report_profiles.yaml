@@ -1,0 +1,20 @@
+# Report rendering profiles.
+report_profiles:
+  default:
+    include_sections:
+      - repo_inventory
+      - dependency_graph
+      - risk_register
+      - maturity_scorecard
+      - graphiti_memory_topology
+      - unknowns
+    output_formats: ["markdown", "json", "csv", "mermaid"]
+  minimal:
+    include_sections:
+      - repo_inventory
+      - risk_register
+    output_formats: ["markdown"]
+  neo4j_export:
+    include_sections:
+      - graph_records
+    output_formats: ["jsonl"]

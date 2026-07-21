@@ -1,0 +1,57 @@
+{
+  "$defs": {
+    "ReplayRequestData": {
+      "additionalProperties": false,
+      "properties": {
+        "dry_run": {
+          "default": false,
+          "title": "Dry Run",
+          "type": "boolean"
+        },
+        "packet_id": {
+          "title": "Packet Id",
+          "type": "string"
+        },
+        "reason": {
+          "title": "Reason",
+          "type": "string"
+        },
+        "run_id": {
+          "title": "Run Id",
+          "type": "string"
+        },
+        "stage_id": {
+          "title": "Stage Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "run_id",
+        "stage_id",
+        "packet_id",
+        "reason"
+      ],
+      "title": "ReplayRequestData",
+      "type": "object"
+    }
+  },
+  "$id": "https://quantum-l9.dev/contracts/replay-request.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "data": {
+      "$ref": "#/$defs/ReplayRequestData"
+    },
+    "payload_schema": {
+      "const": "l9.replay-request/1.0.0",
+      "default": "l9.replay-request/1.0.0",
+      "title": "Payload Schema",
+      "type": "string"
+    }
+  },
+  "required": [
+    "data"
+  ],
+  "title": "ReplayRequestPayload",
+  "type": "object"
+}

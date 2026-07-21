@@ -1,0 +1,266 @@
+{
+  "$defs": {
+    "Authority": {
+      "enum": [
+        "source",
+        "validated-machine",
+        "derived",
+        "candidate",
+        "unknown"
+      ],
+      "title": "Authority",
+      "type": "string"
+    },
+    "Completeness": {
+      "enum": [
+        "partial",
+        "sufficient",
+        "complete"
+      ],
+      "title": "Completeness",
+      "type": "string"
+    },
+    "ConfidenceAssessment": {
+      "additionalProperties": false,
+      "properties": {
+        "authority": {
+          "$ref": "#/$defs/Authority"
+        },
+        "completeness": {
+          "$ref": "#/$defs/Completeness"
+        },
+        "conflict_status": {
+          "$ref": "#/$defs/ConflictStatus",
+          "default": "none"
+        },
+        "derivation_method": {
+          "$ref": "#/$defs/DerivationMethod"
+        },
+        "evidence_strength": {
+          "$ref": "#/$defs/EvidenceStrength"
+        },
+        "level": {
+          "$ref": "#/$defs/ConfidenceLevel"
+        }
+      },
+      "required": [
+        "level",
+        "evidence_strength",
+        "derivation_method",
+        "authority",
+        "completeness"
+      ],
+      "title": "ConfidenceAssessment",
+      "type": "object"
+    },
+    "ConfidenceLevel": {
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "title": "ConfidenceLevel",
+      "type": "string"
+    },
+    "ConflictStatus": {
+      "enum": [
+        "none",
+        "possible",
+        "confirmed"
+      ],
+      "title": "ConflictStatus",
+      "type": "string"
+    },
+    "DerivationMethod": {
+      "enum": [
+        "declared",
+        "deterministic",
+        "cross-record",
+        "heuristic",
+        "model-assisted",
+        "unknown"
+      ],
+      "title": "DerivationMethod",
+      "type": "string"
+    },
+    "EvidenceSourceRef": {
+      "additionalProperties": false,
+      "properties": {
+        "content_hash": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Content Hash"
+        },
+        "line_number": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Line Number"
+        },
+        "packet_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Packet Id"
+        },
+        "source_path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Path"
+        },
+        "source_revision": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Revision"
+        },
+        "uri": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Uri"
+        }
+      },
+      "title": "EvidenceSourceRef",
+      "type": "object"
+    },
+    "EvidenceStrength": {
+      "enum": [
+        "none",
+        "weak",
+        "corroborated",
+        "direct"
+      ],
+      "title": "EvidenceStrength",
+      "type": "string"
+    }
+  },
+  "$id": "https://quantum-l9.dev/schemas/evidence-record.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "confidence": {
+      "$ref": "#/$defs/ConfidenceAssessment"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "evidence_class": {
+      "enum": [
+        "observed",
+        "declared",
+        "derived",
+        "assisted",
+        "projected",
+        "validated",
+        "committed"
+      ],
+      "title": "Evidence Class",
+      "type": "string"
+    },
+    "evidence_id": {
+      "title": "Evidence Id",
+      "type": "string"
+    },
+    "field": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Field"
+    },
+    "producer": {
+      "title": "Producer",
+      "type": "string"
+    },
+    "producer_version": {
+      "title": "Producer Version",
+      "type": "string"
+    },
+    "source_ref": {
+      "$ref": "#/$defs/EvidenceSourceRef"
+    },
+    "source_type": {
+      "enum": [
+        "file",
+        "packet",
+        "inference",
+        "validation",
+        "unknown"
+      ],
+      "title": "Source Type",
+      "type": "string"
+    },
+    "stage": {
+      "title": "Stage",
+      "type": "string"
+    },
+    "subject_id": {
+      "title": "Subject Id",
+      "type": "string"
+    },
+    "value": {
+      "title": "Value"
+    }
+  },
+  "required": [
+    "evidence_id",
+    "subject_id",
+    "stage",
+    "evidence_class",
+    "source_type",
+    "source_ref",
+    "value",
+    "confidence",
+    "producer",
+    "producer_version"
+  ],
+  "title": "EvidenceRecord",
+  "type": "object"
+}

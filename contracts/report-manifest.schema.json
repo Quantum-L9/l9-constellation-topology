@@ -1,0 +1,114 @@
+{
+  "$defs": {
+    "Producer": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "version": {
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "version"
+      ],
+      "title": "Producer",
+      "type": "object"
+    },
+    "ReportRef": {
+      "additionalProperties": false,
+      "properties": {
+        "content_hash": {
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "media_type": {
+          "title": "Media Type",
+          "type": "string"
+        },
+        "report_type": {
+          "title": "Report Type",
+          "type": "string"
+        },
+        "uri": {
+          "title": "Uri",
+          "type": "string"
+        }
+      },
+      "required": [
+        "report_type",
+        "uri",
+        "content_hash",
+        "media_type"
+      ],
+      "title": "ReportRef",
+      "type": "object"
+    }
+  },
+  "$id": "https://quantum-l9.dev/contracts/report-manifest.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "cache_key": {
+      "title": "Cache Key",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "packet_type": {
+      "const": "l9.report-manifest",
+      "default": "l9.report-manifest",
+      "title": "Packet Type",
+      "type": "string"
+    },
+    "packet_version": {
+      "default": "1.0.0",
+      "title": "Packet Version",
+      "type": "string"
+    },
+    "renderer": {
+      "$ref": "#/$defs/Producer"
+    },
+    "report_profile_hash": {
+      "title": "Report Profile Hash",
+      "type": "string"
+    },
+    "reports": {
+      "items": {
+        "$ref": "#/$defs/ReportRef"
+      },
+      "title": "Reports",
+      "type": "array"
+    },
+    "semantic_hash": {
+      "title": "Semantic Hash",
+      "type": "string"
+    },
+    "source_packet_id": {
+      "title": "Source Packet Id",
+      "type": "string"
+    },
+    "source_semantic_hash": {
+      "title": "Source Semantic Hash",
+      "type": "string"
+    }
+  },
+  "required": [
+    "source_packet_id",
+    "source_semantic_hash",
+    "renderer",
+    "report_profile_hash",
+    "cache_key",
+    "reports",
+    "semantic_hash"
+  ],
+  "title": "ReportManifest",
+  "type": "object"
+}

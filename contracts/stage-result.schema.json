@@ -1,0 +1,140 @@
+{
+  "$defs": {
+    "PacketRef": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_hash": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Artifact Hash"
+        },
+        "packet_id": {
+          "title": "Packet Id",
+          "type": "string"
+        },
+        "packet_type": {
+          "title": "Packet Type",
+          "type": "string"
+        },
+        "packet_version": {
+          "title": "Packet Version",
+          "type": "string"
+        },
+        "semantic_hash": {
+          "title": "Semantic Hash",
+          "type": "string"
+        },
+        "source_revision": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Revision"
+        },
+        "subject_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Subject Id"
+        },
+        "uri": {
+          "title": "Uri",
+          "type": "string"
+        },
+        "validation_status": {
+          "enum": [
+            "passed",
+            "failed",
+            "not_run",
+            "blocked"
+          ],
+          "title": "Validation Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "packet_id",
+        "packet_type",
+        "packet_version",
+        "uri",
+        "semantic_hash",
+        "validation_status"
+      ],
+      "title": "PacketRef",
+      "type": "object"
+    }
+  },
+  "$id": "https://quantum-l9.dev/contracts/stage-result.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "commit_receipt_uri": {
+      "title": "Commit Receipt Uri",
+      "type": "string"
+    },
+    "completed_at": {
+      "format": "date-time",
+      "title": "Completed At",
+      "type": "string"
+    },
+    "idempotency_key": {
+      "title": "Idempotency Key",
+      "type": "string"
+    },
+    "output_packet": {
+      "$ref": "#/$defs/PacketRef"
+    },
+    "payload_schema": {
+      "const": "l9.stage-result/1.0.0",
+      "default": "l9.stage-result/1.0.0",
+      "title": "Payload Schema",
+      "type": "string"
+    },
+    "run_id": {
+      "title": "Run Id",
+      "type": "string"
+    },
+    "stage_id": {
+      "title": "Stage Id",
+      "type": "string"
+    },
+    "status": {
+      "const": "succeeded",
+      "default": "succeeded",
+      "title": "Status",
+      "type": "string"
+    },
+    "validation_receipt_uri": {
+      "title": "Validation Receipt Uri",
+      "type": "string"
+    }
+  },
+  "required": [
+    "run_id",
+    "stage_id",
+    "output_packet",
+    "validation_receipt_uri",
+    "commit_receipt_uri",
+    "idempotency_key"
+  ],
+  "title": "StageResult",
+  "type": "object"
+}

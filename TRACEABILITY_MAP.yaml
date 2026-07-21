@@ -1,0 +1,75 @@
+schema: l9.traceability-map/v1
+artifact: l9-constellation-topology
+release: 2.0.0-initial-commit
+changes:
+  - id: TRACE-001
+    source: src/l9_constellation_topology/scanners/dependency_scanner.py
+    defect: malformed package.json was silently ignored
+    fix: reject invalid JSON, non-object roots, and non-object dependency sections
+    validation:
+      - tests/test_release_readiness.py::test_dependency_scanner_rejects_malformed_package_json
+      - tests/test_release_readiness.py::test_dependency_scanner_rejects_non_object_dependency_section
+  - id: TRACE-002
+    source: src/l9_constellation_topology/io/output_sink.py
+    defect: protocol methods used ellipsis-only bodies
+    fix: explicit fail-closed structural-contract bodies
+    validation:
+      - scripts/validate_release_readiness.py
+      - tests/test_release_readiness.py::test_release_readiness_has_no_blocking_findings
+  - id: TRACE-003
+    source: src/l9_constellation_topology/sources/reader.py
+    defect: protocol methods used ellipsis-only bodies
+    fix: explicit fail-closed structural-contract bodies
+    validation:
+      - scripts/validate_release_readiness.py
+  - id: TRACE-004
+    source: src/l9_constellation_topology/packets/loader.py
+    defect: exception class used a pass-only body
+    fix: explicit exception responsibility docstring
+    validation:
+      - scripts/validate_release_readiness.py
+  - id: TRACE-005
+    source: .github/workflows/l9-pr-validate.yml
+    defect: pull-request validation omitted release-readiness enforcement
+    fix: execute the hardening gate in CI
+    validation:
+      - scripts/validate_workflows.py
+  - id: TRACE-006
+    source: repository root
+    defect: required handoff and evidence artifacts were absent
+    fix: add manifest, final tree, validation, Unknown, regression, audit, fix, and convergence artifacts
+    validation:
+      - scripts/validate_release_readiness.py
+  - id: ENRICH-001
+    source: user_request.initial_commit_enrichment
+    gap: missing_complete_root_governance_and_decision_memory
+    fixes:
+      - ARCHITECTURE.md
+      - BUILD_SPECIFICATION.md
+      - GOVERNANCE.md
+      - MAINTAINERS.md
+      - CODE_OF_CONDUCT.md
+      - SUPPORT.md
+      - ROADMAP.md
+      - RELEASING.md
+      - DEVELOPMENT.md
+      - THREAT_MODEL.md
+      - DEPENDENCY_POLICY.md
+      - LICENSE
+      - NOTICE.md
+      - INITIAL_COMMIT.md
+      - ADR_INDEX.md
+      - docs/adr/
+    validation:
+      - tests/test_repository_governance.py
+      - scripts/validate_release_readiness.py
+    status: implemented
+  - id: ENRICH-002
+    source: docs/archive/v4/
+    gap: archived documentation contained broken repository-local links
+    fixes:
+      - docs/archive/v4/README.md
+      - docs/archive/v4/architecture.md
+    validation:
+      - repository-wide internal Markdown link check
+    status: implemented

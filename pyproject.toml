@@ -1,0 +1,88 @@
+[build-system]
+requires = ["setuptools>=75", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "l9-constellation-topology"
+version = "2.0.0"
+description = "Packet-native, evidence-backed repository and constellation topology compiler for L9."
+readme = "README.md"
+requires-python = ">=3.12"
+license = "LicenseRef-Proprietary"
+license-files = ["LICENSE"]
+authors = [{name = "Quantum L9"}]
+classifiers = [
+    "Private :: Do Not Upload",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Typing :: Typed",
+]
+dependencies = [
+    "pydantic>=2.12,<3",
+    "PyYAML>=6.0,<7",
+    "jsonschema>=4.23,<5",
+]
+
+[project.urls]
+Repository = "https://github.com/Quantum-L9/l9-constellation-topology"
+Documentation = "https://github.com/Quantum-L9/l9-constellation-topology/tree/main/docs"
+Issues = "https://github.com/Quantum-L9/l9-constellation-topology/issues"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3,<10",
+    "pytest-cov>=6,<8",
+    "ruff>=0.12,<1",
+    "mypy>=1.15,<2",
+    "build>=1.2,<2",
+    "types-PyYAML>=6.0.12,<7",
+]
+
+[project.scripts]
+l9-topology = "l9_constellation_topology.cli:main"
+l9-topology-worker = "l9_constellation_topology.worker.stage_runner:main"
+l9-topology-control-packet = "l9_constellation_topology.worker.control_packet:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+l9_constellation_topology = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --strict-markers --strict-config"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM", "RUF"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+packages = ["l9_constellation_topology"]
+mypy_path = "src"
+warn_unused_ignores = true
+
+[tool.coverage.run]
+branch = true
+source = ["l9_constellation_topology"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+fail_under = 80
+
+[tool.ruff.lint.per-file-ignores]
+"tests/test_dependency_scanner.py" = ["E402"]
+"tests/test_graph_builder.py" = ["E402"]
+"tests/test_impact.py" = ["E402"]
+"tests/test_maturity.py" = ["E402"]
+"tests/test_renderers.py" = ["E402"]
+"tests/test_repo_scanner.py" = ["E402"]
+"tests/test_validation.py" = ["E402"]

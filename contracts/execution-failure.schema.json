@@ -1,0 +1,64 @@
+{
+  "$id": "https://quantum-l9.dev/contracts/execution-failure.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "error_class": {
+      "title": "Error Class",
+      "type": "string"
+    },
+    "failed_at": {
+      "format": "date-time",
+      "title": "Failed At",
+      "type": "string"
+    },
+    "input_packet_ids": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Input Packet Ids",
+      "type": "array"
+    },
+    "message": {
+      "title": "Message",
+      "type": "string"
+    },
+    "payload_schema": {
+      "const": "l9.execution-failure/1.0.0",
+      "default": "l9.execution-failure/1.0.0",
+      "title": "Payload Schema",
+      "type": "string"
+    },
+    "retryable": {
+      "title": "Retryable",
+      "type": "boolean"
+    },
+    "run_id": {
+      "title": "Run Id",
+      "type": "string"
+    },
+    "stage_id": {
+      "title": "Stage Id",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "failed",
+        "blocked"
+      ],
+      "title": "Status",
+      "type": "string"
+    }
+  },
+  "required": [
+    "run_id",
+    "stage_id",
+    "status",
+    "error_class",
+    "message",
+    "retryable"
+  ],
+  "title": "ExecutionFailure",
+  "type": "object"
+}

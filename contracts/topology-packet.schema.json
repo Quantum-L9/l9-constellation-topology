@@ -1,0 +1,297 @@
+{
+  "$defs": {
+    "PacketLineage": {
+      "additionalProperties": false,
+      "properties": {
+        "generation": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Generation",
+          "type": "integer"
+        },
+        "parent_packet_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Parent Packet Ids",
+          "type": "array"
+        },
+        "root_packet_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Root Packet Id"
+        }
+      },
+      "title": "PacketLineage",
+      "type": "object"
+    },
+    "PacketRef": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_hash": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Artifact Hash"
+        },
+        "packet_id": {
+          "title": "Packet Id",
+          "type": "string"
+        },
+        "packet_type": {
+          "title": "Packet Type",
+          "type": "string"
+        },
+        "packet_version": {
+          "title": "Packet Version",
+          "type": "string"
+        },
+        "semantic_hash": {
+          "title": "Semantic Hash",
+          "type": "string"
+        },
+        "source_revision": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Revision"
+        },
+        "subject_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Subject Id"
+        },
+        "uri": {
+          "title": "Uri",
+          "type": "string"
+        },
+        "validation_status": {
+          "enum": [
+            "passed",
+            "failed",
+            "not_run",
+            "blocked"
+          ],
+          "title": "Validation Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "packet_id",
+        "packet_type",
+        "packet_version",
+        "uri",
+        "semantic_hash",
+        "validation_status"
+      ],
+      "title": "PacketRef",
+      "type": "object"
+    },
+    "PacketValidationRef": {
+      "additionalProperties": false,
+      "properties": {
+        "receipt_ref": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Receipt Ref"
+        },
+        "status": {
+          "enum": [
+            "passed",
+            "failed",
+            "not_run",
+            "blocked"
+          ],
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "title": "PacketValidationRef",
+      "type": "object"
+    },
+    "Producer": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "version": {
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "version"
+      ],
+      "title": "Producer",
+      "type": "object"
+    },
+    "ProfileRef": {
+      "additionalProperties": false,
+      "properties": {
+        "hash": {
+          "title": "Hash",
+          "type": "string"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "version": {
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "hash"
+      ],
+      "title": "ProfileRef",
+      "type": "object"
+    },
+    "TopologyInputs": {
+      "additionalProperties": false,
+      "properties": {
+        "repository_model_packets": {
+          "items": {
+            "$ref": "#/$defs/PacketRef"
+          },
+          "title": "Repository Model Packets",
+          "type": "array"
+        }
+      },
+      "required": [
+        "repository_model_packets"
+      ],
+      "title": "TopologyInputs",
+      "type": "object"
+    }
+  },
+  "$id": "https://quantum-l9.dev/contracts/topology-packet.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "artifact_hash": {
+      "title": "Artifact Hash",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "inputs": {
+      "$ref": "#/$defs/TopologyInputs"
+    },
+    "lineage": {
+      "$ref": "#/$defs/PacketLineage"
+    },
+    "packet_id": {
+      "title": "Packet Id",
+      "type": "string"
+    },
+    "packet_type": {
+      "const": "l9.topology",
+      "default": "l9.topology",
+      "title": "Packet Type",
+      "type": "string"
+    },
+    "packet_version": {
+      "default": "1.0.0",
+      "title": "Packet Version",
+      "type": "string"
+    },
+    "payload_hashes": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Payload Hashes",
+      "type": "object"
+    },
+    "payload_refs": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Payload Refs",
+      "type": "object"
+    },
+    "policy_hashes": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Policy Hashes",
+      "type": "object"
+    },
+    "producer": {
+      "$ref": "#/$defs/Producer"
+    },
+    "profile": {
+      "$ref": "#/$defs/ProfileRef"
+    },
+    "schema_hash": {
+      "title": "Schema Hash",
+      "type": "string"
+    },
+    "semantic_hash": {
+      "title": "Semantic Hash",
+      "type": "string"
+    },
+    "validation": {
+      "$ref": "#/$defs/PacketValidationRef"
+    }
+  },
+  "required": [
+    "packet_id",
+    "producer",
+    "profile",
+    "inputs",
+    "schema_hash",
+    "payload_refs",
+    "payload_hashes",
+    "validation",
+    "semantic_hash",
+    "artifact_hash"
+  ],
+  "title": "TopologyPacket",
+  "type": "object"
+}
