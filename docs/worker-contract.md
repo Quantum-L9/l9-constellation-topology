@@ -80,7 +80,7 @@ The callback body is another signed `TransportPacket`, not a naked JSON result. 
 - `l9.reuse-receipt/1.0.0`;
 - `l9.execution-failure/1.0.0`.
 
-The callback payload contains only `callback_id`. `.l9/callback-policy.yaml` maps that identifier to worker-local URL and credential environment variables. The client rejects redirects, enforces scheme and path policy, resolves the host before connection, blocks unsafe address classes, and uses TLS for production destinations. Raw credentials and destination URLs are never selected by the packet.
+The callback payload contains only `callback_id`. `.l9/callback-policy.yaml` maps that identifier to worker-local URL and credential variables. The client requires an enabled entry, exact expected host and optional port, segment-bound path matching, rejection of encoded slash and backslash ambiguity, redirect rejection, DNS inspection, unsafe-address blocking, and TLS for production destinations. The checked-in production entry is disabled until an approved hostname is committed. Raw credentials and destination URLs are never selected by the packet.
 
 A callback HTTP 2xx response is the control-plane acknowledgement boundary. Production control-plane implementation must atomically register the packet and commit the stage result before returning success.
 
@@ -114,4 +114,4 @@ The final signing custody platform remains an external deployment decision. The 
 
 ## Digest-bound publication and reuse
 
-Production OCI output and input references must be digest-qualified. After publication, the worker reloads the bundle and compares packet ID, type, version, semantic hash, artifact hash, validation-receipt subject, bundle-manifest digest, and registry manifest digest with the expected publication. A valid but different packet is rejected.
+Production OCI input and authoritative output references must be digest-qualified. Publication uses a semantic-hash-derived staging tag, then discards tag authority in favor of the returned digest. The worker independently fetches the registry descriptor by digest, reloads the bundle, and compares packet ID, type, version, semantic hash, artifact hash, validation-receipt subject, bundle-manifest digest, and registry manifest digest with the expected publication. A valid but different packet is rejected.

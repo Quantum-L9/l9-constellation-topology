@@ -165,15 +165,18 @@ Run after staging every intended file, including dot-directories:
 
 ```bash
 git add -A
+PYTHONPATH=src python scripts/git_tree_manifest.py
+git add GIT_TREE_MANIFEST.json
+git commit -m "your bounded change"
 PYTHONPATH=src python scripts/validate_git_integrity.py
 ```
 
-The check fails when the Git worktree is dirty or when `MANIFEST.md` differs from `git ls-tree HEAD`. CI emits the exact commit SHA, tree SHA, and manifest digest as a workflow artifact.
+`MANIFEST.md` is the human responsibility inventory. `GIT_TREE_MANIFEST.json` records every other tracked entry's Git mode, object type, and blob ID. The check fails when either inventory differs from `git ls-tree HEAD`, any recorded blob identity changes, or the worktree is dirty. CI emits the exact commit SHA, tree SHA, and both manifest digests.
 
 ## Callback policy
 
-Dispatch packets use an approved `callback_id`. Configure destinations and credentials only through the environment variables referenced by `.l9/callback-policy.yaml`. Never add packet-selected URLs or secret variable names.
+Dispatch packets use an approved `callback_id`. Configure destinations and credentials only through variables referenced by `.l9/callback-policy.yaml`. Production entries must bind exact hosts and ports, use segment-bound path prefixes, and reject encoded slash or backslash ambiguity. The checked-in production entry is disabled until an approved hostname is committed. Never add packet-selected URLs or secret variable names.
 
 ## Publication verification
 
-Production OCI references must contain `@sha256:<digest>`. Reuse and fresh publication both verify the retrieved bundle against the exact expected packet and manifest identities.
+Production OCI publication uses a semantic-hash-derived staging tag and accepts only the returned `@sha256:<digest>` reference. Verification independently resolves the registry descriptor, then checks the retrieved bundle against the exact expected packet and manifest identities.

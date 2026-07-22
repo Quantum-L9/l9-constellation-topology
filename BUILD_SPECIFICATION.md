@@ -425,11 +425,11 @@ Manual replay is authorized by the control plane and preserves lineage.
 
 ### 24.1 Callback trust boundary
 
-The dispatch packet carries only an approved callback ID. Worker-local policy resolves the destination and dedicated credential, rejects redirects, enforces path and scheme rules, and blocks unsafe DNS results. Packet content cannot select an environment-variable name or arbitrary destination.
+The dispatch packet carries only an approved callback ID. Worker-local policy resolves the destination and dedicated credential, requires an enabled entry with exact host and optional port constraints, uses segment-bound path matching, rejects encoded slash and backslash ambiguity and redirects, and blocks unsafe DNS results. Packet content cannot select an environment-variable name or arbitrary destination.
 
 ### 24.2 Immutable publication verification
 
-Production OCI references are digest-qualified. Publication and reuse re-fetch the bundle and compare it against the expected PacketRef, validation subject, bundle-manifest digest, and registry manifest digest. A different but internally valid packet is rejected.
+Production OCI authority is digest-qualified. Publication uses a semantic-hash-derived staging tag, records only the returned digest-qualified reference, independently resolves the registry descriptor, and re-fetches the bundle. Publication and reuse compare the result against the expected PacketRef, validation subject, bundle-manifest digest, and registry manifest digest. A different but internally valid packet is rejected.
 6. Build the exact-revision environment from its lockfile.
 7. Revalidate and execute.
 

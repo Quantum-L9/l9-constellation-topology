@@ -1,14 +1,23 @@
 id: foundational-callback-policy
-version: 1.0.0
+version: 1.1.0
 callbacks:
   topology-control-plane:
+    enabled: false
     url_env: L9_CONTROL_API_URL
     credential_env: L9_CALLBACK_TOKEN
     credential_required: true
-    allowed_path_prefix: /
+    expected_hosts: []
+    expected_port: 443
+    allowed_path_prefix: /api/results
     allow_loopback: false
   local-integration-test:
+    enabled: true
     url_env: L9_TEST_CALLBACK_URL
     credential_required: false
+    expected_hosts:
+      - 127.0.0.1
+      - localhost
+      - ::1
+    expected_port: null
     allowed_path_prefix: /callback
     allow_loopback: true

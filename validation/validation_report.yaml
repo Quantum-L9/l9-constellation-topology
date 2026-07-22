@@ -1,26 +1,31 @@
 schema: l9.validation-report/v1
 artifact: l9-constellation-topology
 version: 2.0.0
-status: approved_remediation_candidate_with_external_gates
-prior_validation_status: superseded_due_to_unbound_git_tree
-validated_delivery_files: 335
+status: approved_pr1_review_fix_candidate_with_external_gates
+prior_validation_status: superseded_by_architect_review_fix
+validated_delivery_files: 338
 local_environment:
   python: 3.13.5
   canonical_python: 3.12
 checks:
   passed:
     - compileall
-    - pytest_97_tests
-    - branch_coverage_81_66_percent
+    - pytest_112_tests
+    - branch_coverage_81_62_percent
     - contracts_and_schemas_31
     - workflows_4
     - architecture_boundaries_111_files_zero_findings
-    - release_readiness_335_files_zero_findings
+    - release_readiness_338_files_zero_findings
+    - callback_segment_boundary_and_encoded_separator_tests
+    - callback_expected_host_port_and_disabled_profile_tests
+    - git_blob_manifest_mutation_tests
+    - unique_oci_staging_and_registry_descriptor_tests
     - deterministic_semantic_hash_b3c3194984b8b2a8d2e14cfe4830436cc5f5cb01e97dbde4b43918c226317101
     - frozen_lock_offline_python_3_13
     - package_wheel_build
     - installed_entrypoint_smoke
   blocked:
+    - exact_pr_commit_git_integrity_report_pending_commit
     - canonical_python_3_12_local_run
     - ruff_offline_environment_materialization
     - mypy_offline_environment_materialization
@@ -28,18 +33,19 @@ checks:
     - live_digest_qualified_oci_publication
     - live_postgres_reconciliation
     - real_three_repository_packet_chain
-confirmed_audit_findings:
+architect_review_findings:
   fixed:
-    - delivery_integrity
-    - complete_idempotency_fingerprint
-    - callback_trust_boundary
-    - exact_publication_identity_binding
-    - diagnostics_conservation
-    - atomic_bundle_visibility
-    - transactional_local_registry
-    - validation_layer_precision
+    - callback_path_prefix_boundary_bypass
+    - path_only_manifest_content_integrity_gap
+  additional_hardening:
+    - explicit_callback_host_and_port_policy
+    - production_callback_disabled_until_host_approval
+    - semantic_hash_derived_oci_staging_tag
+    - independent_registry_descriptor_resolution
+original_remediation_findings:
+  regression_status: passed
 critical_findings_remaining: 0
 major_findings_remaining: 0
-pull_request_gate: passed_locally
+pull_request_gate: passed_locally_pending_exact_commit_ci
 production_deployment_gate: external_validation_required
-commit_bound_evidence: generated_by_scripts_validate_git_integrity_in_ci
+commit_bound_evidence: generated_after_commit_and_in_ci_by_scripts_validate_git_integrity

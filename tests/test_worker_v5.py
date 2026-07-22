@@ -33,7 +33,12 @@ from l9_constellation_topology.worker import (
     validate_stage_dispatch,
     verify_transport_packet,
 )
-from l9_constellation_topology.worker.callback import send_callback
+from l9_constellation_topology.worker.callback import (
+    ResolvedCallback,
+    _validate_endpoint,
+    path_is_allowed,
+    send_callback,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 INPUTS = (
@@ -278,6 +283,76 @@ def test_callback_id_must_exist_in_local_policy() -> None:
     with pytest.raises(WorkerError, match="callback-id-forbidden"):
         send_callback(
             CallbackRef(callback_id="not-allowlisted"),
+            {"status": "test"},
+            callback_policy=resolve_configuration(ROOT).callback_policy,
+            attempts=1,
+        )
+
+
+@pytest.mark.parametrize(
+    ("path", "expected"),
+    [
+        ("/api/results", True),
+        ("/api/results/run-123", True),
+        ("/api/results/", True),
+        ("/api/results-evil", False),
+        ("/api/result", False),
+        ("/api/results%2fevil", False),
+        ("/api/results%2Fevil", False),
+        ("/api/results%5cevil", False),
+        ("/api/results%5Cevil", False),
+    ],
+)
+def test_callback_path_policy_uses_segment_boundaries(path: str, expected: bool) -> None:
+    assert path_is_allowed(path, "/api/results") is expected
+
+
+def test_callback_endpoint_rejects_encoded_separator_before_request() -> None:
+    endpoint = ResolvedCallback(
+        callback_id="test",
+        url="https://control.example/api/results%2fevil",
+        token=None,
+        allow_loopback=False,
+        allowed_path_prefix="/api/results",
+        expected_hosts=("control.example",),
+        expected_port=443,
+    )
+    with pytest.raises(WorkerError, match="callback-path-forbidden"):
+        _validate_endpoint(endpoint)
+
+
+def test_callback_endpoint_enforces_expected_host_and_port() -> None:
+    wrong_host = ResolvedCallback(
+        callback_id="test",
+        url="https://other.example/api/results",
+        token=None,
+        allow_loopback=False,
+        allowed_path_prefix="/api/results",
+        expected_hosts=("control.example",),
+        expected_port=443,
+    )
+    with pytest.raises(WorkerError, match="callback-host-forbidden"):
+        _validate_endpoint(wrong_host)
+
+    wrong_port = ResolvedCallback(
+        callback_id="test",
+        url="https://control.example:8443/api/results",
+        token=None,
+        allow_loopback=False,
+        allowed_path_prefix="/api/results",
+        expected_hosts=("control.example",),
+        expected_port=443,
+    )
+    with pytest.raises(WorkerError, match="callback-port-forbidden"):
+        _validate_endpoint(wrong_port)
+
+
+def test_disabled_production_callback_fails_closed(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("L9_CONTROL_API_URL", "https://control.example/api/results")
+    monkeypatch.setenv("L9_CALLBACK_TOKEN", "test-token")
+    with pytest.raises(WorkerError, match="callback-id-disabled"):
+        send_callback(
+            CallbackRef(callback_id="topology-control-plane"),
             {"status": "test"},
             callback_policy=resolve_configuration(ROOT).callback_policy,
             attempts=1,

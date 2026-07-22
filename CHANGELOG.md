@@ -10,6 +10,9 @@
 - Made packet-bundle publication atomic at directory scope and replaced the local JSON recovery index with transactional SQLite WAL storage.
 - Separated runtime-model construction checks from independent checked-in JSON Schema validation in Validation Receipts.
 - Added adversarial regression tests for policy mutation, callback trust, packet substitution, diagnostics conservation, bundle atomicity, registry concurrency, and Git-tree evidence drift.
+- Enforced callback path segment boundaries, rejected encoded slash and backslash ambiguity, and added explicit host and port policy.
+- Added `GIT_TREE_MANIFEST.json`, which binds every tracked entry except itself to its Git mode, object type, and blob ID.
+- Published OCI bundles through semantic-hash-derived staging tags and independently resolved the immutable registry descriptor before accepting publication.
 
 ## Unreleased - initial repository enrichment
 

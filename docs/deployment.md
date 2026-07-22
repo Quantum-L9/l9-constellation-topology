@@ -58,7 +58,9 @@ For GHCR-compatible storage, dispatch `output_uri` must be an immutable `oci://g
 
 - commits the complete bundle locally;
 - includes packet, payloads, validation receipt, manifest, and commit receipt;
-- pushes through ORAS;
+- pushes through a semantic-hash-derived unique staging tag;
+- records the returned digest-qualified reference as the sole authority;
+- independently fetches the registry descriptor by digest;
 - pulls the artifact into a clean verification directory;
 - reloads and validates the published packet before callback success.
 
@@ -71,7 +73,7 @@ Production activation requires all of the following:
 - dispatch and result keys are in an external secret store;
 - the control API enforces atomic packet registration and stage completion;
 - GHCR package permissions are restricted to required repositories;
-- callback endpoints require HTTPS and authenticated bearer tokens;
+- callback policy is enabled only after exact expected hosts, port, and segment-bound path are committed; endpoints require HTTPS and dedicated authentication;
 - a real `l9-meta-injector` packet passes through the compiler;
 - `l9-topology-ingestion-bridge` consumes the resulting packet without report-file dependencies;
 - retry, dropped-callback reconciliation, dead-letter, and manual replay drills are executed.

@@ -423,7 +423,7 @@ def _execute_validated_stage(
         subject_id="constellation:foundational-repository-intelligence",
         source_revision=data.target_revision,
     )
-    packet_store.verify_published(
+    registry_descriptor_digest = packet_store.verify_published(
         published.uri,
         expected=output_packet,
         expected_bundle_manifest_digest=published.bundle_manifest_digest,
@@ -446,6 +446,16 @@ def _execute_validated_stage(
                 **(
                     {"registry_manifest_digest": published.registry_manifest_digest}
                     if published.registry_manifest_digest
+                    else {}
+                ),
+                **(
+                    {"registry_descriptor_digest": registry_descriptor_digest}
+                    if registry_descriptor_digest
+                    else {}
+                ),
+                **(
+                    {"publication_staging_uri": published.staging_uri}
+                    if published.staging_uri
                     else {}
                 ),
             },

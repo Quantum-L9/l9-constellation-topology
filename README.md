@@ -121,6 +121,7 @@ uv run python scripts/validate_contracts.py
 uv run python scripts/validate_workflows.py
 uv run python scripts/architecture_boundary_check.py
 uv run python scripts/validate_release_readiness.py
+uv run python scripts/validate_git_integrity.py
 uv run python scripts/verify_determinism.py
 uv build
 ```

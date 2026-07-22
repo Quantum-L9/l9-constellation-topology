@@ -73,10 +73,10 @@ l9-constellation-topology/
 │   │       ├── 03_DEPENDENCY_DAG.md
 │   │       ├── 07_VALIDATION_REPORT.md
 │   │       ├── 08_EXECUTION_CHECKLIST_REPORT.md
-│   │       ├── MANIFEST.md
-│   │       ├── README.md
 │   │       ├── architecture.md
-│   │       └── machine-summary.json
+│   │       ├── machine-summary.json
+│   │       ├── MANIFEST.md
+│   │       └── README.md
 │   ├── acceptance-matrix.md
 │   ├── architecture.md
 │   ├── deployment.md
@@ -113,6 +113,7 @@ l9-constellation-topology/
 │   ├── compile_topology_packet.py
 │   ├── generate_fixture_packets.py
 │   ├── generate_schemas.py
+│   ├── git_tree_manifest.py
 │   ├── render_topology_reports.py
 │   ├── validate_contracts.py
 │   ├── validate_git_integrity.py
@@ -287,8 +288,8 @@ l9-constellation-topology/
 │   │   │   │   ├── src
 │   │   │   │   │   └── l9_gate_sdk
 │   │   │   │   │       └── __init__.py
-│   │   │   │   ├── README.md
-│   │   │   │   └── pyproject.toml
+│   │   │   │   ├── pyproject.toml
+│   │   │   │   └── README.md
 │   │   │   └── l9-mcp-server
 │   │   │       ├── .github
 │   │   │       │   └── workflows
@@ -296,8 +297,8 @@ l9-constellation-topology/
 │   │   │       ├── src
 │   │   │       │   └── l9_mcp_server
 │   │   │       │       └── __init__.py
-│   │   │       ├── README.md
-│   │   │       └── pyproject.toml
+│   │   │       ├── pyproject.toml
+│   │   │       └── README.md
 │   │   └── topology_packets
 │   │       └── foundational-two-repo
 │   │           ├── payload
@@ -326,6 +327,7 @@ l9-constellation-topology/
 │   ├── test_dependency_scanner.py
 │   ├── test_direct_observation_adapter_v5.py
 │   ├── test_evidence_v5.py
+│   ├── test_git_integrity.py
 │   ├── test_graph_builder.py
 │   ├── test_impact.py
 │   ├── test_maturity.py
@@ -360,8 +362,8 @@ l9-constellation-topology/
 ├── ALIGNMENT_AUDIT.md
 ├── ARCHITECTURE.md
 ├── BUILD_SPECIFICATION.md
-├── CHANGELOG.md
 ├── CHANGE_SUMMARY.md
+├── CHANGELOG.md
 ├── CODE_OF_CONDUCT.md
 ├── CONTRIBUTING.md
 ├── CONVERGENCE_REPORT.yaml
@@ -369,13 +371,15 @@ l9-constellation-topology/
 ├── DEVELOPMENT.md
 ├── FINAL_TREE.md
 ├── FIX_MAP.md
+├── GIT_TREE_MANIFEST.json
 ├── GOVERNANCE.md
 ├── INITIAL_COMMIT.md
 ├── LICENSE
 ├── MAINTAINERS.md
-├── MANIFEST.md
 ├── Makefile
+├── MANIFEST.md
 ├── NOTICE.md
+├── pyproject.toml
 ├── README.md
 ├── REGRESSION_GUARD.md
 ├── RELEASING.md
@@ -388,7 +392,6 @@ l9-constellation-topology/
 ├── THREAT_MODEL.md
 ├── TRACEABILITY_MAP.yaml
 ├── UNKNOWN_REGISTER.md
-├── VALIDATION.md
-├── pyproject.toml
-└── uv.lock
+├── uv.lock
+└── VALIDATION.md
 ```

@@ -44,6 +44,9 @@ Status values: `PASS_LOCAL`, `CONTRACT_IMPLEMENTED`, `BLOCKED_EXTERNAL`, `NOT_RU
 | 38 | Valid legacy analytical behavior is preserved | donor regression tests | PASS_LOCAL |
 | 39 | Graph, risk, maturity, impact, and reports remain supported | regression and v5 tests | PASS_LOCAL |
 | 40 | Migration from v4 to v5 is documented | `docs/migration-v4-to-v5.md` | PASS_LOCAL |
+| 41 | Callback policy enforces exact host, port, and path-segment boundaries | adversarial callback tests | PASS_LOCAL |
+| 42 | Release evidence binds tracked modes and blob IDs to the exact commit | `GIT_TREE_MANIFEST.json` and Git-integrity tests | PASS_LOCAL |
+| 43 | OCI publication uses unique staging and independent descriptor verification | packet-store tests | PASS_LOCAL |
 
 ## Release interpretation
 

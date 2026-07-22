@@ -17,6 +17,8 @@ from l9_constellation_topology.run import canonical_bytes
 
 from .errors import WorkerError
 
+_ENCODED_PATH_SEPARATORS = ("%2f", "%5c")
+
 
 @dataclass(frozen=True)
 class ResolvedCallback:
@@ -25,6 +27,39 @@ class ResolvedCallback:
     token: str | None
     allow_loopback: bool
     allowed_path_prefix: str
+    expected_hosts: tuple[str, ...]
+    expected_port: int | None
+
+
+def _normalize_hostname(value: str) -> str:
+    candidate = value.strip().rstrip(".").lower()
+    try:
+        return ipaddress.ip_address(candidate).compressed
+    except ValueError:
+        return candidate
+
+
+def _contains_ambiguous_separator(value: str) -> bool:
+    lowered = value.lower()
+    return "\\" in value or any(token in lowered for token in _ENCODED_PATH_SEPARATORS)
+
+
+def path_is_allowed(path: str, prefix: str) -> bool:
+    """Return whether a raw URL path is within a normalized segment boundary."""
+
+    normalized_path = path or "/"
+    normalized_prefix = prefix.rstrip("/") or "/"
+    if not normalized_path.startswith("/") or not normalized_prefix.startswith("/"):
+        return False
+    if _contains_ambiguous_separator(normalized_path) or _contains_ambiguous_separator(
+        normalized_prefix
+    ):
+        return False
+    if normalized_prefix == "/":
+        return True
+    return normalized_path == normalized_prefix or normalized_path.startswith(
+        normalized_prefix + "/"
+    )
 
 
 def _callback_config(callback: CallbackRef, policy: dict[str, Any]) -> ResolvedCallback:
@@ -40,6 +75,12 @@ def _callback_config(callback: CallbackRef, policy: dict[str, Any]) -> ResolvedC
         raise WorkerError(
             "callback-id-forbidden",
             f"callback ID is not locally allowlisted: {callback.callback_id}",
+            blocked=True,
+        )
+    if not bool(raw.get("enabled", True)):
+        raise WorkerError(
+            "callback-id-disabled",
+            f"callback ID is disabled by local policy: {callback.callback_id}",
             blocked=True,
         )
     url_env = raw.get("url_env")
@@ -64,12 +105,54 @@ def _callback_config(callback: CallbackRef, policy: dict[str, Any]) -> ResolvedC
             f"local callback credential is not set for {callback.callback_id}",
             blocked=True,
         )
+
+    raw_hosts = raw.get("expected_hosts", ())
+    if not isinstance(raw_hosts, (list, tuple)) or not all(
+        isinstance(item, str) and item.strip() for item in raw_hosts
+    ):
+        raise WorkerError(
+            "callback-policy-invalid",
+            f"callback {callback.callback_id} expected_hosts must be a list of hostnames",
+            blocked=True,
+        )
+    expected_hosts = tuple(sorted({_normalize_hostname(item) for item in raw_hosts}))
+    allow_loopback = bool(raw.get("allow_loopback", False))
+    if not allow_loopback and not expected_hosts:
+        raise WorkerError(
+            "callback-policy-hosts-required",
+            f"callback {callback.callback_id} requires at least one expected host",
+            blocked=True,
+        )
+
+    raw_port = raw.get("expected_port")
+    expected_port: int | None
+    if raw_port is None:
+        expected_port = None
+    elif isinstance(raw_port, int) and 1 <= raw_port <= 65535:
+        expected_port = raw_port
+    else:
+        raise WorkerError(
+            "callback-policy-invalid",
+            f"callback {callback.callback_id} expected_port must be an integer from 1 to 65535",
+            blocked=True,
+        )
+
+    allowed_path_prefix = str(raw.get("allowed_path_prefix", "/"))
+    if not path_is_allowed(allowed_path_prefix, allowed_path_prefix):
+        raise WorkerError(
+            "callback-policy-invalid",
+            f"callback {callback.callback_id} has an invalid allowed_path_prefix",
+            blocked=True,
+        )
+
     return ResolvedCallback(
         callback_id=callback.callback_id,
         url=url,
         token=token,
-        allow_loopback=bool(raw.get("allow_loopback", False)),
-        allowed_path_prefix=str(raw.get("allowed_path_prefix", "/")),
+        allow_loopback=allow_loopback,
+        allowed_path_prefix=allowed_path_prefix.rstrip("/") or "/",
+        expected_hosts=expected_hosts,
+        expected_port=expected_port,
     )
 
 
@@ -127,18 +210,35 @@ def _validate_endpoint(endpoint: ResolvedCallback) -> tuple[object, tuple[str, .
     if parsed.scheme == "http" and not endpoint.allow_loopback:
         raise WorkerError(
             "callback-url-insecure",
-            "HTTP callbacks are permitted only for the local integration-test callback ID",
+            "HTTP callbacks are permitted only for a loopback-enabled callback ID",
             blocked=True,
         )
+
+    hostname = _normalize_hostname(parsed.hostname)
+    if endpoint.expected_hosts and hostname not in endpoint.expected_hosts:
+        raise WorkerError(
+            "callback-host-forbidden",
+            f"callback host is outside the local allowlist: {hostname}",
+            blocked=True,
+        )
+
+    port = parsed.port or (443 if parsed.scheme == "https" else 80)
+    if endpoint.expected_port is not None and port != endpoint.expected_port:
+        raise WorkerError(
+            "callback-port-forbidden",
+            f"callback port is outside the local allowlist: {port}",
+            blocked=True,
+        )
+
     path = parsed.path or "/"
-    if not path.startswith(endpoint.allowed_path_prefix):
+    if not path_is_allowed(path, endpoint.allowed_path_prefix):
         raise WorkerError(
             "callback-path-forbidden",
             f"callback path is outside the local allowlist: {path}",
             blocked=True,
         )
-    port = parsed.port or (443 if parsed.scheme == "https" else 80)
-    addresses = _safe_addresses(parsed.hostname, port, allow_loopback=endpoint.allow_loopback)
+
+    addresses = _safe_addresses(hostname, port, allow_loopback=endpoint.allow_loopback)
     request_target = path + (f"?{parsed.query}" if parsed.query else "")
     return parsed, addresses, port, request_target
 

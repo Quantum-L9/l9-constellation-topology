@@ -18,10 +18,10 @@ This hardening pass applies the repository's no-stub, gap-filling, no-regression
 
 ## Confirmed executive-audit remediation
 
-1. **Delivery integrity:** `.github` and `.l9` are part of the tracked repository surface. `scripts/validate_git_integrity.py` compares the committed Git tree with `MANIFEST.md` and records the exact commit and tree identities.
+1. **Delivery integrity:** `.github` and `.l9` are tracked. `MANIFEST.md` remains the human responsibility inventory, while `GIT_TREE_MANIFEST.json` records exact Git modes, object types, and blob IDs for every other tracked entry. `scripts/validate_git_integrity.py` compares both manifests with the exact commit and tree.
 2. **Semantic reuse:** idempotency now uses a complete compilation fingerprint, including aggregate configuration, schemas, active contract versions, adapter mode, exact compiler build identity, and sorted parent semantic hashes.
-3. **Callback trust:** dispatch packets carry only a callback ID. URLs, credentials, redirect policy, path policy, DNS resolution, and private-address restrictions are worker-local.
-4. **Immutable publication:** OCI references must be digest-qualified, and verification compares the fetched packet, validation subject, bundle manifest, and registry digest with the expected publication identity.
+3. **Callback trust:** dispatch packets carry only a callback ID. URLs, credentials, redirects, segment-bound path policy, encoded-separator rejection, expected hosts and ports, DNS resolution, and private-address restrictions are worker-local. The production callback entry is deny-all until an approved hostname is committed.
+4. **Immutable publication:** OCI publication uses a semantic-hash-derived staging tag, returns a digest-qualified reference, independently resolves the registry descriptor, and compares the fetched packet, validation subject, bundle manifest, and registry digest with the expected publication identity.
 5. **Diagnostic conservation:** upstream diagnostics are normalized into typed records and must be preserved or explicitly dispositioned.
 6. **Atomic persistence:** packet bundles become visible through one validated directory rename. Local recovery state uses SQLite WAL transactions instead of JSON read-modify-write.
 7. **Validation precision:** receipts distinguish runtime model construction from independent JSON Schema and semantic invariant checks.

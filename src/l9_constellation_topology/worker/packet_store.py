@@ -25,6 +25,7 @@ class PublishedPacket:
     uri: str
     bundle_manifest_digest: str
     registry_manifest_digest: str | None = None
+    staging_uri: str | None = None
 
 
 def file_uri_to_path(uri: str) -> Path:
@@ -59,6 +60,21 @@ def _oci_repository(reference: str) -> str:
     if colon > slash:
         value = value[:colon]
     return value
+
+
+
+def _publication_staging_target(output_uri: str, bundle_path: Path) -> str:
+    materialized, _ = load_topology_bundle(bundle_path)
+    semantic_digest = materialized.packet.semantic_hash.removeprefix("sha256:")
+    if len(semantic_digest) != 64 or any(
+        character not in "0123456789abcdef" for character in semantic_digest
+    ):
+        raise WorkerError(
+            "packet-semantic-hash-invalid",
+            "Topology Packet semantic hash cannot form an OCI staging tag",
+            blocked=True,
+        )
+    return f"{_oci_repository(output_uri)}:packet-{semantic_digest}"
 
 
 def _extract_digest(value: object) -> str | None:
@@ -186,7 +202,10 @@ class PacketStoreClient:
             mismatches.append("packet_version")
         if reference.artifact_hash is not None and packet.artifact_hash != reference.artifact_hash:
             mismatches.append("artifact_hash")
-        if reference.subject_id is not None and packet.subject.repository_id != reference.subject_id:
+        if (
+            reference.subject_id is not None
+            and packet.subject.repository_id != reference.subject_id
+        ):
             mismatches.append("subject_id")
         if packet.source_snapshot.revision != reference.source_revision:
             mismatches.append("source_revision")
@@ -227,7 +246,7 @@ class PacketStoreClient:
             for path in sorted(bundle_path.rglob("*"))
             if path.is_file()
         )
-        target = output_uri.removeprefix("oci://")
+        target = _publication_staging_target(output_uri, bundle_path)
         command = [
             self._oras(),
             "push",
@@ -272,7 +291,47 @@ class PacketStoreClient:
             uri=immutable_uri,
             bundle_manifest_digest=bundle_manifest_digest,
             registry_manifest_digest=registry_digest,
+            staging_uri=f"oci://{target}",
         )
+
+    def _fetch_registry_descriptor_digest(self, output_uri: str) -> str:
+        completed = subprocess.run(
+            [
+                self._oras(),
+                "manifest",
+                "fetch",
+                "--descriptor",
+                "--format",
+                "json",
+                output_uri.removeprefix("oci://"),
+            ],
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=self.timeout_seconds,
+        )
+        if completed.returncode != 0:
+            raise WorkerError(
+                "packet-verification-descriptor-failed",
+                completed.stderr.strip() or completed.stdout.strip(),
+                retryable=True,
+            )
+        try:
+            descriptor = json.loads(completed.stdout or "{}")
+        except json.JSONDecodeError as exc:
+            raise WorkerError(
+                "packet-verification-descriptor-invalid",
+                "registry descriptor response is not valid JSON",
+                blocked=True,
+            ) from exc
+        digest = _extract_digest(descriptor)
+        if digest is None:
+            raise WorkerError(
+                "packet-verification-descriptor-invalid",
+                "registry descriptor response lacks a sha256 digest",
+                blocked=True,
+            )
+        return digest
 
     def verify_published(
         self,
@@ -282,7 +341,7 @@ class PacketStoreClient:
         expected_bundle_manifest_digest: str,
         expected_registry_manifest_digest: str | None,
         workspace: Path,
-    ) -> None:
+    ) -> str | None:
         parsed = urlparse(output_uri)
         if parsed.scheme in {"", "file"}:
             _assert_expected_topology(
@@ -290,7 +349,7 @@ class PacketStoreClient:
                 expected=expected,
                 expected_bundle_manifest_digest=expected_bundle_manifest_digest,
             )
-            return
+            return None
         if parsed.scheme != "oci":
             raise WorkerError(
                 "packet-uri-unsupported",
@@ -304,10 +363,20 @@ class PacketStoreClient:
                 blocked=True,
             )
         uri_digest = output_uri.rsplit("@", 1)[1]
-        if expected_registry_manifest_digest is None or uri_digest != expected_registry_manifest_digest:
+        if (
+            expected_registry_manifest_digest is None
+            or uri_digest != expected_registry_manifest_digest
+        ):
             raise WorkerError(
                 "registry-manifest-digest-mismatch",
                 "published OCI URI digest does not match registry evidence",
+                blocked=True,
+            )
+        descriptor_digest = self._fetch_registry_descriptor_digest(output_uri)
+        if descriptor_digest != uri_digest:
+            raise WorkerError(
+                "registry-descriptor-digest-mismatch",
+                "independently resolved registry descriptor does not match the immutable URI",
                 blocked=True,
             )
         workspace.mkdir(parents=True, exist_ok=True)
@@ -338,3 +407,4 @@ class PacketStoreClient:
             expected=expected,
             expected_bundle_manifest_digest=expected_bundle_manifest_digest,
         )
+        return descriptor_digest

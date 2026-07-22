@@ -21,10 +21,10 @@
 
 | Priority | Confirmed finding | Owner | Applied fix | Regression evidence |
 |---:|---|---|---|---|
-| P0 | Validated package and committed tree diverged | Git workflows, `.l9`, manifest validation | Restore hidden repository surfaces; validate `git ls-tree` against the manifest; emit commit/tree-bound evidence | `scripts/validate_git_integrity.py`, workflow contract tests |
+| P0 | Validated package and committed tree diverged | Git workflows, `.l9`, manifest validation | Restore hidden surfaces; bind every tracked entry to path, mode, object type, and blob ID in `GIT_TREE_MANIFEST.json`; emit commit/tree-bound evidence | Git-integrity tests and CI gate |
 | P1 | Reuse key omitted output-changing policies | compiler and worker | Complete semantic compilation fingerprint | policy and schema mutation tests |
-| P1 | Dispatch selected callback URL and worker secret | callback transport and worker policy | callback ID plus local allowlist, credential provider, redirect rejection, DNS/IP controls | callback contract and network-policy tests |
-| P1 | Publication verification accepted any valid bundle at a URI | packet store and worker | digest-qualified OCI reference plus exact expected `PacketRef` and manifest comparison | valid-object substitution test |
+| P1 | Dispatch selected callback URL and worker secret | callback transport and worker policy | callback ID plus local credentials, segment-bound path checks, encoded-separator rejection, expected host/port policy, redirect rejection, and DNS/IP controls | adversarial callback-policy tests |
+| P1 | Publication verification accepted any valid bundle at a URI | packet store and worker | semantic-hash staging tag, digest-qualified reference, independent registry descriptor resolution, exact expected `PacketRef`, and manifest comparison | substitution and descriptor-mismatch tests |
 | P1 | Input diagnostics disappeared | packet adapter, topology state, schemas, validator | typed diagnostics payload plus conservation invariant | diagnostic round-trip and removal-failure tests |
 | P2 | Bundle visibility was only atomic per file | packet bundle sink | validate and fsync a staging directory, then atomically rename | injected staging-failure test |
 | P2 | Local JSON registry lost concurrent updates | local registry | SQLite WAL transaction and uniqueness constraints | concurrent writer test |

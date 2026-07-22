@@ -28,13 +28,13 @@
 | Tampered dispatch selects attacker code | Verify signature with trusted `main` before exact-revision checkout |
 | Mutable branch changes execution | Require an exact Git object ID |
 | Parent packet substitution | Verify packet ID, semantic hash, bundle hash, source revision, and passed receipt |
-| OCI tag substitution | Reject mutable production references and bind re-fetch verification to the expected PacketRef plus manifest digest |
+| OCI tag substitution or publisher race | Publish through a semantic-hash-derived staging tag, accept only the returned digest-qualified reference, independently resolve the registry descriptor, and bind re-fetch verification to the expected PacketRef plus manifest digest |
 | Local-path identity drift | Normalize source paths and exclude machine-local paths from semantic hashes |
 | False canonical claims | Require evidence references, decomposed confidence, and fail-closed validation |
 | Direct source mutation | Read-only source providers and architecture boundary checks |
 | Output path escape, partial bundle visibility, or overwrite | OutputSink containment, collision policy, immutable bundles, validated staging directories, fsync, and atomic directory replacement |
 | Duplicate or stale publication after retry | Complete compilation fingerprint, exact packet verification, reuse receipt, and reconciliation |
-| Callback secret exfiltration or destination substitution | Dispatch selects only a callback ID; worker-local policy owns URL and credential variables, rejects redirects, and blocks unsafe resolved addresses |
+| Callback secret exfiltration or destination substitution | Dispatch selects only a callback ID; worker-local policy owns URL and credentials, requires expected host and port, applies segment-bound path matching, rejects encoded separators and redirects, and blocks unsafe resolved addresses |
 | Unauthorized graph mutation | No Neo4j or Graphiti write client in this repository |
 | Malicious report treated as truth | Reports are projections and cannot serve as stage inputs |
 | Dependency or action supply-chain drift | Frozen `uv.lock`, exact action SHAs, clean build, and isolated install smoke |

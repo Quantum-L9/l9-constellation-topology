@@ -14,7 +14,7 @@ A dispatch that selects code before authentication can execute attacker-controll
 - Authenticate the signed dispatch with trusted main code before checkout.
 - Require an exact Git object ID.
 - Build a frozen environment from the selected revision and revalidate before execution.
-- Allow dispatch to select only a locally approved callback ID, never a URL or secret reference.
+- Allow dispatch to select only a locally approved callback ID, never a URL or secret reference. Worker policy must constrain enabled state, exact hosts and ports, segment-bound paths, encoded separators, redirects, and resolved address classes.
 
 ## Consequences
 
