@@ -188,7 +188,7 @@
       "path": "ADR_INDEX.md"
     },
     {
-      "git_object_id": "c696972b58b4cbef784cef9e4d2cbe2080c138a0",
+      "git_object_id": "e2c83e9257351b02a557df163b9bc47327632ed6",
       "mode": "100644",
       "object_type": "blob",
       "path": "AGENTS.md"
@@ -212,13 +212,13 @@
       "path": "BUILD_SPECIFICATION.md"
     },
     {
-      "git_object_id": "ee9744b7fef19e2a212192d77067e2dbd601a595",
+      "git_object_id": "9c997a5d239e8ee5919920cd8321ab1bd1333ce0",
       "mode": "100644",
       "object_type": "blob",
       "path": "CHANGELOG.md"
     },
     {
-      "git_object_id": "ea5aa3042d4b1cd7149fb30ab45643571b5376fa",
+      "git_object_id": "ad904b3908d830fc9cff9fea51d58a930766db7b",
       "mode": "100644",
       "object_type": "blob",
       "path": "CHANGE_SUMMARY.md"
@@ -248,13 +248,13 @@
       "path": "DEPENDENCY_POLICY.md"
     },
     {
-      "git_object_id": "a03a81b2efa66a6c8e08dd54fa3c8f32244768c9",
+      "git_object_id": "d740bbb8be0a6335dde5e4379a2aa93bbc74d4c4",
       "mode": "100644",
       "object_type": "blob",
       "path": "DEVELOPMENT.md"
     },
     {
-      "git_object_id": "71ca3ac9ab7572e51685d78bf0b41395535d86aa",
+      "git_object_id": "426ad11ce22f67bc78699230c7a05cb5bd483599",
       "mode": "100644",
       "object_type": "blob",
       "path": "FINAL_TREE.md"
@@ -290,13 +290,13 @@
       "path": "MAINTAINERS.md"
     },
     {
-      "git_object_id": "6ffbd38022a6322ab501239960ef416323e82fee",
+      "git_object_id": "8f3149c5bcf568a8d329d964991698a06e370d60",
       "mode": "100644",
       "object_type": "blob",
       "path": "MANIFEST.md"
     },
     {
-      "git_object_id": "bfe850f1a81b2b6c106bb04679171e0aea7e69be",
+      "git_object_id": "ec6719ac76328336fa00b139f4fedfd8b2e5de03",
       "mode": "100644",
       "object_type": "blob",
       "path": "Makefile"
@@ -308,13 +308,13 @@
       "path": "NOTICE.md"
     },
     {
-      "git_object_id": "df1602b167afc968511fe43108535d305bdc65da",
+      "git_object_id": "194f525a1bea0f6457fd560804cc0f9c393697f8",
       "mode": "100644",
       "object_type": "blob",
       "path": "README.md"
     },
     {
-      "git_object_id": "15520236f0a8d221c1f1bf5a25a14251c285043d",
+      "git_object_id": "0948459c4b9f66de9a29cdb2ba5a61c55a6ffba2",
       "mode": "100644",
       "object_type": "blob",
       "path": "REGRESSION_GUARD.md"
@@ -326,13 +326,13 @@
       "path": "RELEASING.md"
     },
     {
-      "git_object_id": "8db05b34ee7a8082697370f1199f579fcbf744ed",
+      "git_object_id": "9a2c3f1daa1c8a0cabd73a73138f3cbe85f9671a",
       "mode": "100644",
       "object_type": "blob",
       "path": "ROADMAP.md"
     },
     {
-      "git_object_id": "17a53c1bc27ffa6b6ded9c8c81c66a80e519f0a5",
+      "git_object_id": "59c01a022e76414cfefe2f61192cac2503175095",
       "mode": "100644",
       "object_type": "blob",
       "path": "RUNBOOK.md"
@@ -368,7 +368,7 @@
       "path": "THREAT_MODEL.md"
     },
     {
-      "git_object_id": "352a369f40a215d2db38981db8da09fd7b122008",
+      "git_object_id": "15e6d0fbff1a0fb64c72204da77d5b2208f4a893",
       "mode": "100644",
       "object_type": "blob",
       "path": "TRACEABILITY_MAP.yaml"
@@ -380,7 +380,7 @@
       "path": "UNKNOWN_REGISTER.md"
     },
     {
-      "git_object_id": "4c060c33e665dd4006d7f8fcd637036aaf246f00",
+      "git_object_id": "9f523eb9626e2a19c3606f4602a2d5fb91f80eea",
       "mode": "100644",
       "object_type": "blob",
       "path": "VALIDATION.md"
@@ -878,16 +878,22 @@
       "path": "scripts/compile_topology_packet.py"
     },
     {
-      "git_object_id": "28f866750b635f3381635d8004f71d1fad55db35",
+      "git_object_id": "bc512db575e2f219af0c3d236f211da0b04d9df0",
       "mode": "100644",
       "object_type": "blob",
       "path": "scripts/generate_fixture_packets.py"
     },
     {
-      "git_object_id": "73168175d607ae15bbd154c228ee9b13167eb8ea",
+      "git_object_id": "9e6905853c6407b109134783476a90799802f640",
       "mode": "100644",
       "object_type": "blob",
       "path": "scripts/generate_schemas.py"
+    },
+    {
+      "git_object_id": "b9cdeaf069aee4bdb92756abddbb7c204adac999",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "scripts/generated_artifact_sync.py"
     },
     {
       "git_object_id": "4048410fadad763c32332ada905b9a170d9702b1",
@@ -1934,6 +1940,12 @@
       "path": "tests/test_evidence_v5.py"
     },
     {
+      "git_object_id": "b12f780a89e97749b99424f13d3cea41df15de5c",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/test_generated_artifact_sync.py"
+    },
+    {
       "git_object_id": "689b05002a41cba30f8096d2255153e5b9183649",
       "mode": "100644",
       "object_type": "blob",
@@ -2084,8 +2096,8 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:56509fbf652877c2348a0892c89a77c991c62a5bf41816b4becd71a8ff2769ff",
-  "entry_count": 347,
+  "entries_sha256": "sha256:8f441790ecf11e37162a7f23626060d55e6fe4ab74d337f38e93c5601a9e3fb2",
+  "entry_count": 349,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
   ],

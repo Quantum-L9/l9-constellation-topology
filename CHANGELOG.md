@@ -13,6 +13,9 @@
 - Enforced callback path segment boundaries, rejected encoded slash and backslash ambiguity, and added explicit host and port policy.
 - Added `GIT_TREE_MANIFEST.json`, which binds every tracked entry except itself to its Git mode, object type, and blob ID.
 - Published OCI bundles through semantic-hash-derived staging tags and independently resolved the immutable registry descriptor before accepting publication.
+- Added read-only generated-artifact drift gates for checked-in schemas and Repository Model Packet fixtures, with explicit `schemas-update`/`fixtures-update` regeneration commands.
+- Wired the deterministic schema drift gate (`schemas-check`) into `make validate`; fixture drift is checked on demand via `make fixtures-check` pending deterministic fixture generation.
+- Synchronized AGENTS, README, DEVELOPMENT, RUNBOOK, and VALIDATION with the generated-artifact workflow.
 
 ## Unreleased - initial repository enrichment
 

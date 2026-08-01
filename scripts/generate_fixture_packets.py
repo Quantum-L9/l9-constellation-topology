@@ -3,7 +3,11 @@
 
 from __future__ import annotations
 
+import argparse
+from collections.abc import Sequence
 from pathlib import Path
+
+from generated_artifact_sync import GeneratedArtifact, synchronize
 
 from l9_constellation_topology.compatibility.v4_models import RepoSource
 from l9_constellation_topology.packets import (
@@ -19,14 +23,12 @@ SAMPLE = ROOT / "tests" / "fixtures" / "sample_constellation"
 DESTINATION = ROOT / "tests" / "fixtures" / "repository_model_packets"
 
 
-def write_bundle(repo_name: str) -> None:
+def build_bundle_artifacts(repo_name: str) -> tuple[GeneratedArtifact, ...]:
     source_root = SAMPLE / repo_name
     bundle = scan_repository_model(
         RepoSource(repo_id=repo_name, name=repo_name, local_path=str(source_root))
     )
     destination = DESTINATION / repo_name
-    receipt_path = destination / "receipts" / "validation-receipt.json"
-    receipt_path.parent.mkdir(parents=True, exist_ok=True)
 
     packet = bundle.packet.model_copy(
         update={
@@ -38,9 +40,6 @@ def write_bundle(repo_name: str) -> None:
     )
     packet_bytes = canonical_bytes(packet) + b"\n"
     receipt_bytes = canonical_bytes(bundle.receipt) + b"\n"
-    (destination / "packet.json").write_bytes(packet_bytes)
-    receipt_path.write_bytes(receipt_bytes)
-
     files = (
         PacketFileEntry(
             path="packet.json",
@@ -63,12 +62,40 @@ def write_bundle(repo_name: str) -> None:
         artifact_hash=semantic_hash(files),
         files=files,
     )
-    (destination / "manifest.json").write_bytes(canonical_bytes(manifest) + b"\n")
+    return (
+        GeneratedArtifact(destination / "packet.json", packet_bytes),
+        GeneratedArtifact(
+            destination / "receipts" / "validation-receipt.json",
+            receipt_bytes,
+        ),
+        GeneratedArtifact(
+            destination / "manifest.json",
+            canonical_bytes(manifest) + b"\n",
+        ),
+    )
 
 
-def main() -> int:
-    for repo_name in ("l9-gate-sdk", "l9-mcp-server"):
-        write_bundle(repo_name)
+def main(argv: Sequence[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--check",
+        action="store_true",
+        help="Fail when generated fixtures differ; never modify files.",
+    )
+    args = parser.parse_args(argv)
+    artifacts = tuple(
+        artifact
+        for repo_name in ("l9-gate-sdk", "l9-mcp-server")
+        for artifact in build_bundle_artifacts(repo_name)
+    )
+    findings = synchronize(artifacts, check=args.check)
+    if args.check and findings:
+        for finding in findings:
+            print(f"{finding.kind}: {finding.path.relative_to(ROOT)}")
+        return 1
+    if not args.check:
+        for finding in findings:
+            print(f"updated: {finding.path.relative_to(ROOT)}")
     return 0
 
 

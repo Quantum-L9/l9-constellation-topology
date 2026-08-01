@@ -14,6 +14,7 @@ This hardening pass applies the repository's no-stub, gap-filling, no-regression
 6. Tests cover malformed JavaScript manifests and the repository-wide hardening gate.
 7. Required operator and release artifacts were added: manifest, final tree, traceability map, Unknown register, regression guard, alignment audit, fix map, convergence report, and validation records.
 8. Versioned runtime and packet identities remain at `2.0.0`; this patch changes validation and hardening behavior without altering packet contracts.
+9. `scripts/generated_artifact_sync.py` separates generated-artifact validation from mutation: `make generated-check` recomputes schemas and packet fixtures in memory and fails when checked-in bytes are missing or stale, while explicit update targets regenerate only intentionally changed outputs. `make validate` gates the deterministic schema drift check; fixture drift is an on-demand check because fixture packets embed a wall-clock timestamp and the live repository revision. Focused tests cover missing, stale, update, and duplicate-destination behavior.
 
 
 ## Confirmed executive-audit remediation

@@ -62,3 +62,12 @@ PYTHONPATH=src python scripts/verify_determinism.py
 - Root architecture, governance, security, development, support, release, license,
   threat, dependency, and initial-commit files must remain present.
 - Collaboration templates cannot weaken packet, evidence, OutputSink, or validation laws.
+
+## Generated artifact synchronization invariant
+
+- Validation must not rewrite generated files; check targets are read-only and fail closed.
+- `make generated-check` must fail for missing or stale schemas or packet fixtures.
+- `make schemas-update`, `make fixtures-update`, and `make generated-update` are the only canonical regeneration targets.
+- Duplicate generated destinations fail closed.
+- `make validate` must retain the deterministic schema drift gate (`schemas-check`).
+- A generated source change is incomplete until generated diffs are reviewed and the read-only check passes.

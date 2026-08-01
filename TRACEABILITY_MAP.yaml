@@ -161,3 +161,12 @@ changes:
       - tests/test_packet_store_v5.py::test_oci_publish_returns_digest_qualified_uri
       - tests/test_packet_store_v5.py::test_oci_verification_resolves_registry_descriptor_independently
     status: implemented
+  - id: REVIEW-005
+    source: scripts/generate_schemas.py, scripts/generate_fixture_packets.py, Makefile
+    gap: generated schemas and packet fixtures could drift because validation checked current files but never recomputed expected bytes
+    fix: add scripts/generated_artifact_sync.py with read-only drift detection and explicit update targets; gate make validate on the deterministic schemas-check
+    validation:
+      - tests/test_generated_artifact_sync.py
+      - make schemas-check
+      - make validate
+    status: implemented_schema_gate_enforced; fixture drift gate deferred pending deterministic fixture generation (non-deterministic created_at and repository-revision-bound source_revision)

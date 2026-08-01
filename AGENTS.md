@@ -13,3 +13,8 @@
 11. Treat `BUILD_SPECIFICATION.md` and accepted ADRs as binding architecture authority.
 12. Create a new ADR before changing packet boundaries, authority, identity, effects, or orchestration.
 13. Keep root governance, manifest, final tree, and validation evidence synchronized.
+14. Inspect `AGENTS.md`, `README.md`, `DEVELOPMENT.md`, `RUNBOOK.md`, and `VALIDATION.md` for every command, validation, generated-artifact, developer-workflow, or operator-workflow change. Update all five when the change affects their contract or instructions.
+15. Generated schemas and checked-in packet fixtures are derived artifacts. Run `make generated-check` before declaring validation complete.
+16. When canonical models, schema generation, sample repositories, packet construction, or fixture generation changes, run the applicable explicit update target: `make schemas-update`, `make fixtures-update`, or `make generated-update`. Review the generated diff before committing.
+17. Never make validation mutate generated artifacts. Check targets are read-only and fail closed; update targets are explicit mutation commands.
+18. After changing tracked files, regenerate or update `MANIFEST.md`, `FINAL_TREE.md`, `GIT_TREE_MANIFEST.json`, traceability records, and validation evidence as required by repository governance. Commit-bound integrity must be generated from the final staged tree.

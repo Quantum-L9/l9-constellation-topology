@@ -6,7 +6,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 
 ## Inventory
 
-**Tracked delivery files:** 348
+**Tracked delivery files:** 350
 
 - `.editorconfig` — editor encoding, indentation, and whitespace policy
 - `.env.example` — documented worker and control-plane environment variables
@@ -158,6 +158,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `scripts/generate_fixture_packets.py` — operator, build, generation, or validation command
 - `scripts/git_tree_manifest.py` — deterministic Git tree manifest generator and validator
 - `scripts/generate_schemas.py` — operator, build, generation, or validation command
+- `scripts/generated_artifact_sync.py` — shared read-only generated-artifact drift detection and explicit update support
 - `scripts/render_topology_reports.py` — operator, build, generation, or validation command
 - `scripts/validate_contracts.py` — operator, build, generation, or validation command
 - `scripts/validate_git_integrity.py` — commit, human inventory, and Git blob-identity validator
@@ -331,6 +332,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `tests/test_dependency_scanner.py` — unit, contract, integration, regression, or governance test
 - `tests/test_direct_observation_adapter_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_evidence_v5.py` — unit, contract, integration, regression, or governance test
+- `tests/test_generated_artifact_sync.py` — generated-artifact check/update and fail-closed regression tests
 - `tests/test_git_integrity.py` — Git path, mode, object-type, and blob-identity regression tests
 - `tests/test_graph_builder.py` — unit, contract, integration, regression, or governance test
 - `tests/test_impact.py` — unit, contract, integration, regression, or governance test

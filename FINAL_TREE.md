@@ -113,6 +113,7 @@ l9-constellation-topology/
 │   ├── compile_topology_packet.py
 │   ├── generate_fixture_packets.py
 │   ├── generate_schemas.py
+│   ├── generated_artifact_sync.py
 │   ├── git_tree_manifest.py
 │   ├── render_topology_reports.py
 │   ├── validate_contracts.py
@@ -327,6 +328,7 @@ l9-constellation-topology/
 │   ├── test_dependency_scanner.py
 │   ├── test_direct_observation_adapter_v5.py
 │   ├── test_evidence_v5.py
+│   ├── test_generated_artifact_sync.py
 │   ├── test_git_integrity.py
 │   ├── test_graph_builder.py
 │   ├── test_impact.py

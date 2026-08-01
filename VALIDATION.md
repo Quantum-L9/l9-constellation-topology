@@ -89,6 +89,29 @@ The final command verifies:
 ID. CI produces the exact commit-bound report as a workflow artifact. A release claim without
 that report is invalid.
 
+## Generated-artifact drift guard
+
+Checked-in JSON Schemas and Repository Model Packet fixtures are derived outputs.
+`scripts/generated_artifact_sync.py` provides read-only drift detection (`find_drift`)
+and explicit mutation (`synchronize`) so validation never rewrites the worktree.
+
+```bash
+make schemas-check     # read-only: fail on missing/stale checked-in schemas
+make fixtures-check     # read-only: fail on missing/stale fixture packets
+make generated-check    # both of the above
+make schemas-update     # explicit regeneration
+make fixtures-update    # explicit regeneration
+```
+
+- `make validate` includes `schemas-check` (deterministic) and fails on schema drift.
+- `fixtures-check` is retained as an on-demand diagnostic and is intentionally excluded
+  from `make validate`: fixture packets embed a wall-clock `created_at` and the live
+  repository revision as `source_revision`, so a byte-for-byte regeneration check cannot
+  pass in steady state. It becomes gate-eligible once fixture generation is made
+  deterministic (recorded as a follow-up in `ROADMAP.md`).
+- `tests/test_generated_artifact_sync.py` covers missing, stale, explicit-update, and
+  duplicate-destination (fail-closed) behavior of the drift helper.
+
 ## Release decision
 
 The repository is suitable for an updated remediation pull request and architect re-review.
