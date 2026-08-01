@@ -172,6 +172,7 @@ def adapt_repo_card(
             )
         )
     model = NormalizedRepositoryModel(
+        packet_id=packet_ref,
         repositories=(repository,),
         artifacts=tuple(artifacts),
         capabilities=capabilities,

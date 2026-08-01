@@ -16,6 +16,7 @@ TOPOLOGY_PAYLOAD_FIELDS: tuple[str, ...] = (
     "maturity",
     "impact_indexes",
     "evidence",
+    "diagnostics",
     "unknowns",
     "conflicts",
 )

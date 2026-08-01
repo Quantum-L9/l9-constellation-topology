@@ -1,0 +1,38 @@
+name: Architecture change proposal
+description: Propose a bounded contract, boundary, or architectural decision change
+title: "[Architecture] "
+labels: ["architecture"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Describe the observed limitation or conflict with evidence.
+    validations:
+      required: true
+  - type: textarea
+    id: authority
+    attributes:
+      label: Affected authority and contracts
+      description: Name the specification, ADRs, schemas, profiles, or interfaces affected.
+    validations:
+      required: true
+  - type: textarea
+    id: decision
+    attributes:
+      label: Proposed decision
+      description: State the exact boundary or behavior change.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives and tradeoffs
+    validations:
+      required: true
+  - type: textarea
+    id: validation
+    attributes:
+      label: Required validation and migration
+    validations:
+      required: true

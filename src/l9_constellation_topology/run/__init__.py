@@ -1,5 +1,5 @@
 from .context import ArtifactState, RunContext
-from .diagnostics import Diagnostic
+from .diagnostics import Diagnostic, normalize_diagnostic
 from .evidence import (
     EvidenceRecord,
     EvidenceSourceRef,
@@ -20,6 +20,7 @@ from .receipts import StageReceipt
 __all__ = [
     "ArtifactState",
     "Diagnostic",
+    "normalize_diagnostic",
     "EvidenceRecord",
     "EvidenceSourceRef",
     "RunContext",

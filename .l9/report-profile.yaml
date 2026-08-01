@@ -1,0 +1,5 @@
+id: default-topology-reports
+version: 1.0.0
+default_formats: [markdown, mermaid, csv, json, neo4j-candidate]
+cache_key_fields: [topology_semantic_hash, renderer_id, renderer_version, profile_hash]
+always_render_during_compile: false

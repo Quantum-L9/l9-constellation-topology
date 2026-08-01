@@ -1,6 +1,6 @@
 schema: l9.traceability-map/v1
 artifact: l9-constellation-topology
-release: 2.0.0-initial-commit
+release: 2.0.0-pr1-review-fix
 changes:
   - id: TRACE-001
     source: src/l9_constellation_topology/scanners/dependency_scanner.py
@@ -72,4 +72,92 @@ changes:
       - docs/archive/v4/architecture.md
     validation:
       - repository-wide internal Markdown link check
+    status: implemented
+  - id: REM-001
+    source: Git index, MANIFEST.md, .github/, .l9/
+    defect: validated package and committed repository tree diverged
+    fix: restore hidden repository surfaces, validate human inventory paths, and bind committed content through a Git-native mode, object-type, and blob-ID manifest
+    validation:
+      - scripts/validate_git_integrity.py
+      - .github/workflows/l9-pr-validate.yml
+    status: implemented
+  - id: REM-002
+    source: src/l9_constellation_topology/compiler.py
+    defect: idempotency omitted risk, maturity, packet, report, and output policy changes
+    fix: hash a complete semantic compilation fingerprint
+    validation:
+      - tests/test_confirmed_findings_remediation.py::test_idempotency_fingerprint_changes_for_every_semantic_policy
+      - tests/test_confirmed_findings_remediation.py::test_idempotency_fingerprint_changes_for_schema_and_build_identity
+    status: implemented
+  - id: REM-003
+    source: src/l9_constellation_topology/worker/callback.py
+    defect: dispatch could select an arbitrary callback URL and worker environment secret
+    fix: callback ID resolved through worker-local destination and credential policy with redirect and network controls
+    validation:
+      - tests/test_worker_v5.py::test_callback_contract_rejects_packet_selected_url_and_secret
+      - tests/test_worker_v5.py::test_callback_id_must_exist_in_local_policy
+    status: implemented
+  - id: REM-004
+    source: src/l9_constellation_topology/worker/packet_store.py
+    defect: publication verification accepted any internally valid bundle at the supplied URI
+    fix: require digest-qualified OCI references and compare retrieved content with the exact expected PacketRef and manifest digests
+    validation:
+      - tests/test_packet_store_v5.py::test_verify_published_binds_uri_to_expected_packet
+      - tests/test_packet_store_v5.py::test_oci_verification_rejects_mutable_tag_before_pull
+    status: implemented
+  - id: REM-005
+    source: repository model adapter, TopologyState, packet schemas, topology validator
+    defect: accepted upstream diagnostics disappeared during compilation
+    fix: preserve typed diagnostics with source lineage and enforce a conservation invariant
+    validation:
+      - tests/test_confirmed_findings_remediation.py::test_input_diagnostics_are_preserved_and_round_trip
+    status: implemented
+  - id: REM-006
+    source: PacketBundleOutputSink and LocalPacketRegistry
+    defect: multi-file bundle visibility and local recovery writes were not transaction-safe
+    fix: atomic staged-directory publication and SQLite WAL local registry transactions
+    validation:
+      - tests/test_confirmed_findings_remediation.py::test_packet_bundle_commit_is_atomic_on_staging_failure
+      - tests/test_confirmed_findings_remediation.py::test_local_registry_is_transaction_safe_under_concurrent_writers
+    status: implemented
+  - id: REM-007
+    source: src/l9_constellation_topology/validation/topology_validator.py
+    defect: validation receipts conflated model construction with independent schema verification
+    fix: report separate model-construction, JSON Schema, invariant, evidence, and cross-packet layers
+    validation:
+      - tests/test_confirmed_findings_remediation.py::test_independent_json_schema_validation_can_block_compilation
+    status: implemented
+
+  - id: REVIEW-001
+    source: src/l9_constellation_topology/worker/callback.py
+    defect: callback path policy used a raw string prefix and permitted sibling paths such as /api/results-evil
+    fix: require exact or slash-delimited descendant paths and reject encoded slash or backslash ambiguity before request construction
+    validation:
+      - tests/test_worker_v5.py::test_callback_path_policy_uses_segment_boundaries
+      - tests/test_worker_v5.py::test_callback_endpoint_rejects_encoded_separator_before_request
+    status: implemented
+  - id: REVIEW-002
+    source: MANIFEST.md, GIT_TREE_MANIFEST.json, scripts/git_tree_manifest.py, scripts/validate_git_integrity.py
+    defect: commit-bound validation proved tracked-path equality but did not prove per-file committed content identity
+    fix: retain MANIFEST.md as the human inventory and add a non-self-referential Git-native manifest covering path, mode, object type, and blob ID
+    validation:
+      - tests/test_git_integrity.py::test_git_integrity_binds_paths_modes_and_blob_ids
+      - tests/test_git_integrity.py::test_git_integrity_rejects_same_paths_with_changed_blob
+      - scripts/validate_git_integrity.py
+    status: implemented
+  - id: REVIEW-003
+    source: .l9/callback-policy.yaml and src/l9_constellation_topology/worker/callback.py
+    gap: local callback policy selected a destination indirectly but did not explicitly constrain its hostname and port
+    fix: add expected host and port constraints and disable the production callback profile until an approved host is committed
+    validation:
+      - tests/test_worker_v5.py::test_callback_endpoint_enforces_expected_host_and_port
+      - tests/test_worker_v5.py::test_disabled_production_callback_fails_closed
+    status: implemented
+  - id: REVIEW-004
+    source: src/l9_constellation_topology/worker/packet_store.py
+    gap: OCI publication could initially target a shared mutable tag and trusted only the digest reported by push
+    fix: publish through a semantic-hash-derived staging tag and independently fetch the registry descriptor before packet acceptance
+    validation:
+      - tests/test_packet_store_v5.py::test_oci_publish_returns_digest_qualified_uri
+      - tests/test_packet_store_v5.py::test_oci_verification_resolves_registry_descriptor_independently
     status: implemented

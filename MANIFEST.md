@@ -6,7 +6,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 
 ## Inventory
 
-**Tracked delivery files:** 329
+**Tracked delivery files:** 338
 
 - `.editorconfig` — editor encoding, indentation, and whitespace policy
 - `.env.example` — documented worker and control-plane environment variables
@@ -20,6 +20,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `.github/workflows/l9-pr-validate.yml` — immutable-pinned GitHub Actions workflow
 - `.github/workflows/l9-stage-worker.yml` — immutable-pinned GitHub Actions workflow
 - `.gitignore` — generated, secret, cache, and build exclusions
+- `.l9/callback-policy.yaml` — local callback destination, credential, redirect, and network trust policy
 - `.l9/maturity-profile.yaml` — versioned compiler, policy, packet, output, or pipeline profile
 - `.l9/output-policy.yaml` — versioned compiler, policy, packet, output, or pipeline profile
 - `.l9/packet-profile.yaml` — versioned compiler, policy, packet, output, or pipeline profile
@@ -43,6 +44,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `FINAL_TREE.md` — deterministic final repository tree
 - `FIX_MAP.md` — confirmed finding to fix and validation mapping
 - `GOVERNANCE.md` — authority, approval, ADR, branch, and release governance
+- `GIT_TREE_MANIFEST.json` — Git-native mode, object-type, and blob-identity manifest
 - `INITIAL_COMMIT.md` — clean initial-commit and push handoff
 - `LICENSE` — proprietary repository license terms
 - `MAINTAINERS.md` — maintainer roles and ownership responsibilities
@@ -126,6 +128,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `pyproject.toml` — Python package metadata, entrypoints, and quality configuration
 - `schemas/artifact-record.schema.json` — canonical or compatibility domain JSON Schema
 - `schemas/capability-record.schema.json` — canonical or compatibility domain JSON Schema
+- `schemas/diagnostic-record.schema.json` — typed conserved upstream diagnostic JSON Schema
 - `schemas/edge-record.schema.json` — canonical or compatibility domain JSON Schema
 - `schemas/edge_card.schema.json` — canonical or compatibility domain JSON Schema
 - `schemas/evidence-record.schema.json` — canonical or compatibility domain JSON Schema
@@ -143,9 +146,11 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `scripts/build_control_packet.py` — operator, build, generation, or validation command
 - `scripts/compile_topology_packet.py` — operator, build, generation, or validation command
 - `scripts/generate_fixture_packets.py` — operator, build, generation, or validation command
+- `scripts/git_tree_manifest.py` — deterministic Git tree manifest generator and validator
 - `scripts/generate_schemas.py` — operator, build, generation, or validation command
 - `scripts/render_topology_reports.py` — operator, build, generation, or validation command
 - `scripts/validate_contracts.py` — operator, build, generation, or validation command
+- `scripts/validate_git_integrity.py` — commit, human inventory, and Git blob-identity validator
 - `scripts/validate_nuclear_execution.py` — operator, build, generation, or validation command
 - `scripts/validate_release_readiness.py` — operator, build, generation, or validation command
 - `scripts/validate_workflows.py` — operator, build, generation, or validation command
@@ -163,6 +168,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `src/l9_constellation_topology/domain/base.py` — production Python package implementation
 - `src/l9_constellation_topology/domain/capability.py` — production Python package implementation
 - `src/l9_constellation_topology/domain/confidence.py` — production Python package implementation
+- `src/l9_constellation_topology/domain/diagnostic.py` — typed diagnostic conservation domain model
 - `src/l9_constellation_topology/domain/edge.py` — production Python package implementation
 - `src/l9_constellation_topology/domain/flow.py` — production Python package implementation
 - `src/l9_constellation_topology/domain/repository.py` — production Python package implementation
@@ -297,6 +303,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `tests/fixtures/topology_packets/foundational-two-repo/payload/artifact-records.json` — deterministic packet, source, or regression fixture
 - `tests/fixtures/topology_packets/foundational-two-repo/payload/capability-records.json` — deterministic packet, source, or regression fixture
 - `tests/fixtures/topology_packets/foundational-two-repo/payload/conflicts.json` — deterministic packet, source, or regression fixture
+- `tests/fixtures/topology_packets/foundational-two-repo/payload/diagnostics.json` — deterministic conserved-diagnostic payload fixture
 - `tests/fixtures/topology_packets/foundational-two-repo/payload/edge-records.json` — deterministic packet, source, or regression fixture
 - `tests/fixtures/topology_packets/foundational-two-repo/payload/evidence.json` — deterministic packet, source, or regression fixture
 - `tests/fixtures/topology_packets/foundational-two-repo/payload/flow-records.json` — deterministic packet, source, or regression fixture
@@ -310,9 +317,11 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `tests/test_architecture_boundary_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_assessments_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_cli_v5.py` — unit, contract, integration, regression, or governance test
+- `tests/test_confirmed_findings_remediation.py` — adversarial regression tests for every confirmed audit finding
 - `tests/test_dependency_scanner.py` — unit, contract, integration, regression, or governance test
 - `tests/test_direct_observation_adapter_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_evidence_v5.py` — unit, contract, integration, regression, or governance test
+- `tests/test_git_integrity.py` — Git path, mode, object-type, and blob-identity regression tests
 - `tests/test_graph_builder.py` — unit, contract, integration, regression, or governance test
 - `tests/test_impact.py` — unit, contract, integration, regression, or governance test
 - `tests/test_maturity.py` — unit, contract, integration, regression, or governance test
@@ -344,4 +353,4 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - No Git metadata, caches, local environments, build products, secrets, or nested archives.
 - `BUILD_SPECIFICATION.md` preserves the full source-aligned build authority.
 - `ADR_INDEX.md` indexes 20 accepted initial ADRs.
-- `FINAL_TREE.md` and this manifest are generated from the packaged file set.
+- `FINAL_TREE.md` and this human inventory describe the packaged file set. `GIT_TREE_MANIFEST.json` independently binds exact Git modes, object types, and blob IDs.

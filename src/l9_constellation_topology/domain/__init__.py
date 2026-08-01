@@ -12,6 +12,7 @@ from .confidence import (
     DerivationMethod,
     EvidenceStrength,
 )
+from .diagnostic import DiagnosticRecord
 from .edge import Direction, EdgeRecord, EdgeType, GraphRecord
 from .flow import FlowRecord
 from .repository import RepositoryRecord
@@ -27,6 +28,7 @@ __all__ = [
     "ConflictRecord",
     "ConflictStatus",
     "DerivationMethod",
+    "DiagnosticRecord",
     "Direction",
     "EdgeRecord",
     "EdgeType",

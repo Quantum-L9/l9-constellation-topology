@@ -1,0 +1,33 @@
+id: foundational-maturity
+version: 1.0.0
+maximum_score: 100
+unknown_handling: zero
+conflict_handling: zero
+bands:
+  exemplary: 90
+  mature: 70
+  emerging: 40
+  nascent: 0
+dimensions:
+  package_manifest:
+    weight: 15
+    field: package_managers
+  ci_workflow:
+    weight: 20
+    field: workflows
+  architecture_decisions:
+    weight: 15
+    field: adr_refs
+  governance:
+    weight: 15
+    field: governance_refs
+  documentation:
+    weight: 10
+    field: artifact_ids
+    evidence_contains: README
+  dependencies:
+    weight: 10
+    field: upstream_repository_ids
+  evidence_confidence:
+    weight: 15
+    minimum_confidence: high

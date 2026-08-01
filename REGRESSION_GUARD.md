@@ -12,6 +12,11 @@
 - Legacy read-only scanner compatibility ingress
 - Signed TransportPacket preflight and exact-revision worker execution
 - Local and OCI packet-store adapters
+- Typed upstream diagnostic conservation
+- Complete semantic compilation fingerprints
+- Digest-bound packet publication and reuse
+- Locally governed callback destinations, credentials, hosts, ports, and segment-bound paths
+- Transactional local recovery registry
 - Idempotent packet reuse and signed callbacks
 
 ## Guard commands
@@ -23,6 +28,10 @@ PYTHONPATH=src python scripts/validate_contracts.py
 PYTHONPATH=src python scripts/validate_workflows.py
 PYTHONPATH=src python scripts/architecture_boundary_check.py
 PYTHONPATH=src python scripts/validate_release_readiness.py
+git add -A
+PYTHONPATH=src python scripts/git_tree_manifest.py
+git add GIT_TREE_MANIFEST.json
+PYTHONPATH=src python scripts/validate_git_integrity.py
 PYTHONPATH=src python scripts/verify_determinism.py
 ```
 
@@ -36,6 +45,13 @@ PYTHONPATH=src python scripts/verify_determinism.py
 - Validation mutating the packet under review
 - Silent malformed-manifest handling
 - Removal of required release evidence without a manifest update
+- A human inventory that differs from tracked paths
+- A Git tree manifest whose path, mode, object type, or blob ID differs from `git ls-tree`
+- Packet-selected callback URLs or environment-variable names
+- Callback path prefix checks without segment boundaries or encoded-separator rejection
+- Tag-only OCI references in production paths or shared mutable publication tags
+- Reuse keys that omit any output-affecting profile, schema, adapter, or compiler build identity
+- Dropped input diagnostics
 
 ## Governance and decision-memory guards
 

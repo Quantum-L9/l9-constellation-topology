@@ -1,7 +1,7 @@
 UV ?= uv
 PYTHON ?= python
 
-.PHONY: sync compile test coverage lint type contracts workflows architecture readiness determinism build validate clean
+.PHONY: sync compile test coverage lint type contracts workflows architecture readiness git-manifest git-integrity determinism build validate clean
 
 sync:
 	$(UV) sync --frozen --extra dev
@@ -33,13 +33,19 @@ architecture:
 readiness:
 	$(UV) run $(PYTHON) scripts/validate_release_readiness.py
 
+git-manifest:
+	$(UV) run $(PYTHON) scripts/git_tree_manifest.py
+
+git-integrity:
+	$(UV) run $(PYTHON) scripts/validate_git_integrity.py
+
 determinism:
 	$(UV) run $(PYTHON) scripts/verify_determinism.py
 
 build:
 	$(UV) build
 
-validate: compile coverage lint type contracts workflows architecture readiness determinism build
+validate: compile coverage lint type contracts workflows architecture readiness git-integrity determinism build
 
 clean:
 	rm -rf .coverage coverage.xml htmlcov build dist .pytest_cache .ruff_cache .mypy_cache .wheel-smoke

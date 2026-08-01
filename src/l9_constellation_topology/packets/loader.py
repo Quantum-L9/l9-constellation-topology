@@ -179,6 +179,7 @@ def load_topology_bundle(bundle_root: Path) -> tuple[MaterializedTopology, Valid
         maturity=tuple(load_records("maturity")),
         impact_indexes=tuple(load_records("impact_indexes")),
         evidence=tuple(load_records("evidence")),
+        diagnostics=tuple(load_records("diagnostics")),
         unknowns=tuple(load_records("unknowns")),
         conflicts=tuple(load_records("conflicts")),
     )

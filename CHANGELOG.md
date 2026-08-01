@@ -1,5 +1,19 @@
 # Changelog
 
+## Unreleased - release-integrity and trust-boundary remediation
+
+- Restored the complete `.github` and `.l9` surfaces to the deliverable and added a Git-index integrity gate.
+- Replaced topology-only reuse identity with a complete compilation fingerprint covering all semantic profiles, schemas, adapters, inputs, and compiler build identity.
+- Replaced packet-selected callback URLs and environment-variable names with a worker-local callback registry and network destination policy.
+- Bound publication and reuse verification to digest-qualified immutable packet references and exact expected packet identities.
+- Preserved upstream diagnostics as typed, lineage-bearing Topology Packet payload records with a conservation invariant.
+- Made packet-bundle publication atomic at directory scope and replaced the local JSON recovery index with transactional SQLite WAL storage.
+- Separated runtime-model construction checks from independent checked-in JSON Schema validation in Validation Receipts.
+- Added adversarial regression tests for policy mutation, callback trust, packet substitution, diagnostics conservation, bundle atomicity, registry concurrency, and Git-tree evidence drift.
+- Enforced callback path segment boundaries, rejected encoded slash and backslash ambiguity, and added explicit host and port policy.
+- Added `GIT_TREE_MANIFEST.json`, which binds every tracked entry except itself to its Git mode, object type, and blob ID.
+- Published OCI bundles through semantic-hash-derived staging tags and independently resolved the immutable registry descriptor before accepting publication.
+
 ## Unreleased - initial repository enrichment
 
 - Added the complete source-aligned v5 build specification.

@@ -1,0 +1,20 @@
+pipeline_id: foundational-repository-intelligence
+version: 1.0.0
+stages:
+  - id: compile-repository-model
+    target_repo: Quantum-L9/l9-meta-injector
+    output_packet_type: l9.repository-model
+  - id: compile-topology
+    target_repo: Quantum-L9/l9-constellation-topology
+    depends_on: [compile-repository-model]
+    requires:
+      packet_type: l9.repository-model
+      validation_status: passed
+    output_packet_type: l9.topology
+  - id: plan-ingestion
+    target_repo: Quantum-L9/l9-topology-ingestion-bridge
+    depends_on: [compile-topology]
+    requires:
+      packet_type: l9.topology
+      validation_status: passed
+    output_packet_type: l9.effect-plan

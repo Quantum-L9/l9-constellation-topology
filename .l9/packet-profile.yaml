@@ -1,0 +1,17 @@
+id: foundational-transport
+version: 1.0.0
+require_signature: true
+allowed_signature_algorithms: [hmac-sha256]
+allowed_key_ids: [foundational-hmac-v1]
+allowed_actions: [compile-topology, validate-topology, render-topology, replay-topology]
+allowed_target_repositories: [Quantum-L9/l9-constellation-topology]
+allowed_payload_schemas:
+  - l9.stage-dispatch/1.0.0
+  - l9.replay-request/1.0.0
+  - l9.render-request/1.0.0
+  - l9.validation-request/1.0.0
+require_parent_validation_passed: true
+require_callback: true
+require_output_uri: true
+resolved_by_gate: false
+resolver: l9-ci-core
