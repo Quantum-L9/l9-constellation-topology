@@ -20,7 +20,6 @@ from .receipts import StageReceipt
 __all__ = [
     "ArtifactState",
     "Diagnostic",
-    "normalize_diagnostic",
     "EvidenceRecord",
     "EvidenceSourceRef",
     "RunContext",
@@ -30,6 +29,7 @@ __all__ = [
     "canonical_data",
     "canonical_json",
     "make_evidence_record",
+    "normalize_diagnostic",
     "normalize_source_path",
     "semantic_hash",
     "sha256_bytes",

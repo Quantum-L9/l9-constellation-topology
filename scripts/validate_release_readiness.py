@@ -263,8 +263,7 @@ def _scan_thin_python(path: Path) -> list[Finding]:
             severity="minor",
             evidence=f"Only {len(substantive)} substantive lines.",
             required_fix=(
-                "Confirm the file is a necessary entrypoint or merge it into its "
-                "owner module."
+                "Confirm the file is a necessary entrypoint or merge it into its owner module."
             ),
         )
     ]

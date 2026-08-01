@@ -16,6 +16,7 @@ EXPECTED = {
     "l9-ingress.yml",
     "l9-stage-worker.yml",
     "l9-manual-replay.yml",
+    "l9-analysis.yml",
 }
 PINNED_ACTION = re.compile(r"^[^@\s]+@[0-9a-f]{40}$")
 

@@ -1,6 +1,6 @@
+import shutil
 from pathlib import Path
 from types import SimpleNamespace
-import shutil
 
 import pytest
 import yaml
@@ -64,8 +64,7 @@ def test_verify_published_binds_uri_to_expected_packet(tmp_path: Path) -> None:
     second_result = compile_topology(alternate_root, INPUTS)
     second_bundle = tmp_path / "second"
     assert (
-        commit_compilation(second_result, PacketBundleOutputSink(second_bundle)).status
-        == "passed"
+        commit_compilation(second_result, PacketBundleOutputSink(second_bundle)).status == "passed"
     )
     assert second_result.materialized.packet.packet_id != first_result.materialized.packet.packet_id
 

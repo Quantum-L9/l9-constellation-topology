@@ -69,6 +69,12 @@ packages = ["l9_constellation_topology"]
 mypy_path = "src"
 warn_unused_ignores = true
 
+# jsonschema ships no type stubs on the frozen index; treat its imports as
+# untyped rather than failing strict mode on a third-party gap.
+[[tool.mypy.overrides]]
+module = ["jsonschema.*"]
+ignore_missing_imports = true
+
 [tool.coverage.run]
 branch = true
 source = ["l9_constellation_topology"]

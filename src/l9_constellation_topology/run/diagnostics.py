@@ -20,11 +20,11 @@ def normalize_diagnostic(
     """Convert a version-tolerant upstream diagnostic into the canonical record."""
 
     severity_value = str(raw.get("severity", "warning")).lower()
-    severity: Literal["info", "warning", "error"]
-    if severity_value in {"info", "warning", "error"}:
-        severity = severity_value  # type: ignore[assignment]
-    else:
-        severity = "warning"
+    severity: Literal["info", "warning", "error"] = (
+        severity_value  # type: ignore[assignment]
+        if severity_value in {"info", "warning", "error"}
+        else "warning"
+    )
 
     code = str(raw.get("code", "upstream-diagnostic"))
     message = str(raw.get("message", "Upstream repository analysis emitted a diagnostic."))

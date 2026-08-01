@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from collections import Counter, defaultdict
 import json
+from collections import Counter, defaultdict
 from collections.abc import Iterable
 from pathlib import Path, PurePosixPath
 

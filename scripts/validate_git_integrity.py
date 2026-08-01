@@ -61,9 +61,7 @@ def inspect_commit(root: Path = ROOT) -> dict[str, object]:
     tree_sha = _git(root, "rev-parse", "HEAD^{tree}")
     committed_paths = tuple(
         sorted(
-            line
-            for line in _git(root, "ls-tree", "-r", "--name-only", "HEAD").splitlines()
-            if line
+            line for line in _git(root, "ls-tree", "-r", "--name-only", "HEAD").splitlines() if line
         )
     )
     inventory_paths = _markdown_manifest_paths(root)
@@ -82,9 +80,7 @@ def inspect_commit(root: Path = ROOT) -> dict[str, object]:
 
     committed_by_path = {entry["path"]: entry for entry in committed_entries}
     recorded_by_path = {entry["path"]: entry for entry in recorded_entries}
-    missing_from_git_tree_manifest = tuple(
-        sorted(set(committed_by_path) - set(recorded_by_path))
-    )
+    missing_from_git_tree_manifest = tuple(sorted(set(committed_by_path) - set(recorded_by_path)))
     absent_from_git_tree = tuple(sorted(set(recorded_by_path) - set(committed_by_path)))
     content_identity_mismatches = tuple(
         sorted(

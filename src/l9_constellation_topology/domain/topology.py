@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
-from .diagnostic import DiagnosticRecord
 from l9_constellation_topology.run.evidence import EvidenceRecord
 
 from .artifact import ArtifactRecord
 from .assessment import ConflictRecord, ImpactIndex, MaturityAssessment, RiskRecord, UnknownRecord
 from .base import FrozenModel
 from .capability import CapabilityRecord
+from .diagnostic import DiagnosticRecord
 from .edge import EdgeRecord, GraphRecord
 from .flow import FlowRecord
 from .repository import RepositoryRecord

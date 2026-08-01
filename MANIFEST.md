@@ -6,15 +6,24 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 
 ## Inventory
 
-**Tracked delivery files:** 338
+**Tracked delivery files:** 348
 
 - `.editorconfig` — editor encoding, indentation, and whitespace policy
 - `.env.example` — documented worker and control-plane environment variables
 - `.gitattributes` — Git text normalization and binary-file policy
+- `.github/governance/execution-profiles.yaml` — governed analysis execution-profile definitions
+- `.github/governance/promotion-policy.yaml` — governed analysis finding-promotion policy
+- `.github/governance/provider-requiredness.yaml` — governed analysis provider-requiredness policy
+- `.github/governance/quality-thresholds.yaml` — governed analysis quality-threshold policy
+- `.github/governance/rule-modes.yaml` — governed analysis rule-mode (blocking vs advisory) policy
+- `.github/governance/semgrep-identity-map.yaml` — governed analysis semgrep rule identity resolution map
+- `.github/governance/semgrep-policy.yaml` — governed analysis semgrep provider policy
+- `.github/governance/waivers.yaml` — governed analysis finding-waiver ledger
 - `.github/ISSUE_TEMPLATE/architecture_change.yml` — structured GitHub issue intake contract
 - `.github/ISSUE_TEMPLATE/bug_report.yml` — structured GitHub issue intake contract
 - `.github/ISSUE_TEMPLATE/config.yml` — structured GitHub issue intake contract
 - `.github/PULL_REQUEST_TEMPLATE.md` — pull-request evidence and architecture checklist
+- `.github/workflows/l9-analysis.yml` — immutable-pinned GitHub Actions workflow
 - `.github/workflows/l9-ingress.yml` — immutable-pinned GitHub Actions workflow
 - `.github/workflows/l9-manual-replay.yml` — immutable-pinned GitHub Actions workflow
 - `.github/workflows/l9-pr-validate.yml` — immutable-pinned GitHub Actions workflow
@@ -116,6 +125,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `docs/archive/v4/architecture.md` — superseded v4 historical artifact retained for migration evidence
 - `docs/archive/v4/machine-summary.json` — superseded v4 historical artifact retained for migration evidence
 - `docs/deployment.md` — architecture, contract, deployment, recovery, or model documentation
+- `docs/design/l9-constellation-topology-spec.md` — architecture, contract, deployment, recovery, or model documentation
 - `docs/evidence-model.md` — architecture, contract, deployment, recovery, or model documentation
 - `docs/migration-v4-to-v5.md` — architecture, contract, deployment, recovery, or model documentation
 - `docs/output-sink.md` — architecture, contract, deployment, recovery, or model documentation

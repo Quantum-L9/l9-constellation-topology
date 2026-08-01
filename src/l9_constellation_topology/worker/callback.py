@@ -10,7 +10,7 @@ import ssl
 import time
 from dataclasses import dataclass
 from typing import Any
-from urllib.parse import urlparse
+from urllib.parse import ParseResult, urlparse
 
 from l9_constellation_topology.packets.transport import CallbackRef
 from l9_constellation_topology.run import canonical_bytes
@@ -165,7 +165,7 @@ def _safe_addresses(hostname: str, port: int, *, allow_loopback: bool) -> tuple[
             f"cannot resolve callback host {hostname}: {exc}",
             retryable=True,
         ) from exc
-    addresses = tuple(sorted({item[4][0] for item in resolved}))
+    addresses = tuple(sorted({str(item[4][0]) for item in resolved}))
     if not addresses:
         raise WorkerError(
             "callback-dns-resolution-empty",
@@ -191,7 +191,7 @@ def _safe_addresses(hostname: str, port: int, *, allow_loopback: bool) -> tuple[
     return addresses
 
 
-def _validate_endpoint(endpoint: ResolvedCallback) -> tuple[object, tuple[str, ...], int, str]:
+def _validate_endpoint(endpoint: ResolvedCallback) -> tuple[ParseResult, tuple[str, ...], int, str]:
     parsed = urlparse(endpoint.url)
     if parsed.username or parsed.password or parsed.fragment:
         raise WorkerError(

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import shutil
 from concurrent.futures import ThreadPoolExecutor
-from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
@@ -89,11 +88,14 @@ def test_idempotency_fingerprint_changes_for_every_semantic_policy(tmp_path: Pat
         profile["remediation_test_marker"] = profile_name
         profile_path.write_text(yaml.safe_dump(profile, sort_keys=True), encoding="utf-8")
         changed = resolve_configuration(root)
-        assert calculate_idempotency_key(
-            refs,
-            changed,
-            compiler_build_identity="git:" + "a" * 40,
-        ) != base_key
+        assert (
+            calculate_idempotency_key(
+                refs,
+                changed,
+                compiler_build_identity="git:" + "a" * 40,
+            )
+            != base_key
+        )
 
 
 def test_idempotency_fingerprint_changes_for_schema_and_build_identity(tmp_path: Path) -> None:
@@ -109,16 +111,22 @@ def test_idempotency_fingerprint_changes_for_schema_and_build_identity(tmp_path:
     schema = root / "contracts/topology-packet.schema.json"
     schema.write_text(schema.read_text(encoding="utf-8") + "\n", encoding="utf-8")
     changed = resolve_configuration(root)
-    assert calculate_idempotency_key(
-        refs,
-        changed,
-        compiler_build_identity="git:" + "a" * 40,
-    ) != base_key
-    assert calculate_idempotency_key(
-        refs,
-        base,
-        compiler_build_identity="git:" + "b" * 40,
-    ) != base_key
+    assert (
+        calculate_idempotency_key(
+            refs,
+            changed,
+            compiler_build_identity="git:" + "a" * 40,
+        )
+        != base_key
+    )
+    assert (
+        calculate_idempotency_key(
+            refs,
+            base,
+            compiler_build_identity="git:" + "b" * 40,
+        )
+        != base_key
+    )
 
 
 def _write_bundle_with_diagnostic(source: Path, destination: Path) -> Path:

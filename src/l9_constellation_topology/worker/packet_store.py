@@ -62,7 +62,6 @@ def _oci_repository(reference: str) -> str:
     return value
 
 
-
 def _publication_staging_target(output_uri: str, bundle_path: Path) -> str:
     materialized, _ = load_topology_bundle(bundle_path)
     semantic_digest = materialized.packet.semantic_hash.removeprefix("sha256:")
@@ -380,9 +379,7 @@ class PacketStoreClient:
                 blocked=True,
             )
         workspace.mkdir(parents=True, exist_ok=True)
-        verification_path = Path(
-            tempfile.mkdtemp(prefix="verify-published-", dir=workspace)
-        )
+        verification_path = Path(tempfile.mkdtemp(prefix="verify-published-", dir=workspace))
         completed = subprocess.run(
             [
                 self._oras(),
