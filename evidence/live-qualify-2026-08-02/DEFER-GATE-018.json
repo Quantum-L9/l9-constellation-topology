@@ -1,0 +1,10 @@
+{
+  "blocking_detail": "Requires live CEG semantic match success or explicit sparse-graph waiver with live sample",
+  "campaign_packet": "ledger/artifacts/live-qualify/CAMPAIGN-GATE-LIVE-QUALIFY-NONDESTRUCTIVE.json",
+  "content_digest": "sha256:8b2a00e22f029773efc8fef76d5b574098e86f322d537cf3bb1907c5bba8410e",
+  "gate_id": "GATE-018",
+  "observed_at": "2026-08-02T22:55:01+00:00",
+  "reason": "Requires live CEG semantic match success or explicit sparse-graph waiver with live sample",
+  "schema": "l9.live_qualify.defer_receipt.v1",
+  "status": "DEFERRED"
+}

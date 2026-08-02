@@ -1,0 +1,147 @@
+{
+  "campaign_packet": "ledger/artifacts/live-qualify/CAMPAIGN-GATE-LIVE-QUALIFY-NONDESTRUCTIVE.json",
+  "content_digest": "sha256:e7175e393f37ba2ac95a19b79ce11675eeff8fd4ad2ffd4aaf715976a21d71e2",
+  "docker_ps": [
+    "enrichmentinferenceengine-api-1\tUp 3 minutes (healthy)\t0.0.0.0:8001->8000/tcp, [::]:8001->8000/tcp",
+    "l9-graph-api\tUp 3 minutes (healthy)\t0.0.0.0:8000->8000/tcp, [::]:8000->8000/tcp",
+    "enrichmentinferenceengine-redis-1\tUp 3 minutes (healthy)\t6379/tcp",
+    "otel-collector\tUp 3 minutes (unhealthy)\t0.0.0.0:4317-4318->4317-4318/tcp, [::]:4317-4318->4317-4318/tcp, 0.0.0.0:8889->8889/tcp, [::]:8889->8889/tcp, 0.0.0.0:13133->13133/tcp, [::]:13133->13133/tcp",
+    "l9-graph-postgres\tUp 3 minutes (healthy)\t0.0.0.0:5432->5432/tcp, [::]:5432->5432/tcp",
+    "l9-graph-redis\tUp 3 minutes (healthy)\t0.0.0.0:6379->6379/tcp, [::]:6379->6379/tcp",
+    "l9-graph-neo4j\tUp 3 minutes (healthy)\t0.0.0.0:7475->7474/tcp, [::]:7475->7474/tcp, 0.0.0.0:7688->7687/tcp, [::]:7688->7687/tcp"
+  ],
+  "endpoints": {
+    "ceg": "http://127.0.0.1:8000",
+    "eie": "http://127.0.0.1:8001",
+    "gate": "http://127.0.0.1:9000"
+  },
+  "health": {
+    "ceg": {
+      "node_name": "ceg-real",
+      "ready": true,
+      "service_name": "ceg-real",
+      "service_version": "1.1.0",
+      "status": "healthy"
+    },
+    "eie": {
+      "circuit_breaker_state": "closed",
+      "kb_grades": 0,
+      "kb_loaded": true,
+      "kb_polymers": 0,
+      "kb_rules": 0,
+      "status": "ok",
+      "version": "2.3.0"
+    },
+    "gate": {
+      "environment": "local",
+      "node_name": "gate",
+      "service_name": "constellation-gate",
+      "status": "healthy"
+    }
+  },
+  "note": "Pre-existing stack exercised; Odoo not running on :8069/:8070",
+  "observed_at": "2026-08-02T22:54:58+00:00",
+  "odoo_observed": false,
+  "registry": {
+    "ceg-real": {
+      "active_requests": 0,
+      "health_endpoint": "/v1/health",
+      "healthy": true,
+      "internal_url": "http://127.0.0.1:8000",
+      "max_concurrent": 50,
+      "metadata": {
+        "owner": "ceg",
+        "proof": "real-sdk-aligned-utc-hash"
+      },
+      "node_name": "ceg-real",
+      "priority_class": "P0",
+      "supported_actions": [
+        "match",
+        "sync",
+        "admin",
+        "outcomes",
+        "resolve"
+      ],
+      "timeout_ms": 60000
+    },
+    "enrichment-engine": {
+      "active_requests": 0,
+      "health_endpoint": "/v1/health",
+      "healthy": true,
+      "internal_url": "http://127.0.0.1:8001",
+      "max_concurrent": 50,
+      "metadata": {
+        "owner": "eie",
+        "proof": "real-sdk-aligned-utc-hash"
+      },
+      "node_name": "enrichment-engine",
+      "priority_class": "P0",
+      "supported_actions": [
+        "converge",
+        "graph-inference-result"
+      ],
+      "timeout_ms": 60000
+    },
+    "graph": {
+      "active_requests": 0,
+      "health_endpoint": "/v1/health",
+      "healthy": true,
+      "internal_url": "http://graph:8000",
+      "max_concurrent": 100,
+      "metadata": {
+        "generated_by": "constellation-node-sdk",
+        "type": "engine",
+        "version": "1.1.0"
+      },
+      "node_name": "graph",
+      "priority_class": "P1",
+      "supported_actions": [
+        "graph-query",
+        "graph-traverse",
+        "graph-expand",
+        "graph-neighborhood",
+        "graph-similarity",
+        "graph-path",
+        "graph-match",
+        "graph-score",
+        "graph-rank",
+        "graph-converge",
+        "graph-arbitrate",
+        "graph-infer",
+        "graph-resolve",
+        "graph-enrich",
+        "graph-intake",
+        "graph-upsert",
+        "graph-delete",
+        "graph-feedback",
+        "graph-decay",
+        "graph-reinforce",
+        "graph-health",
+        "graph-audit",
+        "graph-explain"
+      ],
+      "timeout_ms": 30000
+    }
+  },
+  "round_trips": {
+    "converge": {
+      "action": "converge",
+      "hop_count": 1,
+      "hop_packet_ids_match_header": true,
+      "http_status": 200,
+      "packet_type": "failure",
+      "payload_status": "failed",
+      "transport_ok": true
+    },
+    "match": {
+      "action": "match",
+      "hop_count": 1,
+      "hop_packet_ids_match_header": true,
+      "http_status": 200,
+      "packet_type": "failure",
+      "payload_status": "failed",
+      "transport_ok": true
+    }
+  },
+  "schema": "l9.live_qualify.stack_health_snapshot.v1"
+}

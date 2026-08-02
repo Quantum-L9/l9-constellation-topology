@@ -1,0 +1,7 @@
+{
+  "gate_id": "GATE-011",
+  "status": "DEFER",
+  "reason": "Odoo HTTP up but plasticos_base/plasticos_gate install chain failed (plasticos_logistics record_rules missing plasticos_security_base.group_sales_rep). Cannot claim odoo_safe_phase_a LIVE.",
+  "recorded_at": "2026-08-02T23:08:08+00:00",
+  "related_proof": "ledger/artifacts/live-qualify/PROGRAM-E2E-PROOF.json"
+}

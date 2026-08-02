@@ -1,0 +1,10 @@
+{
+  "blocking_detail": "Optional shadow scorer equivalence \u2014 no live shadow compare run",
+  "campaign_packet": "ledger/artifacts/live-qualify/CAMPAIGN-GATE-LIVE-QUALIFY-NONDESTRUCTIVE.json",
+  "content_digest": "sha256:f3fee8929be9e447be097ac5a14c6d7934c1d7d4103371d092def7462d8db271",
+  "gate_id": "GATE-022",
+  "observed_at": "2026-08-02T22:55:01+00:00",
+  "reason": "Optional shadow scorer equivalence \u2014 no live shadow compare run",
+  "schema": "l9.live_qualify.defer_receipt.v1",
+  "status": "DEFERRED"
+}

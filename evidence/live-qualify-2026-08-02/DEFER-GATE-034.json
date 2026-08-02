@@ -1,0 +1,10 @@
+{
+  "blocking_detail": "Requires capability catalog authorization/redaction live tests",
+  "campaign_packet": "ledger/artifacts/live-qualify/CAMPAIGN-GATE-LIVE-QUALIFY-NONDESTRUCTIVE.json",
+  "content_digest": "sha256:008214749a4dd6ca58333942a9b9c004ed97cb5fd8cf3a524f89533a4bd881b5",
+  "gate_id": "GATE-034",
+  "observed_at": "2026-08-02T22:55:01+00:00",
+  "reason": "Requires capability catalog authorization/redaction live tests",
+  "schema": "l9.live_qualify.defer_receipt.v1",
+  "status": "DEFERRED"
+}

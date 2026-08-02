@@ -1,0 +1,10 @@
+{
+  "blocking_detail": "Requires bidirectional match direction live semantic proof",
+  "campaign_packet": "ledger/artifacts/live-qualify/CAMPAIGN-GATE-LIVE-QUALIFY-NONDESTRUCTIVE.json",
+  "content_digest": "sha256:f2de904d2d4e94422f5fbb76d418b6ca0633dc44c85605a5b57ee8e3ff2329e1",
+  "gate_id": "GATE-027",
+  "observed_at": "2026-08-02T22:55:01+00:00",
+  "reason": "Requires bidirectional match direction live semantic proof",
+  "schema": "l9.live_qualify.defer_receipt.v1",
+  "status": "DEFERRED"
+}

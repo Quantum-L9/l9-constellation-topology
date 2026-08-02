@@ -1,0 +1,10 @@
+{
+  "blocking_detail": "Requires SDK consumer lockstep pin verification across all repos",
+  "campaign_packet": "ledger/artifacts/live-qualify/CAMPAIGN-GATE-LIVE-QUALIFY-NONDESTRUCTIVE.json",
+  "content_digest": "sha256:9ce559a7611c772b1b71c8642a22501e616d2b3464928caa9bf0c18bf191fc78",
+  "gate_id": "GATE-035",
+  "observed_at": "2026-08-02T22:55:01+00:00",
+  "reason": "Requires SDK consumer lockstep pin verification across all repos",
+  "schema": "l9.live_qualify.defer_receipt.v1",
+  "status": "DEFERRED"
+}

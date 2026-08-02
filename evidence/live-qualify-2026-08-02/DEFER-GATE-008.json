@@ -1,0 +1,10 @@
+{
+  "blocking_detail": "Requires gate workflow authority live exercise beyond registry snapshot",
+  "campaign_packet": "ledger/artifacts/live-qualify/CAMPAIGN-GATE-LIVE-QUALIFY-NONDESTRUCTIVE.json",
+  "content_digest": "sha256:c94b5122be3a244bd6a533fb92bf0cefa52483d2bbbe68c4d6175994142a3e44",
+  "gate_id": "GATE-008",
+  "observed_at": "2026-08-02T22:55:01+00:00",
+  "reason": "Requires gate workflow authority live exercise beyond registry snapshot",
+  "schema": "l9.live_qualify.defer_receipt.v1",
+  "status": "DEFERRED"
+}

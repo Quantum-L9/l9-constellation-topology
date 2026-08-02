@@ -1,0 +1,170 @@
+{
+  "schema": "l9.program_live_e2e_proof.v1",
+  "recorded_at": "2026-08-02T23:07:50+00:00",
+  "campaign": "autonomy-gate-live-qualify-nondestructive-2026-08-02",
+  "stack": {
+    "gate": {
+      "http": 200,
+      "body": {
+        "status": "healthy",
+        "service_name": "constellation-gate",
+        "node_name": "gate",
+        "environment": "local"
+      },
+      "mode": "host_uvicorn"
+    },
+    "ceg": {
+      "http": 200,
+      "body": {
+        "status": "healthy",
+        "service_name": "ceg-real",
+        "service_version": "1.1.0",
+        "node_name": "ceg-real",
+        "ready": true
+      },
+      "mode": "docker"
+    },
+    "eie": {
+      "http": 200,
+      "body": {
+        "status": "healthy",
+        "service_name": "enrichment-engine",
+        "service_version": "2.3.0",
+        "node_name": "enrichment-engine",
+        "ready": true
+      },
+      "mode": "docker"
+    },
+    "odoo": {
+      "http": 0,
+      "mode": "docker_odoo19",
+      "login_ok": false
+    }
+  },
+  "registry_nodes": [
+    "ceg-real",
+    "enrichment-engine",
+    "graph"
+  ],
+  "registry": {
+    "ceg-real": {
+      "node_name": "ceg-real",
+      "internal_url": "http://127.0.0.1:8000",
+      "supported_actions": [
+        "match",
+        "sync",
+        "admin",
+        "outcomes",
+        "resolve"
+      ],
+      "priority_class": "P0",
+      "max_concurrent": 50,
+      "health_endpoint": "/v1/health",
+      "timeout_ms": 60000,
+      "metadata": {
+        "owner": "ceg",
+        "proof": "real-sdk-aligned-utc-hash"
+      },
+      "healthy": true,
+      "active_requests": 0
+    },
+    "enrichment-engine": {
+      "node_name": "enrichment-engine",
+      "internal_url": "http://127.0.0.1:8001",
+      "supported_actions": [
+        "converge",
+        "graph-inference-result"
+      ],
+      "priority_class": "P0",
+      "max_concurrent": 50,
+      "health_endpoint": "/v1/health",
+      "timeout_ms": 60000,
+      "metadata": {
+        "owner": "eie",
+        "proof": "real-sdk-aligned-utc-hash"
+      },
+      "healthy": true,
+      "active_requests": 0
+    },
+    "graph": {
+      "node_name": "graph",
+      "internal_url": "http://graph:8000",
+      "supported_actions": [
+        "graph-query",
+        "graph-traverse",
+        "graph-expand",
+        "graph-neighborhood",
+        "graph-similarity",
+        "graph-path",
+        "graph-match",
+        "graph-score",
+        "graph-rank",
+        "graph-converge",
+        "graph-arbitrate",
+        "graph-infer",
+        "graph-resolve",
+        "graph-enrich",
+        "graph-intake",
+        "graph-upsert",
+        "graph-delete",
+        "graph-feedback",
+        "graph-decay",
+        "graph-reinforce",
+        "graph-health",
+        "graph-audit",
+        "graph-explain"
+      ],
+      "priority_class": "P1",
+      "max_concurrent": 100,
+      "health_endpoint": "/v1/health",
+      "timeout_ms": 30000,
+      "metadata": {
+        "version": "1.1.0",
+        "type": "engine",
+        "generated_by": "constellation-node-sdk"
+      },
+      "healthy": true,
+      "active_requests": 0
+    }
+  },
+  "transport_round_trips": {
+    "converge": {
+      "action": "converge",
+      "hop_count": 1,
+      "hop_packet_ids_match_header": true,
+      "http_status": 200,
+      "packet_type": "failure",
+      "payload_status": "failed",
+      "transport_ok": true
+    },
+    "match": {
+      "action": "match",
+      "hop_count": 1,
+      "hop_packet_ids_match_header": true,
+      "http_status": 200,
+      "packet_type": "failure",
+      "payload_status": "failed",
+      "transport_ok": true
+    }
+  },
+  "odoo_plasticos_install": {
+    "attempted": true,
+    "plasticos_gate_loaded_then_chain_failed": true,
+    "blocker": "plasticos_logistics record_rules require plasticos_security_base.group_sales_rep; earlier color_scheme NOT NULL mitigated via DB default",
+    "enterprise_mount": "empty (full enterprise blocked on xmlsec)"
+  },
+  "mothball": {
+    "scanner_exit": 0,
+    "buyer_match_engine_absent": true,
+    "inference_engine_absent": true,
+    "odoo_sha": "ref: refs/heads/Staging"
+  },
+  "honest_declaration": "Gate+CEG+EIE local live transport proven (HTTP 200 hop integrity; owner may return classified failures). Odoo container HTTP up. Full plasticos_gate consumer e2e NOT completed due to module-graph install failure. Not production.",
+  "LIVE_INTEGRATION_PASS_scope": "local_gate_ceg_eie_transport_only",
+  "not_claimed": [
+    "production_complete",
+    "full_odoo_plasticos_gate_consumer_e2e",
+    "business_cutover"
+  ],
+  "content_digest": "sha256:47a5c9fd54211fee82bfeec0d2c2604d37afd11a421c79aa67f8744c62f26fbf"
+}

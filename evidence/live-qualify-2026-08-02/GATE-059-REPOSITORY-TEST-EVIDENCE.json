@@ -1,0 +1,18 @@
+{
+  "content_digest": "sha256:a41b46fd09ff6dac3b32169321dab981ecc355a4e1bfaf7be88ca0a9e89e10e5",
+  "gate_id": "GATE-059",
+  "honest_declaration": "Tenant immutability and context enforcement verified by Gate_SDK unit tests.",
+  "observed_at": "2026-08-02T22:55:00+00:00",
+  "repo": "Gate_SDK",
+  "schema": "l9.live_qualify.repository_test_evidence.v1",
+  "spec_refs": [
+    "contracts/TRANSPORT_PACKET_SPEC.md",
+    "src/constellation_node_sdk/transport/tenant.py"
+  ],
+  "tests": {
+    "command": "pytest tests/transport/test_tenant.py",
+    "exit_code": 0,
+    "passed": true,
+    "summary": "                         [100%]\n=============================== warnings summary ===============================\n../Library/Python/3.12/lib/python/site-packages/pythonjsonlogger/jsonlogger.py:11\n  /Users/ib-mac/Library/Python/3.12/lib/python/site-packages/pythonjsonlogger/jsonlogger.py:11: DeprecationWarning: pythonjsonlogger.jsonlogger has been moved to pythonjsonlogger.json\n    warnings.warn(\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n4 passed, 1 warning in 0.11s\n"
+  }
+}

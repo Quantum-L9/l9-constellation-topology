@@ -1,0 +1,85 @@
+{
+  "campaign_packet": "ledger/artifacts/live-qualify/CAMPAIGN-GATE-LIVE-QUALIFY-NONDESTRUCTIVE.json",
+  "canonical_actions_in_registry": [
+    "admin",
+    "converge",
+    "graph-inference-result",
+    "match",
+    "outcomes",
+    "resolve",
+    "sync"
+  ],
+  "content_digest": "sha256:78b555cb6c264cc3d6df83c2862502a012ae45b8afff63f4ac28249e9335756a",
+  "gate_url": "http://127.0.0.1:9000",
+  "honest_declaration": "Local live Gate+CEG+EIE health and registry observed; match/converge TransportPacket round-trips return HTTP 200 with hop integrity. Owner handlers may return classified failure payloads (sparse graph). Odoo consumer path not exercised (Odoo not running).",
+  "not_claimed": [
+    "production_complete",
+    "Odoo dual-write parity"
+  ],
+  "observed_at": "2026-08-02T22:54:58+00:00",
+  "registry": {
+    "ceg-real": {
+      "active_requests": 0,
+      "health_endpoint": "/v1/health",
+      "healthy": true,
+      "internal_url": "http://127.0.0.1:8000",
+      "max_concurrent": 50,
+      "metadata": {
+        "owner": "ceg",
+        "proof": "real-sdk-aligned-utc-hash"
+      },
+      "node_name": "ceg-real",
+      "priority_class": "P0",
+      "supported_actions": [
+        "match",
+        "sync",
+        "admin",
+        "outcomes",
+        "resolve"
+      ],
+      "timeout_ms": 60000
+    },
+    "enrichment-engine": {
+      "active_requests": 0,
+      "health_endpoint": "/v1/health",
+      "healthy": true,
+      "internal_url": "http://127.0.0.1:8001",
+      "max_concurrent": 50,
+      "metadata": {
+        "owner": "eie",
+        "proof": "real-sdk-aligned-utc-hash"
+      },
+      "node_name": "enrichment-engine",
+      "priority_class": "P0",
+      "supported_actions": [
+        "converge",
+        "graph-inference-result"
+      ],
+      "timeout_ms": 60000
+    }
+  },
+  "round_trips": {
+    "converge": {
+      "action": "converge",
+      "hop_count": 1,
+      "hop_packet_ids_match_header": true,
+      "http_status": 200,
+      "packet_type": "failure",
+      "payload_status": "failed",
+      "transport_ok": true
+    },
+    "match": {
+      "action": "match",
+      "hop_count": 1,
+      "hop_packet_ids_match_header": true,
+      "http_status": 200,
+      "packet_type": "failure",
+      "payload_status": "failed",
+      "transport_ok": true
+    }
+  },
+  "schema": "l9.live_qualify.live_integration_evidence.v1",
+  "sdk_path": "/Users/ib-mac/Gate_SDK",
+  "stack_snapshot": "ledger/artifacts/live-qualify/STACK-HEALTH-SNAPSHOT.json",
+  "stack_snapshot_digest": "sha256:f8c43cdad5a4baa609e18e1e4af97cab8b7bfd6528fdeb5edf4247046851b902"
+}

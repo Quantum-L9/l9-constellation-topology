@@ -1,0 +1,17 @@
+{
+  "schema": "l9.operator_approve_slip.v1",
+  "approved_at": "2026-08-02T22:52:44+00:00",
+  "approver": "operator:ib-mac",
+  "packet_id": "autonomy-gate-live-qualify-nondestructive-2026-08-02",
+  "selected_option": "APPROVE_CAMPAIGN_A_NONDESTRUCTIVE_GATE_QUALIFY",
+  "verbatim_operator_message": "make me an approve packet to unblock everything non destructive / i approve you to bring up the local stack named in LIVE-INTEGRATION-STACK-GAP.json / use docker as needed it's launched - only keep containers active while you're using them",
+  "docker_local_stack_approved": true,
+  "destructive_not_approved": true,
+  "amendments": [
+    {
+      "at": "2026-08-02T22:55:38+00:00",
+      "verbatim": "you must deploy as many containers as necessary to run full e2e testing",
+      "interpretation": "local docker e2e stack including Odoo/Gate/deps; not production deploy"
+    }
+  ]
+}

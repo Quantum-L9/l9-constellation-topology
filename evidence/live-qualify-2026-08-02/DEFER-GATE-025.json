@@ -1,0 +1,10 @@
+{
+  "blocking_detail": "Requires field ownership registry live cross-service proof",
+  "campaign_packet": "ledger/artifacts/live-qualify/CAMPAIGN-GATE-LIVE-QUALIFY-NONDESTRUCTIVE.json",
+  "content_digest": "sha256:8fcc6ce963c300f1140e8cf71d3cbd8bd052ba6b8dfdf0e05263782a32f42eb7",
+  "gate_id": "GATE-025",
+  "observed_at": "2026-08-02T22:55:01+00:00",
+  "reason": "Requires field ownership registry live cross-service proof",
+  "schema": "l9.live_qualify.defer_receipt.v1",
+  "status": "DEFERRED"
+}

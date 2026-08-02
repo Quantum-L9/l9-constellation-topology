@@ -1,0 +1,69 @@
+{
+  "authorization_class": "A0",
+  "authorization_id": "A0-GATE-LIVE-QUALIFY-NONDESTRUCTIVE-20260802",
+  "issued_at": "2026-08-02T22:52:44+00:00",
+  "expires_at": "2026-08-16T22:52:44+00:00",
+  "issued_by": "operator:ib-mac",
+  "program_digest": "sha256:9cd1a79f948dac419913c134396e58359e4df82862bb3901bdd327684a37cb52",
+  "publication_ceiling": "local_only",
+  "max_parallel_workers": 2,
+  "max_retry_attempts": 2,
+  "permitted_waves": [
+    "W0",
+    "W1",
+    "W2",
+    "W3",
+    "W4",
+    "W5",
+    "W6",
+    "W7",
+    "W8",
+    "W9",
+    "W10"
+  ],
+  "permitted_repositories": [
+    "gate-sdk",
+    "constellation-gate",
+    "ceg",
+    "eie",
+    "odoo"
+  ],
+  "permitted_risk_tiers": [
+    "T0",
+    "T1",
+    "T2",
+    "T3",
+    "T4"
+  ],
+  "permitted_action_classes": [
+    "controller_evidence_work",
+    "local_repository_execution",
+    "local_live_stack_exercise",
+    "set_gate_status",
+    "recover_expired_non_destructive_lease"
+  ],
+  "explicit_forbids": [
+    "waive_blocking_gate",
+    "fake_LIVE_INTEGRATION_PASS",
+    "deploy",
+    "cutover",
+    "release",
+    "tag",
+    "mark_ready",
+    "approve_pr",
+    "merge",
+    "remote_publication",
+    "publish_verified_draft",
+    "destructive_file_or_data_deletion",
+    "execute_destructive_task",
+    "production_database_migration",
+    "production_cutover",
+    "uninstall_production_addon",
+    "automatic_production_uninstall",
+    "drop_business_audit_records",
+    "resolve_semantic_unknown",
+    "expand_task_scope"
+  ],
+  "signature_or_controller_attestation": "operator-approve-packet-unblock-nondestructive-local-stack-docker-ok",
+  "bound_campaign_packet": "ledger/artifacts/live-qualify/CAMPAIGN-GATE-LIVE-QUALIFY-NONDESTRUCTIVE.json"
+}

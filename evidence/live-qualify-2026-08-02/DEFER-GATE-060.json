@@ -1,0 +1,10 @@
+{
+  "blocking_detail": "Requires load/retry/backpressure live spec exercise",
+  "campaign_packet": "ledger/artifacts/live-qualify/CAMPAIGN-GATE-LIVE-QUALIFY-NONDESTRUCTIVE.json",
+  "content_digest": "sha256:f539b5585427f872317f5601f0b621e21303e5af7e4289fd73e5365585343f53",
+  "gate_id": "GATE-060",
+  "observed_at": "2026-08-02T22:55:01+00:00",
+  "reason": "Requires load/retry/backpressure live spec exercise",
+  "schema": "l9.live_qualify.defer_receipt.v1",
+  "status": "DEFERRED"
+}
