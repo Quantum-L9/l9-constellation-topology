@@ -1,0 +1,10 @@
+{
+  "blocking_detail": "Requires cross-repo SDK release tag/SHA pin verification against GitHub release",
+  "campaign_packet": "ledger/artifacts/live-qualify/CAMPAIGN-GATE-LIVE-QUALIFY-NONDESTRUCTIVE.json",
+  "content_digest": "sha256:9900230c5654ec266ce039b6d2aaf35c821ccea492a60877a730741b238961a0",
+  "gate_id": "GATE-004",
+  "observed_at": "2026-08-02T22:55:01+00:00",
+  "reason": "Requires cross-repo SDK release tag/SHA pin verification against GitHub release",
+  "schema": "l9.live_qualify.defer_receipt.v1",
+  "status": "DEFERRED"
+}

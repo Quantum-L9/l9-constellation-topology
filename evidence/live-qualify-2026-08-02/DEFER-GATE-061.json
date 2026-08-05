@@ -1,0 +1,10 @@
+{
+  "blocking_detail": "Requires constellation release identity live proof",
+  "campaign_packet": "ledger/artifacts/live-qualify/CAMPAIGN-GATE-LIVE-QUALIFY-NONDESTRUCTIVE.json",
+  "content_digest": "sha256:6b0a93d78183a13d05857f4966557ac853a35f3b72c5dcc31df7f8ef241ed44a",
+  "gate_id": "GATE-061",
+  "observed_at": "2026-08-02T22:55:01+00:00",
+  "reason": "Requires constellation release identity live proof",
+  "schema": "l9.live_qualify.defer_receipt.v1",
+  "status": "DEFERRED"
+}

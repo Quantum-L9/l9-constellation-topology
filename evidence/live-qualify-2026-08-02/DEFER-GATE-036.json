@@ -1,0 +1,10 @@
+{
+  "blocking_detail": "Requires cross-repository fixture parity live compare",
+  "campaign_packet": "ledger/artifacts/live-qualify/CAMPAIGN-GATE-LIVE-QUALIFY-NONDESTRUCTIVE.json",
+  "content_digest": "sha256:2cd409aa102dc51dacef611ec7ac647ab3ae14b1d88f91f243cbf06d89dbeaca",
+  "gate_id": "GATE-036",
+  "observed_at": "2026-08-02T22:55:01+00:00",
+  "reason": "Requires cross-repository fixture parity live compare",
+  "schema": "l9.live_qualify.defer_receipt.v1",
+  "status": "DEFERRED"
+}

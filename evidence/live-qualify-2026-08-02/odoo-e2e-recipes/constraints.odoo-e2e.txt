@@ -1,0 +1,40 @@
+# constraints.txt — transitive dependency lock for Dockerfile installs (SonarCloud S8541/S8544)
+# Regenerate: make lock-deps  (resolves requirements.txt in a clean venv and freezes)
+# Note: git-pinned direct deps (constellation-node-sdk, pr-repair) are already SHA-locked in requirements.txt.
+annotated-doc==0.0.4
+annotated-types==0.8.0
+anyio==4.14.2
+certifi==2026.7.22
+cffi==2.1.0
+charset-normalizer==3.4.9
+click==8.4.2
+cryptography==43.0.3
+distro==1.9.0
+fastapi==0.139.2
+h11==0.16.0
+httpcore==1.0.9
+httptools==0.8.0
+httpx==0.28.1
+idna==3.18
+jiter==0.16.0
+neo4j==6.2.0
+openai==2.48.0
+prometheus_client==0.25.0
+pycparser==3.0
+pydantic==2.13.4
+pydantic_core==2.46.4
+python-dotenv==1.2.2
+python-json-logger==4.1.0
+pytz==2026.2
+PyYAML==6.0.3
+requests==2.34.2
+sniffio==1.3.1
+starlette==1.3.1
+tqdm==4.69.0
+typing-inspection==0.4.2
+typing_extensions==4.16.0
+urllib3==2.7.0
+uvicorn==0.51.0
+uvloop==0.22.1
+watchfiles==1.2.0
+websockets==16.1.1

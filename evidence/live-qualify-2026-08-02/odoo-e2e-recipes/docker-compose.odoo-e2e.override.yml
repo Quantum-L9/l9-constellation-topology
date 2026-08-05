@@ -1,0 +1,10 @@
+services:
+  odoo:
+    build:
+      context: /Users/ib-mac/l9-constellation-control/ledger/artifacts/live-qualify/odoo-build-context
+      dockerfile: Dockerfile
+    volumes:
+      - /Users/ib-mac/l9-constellation-repos/IB-Odoo_19:/mnt/extra-addons
+      - /Users/ib-mac/l9-constellation-control/ledger/artifacts/live-qualify/empty-enterprise:/mnt/enterprise:ro
+      - odoo_data:/var/lib/odoo
+      - /Users/ib-mac/l9-constellation-control/ledger/artifacts/live-qualify/odoo-etc-e2e:/etc/odoo:ro
