@@ -1,0 +1,10 @@
+{
+  "blocking_detail": "Requires schema publication version lock live proof",
+  "campaign_packet": "ledger/artifacts/live-qualify/CAMPAIGN-GATE-LIVE-QUALIFY-NONDESTRUCTIVE.json",
+  "content_digest": "sha256:9f6ee134daea546ad1362b5a103d4cc346be47dfe091a2e5046d293a84fdc9cb",
+  "gate_id": "GATE-046",
+  "observed_at": "2026-08-02T22:55:01+00:00",
+  "reason": "Requires schema publication version lock live proof",
+  "schema": "l9.live_qualify.defer_receipt.v1",
+  "status": "DEFERRED"
+}

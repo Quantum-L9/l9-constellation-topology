@@ -1,0 +1,251 @@
+{
+  "schema": "l9.program_completion_report.v1",
+  "recorded_at": "2026-08-02T23:08:09+00:00",
+  "program_digest": "sha256:9cd1a79f948dac419913c134396e58359e4df82862bb3901bdd327684a37cb52",
+  "campaign_w8_w10": "COMPLETE",
+  "gate_qualification_campaign": "autonomy-gate-live-qualify-nondestructive-2026-08-02",
+  "gate_status_counts": {
+    "PACK_VALIDATION_PASS": 19,
+    "LIVE_INTEGRATION_PASS": 10,
+    "BLOCKED": 29,
+    "REPOSITORY_TEST_PASS": 15,
+    "PROMOTION_APPROVED": 6,
+    "DRAFT_SPEC_PASS": 1
+  },
+  "gates_LIVE_INTEGRATION_PASS": [
+    "GATE-003",
+    "GATE-005",
+    "GATE-006",
+    "GATE-007",
+    "GATE-009",
+    "GATE-010",
+    "GATE-048",
+    "GATE-054",
+    "GATE-055",
+    "GATE-069"
+  ],
+  "gates_PROMOTION_APPROVED": [
+    "GATE-063",
+    "GATE-064",
+    "GATE-065",
+    "GATE-067",
+    "GATE-068",
+    "GATE-075"
+  ],
+  "gates_REPOSITORY_TEST_PASS": [
+    "GATE-047",
+    "GATE-049",
+    "GATE-050",
+    "GATE-051",
+    "GATE-052",
+    "GATE-053",
+    "GATE-056",
+    "GATE-059",
+    "GATE-066",
+    "GATE-070",
+    "GATE-071",
+    "GATE-072",
+    "GATE-073",
+    "GATE-078",
+    "GATE-079"
+  ],
+  "gates_BLOCKED_remaining": [
+    "GATE-004",
+    "GATE-008",
+    "GATE-011",
+    "GATE-012",
+    "GATE-013",
+    "GATE-015",
+    "GATE-018",
+    "GATE-019",
+    "GATE-020",
+    "GATE-021",
+    "GATE-022",
+    "GATE-023",
+    "GATE-025",
+    "GATE-026",
+    "GATE-027",
+    "GATE-028",
+    "GATE-029",
+    "GATE-032",
+    "GATE-034",
+    "GATE-035",
+    "GATE-036",
+    "GATE-037",
+    "GATE-038",
+    "GATE-042",
+    "GATE-045",
+    "GATE-046",
+    "GATE-060",
+    "GATE-061",
+    "GATE-062"
+  ],
+  "blocked_detail": [
+    {
+      "id": "GATE-004",
+      "name": "canonical_sdk_release",
+      "required_proof_class": "live_integration_proof"
+    },
+    {
+      "id": "GATE-008",
+      "name": "gate_workflow_authority",
+      "required_proof_class": "live_integration_proof"
+    },
+    {
+      "id": "GATE-011",
+      "name": "odoo_safe_phase_a",
+      "required_proof_class": "live_integration_proof"
+    },
+    {
+      "id": "GATE-012",
+      "name": "odoo_operator_decisions",
+      "required_proof_class": "live_integration_proof"
+    },
+    {
+      "id": "GATE-013",
+      "name": "odoo_observability_safety",
+      "required_proof_class": "live_integration_proof"
+    },
+    {
+      "id": "GATE-015",
+      "name": "odoo_runtime_dependency_compatibility",
+      "required_proof_class": "live_integration_proof"
+    },
+    {
+      "id": "GATE-018",
+      "name": "compiler_targets_live_ceg_contracts",
+      "required_proof_class": "live_integration_proof"
+    },
+    {
+      "id": "GATE-019",
+      "name": "eie_feature_evidence_contract",
+      "required_proof_class": "live_integration_proof"
+    },
+    {
+      "id": "GATE-020",
+      "name": "plasticos_semantic_ownership",
+      "required_proof_class": "live_integration_proof"
+    },
+    {
+      "id": "GATE-021",
+      "name": "plasticos_operator_decisions_for_scoring",
+      "required_proof_class": "live_integration_proof"
+    },
+    {
+      "id": "GATE-022",
+      "name": "optional_shadow_scorer_equivalence",
+      "required_proof_class": "live_integration_proof"
+    },
+    {
+      "id": "GATE-023",
+      "name": "odoo_pr_portfolio_cleanup",
+      "required_proof_class": "live_integration_proof"
+    },
+    {
+      "id": "GATE-025",
+      "name": "field_ownership_registry",
+      "required_proof_class": "live_integration_proof"
+    },
+    {
+      "id": "GATE-026",
+      "name": "ceg_plasticos_executable_spec_authority",
+      "required_proof_class": "live_integration_proof"
+    },
+    {
+      "id": "GATE-027",
+      "name": "bidirectional_match_direction_contract",
+      "required_proof_class": "live_integration_proof"
+    },
+    {
+      "id": "GATE-028",
+      "name": "eie_feature_evidence_contract",
+      "required_proof_class": "live_integration_proof"
+    },
+    {
+      "id": "GATE-029",
+      "name": "odoo_additive_migration_reconciliation",
+      "required_proof_class": "live_integration_proof"
+    },
+    {
+      "id": "GATE-032",
+      "name": "rollback_rehearsal",
+      "required_proof_class": "live_integration_proof"
+    },
+    {
+      "id": "GATE-034",
+      "name": "capability_catalog_safety",
+      "required_proof_class": "live_integration_proof"
+    },
+    {
+      "id": "GATE-035",
+      "name": "sdk_consumer_lockstep",
+      "required_proof_class": "live_integration_proof"
+    },
+    {
+      "id": "GATE-036",
+      "name": "cross_repository_fixture_parity",
+      "required_proof_class": "live_integration_proof"
+    },
+    {
+      "id": "GATE-037",
+      "name": "shadow_projection_equivalence",
+      "required_proof_class": "live_integration_proof"
+    },
+    {
+      "id": "GATE-038",
+      "name": "business_workflow_cutover",
+      "required_proof_class": "live_integration_proof"
+    },
+    {
+      "id": "GATE-042",
+      "name": "opportunity_schema_split",
+      "required_proof_class": "live_integration_proof"
+    },
+    {
+      "id": "GATE-045",
+      "name": "producer_consumer_schema_parity",
+      "required_proof_class": "live_integration_proof"
+    },
+    {
+      "id": "GATE-046",
+      "name": "schema_publication_version_lock",
+      "required_proof_class": "live_integration_proof"
+    },
+    {
+      "id": "GATE-060",
+      "name": "load_retry_backpressure_and_recovery_spec",
+      "required_proof_class": "live_integration_proof"
+    },
+    {
+      "id": "GATE-061",
+      "name": "constellation_release_identity",
+      "required_proof_class": "live_integration_proof"
+    },
+    {
+      "id": "GATE-062",
+      "name": "runtime_data_parity",
+      "required_proof_class": "live_integration_proof"
+    }
+  ],
+  "e2e_proof": "ledger/artifacts/live-qualify/PROGRAM-E2E-PROOF.json",
+  "proven": [
+    "W8-W10 ready_impl_order terminal",
+    "Local Gate+CEG+EIE transport LIVE",
+    "Mothball absence + drift scanner LIVE (054/055)",
+    "Delivery branch Staging LIVE (069)",
+    "Odoo container HTTP healthy"
+  ],
+  "not_proven": [
+    "Full Odoo plasticos_gate consumer e2e (module install graph failure)",
+    "Production deploy/cutover",
+    "All previously-BLOCKED gates green"
+  ],
+  "blockers_for_remaining_gates": [
+    "Enterprise addons require xmlsec and full enterprise mount",
+    "plasticos_logistics security XML references missing plasticos_security_base",
+    "Several gates need cross-repo release tags / semantic live data / dual-write DB rows"
+  ],
+  "honest_program_status": "CAMPAIGN_COMPLETE; LIVE_TRANSPORT_QUALIFIED; ODOO_CONSUMER_E2E_INCOMPLETE; NOT_PRODUCTION",
+  "claim_LIVE_INTEGRATION_PASS_full_program": false,
+  "content_digest": "sha256:c0e30ef2ff6ca5952cbff153937b6c1b9fd4bc88e04e819d02a5fb1e9440d9bf"
+}

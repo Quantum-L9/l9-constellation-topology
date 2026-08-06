@@ -1,0 +1,38 @@
+{
+  "recorded_at": "2026-08-02T23:04:46+00:00",
+  "operator_authority": "local containers for full e2e \u2014 not production deploy",
+  "gate": {
+    "url": "http://127.0.0.1:9000",
+    "mode": "host_uvicorn",
+    "container": false
+  },
+  "ceg": {
+    "url": "http://127.0.0.1:8000",
+    "containers": [
+      "l9-graph-api",
+      "l9-graph-neo4j",
+      "l9-graph-redis",
+      "l9-graph-postgres"
+    ]
+  },
+  "eie": {
+    "url": "http://127.0.0.1:8001",
+    "containers": [
+      "enrichmentinferenceengine-api-1"
+    ]
+  },
+  "odoo": {
+    "url": "http://127.0.0.1:8069",
+    "containers": [
+      "odoo19-odoo-1",
+      "odoo19-db-1"
+    ],
+    "login_http_ok": true,
+    "enterprise_mount": "empty (skipped full enterprise for e2e bring-up)"
+  },
+  "notes": [
+    "Gate already healthy as host process \u2014 no Gate container required",
+    "Odoo brought via compose project odoo19 with e2e overlay",
+    "Keep active only while qualifying; stop odoo19 when idle"
+  ]
+}

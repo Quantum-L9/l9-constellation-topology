@@ -1,0 +1,10 @@
+{
+  "blocking_detail": "Requires live Odoo consumer on :8069/:8070 for odoo-scoped proof",
+  "campaign_packet": "ledger/artifacts/live-qualify/CAMPAIGN-GATE-LIVE-QUALIFY-NONDESTRUCTIVE.json",
+  "content_digest": "sha256:bffdd9040e2c017fb561559535e664ff119d217d64f650a8a558258041c58eed",
+  "gate_id": "GATE-021",
+  "observed_at": "2026-08-02T22:55:01+00:00",
+  "reason": "Odoo not running",
+  "schema": "l9.live_qualify.defer_receipt.v1",
+  "status": "DEFERRED"
+}

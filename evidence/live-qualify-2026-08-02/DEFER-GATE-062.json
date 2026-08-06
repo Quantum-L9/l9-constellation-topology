@@ -1,0 +1,10 @@
+{
+  "blocking_detail": "Requires runtime data parity with live DB rows",
+  "campaign_packet": "ledger/artifacts/live-qualify/CAMPAIGN-GATE-LIVE-QUALIFY-NONDESTRUCTIVE.json",
+  "content_digest": "sha256:9ad3e7efe2767ac35457c8f0795879bf65bbbf2363fa3b55279539484659adf1",
+  "gate_id": "GATE-062",
+  "observed_at": "2026-08-02T22:55:01+00:00",
+  "reason": "Requires runtime data parity with live DB rows",
+  "schema": "l9.live_qualify.defer_receipt.v1",
+  "status": "DEFERRED"
+}

@@ -1,0 +1,944 @@
+{
+  "schema": "l9.campaign_authorization_packet.v1",
+  "packet_id": "autonomy-gate-live-qualify-nondestructive-2026-08-02",
+  "status": "OPERATOR_APPROVED",
+  "issued_at": "2026-08-02T22:52:44+00:00",
+  "expires_at": "2026-08-16T22:52:44+00:00",
+  "issued_by": "operator:ib-mac",
+  "attestation": "operator-message-make-approve-packet-unblock-everything-non-destructive-approve-bring-up-local-stack-docker-as-needed-only-keep-containers-active-while-using",
+  "authority": "OPERATOR_CAMPAIGN_BOUNDED_GATE_QUALIFICATION",
+  "profile": "live_gate_qualification_nondestructive",
+  "program_digest": "sha256:9cd1a79f948dac419913c134396e58359e4df82862bb3901bdd327684a37cb52",
+  "reference_gap": "ledger/artifacts/wave8/LIVE-INTEGRATION-STACK-GAP.json",
+  "wave_span": [
+    "W0",
+    "W1",
+    "W2",
+    "W3",
+    "W4",
+    "W5",
+    "W6",
+    "W7",
+    "W8",
+    "W9",
+    "W10"
+  ],
+  "autonomous_merge": false,
+  "publication_ceiling": "local_only",
+  "docker_policy": {
+    "allowed": true,
+    "stack_reference": "ledger/artifacts/wave8/LIVE-INTEGRATION-STACK-GAP.json",
+    "keep_active_only_while_using": true,
+    "must_stop_or_idle_down_when_evidence_pass_complete": true,
+    "operator_note": "docker launched; agent may start/stop compose as needed",
+    "full_e2e_containers_approved": true,
+    "operator_amendment_at": "2026-08-02T22:55:38+00:00",
+    "operator_amendment": "you must deploy as many containers as necessary to run full e2e testing \u2014 LOCAL only, not production"
+  },
+  "local_stack": {
+    "gate_url": "http://127.0.0.1:9000",
+    "ceg_url": "http://127.0.0.1:8000",
+    "eie_url": "http://127.0.0.1:8001",
+    "required_processes": [
+      "Odoo (IB-Odoo_19) with plasticos_gate -> GATE_URL when odoo-scoped gates need it",
+      "Constellation Gate :9000 with registry",
+      "CEG worker registered (typically :8000) + Neo4j + Redis",
+      "EIE worker registered when converge path needed (typically :8001)"
+    ]
+  },
+  "permits": [
+    "controller_evidence_work",
+    "docker_compose_up_down_local",
+    "local_docker_compose_up_for_e2e",
+    "local_gate_container_or_host_process",
+    "local_live_stack_exercise",
+    "local_odoo_container",
+    "local_repository_execution",
+    "record_control_task_evidence",
+    "set_gate_status",
+    "write_evidence_artifact"
+  ],
+  "forbids": [
+    "automatic_production_uninstall",
+    "cutover",
+    "destructive_file_or_data_deletion",
+    "drop_business_audit_records",
+    "execute_destructive_task",
+    "fake_LIVE_INTEGRATION_PASS",
+    "production_cutover",
+    "production_database_migration",
+    "production_deploy",
+    "release",
+    "remote_production_mutation",
+    "rename_controller_offline_evidence_to_LIVE_INTEGRATION_PASS",
+    "tag",
+    "uninstall_production_addon",
+    "waive_blocking_gate"
+  ],
+  "honest_proof_rules": [
+    "LIVE_INTEGRATION_PASS requires local live stack observation digests (health+registry+packet round-trip or gate-specific live check)",
+    "PROMOTION_APPROVED requires explicit digest path + this packet attestation for promotion_proof gates only",
+    "REPOSITORY_TEST_PASS requires repo/CI/spec evidence path",
+    "Never claim production completion",
+    "GATE-007 and GATE-038 qualify local paths only; production cutover remains forbidden"
+  ],
+  "gate_roster": [
+    {
+      "gate_id": "GATE-003",
+      "name": "canonical_action_registry",
+      "blocking": true,
+      "required_proof_class": "live_integration_proof",
+      "target_status": "LIVE_INTEGRATION_PASS",
+      "treatment": "QUALIFY_LOCAL_LIVE",
+      "actions_allowed": [
+        "exercise_local_stack",
+        "set_gate_status",
+        "write_evidence_artifact"
+      ],
+      "actions_forbidden": [
+        "waive_blocking_gate",
+        "production_cutover",
+        "deploy",
+        "release"
+      ],
+      "note": "local_live_stack_proof"
+    },
+    {
+      "gate_id": "GATE-004",
+      "name": "canonical_sdk_release",
+      "blocking": true,
+      "required_proof_class": "live_integration_proof",
+      "target_status": "LIVE_INTEGRATION_PASS",
+      "treatment": "QUALIFY_LOCAL_LIVE",
+      "actions_allowed": [
+        "exercise_local_stack",
+        "set_gate_status",
+        "write_evidence_artifact"
+      ],
+      "actions_forbidden": [
+        "waive_blocking_gate",
+        "production_cutover",
+        "deploy",
+        "release"
+      ],
+      "note": "local_live_stack_proof"
+    },
+    {
+      "gate_id": "GATE-005",
+      "name": "sdk_client_node_contract",
+      "blocking": true,
+      "required_proof_class": "live_integration_proof",
+      "target_status": "LIVE_INTEGRATION_PASS",
+      "treatment": "QUALIFY_LOCAL_LIVE",
+      "actions_allowed": [
+        "exercise_local_stack",
+        "set_gate_status",
+        "write_evidence_artifact"
+      ],
+      "actions_forbidden": [
+        "waive_blocking_gate",
+        "production_cutover",
+        "deploy",
+        "release"
+      ],
+      "note": "local_live_stack_proof"
+    },
+    {
+      "gate_id": "GATE-006",
+      "name": "gate_route_reply_proof",
+      "blocking": true,
+      "required_proof_class": "live_integration_proof",
+      "target_status": "LIVE_INTEGRATION_PASS",
+      "treatment": "QUALIFY_LOCAL_LIVE",
+      "actions_allowed": [
+        "exercise_local_stack",
+        "set_gate_status",
+        "write_evidence_artifact"
+      ],
+      "actions_forbidden": [
+        "waive_blocking_gate",
+        "production_cutover",
+        "deploy",
+        "release"
+      ],
+      "note": "local_live_stack_proof"
+    },
+    {
+      "gate_id": "GATE-007",
+      "name": "ceg_transport_cutover",
+      "blocking": true,
+      "required_proof_class": "live_integration_proof",
+      "target_status": "LIVE_INTEGRATION_PASS",
+      "treatment": "QUALIFY_LOCAL_LIVE",
+      "actions_allowed": [
+        "exercise_local_stack",
+        "set_gate_status",
+        "write_evidence_artifact"
+      ],
+      "actions_forbidden": [
+        "waive_blocking_gate",
+        "production_cutover",
+        "deploy",
+        "release"
+      ],
+      "note": "local_transport_path_only_not_production_cutover"
+    },
+    {
+      "gate_id": "GATE-008",
+      "name": "gate_workflow_authority",
+      "blocking": true,
+      "required_proof_class": "live_integration_proof",
+      "target_status": "LIVE_INTEGRATION_PASS",
+      "treatment": "QUALIFY_LOCAL_LIVE",
+      "actions_allowed": [
+        "exercise_local_stack",
+        "set_gate_status",
+        "write_evidence_artifact"
+      ],
+      "actions_forbidden": [
+        "waive_blocking_gate",
+        "production_cutover",
+        "deploy",
+        "release"
+      ],
+      "note": "local_live_stack_proof"
+    },
+    {
+      "gate_id": "GATE-009",
+      "name": "eie_registration_and_side_effects",
+      "blocking": true,
+      "required_proof_class": "live_integration_proof",
+      "target_status": "LIVE_INTEGRATION_PASS",
+      "treatment": "QUALIFY_LOCAL_LIVE",
+      "actions_allowed": [
+        "exercise_local_stack",
+        "set_gate_status",
+        "write_evidence_artifact"
+      ],
+      "actions_forbidden": [
+        "waive_blocking_gate",
+        "production_cutover",
+        "deploy",
+        "release"
+      ],
+      "note": "local_live_stack_proof"
+    },
+    {
+      "gate_id": "GATE-010",
+      "name": "cross_repository_transport_smoke",
+      "blocking": true,
+      "required_proof_class": "live_integration_proof",
+      "target_status": "LIVE_INTEGRATION_PASS",
+      "treatment": "QUALIFY_LOCAL_LIVE",
+      "actions_allowed": [
+        "exercise_local_stack",
+        "set_gate_status",
+        "write_evidence_artifact"
+      ],
+      "actions_forbidden": [
+        "waive_blocking_gate",
+        "production_cutover",
+        "deploy",
+        "release"
+      ],
+      "note": "local_live_stack_proof"
+    },
+    {
+      "gate_id": "GATE-011",
+      "name": "odoo_safe_phase_a",
+      "blocking": true,
+      "required_proof_class": "live_integration_proof",
+      "target_status": "LIVE_INTEGRATION_PASS",
+      "treatment": "QUALIFY_LOCAL_LIVE",
+      "actions_allowed": [
+        "exercise_local_stack",
+        "set_gate_status",
+        "write_evidence_artifact"
+      ],
+      "actions_forbidden": [
+        "waive_blocking_gate",
+        "production_cutover",
+        "deploy",
+        "release"
+      ],
+      "note": "local_live_stack_proof"
+    },
+    {
+      "gate_id": "GATE-012",
+      "name": "odoo_operator_decisions",
+      "blocking": true,
+      "required_proof_class": "live_integration_proof",
+      "target_status": "LIVE_INTEGRATION_PASS",
+      "treatment": "QUALIFY_LOCAL_LIVE",
+      "actions_allowed": [
+        "exercise_local_stack",
+        "set_gate_status",
+        "write_evidence_artifact"
+      ],
+      "actions_forbidden": [
+        "waive_blocking_gate",
+        "production_cutover",
+        "deploy",
+        "release"
+      ],
+      "note": "local_live_stack_proof"
+    },
+    {
+      "gate_id": "GATE-013",
+      "name": "odoo_observability_safety",
+      "blocking": true,
+      "required_proof_class": "live_integration_proof",
+      "target_status": "LIVE_INTEGRATION_PASS",
+      "treatment": "QUALIFY_LOCAL_LIVE",
+      "actions_allowed": [
+        "exercise_local_stack",
+        "set_gate_status",
+        "write_evidence_artifact"
+      ],
+      "actions_forbidden": [
+        "waive_blocking_gate",
+        "production_cutover",
+        "deploy",
+        "release"
+      ],
+      "note": "local_live_stack_proof"
+    },
+    {
+      "gate_id": "GATE-015",
+      "name": "odoo_runtime_dependency_compatibility",
+      "blocking": true,
+      "required_proof_class": "live_integration_proof",
+      "target_status": "LIVE_INTEGRATION_PASS",
+      "treatment": "QUALIFY_LOCAL_LIVE",
+      "actions_allowed": [
+        "exercise_local_stack",
+        "set_gate_status",
+        "write_evidence_artifact"
+      ],
+      "actions_forbidden": [
+        "waive_blocking_gate",
+        "production_cutover",
+        "deploy",
+        "release"
+      ],
+      "note": "local_live_stack_proof"
+    },
+    {
+      "gate_id": "GATE-018",
+      "name": "compiler_targets_live_ceg_contracts",
+      "blocking": true,
+      "required_proof_class": "live_integration_proof",
+      "target_status": "LIVE_INTEGRATION_PASS",
+      "treatment": "QUALIFY_LOCAL_LIVE",
+      "actions_allowed": [
+        "exercise_local_stack",
+        "set_gate_status",
+        "write_evidence_artifact"
+      ],
+      "actions_forbidden": [
+        "waive_blocking_gate",
+        "production_cutover",
+        "deploy",
+        "release"
+      ],
+      "note": "local_live_stack_proof"
+    },
+    {
+      "gate_id": "GATE-019",
+      "name": "eie_feature_evidence_contract",
+      "blocking": true,
+      "required_proof_class": "live_integration_proof",
+      "target_status": "LIVE_INTEGRATION_PASS",
+      "treatment": "QUALIFY_LOCAL_LIVE",
+      "actions_allowed": [
+        "exercise_local_stack",
+        "set_gate_status",
+        "write_evidence_artifact"
+      ],
+      "actions_forbidden": [
+        "waive_blocking_gate",
+        "production_cutover",
+        "deploy",
+        "release"
+      ],
+      "note": "local_live_stack_proof"
+    },
+    {
+      "gate_id": "GATE-020",
+      "name": "plasticos_semantic_ownership",
+      "blocking": true,
+      "required_proof_class": "live_integration_proof",
+      "target_status": "LIVE_INTEGRATION_PASS",
+      "treatment": "QUALIFY_LOCAL_LIVE",
+      "actions_allowed": [
+        "exercise_local_stack",
+        "set_gate_status",
+        "write_evidence_artifact"
+      ],
+      "actions_forbidden": [
+        "waive_blocking_gate",
+        "production_cutover",
+        "deploy",
+        "release"
+      ],
+      "note": "local_live_stack_proof"
+    },
+    {
+      "gate_id": "GATE-021",
+      "name": "plasticos_operator_decisions_for_scoring",
+      "blocking": true,
+      "required_proof_class": "live_integration_proof",
+      "target_status": "LIVE_INTEGRATION_PASS",
+      "treatment": "QUALIFY_LOCAL_LIVE",
+      "actions_allowed": [
+        "exercise_local_stack",
+        "set_gate_status",
+        "write_evidence_artifact"
+      ],
+      "actions_forbidden": [
+        "waive_blocking_gate",
+        "production_cutover",
+        "deploy",
+        "release"
+      ],
+      "note": "local_live_stack_proof"
+    },
+    {
+      "gate_id": "GATE-022",
+      "name": "optional_shadow_scorer_equivalence",
+      "blocking": false,
+      "required_proof_class": "live_integration_proof",
+      "target_status": "LIVE_INTEGRATION_PASS",
+      "treatment": "QUALIFY_LOCAL_LIVE",
+      "actions_allowed": [
+        "exercise_local_stack",
+        "set_gate_status",
+        "write_evidence_artifact"
+      ],
+      "actions_forbidden": [
+        "waive_blocking_gate",
+        "production_cutover",
+        "deploy",
+        "release"
+      ],
+      "note": "local_live_stack_proof"
+    },
+    {
+      "gate_id": "GATE-023",
+      "name": "odoo_pr_portfolio_cleanup",
+      "blocking": true,
+      "required_proof_class": "live_integration_proof",
+      "target_status": "LIVE_INTEGRATION_PASS",
+      "treatment": "QUALIFY_LOCAL_LIVE",
+      "actions_allowed": [
+        "exercise_local_stack",
+        "set_gate_status",
+        "write_evidence_artifact"
+      ],
+      "actions_forbidden": [
+        "waive_blocking_gate",
+        "production_cutover",
+        "deploy",
+        "release"
+      ],
+      "note": "local_live_stack_proof"
+    },
+    {
+      "gate_id": "GATE-025",
+      "name": "field_ownership_registry",
+      "blocking": true,
+      "required_proof_class": "live_integration_proof",
+      "target_status": "LIVE_INTEGRATION_PASS",
+      "treatment": "QUALIFY_LOCAL_LIVE",
+      "actions_allowed": [
+        "exercise_local_stack",
+        "set_gate_status",
+        "write_evidence_artifact"
+      ],
+      "actions_forbidden": [
+        "waive_blocking_gate",
+        "production_cutover",
+        "deploy",
+        "release"
+      ],
+      "note": "local_live_stack_proof"
+    },
+    {
+      "gate_id": "GATE-026",
+      "name": "ceg_plasticos_executable_spec_authority",
+      "blocking": true,
+      "required_proof_class": "live_integration_proof",
+      "target_status": "LIVE_INTEGRATION_PASS",
+      "treatment": "QUALIFY_LOCAL_LIVE",
+      "actions_allowed": [
+        "exercise_local_stack",
+        "set_gate_status",
+        "write_evidence_artifact"
+      ],
+      "actions_forbidden": [
+        "waive_blocking_gate",
+        "production_cutover",
+        "deploy",
+        "release"
+      ],
+      "note": "local_live_stack_proof"
+    },
+    {
+      "gate_id": "GATE-027",
+      "name": "bidirectional_match_direction_contract",
+      "blocking": true,
+      "required_proof_class": "live_integration_proof",
+      "target_status": "LIVE_INTEGRATION_PASS",
+      "treatment": "QUALIFY_LOCAL_LIVE",
+      "actions_allowed": [
+        "exercise_local_stack",
+        "set_gate_status",
+        "write_evidence_artifact"
+      ],
+      "actions_forbidden": [
+        "waive_blocking_gate",
+        "production_cutover",
+        "deploy",
+        "release"
+      ],
+      "note": "local_live_stack_proof"
+    },
+    {
+      "gate_id": "GATE-028",
+      "name": "eie_feature_evidence_contract",
+      "blocking": true,
+      "required_proof_class": "live_integration_proof",
+      "target_status": "LIVE_INTEGRATION_PASS",
+      "treatment": "QUALIFY_LOCAL_LIVE",
+      "actions_allowed": [
+        "exercise_local_stack",
+        "set_gate_status",
+        "write_evidence_artifact"
+      ],
+      "actions_forbidden": [
+        "waive_blocking_gate",
+        "production_cutover",
+        "deploy",
+        "release"
+      ],
+      "note": "local_live_stack_proof"
+    },
+    {
+      "gate_id": "GATE-029",
+      "name": "odoo_additive_migration_reconciliation",
+      "blocking": true,
+      "required_proof_class": "live_integration_proof",
+      "target_status": "LIVE_INTEGRATION_PASS",
+      "treatment": "QUALIFY_LOCAL_LIVE",
+      "actions_allowed": [
+        "exercise_local_stack",
+        "set_gate_status",
+        "write_evidence_artifact"
+      ],
+      "actions_forbidden": [
+        "waive_blocking_gate",
+        "production_cutover",
+        "deploy",
+        "release"
+      ],
+      "note": "local_live_stack_proof"
+    },
+    {
+      "gate_id": "GATE-032",
+      "name": "rollback_rehearsal",
+      "blocking": false,
+      "required_proof_class": "live_integration_proof",
+      "target_status": "LIVE_INTEGRATION_PASS",
+      "treatment": "QUALIFY_LOCAL_LIVE",
+      "actions_allowed": [
+        "exercise_local_stack",
+        "set_gate_status",
+        "write_evidence_artifact"
+      ],
+      "actions_forbidden": [
+        "waive_blocking_gate",
+        "production_cutover",
+        "deploy",
+        "release"
+      ],
+      "note": "local_live_stack_proof"
+    },
+    {
+      "gate_id": "GATE-034",
+      "name": "capability_catalog_safety",
+      "blocking": true,
+      "required_proof_class": "live_integration_proof",
+      "target_status": "LIVE_INTEGRATION_PASS",
+      "treatment": "QUALIFY_LOCAL_LIVE",
+      "actions_allowed": [
+        "exercise_local_stack",
+        "set_gate_status",
+        "write_evidence_artifact"
+      ],
+      "actions_forbidden": [
+        "waive_blocking_gate",
+        "production_cutover",
+        "deploy",
+        "release"
+      ],
+      "note": "local_live_stack_proof"
+    },
+    {
+      "gate_id": "GATE-035",
+      "name": "sdk_consumer_lockstep",
+      "blocking": true,
+      "required_proof_class": "live_integration_proof",
+      "target_status": "LIVE_INTEGRATION_PASS",
+      "treatment": "QUALIFY_LOCAL_LIVE",
+      "actions_allowed": [
+        "exercise_local_stack",
+        "set_gate_status",
+        "write_evidence_artifact"
+      ],
+      "actions_forbidden": [
+        "waive_blocking_gate",
+        "production_cutover",
+        "deploy",
+        "release"
+      ],
+      "note": "local_live_stack_proof"
+    },
+    {
+      "gate_id": "GATE-036",
+      "name": "cross_repository_fixture_parity",
+      "blocking": true,
+      "required_proof_class": "live_integration_proof",
+      "target_status": "LIVE_INTEGRATION_PASS",
+      "treatment": "QUALIFY_LOCAL_LIVE",
+      "actions_allowed": [
+        "exercise_local_stack",
+        "set_gate_status",
+        "write_evidence_artifact"
+      ],
+      "actions_forbidden": [
+        "waive_blocking_gate",
+        "production_cutover",
+        "deploy",
+        "release"
+      ],
+      "note": "local_live_stack_proof"
+    },
+    {
+      "gate_id": "GATE-037",
+      "name": "shadow_projection_equivalence",
+      "blocking": true,
+      "required_proof_class": "live_integration_proof",
+      "target_status": "LIVE_INTEGRATION_PASS",
+      "treatment": "QUALIFY_LOCAL_LIVE",
+      "actions_allowed": [
+        "exercise_local_stack",
+        "set_gate_status",
+        "write_evidence_artifact"
+      ],
+      "actions_forbidden": [
+        "waive_blocking_gate",
+        "production_cutover",
+        "deploy",
+        "release"
+      ],
+      "note": "local_live_stack_proof"
+    },
+    {
+      "gate_id": "GATE-038",
+      "name": "business_workflow_cutover",
+      "blocking": true,
+      "required_proof_class": "live_integration_proof",
+      "target_status": "LIVE_INTEGRATION_PASS",
+      "treatment": "QUALIFY_LOCAL_LIVE",
+      "actions_allowed": [
+        "exercise_local_stack",
+        "set_gate_status",
+        "write_evidence_artifact"
+      ],
+      "actions_forbidden": [
+        "waive_blocking_gate",
+        "production_cutover",
+        "deploy",
+        "release"
+      ],
+      "note": "local_business_workflow_roundtrip_only_not_production_cutover"
+    },
+    {
+      "gate_id": "GATE-042",
+      "name": "opportunity_schema_split",
+      "blocking": true,
+      "required_proof_class": "live_integration_proof",
+      "target_status": "LIVE_INTEGRATION_PASS",
+      "treatment": "QUALIFY_LOCAL_LIVE",
+      "actions_allowed": [
+        "exercise_local_stack",
+        "set_gate_status",
+        "write_evidence_artifact"
+      ],
+      "actions_forbidden": [
+        "waive_blocking_gate",
+        "production_cutover",
+        "deploy",
+        "release"
+      ],
+      "note": "local_live_stack_proof"
+    },
+    {
+      "gate_id": "GATE-045",
+      "name": "producer_consumer_schema_parity",
+      "blocking": true,
+      "required_proof_class": "live_integration_proof",
+      "target_status": "LIVE_INTEGRATION_PASS",
+      "treatment": "QUALIFY_LOCAL_LIVE",
+      "actions_allowed": [
+        "exercise_local_stack",
+        "set_gate_status",
+        "write_evidence_artifact"
+      ],
+      "actions_forbidden": [
+        "waive_blocking_gate",
+        "production_cutover",
+        "deploy",
+        "release"
+      ],
+      "note": "local_live_stack_proof"
+    },
+    {
+      "gate_id": "GATE-046",
+      "name": "schema_publication_version_lock",
+      "blocking": true,
+      "required_proof_class": "live_integration_proof",
+      "target_status": "LIVE_INTEGRATION_PASS",
+      "treatment": "QUALIFY_LOCAL_LIVE",
+      "actions_allowed": [
+        "exercise_local_stack",
+        "set_gate_status",
+        "write_evidence_artifact"
+      ],
+      "actions_forbidden": [
+        "waive_blocking_gate",
+        "production_cutover",
+        "deploy",
+        "release"
+      ],
+      "note": "local_live_stack_proof"
+    },
+    {
+      "gate_id": "GATE-054",
+      "name": "legacy_module_absence",
+      "blocking": true,
+      "required_proof_class": "live_integration_proof",
+      "target_status": "LIVE_INTEGRATION_PASS",
+      "treatment": "QUALIFY_LOCAL_LIVE",
+      "actions_allowed": [
+        "exercise_local_stack",
+        "set_gate_status",
+        "write_evidence_artifact"
+      ],
+      "actions_forbidden": [
+        "waive_blocking_gate",
+        "production_cutover",
+        "deploy",
+        "release"
+      ],
+      "note": "local_live_stack_proof"
+    },
+    {
+      "gate_id": "GATE-055",
+      "name": "no_local_intelligence_drift_guard",
+      "blocking": true,
+      "required_proof_class": "live_integration_proof",
+      "target_status": "LIVE_INTEGRATION_PASS",
+      "treatment": "QUALIFY_LOCAL_LIVE",
+      "actions_allowed": [
+        "exercise_local_stack",
+        "set_gate_status",
+        "write_evidence_artifact"
+      ],
+      "actions_forbidden": [
+        "waive_blocking_gate",
+        "production_cutover",
+        "deploy",
+        "release"
+      ],
+      "note": "local_live_stack_proof"
+    },
+    {
+      "gate_id": "GATE-060",
+      "name": "load_retry_backpressure_and_recovery_spec",
+      "blocking": false,
+      "required_proof_class": "live_integration_proof",
+      "target_status": "LIVE_INTEGRATION_PASS",
+      "treatment": "QUALIFY_LOCAL_LIVE",
+      "actions_allowed": [
+        "exercise_local_stack",
+        "set_gate_status",
+        "write_evidence_artifact"
+      ],
+      "actions_forbidden": [
+        "waive_blocking_gate",
+        "production_cutover",
+        "deploy",
+        "release"
+      ],
+      "note": "local_live_stack_proof"
+    },
+    {
+      "gate_id": "GATE-061",
+      "name": "constellation_release_identity",
+      "blocking": false,
+      "required_proof_class": "live_integration_proof",
+      "target_status": "LIVE_INTEGRATION_PASS",
+      "treatment": "QUALIFY_LOCAL_LIVE",
+      "actions_allowed": [
+        "exercise_local_stack",
+        "set_gate_status",
+        "write_evidence_artifact"
+      ],
+      "actions_forbidden": [
+        "waive_blocking_gate",
+        "production_cutover",
+        "deploy",
+        "release"
+      ],
+      "note": "local_live_stack_proof"
+    },
+    {
+      "gate_id": "GATE-062",
+      "name": "runtime_data_parity",
+      "blocking": false,
+      "required_proof_class": "live_integration_proof",
+      "target_status": "LIVE_INTEGRATION_PASS",
+      "treatment": "QUALIFY_LOCAL_LIVE",
+      "actions_allowed": [
+        "exercise_local_stack",
+        "set_gate_status",
+        "write_evidence_artifact"
+      ],
+      "actions_forbidden": [
+        "waive_blocking_gate",
+        "production_cutover",
+        "deploy",
+        "release"
+      ],
+      "note": "local_live_stack_proof"
+    },
+    {
+      "gate_id": "GATE-069",
+      "name": "live_delivery_branch_baseline",
+      "blocking": true,
+      "required_proof_class": "live_integration_proof",
+      "target_status": "LIVE_INTEGRATION_PASS",
+      "treatment": "QUALIFY_LOCAL_LIVE",
+      "actions_allowed": [
+        "exercise_local_stack",
+        "set_gate_status",
+        "write_evidence_artifact"
+      ],
+      "actions_forbidden": [
+        "waive_blocking_gate",
+        "production_cutover",
+        "deploy",
+        "release"
+      ],
+      "note": "local_live_stack_proof"
+    },
+    {
+      "gate_id": "GATE-059",
+      "name": "tenant_isolation_and_data_governance_spec",
+      "blocking": false,
+      "required_proof_class": "repository_test_proof",
+      "target_status": "REPOSITORY_TEST_PASS",
+      "treatment": "QUALIFY_REPOSITORY",
+      "actions_allowed": [
+        "set_gate_status",
+        "write_evidence_artifact"
+      ],
+      "actions_forbidden": [
+        "waive_blocking_gate"
+      ],
+      "note": "repo/spec evidence; non-destructive"
+    },
+    {
+      "gate_id": "GATE-066",
+      "name": "blocking_drift_guards",
+      "blocking": false,
+      "required_proof_class": "repository_test_proof",
+      "target_status": "REPOSITORY_TEST_PASS",
+      "treatment": "QUALIFY_REPOSITORY",
+      "actions_allowed": [
+        "set_gate_status",
+        "write_evidence_artifact"
+      ],
+      "actions_forbidden": [
+        "waive_blocking_gate"
+      ],
+      "note": "TASK-052 M8 merge + scanner CI; non-destructive",
+      "preferred_proof": "ledger/receipts/TASK-052-merged.json"
+    },
+    {
+      "gate_id": "GATE-063",
+      "name": "business_equivalence_approval",
+      "blocking": false,
+      "required_proof_class": "promotion_proof",
+      "target_status": "PROMOTION_APPROVED",
+      "treatment": "QUALIFY_PROMOTION",
+      "actions_allowed": [
+        "set_gate_status",
+        "write_evidence_artifact"
+      ],
+      "actions_forbidden": [
+        "waive_blocking_gate",
+        "deploy",
+        "cutover",
+        "release"
+      ],
+      "note": "from TASK-066 VERIFIED control evidence + this operator packet",
+      "preferred_proof": "ledger/artifacts/wave8/TASK-066-control-evidence.json"
+    },
+    {
+      "gate_id": "GATE-064",
+      "name": "observation_window_exit",
+      "blocking": false,
+      "required_proof_class": "promotion_proof",
+      "target_status": "PROMOTION_APPROVED",
+      "treatment": "QUALIFY_PROMOTION",
+      "actions_allowed": [
+        "set_gate_status",
+        "write_evidence_artifact"
+      ],
+      "actions_forbidden": [
+        "waive_blocking_gate",
+        "deploy",
+        "cutover",
+        "release"
+      ],
+      "note": "from TASK-067 VERIFIED + observation reports; non-destructive",
+      "preferred_proof": "ledger/artifacts/wave9/TASK-067-control-evidence.json"
+    },
+    {
+      "gate_id": "GATE-065",
+      "name": "physical_retirement",
+      "blocking": false,
+      "required_proof_class": "promotion_proof",
+      "target_status": "PROMOTION_APPROVED",
+      "treatment": "QUALIFY_PROMOTION",
+      "actions_allowed": [
+        "set_gate_status",
+        "write_evidence_artifact"
+      ],
+      "actions_forbidden": [
+        "waive_blocking_gate",
+        "deploy",
+        "cutover",
+        "release",
+        "automatic_production_uninstall"
+      ],
+      "note": "from TASK-051/052 MERGED mothball; non-destructive promotion of retirement evidence",
+      "preferred_proof": "ledger/artifacts/wave10/W8-W10-campaign-completion-receipt.json"
+    }
+  ],
+  "gate_roster_count": 43,
+  "completion_rule": "Each roster gate either reaches target_status with --proof artifact, or remains BLOCKED with written DEFER receipt explaining missing non-fakeable evidence",
+  "local_e2e_deploy_note": "Operator authorized local container bring-up for full e2e. production_deploy/cutover/release still forbidden."
+}

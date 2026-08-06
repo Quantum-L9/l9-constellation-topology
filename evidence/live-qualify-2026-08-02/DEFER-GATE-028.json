@@ -1,0 +1,10 @@
+{
+  "blocking_detail": "Requires EIE feature evidence live contract proof",
+  "campaign_packet": "ledger/artifacts/live-qualify/CAMPAIGN-GATE-LIVE-QUALIFY-NONDESTRUCTIVE.json",
+  "content_digest": "sha256:38048732e3f8dc8b240a6907bd79af0f419984fb3994ec1df0f01b8dd81e05fe",
+  "gate_id": "GATE-028",
+  "observed_at": "2026-08-02T22:55:01+00:00",
+  "reason": "Requires EIE feature evidence live contract proof",
+  "schema": "l9.live_qualify.defer_receipt.v1",
+  "status": "DEFERRED"
+}

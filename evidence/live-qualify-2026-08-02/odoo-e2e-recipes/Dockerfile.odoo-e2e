@@ -1,0 +1,12 @@
+FROM odoo:19
+USER root
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends git \
+    && rm -rf /var/lib/apt/lists/*
+# requirements from repo context; constraints patched for e2e (cryptography pin align)
+COPY requirements.txt /tmp/requirements.txt
+COPY constraints.odoo-e2e.txt /tmp/constraints.txt
+RUN pip3 install --no-cache-dir --break-system-packages --ignore-installed \
+    -r /tmp/requirements.txt -c /tmp/constraints.txt \
+    && rm /tmp/requirements.txt /tmp/constraints.txt
+USER odoo
