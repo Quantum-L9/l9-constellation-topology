@@ -8,7 +8,7 @@ import hashlib
 import json
 import subprocess
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -37,7 +37,7 @@ CANONICAL_ACTIONS = {
 
 
 def utc_now() -> str:
-    return datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+    return datetime.now(UTC).replace(microsecond=0).isoformat()
 
 
 def sha256_file(path: Path) -> str:
@@ -296,7 +296,7 @@ def qualify_gates(snapshot: dict[str, Any], live_path: Path) -> tuple[list[dict]
 
     live_proof = str(live_path.relative_to(CONTROL))
     rt = snapshot.get("round_trips") or {}
-    registry = snapshot.get("registry") or {}
+    snapshot.get("registry") or {}
     transport_ok = rt.get("match", {}).get("transport_ok") and rt.get("converge", {}).get("transport_ok")
 
     live_pass_gates = []

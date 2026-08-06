@@ -3,25 +3,13 @@
     "CallbackRef": {
       "additionalProperties": false,
       "properties": {
-        "token_ref": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "title": "Token Ref"
-        },
-        "url": {
-          "title": "Url",
+        "callback_id": {
+          "title": "Callback Id",
           "type": "string"
         }
       },
       "required": [
-        "url"
+        "callback_id"
       ],
       "title": "CallbackRef",
       "type": "object"

@@ -110,6 +110,25 @@ uv run l9-topology-worker \
 
 GitHub Actions validates the signature with trusted `main` code before using the requested revision. It then checks out the signed exact Git object ID, creates the exact-revision environment from `uv.lock`, recompiles, publishes, reloads, verifies, and sends a signed callback.
 
+## Generated artifact synchronization
+
+Checked-in JSON Schemas and Repository Model Packet fixtures are deterministic outputs derived from canonical models and sample repositories. Validation detects drift without rewriting the worktree.
+
+```bash
+make generated-check
+```
+
+Use explicit update targets only when the source of a generated artifact intentionally changes:
+
+```bash
+make schemas-update
+make fixtures-update
+# or both
+make generated-update
+```
+
+Review every generated diff, then rerun `make generated-check` and the full validation ladder. `make validate` includes the schema drift gate (`schemas-check`) and fails when a checked-in schema is missing or stale. Fixture packet drift is verified on demand with `make fixtures-check` (or `make generated-check`), which is kept out of `make validate` because fixture packets embed a wall-clock timestamp and the live repository revision; it becomes gate-eligible once fixture generation is deterministic.
+
 ## Validation ladder
 
 ```bash
@@ -121,6 +140,9 @@ uv run python scripts/validate_contracts.py
 uv run python scripts/validate_workflows.py
 uv run python scripts/architecture_boundary_check.py
 uv run python scripts/validate_release_readiness.py
+uv run python scripts/generate_schemas.py --check
+uv run python scripts/generate_fixture_packets.py --check
+uv run python scripts/validate_git_integrity.py
 uv run python scripts/verify_determinism.py
 uv build
 ```

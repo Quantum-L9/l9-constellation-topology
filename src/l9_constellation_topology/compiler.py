@@ -95,13 +95,28 @@ def _policy_hashes(configuration: ResolvedConfiguration) -> dict[str, str]:
 def calculate_idempotency_key(
     input_refs: tuple[PacketRef, ...],
     configuration: ResolvedConfiguration,
+    *,
+    compiler_build_identity: str | None = None,
+    adapter_mode: str = "canonical",
 ) -> str:
+    """Hash every semantic input capable of changing the compiled packet.
+
+    ``configuration.profile_hash`` covers topology, risk, maturity, report, packet,
+    and output profiles. The build identity binds reuse to the exact compiler source
+    revision when supplied by the stage dispatch.
+    """
+
     identity = {
         "packet_type": "l9.topology",
+        "packet_version": "1.0.0",
         "input_semantic_hashes": tuple(sorted(ref.semantic_hash for ref in input_refs)),
+        "compiler_name": COMPILER_NAME,
         "compiler_version": COMPILER_VERSION,
-        "profile_hash": semantic_hash(configuration.topology_profile),
+        "compiler_build_identity": compiler_build_identity or f"version:{COMPILER_VERSION}",
+        "configuration_profile_hash": configuration.profile_hash,
         "schema_contract_hash": configuration.schema_contract_hash,
+        "active_contract_versions": configuration.active_contract_versions,
+        "adapter_mode": adapter_mode,
     }
     return semantic_hash(identity)
 
@@ -160,6 +175,7 @@ def compile_topology(
         maturity=tuple(sorted(maturity, key=lambda item: item.subject_id)),
         impact_indexes=tuple(sorted(impacts, key=lambda item: item.subject_id)),
         evidence=tuple(sorted(evidence, key=lambda item: item.evidence_id)),
+        diagnostics=tuple(sorted(normalized.diagnostics, key=lambda item: item.diagnostic_id)),
         unknowns=tuple(sorted(repository_unknowns, key=lambda item: item.unknown_id)),
         conflicts=tuple(
             sorted(
@@ -198,7 +214,7 @@ def compile_topology(
     digest = calculate_topology_semantic_hash(candidate)
     packet_id = f"packet:{digest.removeprefix('sha256:')}"
     candidate = candidate.model_copy(update={"packet_id": packet_id, "semantic_hash": digest})
-    receipt = validate_topology(candidate, state, bundles)
+    receipt = validate_topology(candidate, state, bundles, schema_root=repository_root)
     if receipt.status != "passed":
         raise TopologyCompilationError(
             "topology validation failed; no outputs were committed", receipt

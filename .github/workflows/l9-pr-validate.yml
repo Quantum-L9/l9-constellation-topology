@@ -1,0 +1,103 @@
+name: l9-pr-validate
+
+on:
+  pull_request:
+    branches: [main]
+  merge_group:
+    types: [checks_requested]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: l9-pr-validate-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout exact revision
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install pinned uv
+        run: python -m pip install --disable-pip-version-check uv==0.10.0
+
+      - name: Synchronize frozen validation environment
+        run: uv sync --frozen --extra dev
+
+      - name: Compile sources
+        run: uv run python -m compileall src tests scripts -q
+
+      - name: Run tests with coverage gate
+        run: >-
+          uv run pytest
+          --cov=l9_constellation_topology
+          --cov-report=term-missing
+          --cov-report=xml
+          -q
+
+      - name: Check formatting
+        run: uv run ruff format --check .
+
+      - name: Lint source and tests
+        run: uv run ruff check .
+
+      - name: Enforce strict typing
+        run: uv run mypy src/l9_constellation_topology
+
+      - name: Validate contracts
+        run: uv run python scripts/validate_contracts.py
+
+      - name: Validate GitHub workflow contracts
+        run: uv run python scripts/validate_workflows.py
+
+      - name: Enforce architecture boundaries
+        run: uv run python scripts/architecture_boundary_check.py
+
+      - name: Validate release readiness and no-stub policy
+        run: uv run python scripts/validate_release_readiness.py
+
+      - name: Bind validation to committed Git tree
+        run: >-
+          uv run python scripts/validate_git_integrity.py
+          --out validation/commit-bound-validation.json
+
+      - name: Verify deterministic semantic identity
+        run: uv run python scripts/verify_determinism.py
+
+      - name: Build distribution
+        run: uv build
+
+      - name: Smoke-install wheel
+        run: |
+          uv venv .wheel-smoke
+          uv pip install --python .wheel-smoke/bin/python dist/*.whl
+          .wheel-smoke/bin/l9-topology --help
+          .wheel-smoke/bin/l9-topology-worker --help
+
+      - name: Upload validation artifacts
+        if: always()
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808
+        with:
+          name: l9-constellation-topology-validation-${{ github.sha }}
+          path: |
+            dist/
+            coverage.xml
+            contracts/
+            schemas/
+            validation/commit-bound-validation.json
+            validation/validation_report.yaml
+            validation/validation_checks.jsonl
+          if-no-files-found: error
+          retention-days: 14

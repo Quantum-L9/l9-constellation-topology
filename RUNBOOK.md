@@ -121,13 +121,56 @@ The dispatch must reference local `file://` parent bundles and a local output UR
 
 ```bash
 export L9_DISPATCH_HMAC_KEY='runtime-secret'
-export L9_PACKET_REGISTRY_FILE='outputs/worker/packet-registry.json'
+export L9_PACKET_REGISTRY_FILE='outputs/worker/packet-registry.sqlite3'
 
 uv run l9-topology-worker \
   --dispatch-file signed-stage-dispatch.json \
   --repo-root . \
   --workspace outputs/worker
 ```
+
+## Generated artifact drift
+
+Detect schema and fixture drift without modifying tracked files:
+
+```bash
+make generated-check
+```
+
+The command exits non-zero and reports each missing or stale generated artifact. It covers checked-in JSON Schemas and the deterministic Repository Model Packet fixtures.
+
+When drift is intentional, regenerate the narrowest affected surface:
+
+```bash
+make schemas-update
+make fixtures-update
+# or both
+make generated-update
+```
+
+Then review the diff before proceeding:
+
+```bash
+git status --short
+git diff -- contracts schemas tests/fixtures/repository_model_packets
+make generated-check
+make validate
+```
+
+Do not accept unexplained generated changes. If output changes unexpectedly, stop and inspect the canonical model, generator inputs, dependency lock, and runtime version.
+
+Before committing, synchronize repository evidence:
+
+```bash
+# Update MANIFEST.md and FINAL_TREE.md for added or removed paths.
+# Refresh traceability and validation records for the new drift gate.
+git add -A
+PYTHONPATH=src python scripts/git_tree_manifest.py
+git add GIT_TREE_MANIFEST.json
+PYTHONPATH=src python scripts/validate_git_integrity.py
+```
+
+The Git tree manifest must be generated from the final staged tree. Any later tracked-file edit invalidates it.
 
 ## Release-readiness validation
 
@@ -143,6 +186,7 @@ The gate rejects executable pass statements, ellipsis-only function bodies, unfi
 
 | Class | Retry | Operator action |
 |---|---:|---|
+| generated artifact missing or stale | no | inspect source change, run the explicit update target, review the diff, and rerun validation |
 | packet download timeout | yes | verify store availability |
 | packet publication timeout | yes | verify registry and ORAS/GHCR availability |
 | callback timeout | yes | allow control-plane reconciliation or retry |
@@ -157,3 +201,25 @@ The gate rejects executable pass statements, ellipsis-only function bodies, unfi
 A stage is not successful until its bundle is committed, published, reloaded, hash-verified, accompanied by a passed Validation Receipt, and acknowledged by the control plane. A published packet with a failed callback must be reconciled by idempotency key rather than republished blindly.
 
 See [docs/recovery.md](docs/recovery.md) and [docs/deployment.md](docs/deployment.md).
+
+## Commit-bound integrity validation
+
+Run after staging every intended file, including dot-directories:
+
+```bash
+git add -A
+PYTHONPATH=src python scripts/git_tree_manifest.py
+git add GIT_TREE_MANIFEST.json
+git commit -m "your bounded change"
+PYTHONPATH=src python scripts/validate_git_integrity.py
+```
+
+`MANIFEST.md` is the human responsibility inventory. `GIT_TREE_MANIFEST.json` records every other tracked entry's Git mode, object type, and blob ID. The check fails when either inventory differs from `git ls-tree HEAD`, any recorded blob identity changes, or the worktree is dirty. CI emits the exact commit SHA, tree SHA, and both manifest digests.
+
+## Callback policy
+
+Dispatch packets use an approved `callback_id`. Configure destinations and credentials only through variables referenced by `.l9/callback-policy.yaml`. Production entries must bind exact hosts and ports, use segment-bound path prefixes, and reject encoded slash or backslash ambiguity. The checked-in production entry is disabled until an approved hostname is committed. Never add packet-selected URLs or secret variable names.
+
+## Publication verification
+
+Production OCI publication uses a semantic-hash-derived staging tag and accepts only the returned `@sha256:<digest>` reference. Verification independently resolves the registry descriptor, then checks the retrieved bundle against the exact expected packet and manifest identities.

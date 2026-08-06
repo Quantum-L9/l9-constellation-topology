@@ -20,6 +20,7 @@ REQUIRED_ROOT_FILES = {
     "LICENSE",
     "INITIAL_COMMIT.md",
     "GOVERNANCE.md",
+    "GIT_TREE_MANIFEST.json",
     "DEVELOPMENT.md",
     "DEPENDENCY_POLICY.md",
     "CODE_OF_CONDUCT.md",
@@ -65,6 +66,7 @@ ROOT_DOC_SCAN_FILES = (
     "MAINTAINERS.md",
     "INITIAL_COMMIT.md",
     "GOVERNANCE.md",
+    "GIT_TREE_MANIFEST.json",
     "DEVELOPMENT.md",
     "DEPENDENCY_POLICY.md",
     "CODE_OF_CONDUCT.md",
@@ -261,8 +263,7 @@ def _scan_thin_python(path: Path) -> list[Finding]:
             severity="minor",
             evidence=f"Only {len(substantive)} substantive lines.",
             required_fix=(
-                "Confirm the file is a necessary entrypoint or merge it into its "
-                "owner module."
+                "Confirm the file is a necessary entrypoint or merge it into its owner module."
             ),
         )
     ]

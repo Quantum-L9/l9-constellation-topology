@@ -3,14 +3,18 @@
 
 from __future__ import annotations
 
+import argparse
 import json
+from collections.abc import Sequence
 from pathlib import Path
 
+from generated_artifact_sync import GeneratedArtifact, synchronize
 from pydantic import BaseModel
 
 from l9_constellation_topology.domain import (
     ArtifactRecord,
     CapabilityRecord,
+    DiagnosticRecord,
     EdgeRecord,
     FlowRecord,
     GraphRecord,
@@ -40,15 +44,14 @@ from l9_constellation_topology.run import EvidenceRecord
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def write_schema(model: type[BaseModel], destination: Path, schema_id: str) -> None:
+def render_schema(model: type[BaseModel], schema_id: str) -> bytes:
     schema = model.model_json_schema(mode="validation")
     schema["$schema"] = "https://json-schema.org/draft/2020-12/schema"
     schema["$id"] = schema_id
-    destination.parent.mkdir(parents=True, exist_ok=True)
-    destination.write_text(json.dumps(schema, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return (json.dumps(schema, indent=2, sort_keys=True) + "\n").encode()
 
 
-def main() -> int:
+def build_schema_artifacts() -> tuple[GeneratedArtifact, ...]:
     contracts: dict[str, tuple[type[BaseModel], str]] = {
         "transport-packet.schema.json": (
             TransportPacket,
@@ -136,6 +139,10 @@ def main() -> int:
             GraphRecord,
             "https://quantum-l9.dev/schemas/graph-record.schema.json",
         ),
+        "diagnostic-record.schema.json": (
+            DiagnosticRecord,
+            "https://quantum-l9.dev/schemas/diagnostic-record.schema.json",
+        ),
         "evidence-record.schema.json": (
             EvidenceRecord,
             "https://quantum-l9.dev/schemas/evidence-record.schema.json",
@@ -149,10 +156,29 @@ def main() -> int:
             "https://quantum-l9.dev/schemas/maturity-assessment.schema.json",
         ),
     }
-    for name, (model, schema_id) in contracts.items():
-        write_schema(model, ROOT / "contracts" / name, schema_id)
-    for name, (model, schema_id) in domain.items():
-        write_schema(model, ROOT / "schemas" / name, schema_id)
+    return tuple(
+        GeneratedArtifact(ROOT / directory / name, render_schema(model, schema_id))
+        for directory, definitions in (("contracts", contracts), ("schemas", domain))
+        for name, (model, schema_id) in definitions.items()
+    )
+
+
+def main(argv: Sequence[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--check",
+        action="store_true",
+        help="Fail when checked-in schemas differ; never modify files.",
+    )
+    args = parser.parse_args(argv)
+    findings = synchronize(build_schema_artifacts(), check=args.check)
+    if args.check and findings:
+        for finding in findings:
+            print(f"{finding.kind}: {finding.path.relative_to(ROOT)}")
+        return 1
+    if not args.check:
+        for finding in findings:
+            print(f"updated: {finding.path.relative_to(ROOT)}")
     return 0
 
 

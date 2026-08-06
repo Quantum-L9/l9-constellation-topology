@@ -57,8 +57,7 @@ class TransportPacket(FrozenModel):
 
 
 class CallbackRef(FrozenModel):
-    url: str
-    token_ref: str | None = None
+    callback_id: str
 
 
 class StageProfileRef(FrozenModel):

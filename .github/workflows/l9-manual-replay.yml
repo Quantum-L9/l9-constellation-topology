@@ -1,0 +1,102 @@
+name: l9-manual-replay
+
+on:
+  workflow_dispatch:
+    inputs:
+      packet_id:
+        description: Packet identity to replay
+        required: true
+        type: string
+      stage_id:
+        description: Failed or completed stage identity
+        required: true
+        type: string
+      dry_run:
+        description: Request a non-mutating replay plan
+        required: true
+        default: true
+        type: boolean
+      reason:
+        description: Operator reason recorded in lineage
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  request-replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout contracts
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install pinned uv
+        run: python -m pip install --disable-pip-version-check uv==0.10.0
+
+      - name: Synchronize frozen runtime environment
+        run: uv sync --frozen --no-dev --no-editable
+
+      - name: Build replay payload
+        env:
+          L9_PACKET_ID: ${{ inputs.packet_id }}
+          L9_STAGE_ID: ${{ inputs.stage_id }}
+          L9_DRY_RUN: ${{ inputs.dry_run }}
+          L9_REASON: ${{ inputs.reason }}
+        run: |
+          .venv/bin/python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          from l9_constellation_topology.packets import ReplayRequestData, ReplayRequestPayload
+
+          payload = ReplayRequestPayload(
+              data=ReplayRequestData(
+                  run_id=f"github:{os.environ['GITHUB_RUN_ID']}:{os.environ['GITHUB_RUN_ATTEMPT']}",
+                  stage_id=os.environ["L9_STAGE_ID"],
+                  packet_id=os.environ["L9_PACKET_ID"],
+                  reason=os.environ["L9_REASON"],
+                  dry_run=os.environ["L9_DRY_RUN"].lower() == "true",
+              )
+          )
+          Path("replay-payload.json").write_text(
+              json.dumps(payload.model_dump(mode="json"), sort_keys=True),
+              encoding="utf-8",
+          )
+          PY
+
+      - name: Sign replay TransportPacket
+        env:
+          L9_DISPATCH_HMAC_KEY: ${{ secrets.L9_DISPATCH_HMAC_KEY }}
+          L9_DISPATCH_HMAC_KEY_ID: ${{ vars.L9_DISPATCH_HMAC_KEY_ID || 'foundational-hmac-v1' }}
+        run: |
+          .venv/bin/l9-topology-control-packet \
+            --payload-file replay-payload.json \
+            --packet-type command \
+            --action replay-topology \
+            --trace-id "github:${GITHUB_RUN_ID}:${GITHUB_RUN_ATTEMPT}" \
+            --correlation-id "replay:${{ inputs.stage_id }}" \
+            --workflow-id foundational-repository-intelligence \
+            --out replay-transport-packet.json
+
+      - name: Submit replay request
+        env:
+          L9_CONTROL_API_URL: ${{ secrets.L9_CONTROL_API_URL }}
+          L9_CONTROL_API_TOKEN: ${{ secrets.L9_CONTROL_API_TOKEN }}
+        run: |
+          test -n "$L9_CONTROL_API_URL"
+          test -n "$L9_CONTROL_API_TOKEN"
+          curl --fail-with-body --retry 3 --retry-all-errors \
+            --connect-timeout 10 --max-time 60 \
+            -H "Authorization: Bearer ${L9_CONTROL_API_TOKEN}" \
+            -H "Content-Type: application/json" \
+            --data-binary @replay-transport-packet.json \
+            "$L9_CONTROL_API_URL"

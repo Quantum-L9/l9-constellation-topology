@@ -1,28 +1,39 @@
 schema: l9.convergence-report/v1
 artifact: l9-constellation-topology
-release: 2.0.0-initial-commit
-status: converged_with_external_unknowns
+release: 2.0.0-pr1-review-fix-candidate
+status: locally_converged_pending_exact_commit_and_external_validation
 passes:
-  - inventory_and_contract_extraction
-  - baseline_execution_validation
-  - stub_marker_and_thin_file_audit
-  - alignment_and_gap_audit
-  - source_supported_repairs
-  - regression_and_release_validation
-no_drift: true
+  - architect_review_finding_reproduction
+  - callback_segment_boundary_and_encoded_separator_remediation
+  - git_blob_identity_manifest_remediation
+  - callback_host_and_port_policy_hardening
+  - unique_oci_staging_and_descriptor_verification
+  - full_regression_and_release_validation
+no_architecture_rewrite: true
 public_contracts_preserved: true
 critical_findings_remaining: 0
 major_findings_remaining: 0
-external_unknowns:
+local_tests_passed: 112
+local_branch_coverage_percent: 81.62
+tracked_delivery_files: 338
+contracts_and_schemas_passed: 31
+workflow_contracts_passed: 4
+architecture_files_checked: 111
+release_readiness_findings: 0
+review_findings_closed:
+  - callback_path_prefix_boundary_bypass
+  - path_only_manifest_integrity_overclaim
+additional_hardening:
+  - exact_callback_host_and_port_constraints
+  - production_callback_deny_all_until_host_approved
+  - semantic_hash_derived_oci_staging_reference
+  - independent_registry_descriptor_resolution
+external_gates:
+  - exact_pr_commit_git_integrity_report
   - canonical_python_3_12_ci_result
-  - live_oci_publication
+  - ruff_and_mypy_ci_result
+  - live_digest_qualified_oci_publication
   - live_postgres_reconciliation
   - real_three_repository_packet_chain
-stop_reason: all locally executable hard gates pass; remaining work requires external systems
-initial_commit_enrichment:
-  full_build_specification_present: true
-  accepted_adr_count: 20
-  root_governance_surface_complete: true
-  github_collaboration_templates_present: true
-  no_parallel_architecture_introduced: true
-  package_ready_for_clean_initial_commit: true
+stop_reason: all locally executable review-fix gates pass; merge evidence requires the exact pushed commit and CI
+production_deployment_ready: false

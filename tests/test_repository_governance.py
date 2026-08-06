@@ -53,7 +53,9 @@ def test_twenty_initial_adrs_are_complete_and_indexed() -> None:
 def test_build_spec_preserves_source_lineage_and_core_laws() -> None:
     text = (ROOT / "BUILD_SPECIFICATION.md").read_text(encoding="utf-8")
     assert "bbca641a0380f66c10dc83ff5be86669d3c94172" in text
-    assert "evidence over inference; packets over reports; planned effects over direct writes" in text
+    assert (
+        "evidence over inference; packets over reports; planned effects over direct writes" in text
+    )
     assert "## 34. Convergence and stop conditions" in text
 
 

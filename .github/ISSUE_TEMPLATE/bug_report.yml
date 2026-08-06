@@ -1,0 +1,50 @@
+name: Defect report
+description: Report a reproducible compiler, packet, validation, or worker defect
+title: "[Defect] "
+labels: ["defect"]
+body:
+  - type: markdown
+    attributes:
+      value: Do not include secrets, signatures, private packet bodies, or sensitive repository data.
+  - type: input
+    id: revision
+    attributes:
+      label: Repository revision
+      description: Exact commit SHA or release version
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Packet ingress
+        - Evidence reconciliation
+        - Repository or capability aggregation
+        - Graph or impact
+        - Maturity or risk
+        - Validation
+        - OutputSink or rendering
+        - Worker, packet store, or callback
+        - Documentation or schema
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Sanitized commands, fixture references, and steps
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior and evidence
+    validations:
+      required: true

@@ -1,0 +1,20 @@
+id: foundational-topology
+version: 1.0.0
+required_repository_packet_versions: [1.0.0]
+allow_direct_observation_fallback: true
+strict_repository_boundaries: true
+unknown_dependency_policy: preserve
+conflict_policy: preserve_and_block_when_required
+maximum_graph_nodes: 100000
+maximum_graph_edges: 500000
+role_taxonomy:
+  api_gateway: [gateway, api-gateway, ingress]
+  agent: [agent, bot, worker]
+  library: [lib, sdk, shared, common]
+  service: [service, svc, microservice, server]
+  infrastructure: [infra, terraform, helm, k8s, docker]
+  data_pipeline: [pipeline, etl, ingestion]
+  frontend: [frontend, ui, web, app]
+  topology: [topology, constellation, map]
+  memory: [memory, graphiti, knowledge]
+  documentation: [docs, documentation, wiki]

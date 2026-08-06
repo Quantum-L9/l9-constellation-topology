@@ -11,7 +11,7 @@ Retries, callback loss, and duplicate events are normal distributed-system condi
 
 ## Decision
 
-- Derive idempotency from parent semantic hashes, compiler version, profile hash, schema hash, and output type.
+- Derive idempotency from a complete semantic compilation fingerprint: parent semantic hashes, compiler build identity, aggregate output-affecting configuration, schema contracts, active contract versions, adapter mode, and output packet type/version.
 - Reuse prior validated packets.
 - Reconcile published results after callback loss and preserve dead letters after exhaustion.
 
@@ -34,7 +34,8 @@ Retries, callback loss, and duplicate events are normal distributed-system condi
 
 ## Compliance and validation
 
-- Local registry tests prove reuse behavior.
+- Mutation tests prove that every output-affecting profile, schema, adapter mode, and compiler build identity changes the key.
+- Local SQLite WAL registry tests prove reuse and concurrent-writer behavior.
 - External staging must prove dropped-callback repair and dead-letter visibility.
 
 ## Related artifacts

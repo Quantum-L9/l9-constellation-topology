@@ -1,5 +1,5 @@
 from .context import ArtifactState, RunContext
-from .diagnostics import Diagnostic
+from .diagnostics import Diagnostic, normalize_diagnostic
 from .evidence import (
     EvidenceRecord,
     EvidenceSourceRef,
@@ -29,6 +29,7 @@ __all__ = [
     "canonical_data",
     "canonical_json",
     "make_evidence_record",
+    "normalize_diagnostic",
     "normalize_source_path",
     "semantic_hash",
     "sha256_bytes",

@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+import json
 from collections import Counter, defaultdict
 from collections.abc import Iterable
-from pathlib import PurePosixPath
+from pathlib import Path, PurePosixPath
+
+from jsonschema import Draft202012Validator
 
 from l9_constellation_topology.domain import (
     Authority,
@@ -47,6 +50,34 @@ def _check(
         evidence_refs=evidence_refs,
         details=details or {},
     )
+
+
+def _schema_errors(schema_path: Path, value: object) -> tuple[str, ...]:
+    try:
+        schema = json.loads(schema_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        return (f"cannot load schema {schema_path}: {exc}",)
+    validator = Draft202012Validator(schema)
+    return tuple(
+        sorted(
+            f"{'/'.join(str(part) for part in error.absolute_path) or '<root>'}: {error.message}"
+            for error in validator.iter_errors(value)
+        )
+    )
+
+
+def _record_schema_errors(
+    schema_root: Path,
+    schema_name: str,
+    records: Iterable[object],
+) -> tuple[str, ...]:
+    errors: list[str] = []
+    schema_path = schema_root / "schemas" / schema_name
+    for index, record in enumerate(records):
+        value = record.model_dump(mode="json") if hasattr(record, "model_dump") else record
+        for error in _schema_errors(schema_path, value):
+            errors.append(f"record[{index}] {error}")
+    return tuple(errors)
 
 
 def _duplicates(values: Iterable[str]) -> tuple[str, ...]:
@@ -93,6 +124,10 @@ def _record_evidence_refs(
         (conflict.conflict_id, conflict.evidence_refs, Authority.candidate)
         for conflict in state.conflicts
     )
+    records.extend(
+        (diagnostic.diagnostic_id, diagnostic.evidence_refs, Authority.candidate)
+        for diagnostic in state.diagnostics
+    )
     return records
 
 
@@ -125,31 +160,86 @@ def validate_topology(
     packet: TopologyPacket,
     state: TopologyState,
     input_bundles: tuple[RepositoryModelBundle, ...],
+    *,
+    schema_root: Path,
 ) -> ValidationReceipt:
     schema_results: list[ValidationCheck] = []
     invariant_results: list[ValidationCheck] = []
     evidence_results: list[ValidationCheck] = []
     cross_reference_results: list[ValidationCheck] = []
 
-    # Schema and serialization depth.
+    # Runtime model construction and independent checked-in JSON Schema validation.
     schema_results.append(
         _check(
-            check_id="schema-topology-packet",
+            check_id="model-topology-packet",
             check_class="schema",
-            rule="topology_packet_schema",
+            rule="pydantic_model_construction",
             passed=True,
-            success="Topology Packet validates against the runtime Pydantic contract.",
-            failure="Topology Packet schema validation failed.",
+            success="Topology Packet was constructed through the runtime Pydantic contract.",
+            failure="Topology Packet runtime model construction failed.",
+            details={"validation_layer": "model-construction", "engine": "pydantic"},
         )
     )
     schema_results.append(
         _check(
-            check_id="schema-topology-state",
+            check_id="model-topology-state",
             check_class="schema",
-            rule="topology_state_schema",
+            rule="pydantic_state_construction",
             passed=True,
-            success="All materialized topology record collections validate.",
-            failure="Materialized topology records failed schema validation.",
+            success="Topology state collections were constructed through typed runtime models.",
+            failure="Topology state runtime model construction failed.",
+            details={"validation_layer": "model-construction", "engine": "pydantic"},
+        )
+    )
+    packet_schema_errors = _schema_errors(
+        schema_root / "contracts" / "topology-packet.schema.json",
+        packet.model_dump(mode="json"),
+    )
+    schema_results.append(
+        _check(
+            check_id="json-schema-topology-packet",
+            check_class="schema",
+            rule="topology_packet_json_schema",
+            passed=not packet_schema_errors,
+            success="Topology Packet independently validates against the checked-in JSON Schema.",
+            failure="Topology Packet failed independent JSON Schema validation.",
+            details={
+                "validation_layer": "json-schema",
+                "engine": "jsonschema.Draft202012Validator",
+                "errors": packet_schema_errors,
+            },
+        )
+    )
+    record_schemas = (
+        ("repository-record.schema.json", state.repository_records),
+        ("artifact-record.schema.json", state.artifact_records),
+        ("capability-record.schema.json", state.capability_records),
+        ("edge-record.schema.json", state.edge_records),
+        ("flow-record.schema.json", state.flow_records),
+        ("graph-record.schema.json", state.graph_records),
+        ("risk-record.schema.json", state.risks),
+        ("maturity-assessment.schema.json", state.maturity),
+        ("evidence-record.schema.json", state.evidence),
+        ("diagnostic-record.schema.json", state.diagnostics),
+    )
+    record_errors = {
+        schema_name: errors
+        for schema_name, records in record_schemas
+        if (errors := _record_schema_errors(schema_root, schema_name, records))
+    }
+    schema_results.append(
+        _check(
+            check_id="json-schema-topology-records",
+            check_class="schema",
+            rule="topology_record_json_schemas",
+            passed=not record_errors,
+            success="All canonical topology records independently validate against checked-in schemas.",
+            failure="One or more topology records failed independent JSON Schema validation.",
+            details={
+                "validation_layer": "json-schema",
+                "engine": "jsonschema.Draft202012Validator",
+                "errors": record_errors,
+            },
         )
     )
 
@@ -308,7 +398,7 @@ def validate_topology(
             rule="cycles_reported",
             passed=True,
             success=(
-                "Dependency cycle scan completed; cycles are preserved as diagnostics."
+                "Dependency cycle scan completed; cycles are recorded in validation receipt details."
                 if cycles
                 else "Dependency cycle scan completed with no cycles."
             ),
@@ -368,6 +458,40 @@ def validate_topology(
             passed=not bad_inference,
             success="No inferred evidence is misclassified as declared authority.",
             failure=f"Inferred evidence marked declared: {', '.join(bad_inference)}.",
+        )
+    )
+
+    input_diagnostic_count = sum(
+        len(bundle.packet.payload.diagnostics)
+        for bundle in input_bundles
+        if bundle.packet.payload is not None
+    )
+    preserved_diagnostic_count = sum(
+        1 for diagnostic in state.diagnostics if diagnostic.disposition == "preserved"
+    )
+    diagnostic_source_packets = {diagnostic.source_packet_id for diagnostic in state.diagnostics}
+    expected_diagnostic_sources = {
+        bundle.packet.packet_id
+        for bundle in input_bundles
+        if bundle.packet.payload is not None and bundle.packet.payload.diagnostics
+    }
+    cross_reference_results.append(
+        _check(
+            check_id="cross-diagnostic-conservation",
+            check_class="cross-reference",
+            rule="input_diagnostics_conserved",
+            passed=(
+                input_diagnostic_count == preserved_diagnostic_count
+                and expected_diagnostic_sources <= diagnostic_source_packets
+            ),
+            success="Every accepted input diagnostic is preserved with source-packet lineage.",
+            failure="One or more accepted input diagnostics were lost or lack source lineage.",
+            details={
+                "input_count": input_diagnostic_count,
+                "preserved_count": preserved_diagnostic_count,
+                "expected_source_packets": tuple(sorted(expected_diagnostic_sources)),
+                "actual_source_packets": tuple(sorted(diagnostic_source_packets)),
+            },
         )
     )
 

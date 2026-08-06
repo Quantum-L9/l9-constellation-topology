@@ -47,7 +47,7 @@ def scan_repository_model(source: RepoSource) -> SyntheticRepositoryModelBundle:
         capabilities=normalized.capabilities,
         relationships=normalized.relationships,
         evidence=normalized.evidence,
-        diagnostics=normalized.diagnostics,
+        diagnostics=tuple(record.model_dump(mode="json") for record in normalized.diagnostics),
     )
     candidate = RepositoryModelPacket(
         packet_version="1.0.0",

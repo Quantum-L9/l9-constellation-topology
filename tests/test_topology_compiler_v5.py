@@ -50,9 +50,10 @@ def test_semantic_hash_ignores_execution_time() -> None:
 
 def test_packet_bundle_round_trip(tmp_path: Path) -> None:
     result = compile_topology(ROOT, INPUTS)
-    receipt = commit_compilation(result, PacketBundleOutputSink(tmp_path))
+    bundle_path = tmp_path / "bundle"
+    receipt = commit_compilation(result, PacketBundleOutputSink(bundle_path))
     assert receipt.status == "passed"
-    materialized, validation = load_topology_bundle(tmp_path)
+    materialized, validation = load_topology_bundle(bundle_path)
     assert validation.status == "passed"
     assert materialized.packet.packet_id == result.materialized.packet.packet_id
     assert materialized.state == result.materialized.state
@@ -74,7 +75,12 @@ def test_failed_validation_commits_zero_outputs() -> None:
             )
         }
     )
-    receipt = validate_topology(result.materialized.packet, state, result.input_bundles)
+    receipt = validate_topology(
+        result.materialized.packet,
+        state,
+        result.input_bundles,
+        schema_root=ROOT,
+    )
     assert receipt.status == "failed"
     sink = MemoryOutputSink(
         WritePolicy(

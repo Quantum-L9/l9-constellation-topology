@@ -1,5 +1,7 @@
 """Explicit topology validation stage."""
 
+from pathlib import Path
+
 from l9_constellation_topology.domain import TopologyState
 from l9_constellation_topology.packets.loader import RepositoryModelBundle
 from l9_constellation_topology.packets.topology_packet import TopologyPacket
@@ -11,5 +13,7 @@ def run(
     packet: TopologyPacket,
     state: TopologyState,
     input_bundles: tuple[RepositoryModelBundle, ...],
+    *,
+    schema_root: Path,
 ) -> ValidationReceipt:
-    return validate_topology(packet, state, input_bundles)
+    return validate_topology(packet, state, input_bundles, schema_root=schema_root)

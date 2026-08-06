@@ -1,0 +1,38 @@
+id: foundational-risk
+version: 1.0.0
+rules:
+  - id: missing-ci
+    version: 1.0.0
+    kind: empty
+    field: workflows
+    severity: high
+    category: ci_gap
+    description: No CI workflow is declared or observed.
+  - id: missing-governance
+    version: 1.0.0
+    kind: empty
+    field: governance_refs
+    severity: medium
+    category: governance_gap
+    description: No governance artifact is declared or observed.
+  - id: missing-adr
+    version: 1.0.0
+    kind: empty
+    field: adr_refs
+    severity: low
+    category: adr_gap
+    description: No architecture decision record is declared or observed.
+  - id: missing-owner
+    version: 1.0.0
+    kind: empty
+    field: owner_ids
+    severity: medium
+    category: ownership_gap
+    description: No repository owner is declared or observed.
+  - id: weak-evidence
+    version: 1.0.0
+    kind: confidence_below
+    threshold: medium
+    severity: medium
+    category: evidence_quality
+    description: Repository evidence confidence is below the required threshold.

@@ -43,6 +43,10 @@ adoption across the foundational chain.
 - Add production observability through the shared L9 platform boundary.
 - Measure compiler performance and introduce optimization only from evidence.
 
+## R7: Generated-artifact determinism
+
+- Make Repository Model Packet fixture generation deterministic (stable `created_at` and a source-content-derived `source_revision` independent of the live repository HEAD) so `make fixtures-check` becomes gate-eligible and can join `schemas-check` inside `make validate`.
+
 ## Explicitly deferred
 
 - Full L9 Gate dependency for the foundational phase.
