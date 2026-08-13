@@ -88,7 +88,9 @@ async def live_execute(action: str, payload: dict[str, Any]) -> dict[str, Any]:
         r = await client.post(f"{GATE_URL}/v1/execute", json=body)
         return {
             "http_status": r.status_code,
-            "body": r.json() if r.headers.get("content-type", "").startswith("application/json") else r.text,
+            "body": r.json()
+            if r.headers.get("content-type", "").startswith("application/json")
+            else r.text,
         }
 
 
@@ -106,7 +108,9 @@ def summarize_roundtrip(action: str, result: dict[str, Any]) -> dict[str, Any]:
         "hop_count": len(hops),
         "hop_packet_ids_match_header": hop_ok,
         "transport_ok": result.get("http_status") == 200 and hop_ok,
-        "payload_status": (body.get("payload") or {}).get("status") if isinstance(body.get("payload"), dict) else None,
+        "payload_status": (body.get("payload") or {}).get("status")
+        if isinstance(body.get("payload"), dict)
+        else None,
     }
 
 
@@ -117,10 +121,10 @@ async def build_stack_snapshot() -> Path:
         eie_health = await fetch_json(client, f"{EIE_URL}/api/v1/health")
         registry = await fetch_json(client, f"{GATE_URL}/v1/registry")
 
-    match_result = await live_execute("match", {"query": {"direction": "intake_to_buyer"}, "top_n": 3})
-    converge_result = await live_execute(
-        "converge", {"entity_type": "partner", "entity_id": "99"}
+    match_result = await live_execute(
+        "match", {"query": {"direction": "intake_to_buyer"}, "top_n": 3}
     )
+    converge_result = await live_execute("converge", {"entity_type": "partner", "entity_id": "99"})
 
     docker_ps = subprocess.run(
         ["docker", "ps", "--format", "{{.Names}}\t{{.Status}}\t{{.Ports}}"],
@@ -170,11 +174,7 @@ async def build_live_integration_evidence(snapshot_path: Path) -> Path:
         "stack_snapshot": str(snapshot_path.relative_to(CONTROL)),
         "stack_snapshot_digest": sha256_file(snapshot_path),
         "gate_url": GATE_URL,
-        "registry": {
-            k: registry[k]
-            for k in ("ceg-real", "enrichment-engine")
-            if k in registry
-        },
+        "registry": {k: registry[k] for k in ("ceg-real", "enrichment-engine") if k in registry},
         "round_trips": snap.get("round_trips"),
         "canonical_actions_in_registry": sorted(actions_seen & CANONICAL_ACTIONS),
         "sdk_path": str(GATE_SDK_SRC.parent),
@@ -228,7 +228,14 @@ def build_repo_evidence_059() -> Path:
 def build_repo_evidence_066() -> Path:
     merged = CONTROL / "ledger/receipts/TASK-052-merged.json"
     tests = subprocess.run(
-        [sys.executable, "-m", "pytest", "tests/contracts/test_no_local_intelligence.py", "-q", "--tb=no"],
+        [
+            sys.executable,
+            "-m",
+            "pytest",
+            "tests/contracts/test_no_local_intelligence.py",
+            "-q",
+            "--tb=no",
+        ],
         cwd="/Users/ib-mac/l9-constellation-repos/IB-Odoo_19",
         capture_output=True,
         text=True,
@@ -274,7 +281,13 @@ def set_gate(gate_id: str, status: str, proof: str) -> dict[str, Any]:
         text=True,
         check=False,
     )
-    return {"gate_id": gate_id, "status": status, "proof": rel, "ok": proc.returncode == 0, "out": proc.stdout + proc.stderr}
+    return {
+        "gate_id": gate_id,
+        "status": status,
+        "proof": rel,
+        "ok": proc.returncode == 0,
+        "out": proc.stdout + proc.stderr,
+    }
 
 
 def defer_gate(gate_id: str, reason: str, blocking_detail: str) -> Path:
@@ -297,7 +310,9 @@ def qualify_gates(snapshot: dict[str, Any], live_path: Path) -> tuple[list[dict]
     live_proof = str(live_path.relative_to(CONTROL))
     rt = snapshot.get("round_trips") or {}
     snapshot.get("registry") or {}
-    transport_ok = rt.get("match", {}).get("transport_ok") and rt.get("converge", {}).get("transport_ok")
+    transport_ok = rt.get("match", {}).get("transport_ok") and rt.get("converge", {}).get(
+        "transport_ok"
+    )
 
     live_pass_gates = []
     if transport_ok:
@@ -344,8 +359,14 @@ def qualify_gates(snapshot: dict[str, Any], live_path: Path) -> tuple[list[dict]
         "GATE-069",
     ]
     for gid in odoo_gates:
-        p = defer_gate(gid, "Odoo not running", "Requires live Odoo consumer on :8069/:8070 for odoo-scoped proof")
-        deferred.append({"gate_id": gid, "proof": str(p.relative_to(CONTROL)), "reason": "Odoo not running"})
+        p = defer_gate(
+            gid,
+            "Odoo not running",
+            "Requires live Odoo consumer on :8069/:8070 for odoo-scoped proof",
+        )
+        deferred.append(
+            {"gate_id": gid, "proof": str(p.relative_to(CONTROL)), "reason": "Odoo not running"}
+        )
 
     other_defer = {
         "GATE-004": "Requires cross-repo SDK release tag/SHA pin verification against GitHub release",
@@ -399,7 +420,16 @@ async def main() -> int:
         "docker_note": "Stack was pre-existing before campaign; not stopped (agent did not start containers)",
     }
     summary_path = write_json("GATE-QUALIFY-SUMMARY.json", summary)
-    print(json.dumps({"summary": str(summary_path), "passed_ok": summary["counts"]["passed_set_gate"], "deferred": summary["counts"]["deferred"]}, indent=2))
+    print(
+        json.dumps(
+            {
+                "summary": str(summary_path),
+                "passed_ok": summary["counts"]["passed_set_gate"],
+                "deferred": summary["counts"]["deferred"],
+            },
+            indent=2,
+        )
+    )
     return 0 if summary["counts"]["passed_set_gate_failed"] == 0 else 1
 
 

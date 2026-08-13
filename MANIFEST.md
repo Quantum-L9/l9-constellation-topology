@@ -6,7 +6,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 
 ## Inventory
 
-**Tracked delivery files:** 350
+**Tracked delivery files:** 396
 
 - `.editorconfig` — editor encoding, indentation, and whitespace policy
 - `.env.example` — documented worker and control-plane environment variables
@@ -134,6 +134,52 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `docs/report-lifecycle.md` — architecture, contract, deployment, recovery, or model documentation
 - `docs/topology-model.md` — architecture, contract, deployment, recovery, or model documentation
 - `docs/worker-contract.md` — architecture, contract, deployment, recovery, or model documentation
+- `evidence/live-qualify-2026-08-02/A0-GATE-LIVE-QUALIFY-NONDESTRUCTIVE-20260802.json` — A0 operator authorization record for the 2026-08-02 non-destructive live gate-qualification campaign
+- `evidence/live-qualify-2026-08-02/CAMPAIGN-GATE-LIVE-QUALIFY-NONDESTRUCTIVE.json` — operator campaign authorization packet governing the bounded non-destructive live gate-qualification run
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-004.json` — DEFER receipt recording why gate GATE-004 was deferred during the 2026-08-02 live-qualification campaign
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-008.json` — DEFER receipt recording why gate GATE-008 was deferred during the 2026-08-02 live-qualification campaign
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-011.json` — DEFER receipt recording why gate GATE-011 was deferred during the 2026-08-02 live-qualification campaign
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-012.json` — DEFER receipt recording why gate GATE-012 was deferred during the 2026-08-02 live-qualification campaign
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-013.json` — DEFER receipt recording why gate GATE-013 was deferred during the 2026-08-02 live-qualification campaign
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-015.json` — DEFER receipt recording why gate GATE-015 was deferred during the 2026-08-02 live-qualification campaign
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-018.json` — DEFER receipt recording why gate GATE-018 was deferred during the 2026-08-02 live-qualification campaign
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-019.json` — DEFER receipt recording why gate GATE-019 was deferred during the 2026-08-02 live-qualification campaign
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-020.json` — DEFER receipt recording why gate GATE-020 was deferred during the 2026-08-02 live-qualification campaign
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-021.json` — DEFER receipt recording why gate GATE-021 was deferred during the 2026-08-02 live-qualification campaign
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-022.json` — DEFER receipt recording why gate GATE-022 was deferred during the 2026-08-02 live-qualification campaign
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-023.json` — DEFER receipt recording why gate GATE-023 was deferred during the 2026-08-02 live-qualification campaign
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-025.json` — DEFER receipt recording why gate GATE-025 was deferred during the 2026-08-02 live-qualification campaign
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-026.json` — DEFER receipt recording why gate GATE-026 was deferred during the 2026-08-02 live-qualification campaign
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-027.json` — DEFER receipt recording why gate GATE-027 was deferred during the 2026-08-02 live-qualification campaign
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-028.json` — DEFER receipt recording why gate GATE-028 was deferred during the 2026-08-02 live-qualification campaign
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-029.json` — DEFER receipt recording why gate GATE-029 was deferred during the 2026-08-02 live-qualification campaign
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-032.json` — DEFER receipt recording why gate GATE-032 was deferred during the 2026-08-02 live-qualification campaign
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-034.json` — DEFER receipt recording why gate GATE-034 was deferred during the 2026-08-02 live-qualification campaign
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-035.json` — DEFER receipt recording why gate GATE-035 was deferred during the 2026-08-02 live-qualification campaign
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-036.json` — DEFER receipt recording why gate GATE-036 was deferred during the 2026-08-02 live-qualification campaign
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-037.json` — DEFER receipt recording why gate GATE-037 was deferred during the 2026-08-02 live-qualification campaign
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-038.json` — DEFER receipt recording why gate GATE-038 was deferred during the 2026-08-02 live-qualification campaign
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-042.json` — DEFER receipt recording why gate GATE-042 was deferred during the 2026-08-02 live-qualification campaign
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-045.json` — DEFER receipt recording why gate GATE-045 was deferred during the 2026-08-02 live-qualification campaign
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-046.json` — DEFER receipt recording why gate GATE-046 was deferred during the 2026-08-02 live-qualification campaign
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-060.json` — DEFER receipt recording why gate GATE-060 was deferred during the 2026-08-02 live-qualification campaign
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-061.json` — DEFER receipt recording why gate GATE-061 was deferred during the 2026-08-02 live-qualification campaign
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-062.json` — DEFER receipt recording why gate GATE-062 was deferred during the 2026-08-02 live-qualification campaign
+- `evidence/live-qualify-2026-08-02/E2E-STACK-STATUS.json` — recorded local end-to-end stack endpoint and container status snapshot
+- `evidence/live-qualify-2026-08-02/GATE-059-REPOSITORY-TEST-EVIDENCE.json` — repository-test pass evidence receipt for gate GATE-059
+- `evidence/live-qualify-2026-08-02/GATE-066-REPOSITORY-TEST-EVIDENCE.json` — repository-test pass evidence receipt for gate GATE-066
+- `evidence/live-qualify-2026-08-02/GATE-QUALIFY-SUMMARY.json` — aggregate gate-status count summary for the live-qualification campaign
+- `evidence/live-qualify-2026-08-02/LIVE-INTEGRATION-EVIDENCE.json` — live cross-service integration evidence receipt for the qualification stack
+- `evidence/live-qualify-2026-08-02/OPERATOR-APPROVE-SLIP.json` — operator approval slip capturing verbatim campaign attestations
+- `evidence/live-qualify-2026-08-02/PROGRAM-COMPLETION-REPORT.json` — W8–W10 program completion report with gate counts and residual blocker list
+- `evidence/live-qualify-2026-08-02/PROGRAM-E2E-PROOF.json` — program-level live end-to-end proof of stack health and install blockers
+- `evidence/live-qualify-2026-08-02/README.md` — honest status narrative and key-file index for the live-qualify evidence pack
+- `evidence/live-qualify-2026-08-02/STACK-HEALTH-SNAPSHOT.json` — docker container health snapshot for the local qualification stack
+- `evidence/live-qualify-2026-08-02/odoo-e2e-recipes/Dockerfile.odoo-e2e` — non-authoritative Odoo end-to-end container build recipe retained as evidence
+- `evidence/live-qualify-2026-08-02/odoo-e2e-recipes/constraints.odoo-e2e.txt` — transitive dependency constraint lock for the Odoo end-to-end image, retained as evidence
+- `evidence/live-qualify-2026-08-02/odoo-e2e-recipes/docker-compose.odoo-e2e.override.yml` — Odoo end-to-end docker-compose override recipe retained as evidence
+- `evidence/live-qualify-2026-08-02/odoo-e2e-recipes/odoo-etc-e2e/odoo.conf` — Odoo end-to-end server configuration recipe retained as evidence
+- `evidence/live-qualify-2026-08-02/run_gate_qualify.py` — reference non-destructive live gate-qualification harness that produced this evidence pack; not part of the compiler runtime
 - `outputs/.gitkeep` — tracked output-directory marker only
 - `pyproject.toml` — Python package metadata, entrypoints, and quality configuration
 - `schemas/artifact-record.schema.json` — canonical or compatibility domain JSON Schema
