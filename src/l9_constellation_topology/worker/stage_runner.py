@@ -9,6 +9,7 @@ import subprocess
 import sys
 from collections.abc import Sequence
 from dataclasses import dataclass
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -31,6 +32,7 @@ from l9_constellation_topology.packets import (
     CallbackRef,
     PacketRef,
     ReuseReceipt,
+    StageDispatchData,
     StageDispatchPayload,
     StageResult,
     TransportPacket,
@@ -44,6 +46,11 @@ from l9_constellation_topology.run import (
 
 from .callback import send_callback
 from .errors import WorkerError
+from .execution_authority import (
+    ExecutionAuthority,
+    ExecutionPermit,
+    resolve_execution_authority,
+)
 from .failure import execution_failure
 from .packet_store import PacketStoreClient, file_uri_to_path, path_to_file_uri
 from .registry import LocalPacketRegistry, RegistryEntry
@@ -51,6 +58,11 @@ from .signature import verify_transport_packet
 from .transport_factory import build_callback_transport_packet
 
 TARGET_REPOSITORY = "Quantum-L9/l9-constellation-topology"
+
+# Admission freshness window for signed stage dispatches. HMAC proves possession, not
+# current authorization; these bound how long a signed dispatch remains admissible.
+MAX_CLOCK_SKEW = timedelta(minutes=2)
+MAX_DISPATCH_TTL = timedelta(minutes=15)
 
 
 @dataclass(frozen=True)
@@ -88,6 +100,30 @@ def _response_key_id(packet: TransportPacket) -> str:
     if packet.security.signatures:
         return packet.security.signatures[0].key_id
     return "foundational-hmac-v1"
+
+
+def _validate_dispatch_freshness(data: StageDispatchData) -> None:
+    issued_at = data.issued_at
+    expires_at = data.expires_at
+    now = datetime.now(UTC)
+    if issued_at > now + MAX_CLOCK_SKEW:
+        raise WorkerError(
+            "dispatch-issued-in-future",
+            "dispatch issued_at is further in the future than the allowed clock skew",
+            blocked=True,
+        )
+    if expires_at <= now:
+        raise WorkerError(
+            "dispatch-expired",
+            "dispatch expires_at is in the past; stale authority is rejected",
+            blocked=True,
+        )
+    if expires_at - issued_at > MAX_DISPATCH_TTL:
+        raise WorkerError(
+            "dispatch-ttl-too-long",
+            "dispatch validity window exceeds the maximum admission TTL",
+            blocked=True,
+        )
 
 
 def validate_stage_dispatch(
@@ -143,6 +179,7 @@ def validate_stage_dispatch(
             "TransportPacket workflow_id does not match stage payload workflow_id",
             blocked=True,
         )
+    _validate_dispatch_freshness(data)
     allowed_actions = {str(value) for value in packet_profile.get("allowed_actions", ())}
     if data.action not in allowed_actions:
         raise WorkerError(
@@ -338,11 +375,11 @@ def _send_signed_callback(
     send_callback(callback, signed, callback_policy=callback_policy)
 
 
-def _execute_validated_stage(
+def _reuse_registered_packet(
     packet: TransportPacket,
     dispatch: StageDispatchPayload,
+    existing: RegistryEntry,
     *,
-    repository_root: Path,
     workspace: Path,
     hmac_key: bytes,
     registry: LocalPacketRegistry,
@@ -351,37 +388,55 @@ def _execute_validated_stage(
 ) -> StageExecutionOutcome:
     data = dispatch.data
     idempotency_key = packet.header.idempotency_key
-    existing = registry.get(idempotency_key)
-    if existing is not None:
-        bundle_manifest_digest = existing.metadata.get("bundle_manifest_digest")
-        if not bundle_manifest_digest:
-            raise WorkerError(
-                "registry-publication-evidence-missing",
-                "registry entry lacks bundle manifest digest",
-                blocked=True,
-            )
-        packet_store.verify_published(
-            existing.packet_ref.uri,
-            expected=existing.packet_ref,
-            expected_bundle_manifest_digest=bundle_manifest_digest,
-            expected_registry_manifest_digest=existing.metadata.get("registry_manifest_digest"),
-            workspace=workspace / "reuse-verify",
+    bundle_manifest_digest = existing.metadata.get("bundle_manifest_digest")
+    if not bundle_manifest_digest:
+        raise WorkerError(
+            "registry-publication-evidence-missing",
+            "registry entry lacks bundle manifest digest",
+            blocked=True,
         )
-        reuse = ReuseReceipt(
-            idempotency_key=idempotency_key,
-            reused_packet=existing.packet_ref,
+    packet_store.verify_published(
+        existing.packet_ref.uri,
+        expected=existing.packet_ref,
+        expected_bundle_manifest_digest=bundle_manifest_digest,
+        expected_registry_manifest_digest=existing.metadata.get("registry_manifest_digest"),
+        workspace=workspace / "reuse-verify",
+    )
+    reuse = ReuseReceipt(
+        idempotency_key=idempotency_key,
+        reused_packet=existing.packet_ref,
+    )
+    if data.callback is not None:
+        _send_signed_callback(
+            packet,
+            data.callback,
+            reuse,
+            hmac_key=hmac_key,
+            callback_policy=configuration.callback_policy,
         )
-        if data.callback is not None:
-            _send_signed_callback(
-                packet,
-                data.callback,
-                reuse,
-                hmac_key=hmac_key,
-                callback_policy=configuration.callback_policy,
-            )
-            registry.acknowledge(idempotency_key)
-        return StageExecutionOutcome(payload=reuse, reused=True, output_bundle=None)
+        registry.acknowledge(idempotency_key)
+    return StageExecutionOutcome(payload=reuse, reused=True, output_bundle=None)
 
+
+def _execute_stage(
+    packet: TransportPacket,
+    dispatch: StageDispatchPayload,
+    permit: ExecutionPermit,
+    *,
+    repository_root: Path,
+    workspace: Path,
+    hmac_key: bytes,
+    registry: LocalPacketRegistry,
+    packet_store: PacketStoreClient,
+    configuration: ResolvedConfiguration,
+    authority: ExecutionAuthority,
+) -> StageExecutionOutcome:
+    # Authority — not a naming convention — is the boundary. This function performs
+    # protected side effects only while holding a live lease, and revalidates it
+    # immediately before each irreversible step.
+    authority.assert_active(permit)
+    data = dispatch.data
+    idempotency_key = packet.header.idempotency_key
     input_paths = tuple(
         packet_store.resolve_input(reference, workspace=workspace)
         for reference in data.input_packets
@@ -400,6 +455,7 @@ def _execute_validated_stage(
         workspace=workspace,
         packet_id=packet_id,
     )
+    authority.assert_active(permit)
     commit_receipt = commit_compilation(
         compilation,
         PacketBundleOutputSink(bundle_path, allow_overwrite=False),
@@ -411,6 +467,7 @@ def _execute_validated_stage(
             blocked=True,
         )
     commit_uri = _persist_commit_receipt(workspace, packet_id, commit_receipt)
+    authority.assert_active(permit)
     published = packet_store.publish(bundle_path, publish_uri)
     output_packet = PacketRef(
         packet_id=packet_id,
@@ -430,6 +487,8 @@ def _execute_validated_stage(
         expected_registry_manifest_digest=published.registry_manifest_digest,
         workspace=workspace / "publish-verify",
     )
+    # Atomically finalize the idempotency claim before any acknowledgement.
+    authority.finalize(permit, output_packet)
 
     validation_uri = f"{published.uri}#receipts/validation-receipt.json"
     registry.register(
@@ -478,7 +537,81 @@ def _execute_validated_stage(
             callback_policy=configuration.callback_policy,
         )
         registry.acknowledge(idempotency_key)
+    authority.release(permit)
     return StageExecutionOutcome(payload=result, reused=False, output_bundle=bundle_path)
+
+
+def _dispatch_stage(
+    packet: TransportPacket,
+    dispatch: StageDispatchPayload,
+    *,
+    repository_root: Path,
+    workspace: Path,
+    hmac_key: bytes,
+    registry: LocalPacketRegistry,
+    packet_store: PacketStoreClient,
+    configuration: ResolvedConfiguration,
+    authority: ExecutionAuthority,
+) -> StageExecutionOutcome:
+    data = dispatch.data
+    idempotency_key = packet.header.idempotency_key
+    existing = registry.get(idempotency_key)
+    if existing is not None:
+        return _reuse_registered_packet(
+            packet,
+            dispatch,
+            existing,
+            workspace=workspace,
+            hmac_key=hmac_key,
+            registry=registry,
+            packet_store=packet_store,
+            configuration=configuration,
+        )
+    outcome = authority.acquire(
+        idempotency_key=idempotency_key,
+        packet_id=packet.header.packet_id,
+        dispatch_nonce=data.dispatch_nonce,
+        stage_id=data.stage_id,
+    )
+    if outcome.permit is None:
+        # The lease reports this work already finalized; serve the recovery record.
+        existing = registry.get(idempotency_key)
+        if existing is None:
+            raise WorkerError(
+                "execution-lease-reuse-unavailable",
+                "lease reports a finalized stage but no recovery record is present",
+                blocked=True,
+            )
+        return _reuse_registered_packet(
+            packet,
+            dispatch,
+            existing,
+            workspace=workspace,
+            hmac_key=hmac_key,
+            registry=registry,
+            packet_store=packet_store,
+            configuration=configuration,
+        )
+    permit = outcome.permit
+    try:
+        return _execute_stage(
+            packet,
+            dispatch,
+            permit,
+            repository_root=repository_root,
+            workspace=workspace,
+            hmac_key=hmac_key,
+            registry=registry,
+            packet_store=packet_store,
+            configuration=configuration,
+            authority=authority,
+        )
+    except Exception:
+        try:
+            authority.fail(permit, "stage-execution-failed")
+        except WorkerError as cleanup_error:
+            print(f"execution-lease-cleanup-skipped: {cleanup_error}", file=sys.stderr)
+        raise
 
 
 def execute_stage(
@@ -489,6 +622,7 @@ def execute_stage(
     hmac_key: bytes,
     registry: LocalPacketRegistry,
     packet_store: PacketStoreClient | None = None,
+    authority: ExecutionAuthority | None = None,
 ) -> StageExecutionOutcome:
     repository_root = repository_root.resolve()
     workspace = workspace.resolve()
@@ -500,7 +634,11 @@ def execute_stage(
         repository_root=repository_root,
         hmac_key=hmac_key,
     )
-    return _execute_validated_stage(
+    resolved_authority = authority or resolve_execution_authority(
+        workspace=workspace,
+        registry_path=registry.path,
+    )
+    return _dispatch_stage(
         packet,
         dispatch,
         repository_root=repository_root,
@@ -509,6 +647,7 @@ def execute_stage(
         registry=registry,
         packet_store=packet_store or PacketStoreClient(),
         configuration=configuration,
+        authority=resolved_authority,
     )
 
 
@@ -580,15 +719,21 @@ def run_worker(argv: Sequence[str] | None = None) -> int:
             args.registry_file
             or os.environ.get("L9_PACKET_REGISTRY_FILE", str(workspace / "packet-registry.sqlite3"))
         )
-        outcome = _execute_validated_stage(
+        registry = LocalPacketRegistry(registry_path)
+        authority = resolve_execution_authority(
+            workspace=workspace,
+            registry_path=registry.path,
+        )
+        outcome = _dispatch_stage(
             packet,
             dispatch,
             repository_root=repository_root,
             workspace=workspace,
             hmac_key=key_value.encode("utf-8"),
-            registry=LocalPacketRegistry(registry_path),
+            registry=registry,
             packet_store=PacketStoreClient(),
             configuration=configuration,
+            authority=authority,
         )
         print(canonical_json(outcome.payload))
         return 0

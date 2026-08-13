@@ -6,7 +6,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 
 ## Inventory
 
-**Tracked delivery files:** 350
+**Tracked delivery files:** 399
 
 - `.editorconfig` — editor encoding, indentation, and whitespace policy
 - `.env.example` — documented worker and control-plane environment variables
@@ -132,8 +132,55 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `docs/packet-contracts.md` — architecture, contract, deployment, recovery, or model documentation
 - `docs/recovery.md` — architecture, contract, deployment, recovery, or model documentation
 - `docs/report-lifecycle.md` — architecture, contract, deployment, recovery, or model documentation
+- `docs/runbooks/merge-gate-enforcement.md` — operator runbook for enforcing the governed merge gate on main
 - `docs/topology-model.md` — architecture, contract, deployment, recovery, or model documentation
 - `docs/worker-contract.md` — architecture, contract, deployment, recovery, or model documentation
+- `evidence/live-qualify-2026-08-02/A0-GATE-LIVE-QUALIFY-NONDESTRUCTIVE-20260802.json` — live-qualify 2026-08-02 non-destructive gate evidence record
+- `evidence/live-qualify-2026-08-02/CAMPAIGN-GATE-LIVE-QUALIFY-NONDESTRUCTIVE.json` — live-qualify 2026-08-02 non-destructive gate evidence record
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-004.json` — live-qualify 2026-08-02 non-destructive gate evidence record
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-008.json` — live-qualify 2026-08-02 non-destructive gate evidence record
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-011.json` — live-qualify 2026-08-02 non-destructive gate evidence record
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-012.json` — live-qualify 2026-08-02 non-destructive gate evidence record
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-013.json` — live-qualify 2026-08-02 non-destructive gate evidence record
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-015.json` — live-qualify 2026-08-02 non-destructive gate evidence record
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-018.json` — live-qualify 2026-08-02 non-destructive gate evidence record
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-019.json` — live-qualify 2026-08-02 non-destructive gate evidence record
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-020.json` — live-qualify 2026-08-02 non-destructive gate evidence record
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-021.json` — live-qualify 2026-08-02 non-destructive gate evidence record
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-022.json` — live-qualify 2026-08-02 non-destructive gate evidence record
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-023.json` — live-qualify 2026-08-02 non-destructive gate evidence record
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-025.json` — live-qualify 2026-08-02 non-destructive gate evidence record
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-026.json` — live-qualify 2026-08-02 non-destructive gate evidence record
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-027.json` — live-qualify 2026-08-02 non-destructive gate evidence record
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-028.json` — live-qualify 2026-08-02 non-destructive gate evidence record
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-029.json` — live-qualify 2026-08-02 non-destructive gate evidence record
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-032.json` — live-qualify 2026-08-02 non-destructive gate evidence record
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-034.json` — live-qualify 2026-08-02 non-destructive gate evidence record
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-035.json` — live-qualify 2026-08-02 non-destructive gate evidence record
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-036.json` — live-qualify 2026-08-02 non-destructive gate evidence record
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-037.json` — live-qualify 2026-08-02 non-destructive gate evidence record
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-038.json` — live-qualify 2026-08-02 non-destructive gate evidence record
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-042.json` — live-qualify 2026-08-02 non-destructive gate evidence record
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-045.json` — live-qualify 2026-08-02 non-destructive gate evidence record
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-046.json` — live-qualify 2026-08-02 non-destructive gate evidence record
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-060.json` — live-qualify 2026-08-02 non-destructive gate evidence record
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-061.json` — live-qualify 2026-08-02 non-destructive gate evidence record
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-062.json` — live-qualify 2026-08-02 non-destructive gate evidence record
+- `evidence/live-qualify-2026-08-02/E2E-STACK-STATUS.json` — live-qualify 2026-08-02 non-destructive gate evidence record
+- `evidence/live-qualify-2026-08-02/GATE-059-REPOSITORY-TEST-EVIDENCE.json` — live-qualify 2026-08-02 non-destructive gate evidence record
+- `evidence/live-qualify-2026-08-02/GATE-066-REPOSITORY-TEST-EVIDENCE.json` — live-qualify 2026-08-02 non-destructive gate evidence record
+- `evidence/live-qualify-2026-08-02/GATE-QUALIFY-SUMMARY.json` — live-qualify 2026-08-02 non-destructive gate evidence record
+- `evidence/live-qualify-2026-08-02/LIVE-INTEGRATION-EVIDENCE.json` — live-qualify 2026-08-02 non-destructive gate evidence record
+- `evidence/live-qualify-2026-08-02/OPERATOR-APPROVE-SLIP.json` — live-qualify 2026-08-02 non-destructive gate evidence record
+- `evidence/live-qualify-2026-08-02/PROGRAM-COMPLETION-REPORT.json` — live-qualify 2026-08-02 non-destructive gate evidence record
+- `evidence/live-qualify-2026-08-02/PROGRAM-E2E-PROOF.json` — live-qualify 2026-08-02 non-destructive gate evidence record
+- `evidence/live-qualify-2026-08-02/README.md` — live-qualify 2026-08-02 evidence set overview
+- `evidence/live-qualify-2026-08-02/STACK-HEALTH-SNAPSHOT.json` — live-qualify 2026-08-02 non-destructive gate evidence record
+- `evidence/live-qualify-2026-08-02/odoo-e2e-recipes/Dockerfile.odoo-e2e` — live-qualify end-to-end integration recipe asset
+- `evidence/live-qualify-2026-08-02/odoo-e2e-recipes/constraints.odoo-e2e.txt` — live-qualify end-to-end integration recipe asset
+- `evidence/live-qualify-2026-08-02/odoo-e2e-recipes/docker-compose.odoo-e2e.override.yml` — live-qualify end-to-end integration recipe asset
+- `evidence/live-qualify-2026-08-02/odoo-e2e-recipes/odoo-etc-e2e/odoo.conf` — live-qualify end-to-end integration recipe asset
+- `evidence/live-qualify-2026-08-02/run_gate_qualify.py` — live-qualify non-destructive gate evidence generation script
 - `outputs/.gitkeep` — tracked output-directory marker only
 - `pyproject.toml` — Python package metadata, entrypoints, and quality configuration
 - `schemas/artifact-record.schema.json` — canonical or compatibility domain JSON Schema
@@ -272,6 +319,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `src/l9_constellation_topology/worker/callback.py` — production Python package implementation
 - `src/l9_constellation_topology/worker/control_packet.py` — production Python package implementation
 - `src/l9_constellation_topology/worker/errors.py` — production Python package implementation
+- `src/l9_constellation_topology/worker/execution_authority.py` — production Python package implementation
 - `src/l9_constellation_topology/worker/failure.py` — production Python package implementation
 - `src/l9_constellation_topology/worker/packet_store.py` — production Python package implementation
 - `src/l9_constellation_topology/worker/registry.py` — production Python package implementation
@@ -332,6 +380,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `tests/test_dependency_scanner.py` — unit, contract, integration, regression, or governance test
 - `tests/test_direct_observation_adapter_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_evidence_v5.py` — unit, contract, integration, regression, or governance test
+- `tests/test_execution_authority_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_generated_artifact_sync.py` — generated-artifact check/update and fail-closed regression tests
 - `tests/test_git_integrity.py` — Git path, mode, object-type, and blob-identity regression tests
 - `tests/test_graph_builder.py` — unit, contract, integration, regression, or governance test

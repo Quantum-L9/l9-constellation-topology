@@ -3,6 +3,12 @@
 # DO NOT EDIT — this file is managed by l9-ci-core presets/python.
 # To update, pull the latest preset from Quantum-L9/l9-ci-core.
 #
+# LOCAL DEVIATION (audit F-06): the governed profile is selected per triggering event
+# instead of hardcoding `pr_fast`, because `pr_fast` forbids `push` (see
+# .github/governance/execution-profiles.yaml) and this workflow triggers on push to main.
+# The canonical fix belongs upstream in Quantum-L9/l9-ci-core presets/python; this local
+# change keeps post-merge governed analysis reachable until the preset is updated.
+#
 # This workflow runs the full L9 analysis pipeline:
 #   1. Resolve governance config from .github/governance/
 #   2. Run semgrep with Python rulesets
@@ -18,7 +24,6 @@ on:
 
 env:
   L9_CORE_REF: "f88116503430aa18992b70d8d31063e34ff97ef1"
-  L9_PROFILE: "pr_fast"
   L9_MATRIX_ID: "pr-semgrep"
 
 permissions:
@@ -39,10 +44,25 @@ jobs:
       mode: ${{ steps.gov.outputs.mode }}
       governance-digest: ${{ steps.gov.outputs.governance-digest }}
       artifact-name: ${{ steps.names.outputs.artifact-name }}
+      profile: ${{ steps.profile.outputs.profile }}
     permissions:
       contents: read
       checks: write
     steps:
+      - id: profile
+        name: Select governed profile for event
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          set -euo pipefail
+          case "$EVENT_NAME" in
+            pull_request) profile=pr_fast ;;
+            push) profile=merge ;;
+            workflow_dispatch) profile=merge ;;
+            *) echo "unsupported event for governed analysis: $EVENT_NAME" >&2; exit 1 ;;
+          esac
+          echo "profile=$profile" >> "$GITHUB_OUTPUT"
+
       - name: Checkout immutable event revision
         env:
           REPOSITORY: ${{ github.repository }}
@@ -61,7 +81,7 @@ jobs:
         name: Resolve governance
         uses: Quantum-L9/l9-ci-core/.github/actions/resolve-governance@f88116503430aa18992b70d8d31063e34ff97ef1
         with:
-          profile: ${{ env.L9_PROFILE }}
+          profile: ${{ steps.profile.outputs.profile }}
           provider: semgrep
           event-name: ${{ github.event_name }}
           repository: ${{ github.repository }}
@@ -174,7 +194,7 @@ jobs:
       contents: read
     with:
       artifact-name: ${{ needs.analyze.outputs.artifact-name }}
-      profile: pr_fast
+      profile: ${{ needs.analyze.outputs.profile }}
       mode: ${{ needs.analyze.outputs.mode }}
       provider: semgrep
       matrix-id: pr-semgrep

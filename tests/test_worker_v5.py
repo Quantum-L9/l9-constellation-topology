@@ -3,8 +3,10 @@ from __future__ import annotations
 import json
 import subprocess
 import threading
+import uuid
 from collections.abc import Iterator
 from contextlib import contextmanager
+from datetime import UTC, datetime, timedelta
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import ClassVar
@@ -102,10 +104,18 @@ def _input_refs() -> tuple[PacketRef, ...]:
     return tuple(refs)
 
 
-def _dispatch(output: Path, *, revision: str | None = None) -> TransportPacket:
+def _dispatch(
+    output: Path,
+    *,
+    revision: str | None = None,
+    issued_at: datetime | None = None,
+    expires_at: datetime | None = None,
+    dispatch_nonce: str | None = None,
+) -> TransportPacket:
     configuration = resolve_configuration(ROOT)
     refs = _input_refs()
     target_revision = revision or _git_revision()
+    now = datetime.now(UTC)
     payload = StageDispatchPayload(
         data=StageDispatchData(
             run_id="run:test",
@@ -120,6 +130,9 @@ def _dispatch(output: Path, *, revision: str | None = None) -> TransportPacket:
                 version=configuration.profile_version,
                 hash=semantic_hash(configuration.topology_profile),
             ),
+            issued_at=issued_at or now,
+            expires_at=expires_at or (now + timedelta(minutes=10)),
+            dispatch_nonce=dispatch_nonce or f"nonce:{uuid.uuid4().hex}",
             callback=CallbackRef(callback_id="local-integration-test"),
             output_uri=output.resolve().as_uri(),
         )

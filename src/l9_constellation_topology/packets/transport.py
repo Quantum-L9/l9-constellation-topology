@@ -75,6 +75,13 @@ class StageDispatchData(FrozenModel):
     target_revision: str
     input_packets: tuple[PacketRef, ...]
     profile: StageProfileRef
+    # Freshness and one-time-use authority. These live in the payload (not
+    # header.created_at) so they are covered by both the HMAC signature and the packet_id:
+    # the signing view excludes header.created_at, and semantic_hash excludes run/stage/
+    # trace/workflow/created_at, but does not strip these fields.
+    issued_at: datetime
+    expires_at: datetime
+    dispatch_nonce: str
     callback: CallbackRef | None = None
     output_uri: str | None = None
 
