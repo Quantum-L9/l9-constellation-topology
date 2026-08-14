@@ -1,6 +1,6 @@
 # Architecture Decision Record Index
 
-The following 20 ADRs define the highest-priority architectural decisions for the
+The following 21 ADRs define the highest-priority architectural decisions for the
 initial repository baseline. Accepted ADRs are immutable except for clerical fixes
 and links. A changed decision requires a new ADR that explicitly supersedes the old
 record.
@@ -27,6 +27,7 @@ record.
 | ADR-0018 | [Use immutable OCI packet storage and an external registry](docs/adr/0018-use-immutable-oci-packet-storage-and-an-external-registry.md) | Accepted |
 | ADR-0019 | [Use idempotency, reuse, replay, and reconciliation](docs/adr/0019-use-idempotency-reuse-replay-and-reconciliation.md) | Accepted |
 | ADR-0020 | [Delegate publication planning to the ingestion bridge](docs/adr/0020-delegate-publication-planning-to-the-ingestion-bridge.md) | Accepted |
+| ADR-0021 | [Packet bundle sink verifies by bundle kind](docs/adr/0021-packet-bundle-sink-verifies-by-bundle-kind.md) | Accepted |
 
 ## Decision order
 

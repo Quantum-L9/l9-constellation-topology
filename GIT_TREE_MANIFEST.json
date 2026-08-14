@@ -182,7 +182,7 @@
       "path": ".python-version"
     },
     {
-      "git_object_id": "90e15af40cc6585003dcb36bfd586f44b28d74ab",
+      "git_object_id": "c8f3f5e14e1d81498a0c5f33586a9cf8b0c72744",
       "mode": "100644",
       "object_type": "blob",
       "path": "ADR_INDEX.md"
@@ -290,7 +290,7 @@
       "path": "MAINTAINERS.md"
     },
     {
-      "git_object_id": "919fe95deb2ead89d7297a531d7ebd7ad8d8b4c7",
+      "git_object_id": "71516db649e105344fa5e24db17c598fc1bd8564",
       "mode": "100644",
       "object_type": "blob",
       "path": "MANIFEST.md"
@@ -624,6 +624,12 @@
       "mode": "100644",
       "object_type": "blob",
       "path": "docs/adr/0020-delegate-publication-planning-to-the-ingestion-bridge.md"
+    },
+    {
+      "git_object_id": "f8035667649c9e5d9d0560c5225f3ee148261949",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "docs/adr/0021-packet-bundle-sink-verifies-by-bundle-kind.md"
     },
     {
       "git_object_id": "ab95afae42865b27222966fb9d0a5d1a4c4fee1b",
@@ -1226,7 +1232,7 @@
       "path": "src/l9_constellation_topology/__init__.py"
     },
     {
-      "git_object_id": "08875ac75a696f1e4fddfd563fb7e690c930e8dc",
+      "git_object_id": "89b09a9d507c0beda9afa04e8c9fa2b42f736785",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/cli.py"
@@ -1364,7 +1370,7 @@
       "path": "src/l9_constellation_topology/io/output_sink.py"
     },
     {
-      "git_object_id": "b85062f2d4a1882c0ac08f0cb3d26f8ba41681d2",
+      "git_object_id": "e08f88ea6dfc9be0e475a0e05991de65e9f5b2ea",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/io/packet_bundle_output_sink.py"
@@ -2300,13 +2306,13 @@
       "path": "tests/test_repository_aggregation_v5.py"
     },
     {
-      "git_object_id": "4755d97e385c5b7f67b1d6a19e5a8ef043b08e55",
+      "git_object_id": "c7ac47426251a905190b2355426f298b711d0302",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_repository_governance.py"
     },
     {
-      "git_object_id": "4062520dca6edc47bfbee8e3a9d782cbb45a398e",
+      "git_object_id": "b317fb1fabb364490f5de44d94f699613f13866b",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_runtime_boundaries_v5.py"
@@ -2372,8 +2378,8 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:f703809f0ef97eb5c8f0aeda5fe4dd1142539fe7ef2189f3ae1b2f7fd6154aec",
-  "entry_count": 395,
+  "entries_sha256": "sha256:c59878c0266882e0c338b67b6bc3e980d18fa81fd2c9bfed291e6b28a385d1ea",
+  "entry_count": 396,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
   ],

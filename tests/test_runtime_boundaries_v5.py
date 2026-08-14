@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 
+from l9_constellation_topology.cli import run as cli_run
 from l9_constellation_topology.compatibility.v4_models import RepoSource
 from l9_constellation_topology.evidence import (
     deep_freeze,
@@ -15,11 +16,16 @@ from l9_constellation_topology.evidence import (
 from l9_constellation_topology.io import (
     CompositeOutputSink,
     MemoryOutputSink,
+    PacketBundleOutputSink,
     RenderedArtifact,
     WriteIntent,
     WritePolicy,
 )
 from l9_constellation_topology.packets import TransportPacket
+from l9_constellation_topology.packets.loader import (
+    load_repository_model_bundle,
+    load_topology_bundle,
+)
 from l9_constellation_topology.packets.repository_bundle import (
     build_repository_model_bundle_artifacts,
 )
@@ -151,6 +157,65 @@ def test_direct_observation_fallback_and_repository_bundle(tmp_path: Path) -> No
         "receipts/validation-receipt.json",
         "manifest.json",
     ]
+
+
+def test_packet_bundle_sink_verifies_by_bundle_kind(tmp_path: Path) -> None:
+    """A Repository Model Packet bundle must commit through the sink only when the
+    matching verifier is supplied; the default Topology Packet verifier must reject it."""
+    repo = _sample_repo(tmp_path)
+    synthetic = scan_repository_model(
+        RepoSource(repo_id="sample", name="sample", local_path=str(repo), expected_role="library")
+    )
+    artifacts = build_repository_model_bundle_artifacts(synthetic)
+
+    # Default verifier is Topology-Packet-only: a Repository Model bundle is rejected.
+    default_sink = PacketBundleOutputSink(tmp_path / "default", allow_overwrite=True)
+    for artifact in artifacts:
+        default_sink.enqueue(WriteIntent(artifact=artifact))
+    assert default_sink.commit().status == "failed"
+    assert not (tmp_path / "default").exists()
+
+    # With the Repository Model verifier the same bundle commits cleanly.
+    rmp_sink = PacketBundleOutputSink(
+        tmp_path / "rmp",
+        allow_overwrite=True,
+        bundle_verifier=load_repository_model_bundle,
+    )
+    for artifact in artifacts:
+        rmp_sink.enqueue(WriteIntent(artifact=artifact))
+    assert rmp_sink.commit().status == "passed"
+    loaded = load_repository_model_bundle(tmp_path / "rmp")
+    assert loaded.packet.subject.repository_id == "repo:sample"
+
+
+def test_scan_compatibility_ingress_produces_valid_topology_bundle(tmp_path: Path) -> None:
+    """End-to-end regression for the scan compatibility path (ISSUE-004): scanning a
+    source repository must compile to a passing, loadable Topology Packet bundle."""
+    repo = _sample_repo(tmp_path)
+    out = tmp_path / "scanned-topology"
+    project_root = Path(__file__).resolve().parents[1]
+    exit_code = cli_run(
+        [
+            "scan",
+            "--repo-root",
+            str(project_root),
+            "--source-repo",
+            str(repo),
+            "--repository-id",
+            "sample",
+            "--expected-role",
+            "library",
+            "--out",
+            str(out),
+        ]
+    )
+    assert exit_code == 0
+    materialized, receipt = load_topology_bundle(out)
+    assert receipt.status == "passed"
+    assert materialized.packet.packet_type == "l9.topology"
+    assert any(
+        record.repository_id == "repo:sample" for record in materialized.state.repository_records
+    )
 
 
 def test_control_packet_cli_validates_payload_and_writes_signed_packet(

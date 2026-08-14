@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 import shutil
 import tempfile
+from collections.abc import Callable
 from pathlib import Path
 
 from .filesystem_output_sink import FileSystemOutputSink
@@ -39,7 +40,14 @@ class PacketBundleOutputSink(FileSystemOutputSink):
         *,
         mode: str = "write",
         allow_overwrite: bool = False,
+        bundle_verifier: Callable[[Path], object] | None = None,
     ) -> None:
+        # Post-write verifier that re-reads and validates the staged bundle before the
+        # atomic rename. Defaults to Topology Packet verification; callers writing a
+        # different canonical bundle kind (e.g. a Repository Model Packet in the scan
+        # compatibility path) must pass the matching loader so a valid bundle of that
+        # kind is not rejected as a non-Topology Packet.
+        self._bundle_verifier = bundle_verifier
         policy = WritePolicy(
             mode="dry-run" if mode == "dry-run" else "write",
             allowed_output_roots=(".",),
@@ -135,9 +143,12 @@ class PacketBundleOutputSink(FileSystemOutputSink):
             if staging_receipt.status != "passed":
                 return make_commit_receipt(plan, staging_receipt.results)
 
-            from l9_constellation_topology.packets.loader import load_topology_bundle
+            verifier = self._bundle_verifier
+            if verifier is None:
+                from l9_constellation_topology.packets.loader import load_topology_bundle
 
-            load_topology_bundle(staging)
+                verifier = load_topology_bundle
+            verifier(staging)
             self._fsync_tree(staging)
             os.replace(staging, self.output_root)
             parent_descriptor = os.open(self.output_root.parent, os.O_RDONLY)

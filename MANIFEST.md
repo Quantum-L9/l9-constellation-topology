@@ -113,6 +113,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `docs/adr/0018-use-immutable-oci-packet-storage-and-an-external-registry.md` — accepted architecture decision record
 - `docs/adr/0019-use-idempotency-reuse-replay-and-reconciliation.md` — accepted architecture decision record
 - `docs/adr/0020-delegate-publication-planning-to-the-ingestion-bridge.md` — accepted architecture decision record
+- `docs/adr/0021-packet-bundle-sink-verifies-by-bundle-kind.md` — accepted architecture decision record
 - `docs/adr/README.md` — ADR directory governance and navigation
 - `docs/architecture.md` — architecture, contract, deployment, recovery, or model documentation
 - `docs/archive/v4/01_SPEC_ATTACK.md` — superseded v4 historical artifact retained for migration evidence

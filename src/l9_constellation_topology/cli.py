@@ -234,7 +234,14 @@ def cmd_verify_determinism(args: argparse.Namespace) -> int:
 
 def _write_synthetic_bundle(source: RepoSource, destination: Path) -> None:
     synthetic = scan_repository_model(source)
-    sink = PacketBundleOutputSink(destination, allow_overwrite=True)
+    # The synthetic bundle is a Repository Model Packet, not a Topology Packet, so the
+    # sink must verify it with the Repository Model loader rather than the default
+    # Topology Packet loader.
+    sink = PacketBundleOutputSink(
+        destination,
+        allow_overwrite=True,
+        bundle_verifier=load_repository_model_bundle,
+    )
     for artifact in build_repository_model_bundle_artifacts(synthetic):
         sink.enqueue(WriteIntent(artifact=artifact))
     receipt = sink.commit()

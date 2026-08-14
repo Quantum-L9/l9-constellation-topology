@@ -30,10 +30,11 @@ def test_initial_root_authority_files_exist() -> None:
     assert required <= present
 
 
-def test_twenty_initial_adrs_are_complete_and_indexed() -> None:
+def test_adrs_are_complete_and_indexed() -> None:
     adr_dir = ROOT / "docs" / "adr"
     adr_paths = sorted(path for path in adr_dir.glob("[0-9][0-9][0-9][0-9]-*.md"))
-    assert len(adr_paths) == 20
+    # 20 initial baseline ADRs plus ADR-0021 (packet bundle sink verifies by bundle kind).
+    assert len(adr_paths) == 21
     index = (ROOT / "ADR_INDEX.md").read_text(encoding="utf-8")
     required_sections = (
         "## Context",
