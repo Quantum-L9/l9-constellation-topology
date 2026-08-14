@@ -290,7 +290,7 @@
       "path": "MAINTAINERS.md"
     },
     {
-      "git_object_id": "8f3149c5bcf568a8d329d964991698a06e370d60",
+      "git_object_id": "919fe95deb2ead89d7297a531d7ebd7ad8d8b4c7",
       "mode": "100644",
       "object_type": "blob",
       "path": "MANIFEST.md"
@@ -750,6 +750,282 @@
       "mode": "100644",
       "object_type": "blob",
       "path": "docs/worker-contract.md"
+    },
+    {
+      "git_object_id": "2498714ec54768fc5a5d3cc80c4c91ae498f6fb7",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/A0-GATE-LIVE-QUALIFY-NONDESTRUCTIVE-20260802.json"
+    },
+    {
+      "git_object_id": "2a0a865e8d64a9acef835aa60a3e9376bd5269b9",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/CAMPAIGN-GATE-LIVE-QUALIFY-NONDESTRUCTIVE.json"
+    },
+    {
+      "git_object_id": "3bc6fefdfbd6dfc66701f7e6e08de2bcbcfa2ac2",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-004.json"
+    },
+    {
+      "git_object_id": "6b320f3e2542ee80366c090dcc82e1ec568490ad",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-008.json"
+    },
+    {
+      "git_object_id": "65f1a6e3a6080502625368e5ad607a81ddf3a48f",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-011.json"
+    },
+    {
+      "git_object_id": "734a6d9f69954610cb438af6964c77bcd5783859",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-012.json"
+    },
+    {
+      "git_object_id": "315bfc317b68815b21c037dcb4379ef180d03144",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-013.json"
+    },
+    {
+      "git_object_id": "1cabff7666d183ea97ba533c46acd5da0a3248f1",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-015.json"
+    },
+    {
+      "git_object_id": "f1649d5e9e9fe4f42e4f283454b47285e4d69bb6",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-018.json"
+    },
+    {
+      "git_object_id": "73ffa0ee44f74ad9c32d11097db5558a6a0f9f34",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-019.json"
+    },
+    {
+      "git_object_id": "4e928382edcc877d1570d7b4222a131676e9c556",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-020.json"
+    },
+    {
+      "git_object_id": "541513ab73774a3286a11528dbf94bff184073c1",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-021.json"
+    },
+    {
+      "git_object_id": "d4f340a6ba23fd1cf0ed40af2acaea173ab46332",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-022.json"
+    },
+    {
+      "git_object_id": "397ea084aa9482c288c62c10b6319642d0dba14b",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-023.json"
+    },
+    {
+      "git_object_id": "bec624ea4fbdbd5e64dcd5dc38cda8cd979773cc",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-025.json"
+    },
+    {
+      "git_object_id": "58c64896f325e065bf1b93162dab621e2031f7d5",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-026.json"
+    },
+    {
+      "git_object_id": "b0e27a357763b19901f50ec57da0599630570dd9",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-027.json"
+    },
+    {
+      "git_object_id": "180412dac754c10ba3dc5da63829c5abb18eeb8b",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-028.json"
+    },
+    {
+      "git_object_id": "b2a8018a68bd06c0b1e7d67634106efff65906fe",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-029.json"
+    },
+    {
+      "git_object_id": "d6509b36a5f32faf69bd3c01a16e6ccd44f14bc7",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-032.json"
+    },
+    {
+      "git_object_id": "7a29a185a227d7a49cf1a632c81f54f5fc89b216",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-034.json"
+    },
+    {
+      "git_object_id": "674ae888794abf4e82da81a57e227fd574b67888",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-035.json"
+    },
+    {
+      "git_object_id": "d5c51a828e21194776389192d4a6a0f0014ab8d5",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-036.json"
+    },
+    {
+      "git_object_id": "17504204790912a30dee38305b1cd6837eb3f47a",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-037.json"
+    },
+    {
+      "git_object_id": "7e58f331804ce4969a322699ac598062abbe4862",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-038.json"
+    },
+    {
+      "git_object_id": "3fdb750090ff4387a12d05c6aa76365498c41e97",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-042.json"
+    },
+    {
+      "git_object_id": "717f0b5ee9c13656bb2f4ad979003b286b844d84",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-045.json"
+    },
+    {
+      "git_object_id": "ac04846b9d3f39ebbf25117f4ce4ec253b33222a",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-046.json"
+    },
+    {
+      "git_object_id": "cc570c5d0ceee30f94ce41bd73e9e07b30c445b1",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-060.json"
+    },
+    {
+      "git_object_id": "fae71c02e3045a31b1ed9272aec2730235aaa325",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-061.json"
+    },
+    {
+      "git_object_id": "4c293c6c27c920a915cd7feaab2911174a06feb9",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-062.json"
+    },
+    {
+      "git_object_id": "0fa7dc4902c8f2b4a33dc6dfc091d38d87b37d10",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/E2E-STACK-STATUS.json"
+    },
+    {
+      "git_object_id": "ed360f379ff78d7e7eaffff43f0427216938cdf5",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/GATE-059-REPOSITORY-TEST-EVIDENCE.json"
+    },
+    {
+      "git_object_id": "7545da35fbf183af4f645bf56b003bb3b6cc1005",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/GATE-066-REPOSITORY-TEST-EVIDENCE.json"
+    },
+    {
+      "git_object_id": "f36cf7ebec04ac5cb8df7d06f2e478e9a5586e59",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/GATE-QUALIFY-SUMMARY.json"
+    },
+    {
+      "git_object_id": "6bb3791f60fa47e785feb51697a9de3f320c9011",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/LIVE-INTEGRATION-EVIDENCE.json"
+    },
+    {
+      "git_object_id": "833ad9d912b6d48cba45f83ae90501f5c58c00b1",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/OPERATOR-APPROVE-SLIP.json"
+    },
+    {
+      "git_object_id": "50547b1fe46a5beae98f1c6551030556fc280c40",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/PROGRAM-COMPLETION-REPORT.json"
+    },
+    {
+      "git_object_id": "c2a93b3f8e80df9cf28387871c31d6b5770ffa45",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/PROGRAM-E2E-PROOF.json"
+    },
+    {
+      "git_object_id": "8ff68c1e956383ef89e7b3a212ef2bfe74e02fbe",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/README.md"
+    },
+    {
+      "git_object_id": "9a3da837a9bd5921b2c173b2973f58dd6c79c96d",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/STACK-HEALTH-SNAPSHOT.json"
+    },
+    {
+      "git_object_id": "411b4be0ba7374b1ac27203cad1d9bf458c57bf2",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/odoo-e2e-recipes/Dockerfile.odoo-e2e"
+    },
+    {
+      "git_object_id": "1bc6386f46dd71ba9ef3d138f8c2cef0fa78991b",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/odoo-e2e-recipes/constraints.odoo-e2e.txt"
+    },
+    {
+      "git_object_id": "e65b2968b8d583a3a83d2410c4279b597bb4c844",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/odoo-e2e-recipes/docker-compose.odoo-e2e.override.yml"
+    },
+    {
+      "git_object_id": "10fd0e40020551d3f739169c60a816cee43481f5",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/odoo-e2e-recipes/odoo-etc-e2e/odoo.conf"
+    },
+    {
+      "git_object_id": "b6f3e69c65a0cb46b538f9d6b2cf72ae2bc20ed3",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/run_gate_qualify.py"
     },
     {
       "git_object_id": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
@@ -2072,7 +2348,7 @@
       "path": "tests/test_workflow_contracts_v5.py"
     },
     {
-      "git_object_id": "65879b4655315d3f575b8e2ea11ec0c300af879a",
+      "git_object_id": "a9458c992b49449735aace922471c5aa4c4d7753",
       "mode": "100644",
       "object_type": "blob",
       "path": "uv.lock"
@@ -2096,8 +2372,8 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:8f441790ecf11e37162a7f23626060d55e6fe4ab74d337f38e93c5601a9e3fb2",
-  "entry_count": 349,
+  "entries_sha256": "sha256:f703809f0ef97eb5c8f0aeda5fe4dd1142539fe7ef2189f3ae1b2f7fd6154aec",
+  "entry_count": 395,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
   ],

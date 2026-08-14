@@ -11,6 +11,10 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `.editorconfig` — editor encoding, indentation, and whitespace policy
 - `.env.example` — documented worker and control-plane environment variables
 - `.gitattributes` — Git text normalization and binary-file policy
+- `.github/ISSUE_TEMPLATE/architecture_change.yml` — structured GitHub issue intake contract
+- `.github/ISSUE_TEMPLATE/bug_report.yml` — structured GitHub issue intake contract
+- `.github/ISSUE_TEMPLATE/config.yml` — structured GitHub issue intake contract
+- `.github/PULL_REQUEST_TEMPLATE.md` — pull-request evidence and architecture checklist
 - `.github/governance/execution-profiles.yaml` — governed analysis execution-profile definitions
 - `.github/governance/promotion-policy.yaml` — governed analysis finding-promotion policy
 - `.github/governance/provider-requiredness.yaml` — governed analysis provider-requiredness policy
@@ -19,10 +23,6 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `.github/governance/semgrep-identity-map.yaml` — governed analysis semgrep rule identity resolution map
 - `.github/governance/semgrep-policy.yaml` — governed analysis semgrep provider policy
 - `.github/governance/waivers.yaml` — governed analysis finding-waiver ledger
-- `.github/ISSUE_TEMPLATE/architecture_change.yml` — structured GitHub issue intake contract
-- `.github/ISSUE_TEMPLATE/bug_report.yml` — structured GitHub issue intake contract
-- `.github/ISSUE_TEMPLATE/config.yml` — structured GitHub issue intake contract
-- `.github/PULL_REQUEST_TEMPLATE.md` — pull-request evidence and architecture checklist
 - `.github/workflows/l9-analysis.yml` — immutable-pinned GitHub Actions workflow
 - `.github/workflows/l9-ingress.yml` — immutable-pinned GitHub Actions workflow
 - `.github/workflows/l9-manual-replay.yml` — immutable-pinned GitHub Actions workflow
@@ -52,8 +52,8 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `DEVELOPMENT.md` — developer environment, layout, and command guide
 - `FINAL_TREE.md` — deterministic final repository tree
 - `FIX_MAP.md` — confirmed finding to fix and validation mapping
-- `GOVERNANCE.md` — authority, approval, ADR, branch, and release governance
 - `GIT_TREE_MANIFEST.json` — Git-native mode, object-type, and blob-identity manifest
+- `GOVERNANCE.md` — authority, approval, ADR, branch, and release governance
 - `INITIAL_COMMIT.md` — clean initial-commit and push handoff
 - `LICENSE` — proprietary repository license terms
 - `MAINTAINERS.md` — maintainer roles and ownership responsibilities
@@ -134,6 +134,52 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `docs/report-lifecycle.md` — architecture, contract, deployment, recovery, or model documentation
 - `docs/topology-model.md` — architecture, contract, deployment, recovery, or model documentation
 - `docs/worker-contract.md` — architecture, contract, deployment, recovery, or model documentation
+- `evidence/live-qualify-2026-08-02/A0-GATE-LIVE-QUALIFY-NONDESTRUCTIVE-20260802.json` — A0 non-destructive live-qualify gate receipt (2026-08-02 campaign)
+- `evidence/live-qualify-2026-08-02/CAMPAIGN-GATE-LIVE-QUALIFY-NONDESTRUCTIVE.json` — operator approve packet for the non-destructive live-qualify campaign
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-004.json` — deferred (BLOCKED) gate receipt for GATE-004 with blocking reason and content digest
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-008.json` — deferred (BLOCKED) gate receipt for GATE-008 with blocking reason and content digest
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-011.json` — deferred (BLOCKED) gate receipt for GATE-011 with blocking reason and content digest
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-012.json` — deferred (BLOCKED) gate receipt for GATE-012 with blocking reason and content digest
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-013.json` — deferred (BLOCKED) gate receipt for GATE-013 with blocking reason and content digest
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-015.json` — deferred (BLOCKED) gate receipt for GATE-015 with blocking reason and content digest
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-018.json` — deferred (BLOCKED) gate receipt for GATE-018 with blocking reason and content digest
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-019.json` — deferred (BLOCKED) gate receipt for GATE-019 with blocking reason and content digest
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-020.json` — deferred (BLOCKED) gate receipt for GATE-020 with blocking reason and content digest
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-021.json` — deferred (BLOCKED) gate receipt for GATE-021 with blocking reason and content digest
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-022.json` — deferred (BLOCKED) gate receipt for GATE-022 with blocking reason and content digest
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-023.json` — deferred (BLOCKED) gate receipt for GATE-023 with blocking reason and content digest
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-025.json` — deferred (BLOCKED) gate receipt for GATE-025 with blocking reason and content digest
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-026.json` — deferred (BLOCKED) gate receipt for GATE-026 with blocking reason and content digest
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-027.json` — deferred (BLOCKED) gate receipt for GATE-027 with blocking reason and content digest
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-028.json` — deferred (BLOCKED) gate receipt for GATE-028 with blocking reason and content digest
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-029.json` — deferred (BLOCKED) gate receipt for GATE-029 with blocking reason and content digest
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-032.json` — deferred (BLOCKED) gate receipt for GATE-032 with blocking reason and content digest
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-034.json` — deferred (BLOCKED) gate receipt for GATE-034 with blocking reason and content digest
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-035.json` — deferred (BLOCKED) gate receipt for GATE-035 with blocking reason and content digest
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-036.json` — deferred (BLOCKED) gate receipt for GATE-036 with blocking reason and content digest
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-037.json` — deferred (BLOCKED) gate receipt for GATE-037 with blocking reason and content digest
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-038.json` — deferred (BLOCKED) gate receipt for GATE-038 with blocking reason and content digest
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-042.json` — deferred (BLOCKED) gate receipt for GATE-042 with blocking reason and content digest
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-045.json` — deferred (BLOCKED) gate receipt for GATE-045 with blocking reason and content digest
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-046.json` — deferred (BLOCKED) gate receipt for GATE-046 with blocking reason and content digest
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-060.json` — deferred (BLOCKED) gate receipt for GATE-060 with blocking reason and content digest
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-061.json` — deferred (BLOCKED) gate receipt for GATE-061 with blocking reason and content digest
+- `evidence/live-qualify-2026-08-02/DEFER-GATE-062.json` — deferred (BLOCKED) gate receipt for GATE-062 with blocking reason and content digest
+- `evidence/live-qualify-2026-08-02/E2E-STACK-STATUS.json` — end-to-end stack status snapshot for the live-qualify campaign
+- `evidence/live-qualify-2026-08-02/GATE-059-REPOSITORY-TEST-EVIDENCE.json` — repository test evidence receipt for GATE-059
+- `evidence/live-qualify-2026-08-02/GATE-066-REPOSITORY-TEST-EVIDENCE.json` — repository test evidence receipt for GATE-066
+- `evidence/live-qualify-2026-08-02/GATE-QUALIFY-SUMMARY.json` — gate status count summary for the live-qualify campaign
+- `evidence/live-qualify-2026-08-02/LIVE-INTEGRATION-EVIDENCE.json` — live transport (Gate+CEG+EIE) integration evidence
+- `evidence/live-qualify-2026-08-02/OPERATOR-APPROVE-SLIP.json` — operator chat attestation slip for the live-qualify campaign
+- `evidence/live-qualify-2026-08-02/PROGRAM-COMPLETION-REPORT.json` — program gate counts and residual BLOCKED list
+- `evidence/live-qualify-2026-08-02/PROGRAM-E2E-PROOF.json` — program end-to-end stack health and install-blocker proof
+- `evidence/live-qualify-2026-08-02/README.md` — W8–W10 live-qualify campaign evidence index and honest status
+- `evidence/live-qualify-2026-08-02/STACK-HEALTH-SNAPSHOT.json` — stack health snapshot captured during live-qualify
+- `evidence/live-qualify-2026-08-02/odoo-e2e-recipes/Dockerfile.odoo-e2e` — Odoo end-to-end test container image recipe
+- `evidence/live-qualify-2026-08-02/odoo-e2e-recipes/constraints.odoo-e2e.txt` — pinned Python constraints for the Odoo end-to-end test image
+- `evidence/live-qualify-2026-08-02/odoo-e2e-recipes/docker-compose.odoo-e2e.override.yml` — Docker Compose override for the Odoo end-to-end test stack
+- `evidence/live-qualify-2026-08-02/odoo-e2e-recipes/odoo-etc-e2e/odoo.conf` — Odoo server configuration for the end-to-end test stack
+- `evidence/live-qualify-2026-08-02/run_gate_qualify.py` — non-destructive live gate qualification harness for the live-qualify campaign
 - `outputs/.gitkeep` — tracked output-directory marker only
 - `pyproject.toml` — Python package metadata, entrypoints, and quality configuration
 - `schemas/artifact-record.schema.json` — canonical or compatibility domain JSON Schema
@@ -156,9 +202,9 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `scripts/build_control_packet.py` — operator, build, generation, or validation command
 - `scripts/compile_topology_packet.py` — operator, build, generation, or validation command
 - `scripts/generate_fixture_packets.py` — operator, build, generation, or validation command
-- `scripts/git_tree_manifest.py` — deterministic Git tree manifest generator and validator
 - `scripts/generate_schemas.py` — operator, build, generation, or validation command
 - `scripts/generated_artifact_sync.py` — shared read-only generated-artifact drift detection and explicit update support
+- `scripts/git_tree_manifest.py` — deterministic Git tree manifest generator and validator
 - `scripts/render_topology_reports.py` — operator, build, generation, or validation command
 - `scripts/validate_contracts.py` — operator, build, generation, or validation command
 - `scripts/validate_git_integrity.py` — commit, human inventory, and Git blob-identity validator
