@@ -170,3 +170,29 @@ changes:
       - make schemas-check
       - make validate
     status: implemented_schema_gate_enforced; fixture drift gate deferred pending deterministic fixture generation (non-deterministic created_at and repository-revision-bound source_revision)
+  - id: ACT-001
+    source: src/l9_constellation_topology/publication/, .l9/publication-policy.yaml, docs/adr/0021-internalize-publication-planning-and-memory-lowering.md
+    gap: ADR-0020 delegated publication planning to l9-topology-ingestion-bridge, a repository that was never built, so validated topology truth had no downstream path
+    fix: internalize publication eligibility, destination-neutral memory lowering, and deterministic effect planning as an internal boundary; supersede ADR-0020 on repository placement only and preserve every prohibition it recorded
+    validation:
+      - tests/test_publication_planning.py
+      - tests/test_publication_downstream_conformance.py
+      - scripts/architecture_boundary_check.py
+    status: implemented
+  - id: ACT-002
+    source: src/l9_constellation_topology/publication/contracts.py, tests/fixtures/downstream_contracts/l9-graphiti-memory-contract.json
+    gap: lowered memory intents were never checked against the real l9-graphiti-memory contract, so producer and consumer could drift silently
+    fix: mirror MemoryWriteRequest field-for-field, capture a contract descriptor from the bound downstream revision for offline drift detection, and validate eligible intents against the real GateMemoryBridge.validate_intent when a read-only checkout is supplied
+    validation:
+      - tests/test_publication_downstream_conformance.py::test_mirror_field_names_match_the_downstream_contract
+      - tests/test_publication_downstream_conformance.py::test_intents_validate_against_the_real_downstream_boundary
+    status: implemented_offline_gate_enforced; live probe requires L9_GRAPHITI_MEMORY_SRC and is skipped when absent
+  - id: ACT-003
+    source: scripts/generate_schemas.py, schemas/topology-publication-plan.schema.json
+    gap: adding the publication plan contract under contracts/ would change schema_contract_hash and therefore every Topology Packet semantic identity
+    fix: place the derived publication plan schema under schemas/ so publication policy and contracts never alter canonical topology identity
+    validation:
+      - tests/test_publication_planning.py::test_publication_policy_is_excluded_from_topology_configuration
+      - tests/test_publication_planning.py::test_plan_is_derived_and_leaves_topology_packet_unchanged
+      - make schemas-check
+    status: implemented

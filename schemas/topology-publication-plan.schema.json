@@ -1,0 +1,981 @@
+{
+  "$defs": {
+    "EligibilityDecision": {
+      "additionalProperties": false,
+      "description": "Fail-closed admission decision for a single publication candidate.",
+      "properties": {
+        "reasons": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Reasons",
+          "type": "array"
+        },
+        "status": {
+          "enum": [
+            "eligible",
+            "held",
+            "rejected"
+          ],
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "title": "EligibilityDecision",
+      "type": "object"
+    },
+    "LoweringReceipt": {
+      "additionalProperties": false,
+      "description": "Record exactly which topology facts and rules produced an intent.",
+      "properties": {
+        "confidence_level": {
+          "title": "Confidence Level",
+          "type": "string"
+        },
+        "confidence_method": {
+          "enum": [
+            "explicit",
+            "extracted",
+            "inferred",
+            "aggregated",
+            "calibrated"
+          ],
+          "title": "Confidence Method",
+          "type": "string"
+        },
+        "conflict_status": {
+          "title": "Conflict Status",
+          "type": "string"
+        },
+        "derivation_evidence_kind": {
+          "anyOf": [
+            {
+              "enum": [
+                "explicit",
+                "source_excerpt",
+                "test",
+                "observation",
+                "inference",
+                "aggregation",
+                "governance_approval"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Derivation Evidence Kind"
+        },
+        "observed_conflict_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Observed Conflict Ids",
+          "type": "array"
+        },
+        "observed_unknown_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Observed Unknown Ids",
+          "type": "array"
+        },
+        "owning_repository_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Owning Repository Id"
+        },
+        "resolved_evidence_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Resolved Evidence Ids",
+          "type": "array"
+        },
+        "source_fields": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Fields",
+          "type": "array"
+        },
+        "truncated_evidence_count": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Truncated Evidence Count",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "confidence_level",
+        "confidence_method",
+        "conflict_status"
+      ],
+      "title": "LoweringReceipt",
+      "type": "object"
+    },
+    "MemoryAssertion": {
+      "additionalProperties": false,
+      "description": "Mirror of the downstream ``MemoryAssertion`` contract.",
+      "properties": {
+        "object": {
+          "anyOf": [
+            {
+              "maxLength": 2000,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Object"
+        },
+        "predicate": {
+          "anyOf": [
+            {
+              "maxLength": 200,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Predicate"
+        },
+        "subject": {
+          "anyOf": [
+            {
+              "maxLength": 500,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Subject"
+        }
+      },
+      "title": "MemoryAssertion",
+      "type": "object"
+    },
+    "MemoryConfidence": {
+      "additionalProperties": false,
+      "description": "Mirror of the downstream ``Confidence`` contract.",
+      "properties": {
+        "calibrated_at": {
+          "format": "date-time",
+          "title": "Calibrated At",
+          "type": "string"
+        },
+        "evidence_count": {
+          "default": 1,
+          "minimum": 0,
+          "title": "Evidence Count",
+          "type": "integer"
+        },
+        "method": {
+          "default": "explicit",
+          "enum": [
+            "explicit",
+            "extracted",
+            "inferred",
+            "aggregated",
+            "calibrated"
+          ],
+          "title": "Method",
+          "type": "string"
+        },
+        "policy_version": {
+          "default": "confidence/v1",
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Policy Version",
+          "type": "string"
+        },
+        "score": {
+          "default": 1.0,
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Score",
+          "type": "number"
+        }
+      },
+      "required": [
+        "calibrated_at"
+      ],
+      "title": "MemoryConfidence",
+      "type": "object"
+    },
+    "MemoryEvidenceRef": {
+      "additionalProperties": false,
+      "description": "Mirror of the downstream ``EvidenceRef`` contract.",
+      "properties": {
+        "description": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "explicit",
+            "source_excerpt",
+            "test",
+            "observation",
+            "inference",
+            "aggregation",
+            "governance_approval"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "observed_at": {
+          "format": "date-time",
+          "title": "Observed At",
+          "type": "string"
+        },
+        "source_digest": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Digest"
+        },
+        "source_id": {
+          "anyOf": [
+            {
+              "maxLength": 500,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Id"
+        },
+        "source_range": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MemorySourceRange"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "kind",
+        "description",
+        "observed_at"
+      ],
+      "title": "MemoryEvidenceRef",
+      "type": "object"
+    },
+    "MemoryIngestIntent": {
+      "additionalProperties": false,
+      "description": "Mirror of the downstream ``IngestMemoryIntent`` discriminated member.",
+      "properties": {
+        "operation": {
+          "const": "memory.ingest",
+          "default": "memory.ingest",
+          "title": "Operation",
+          "type": "string"
+        },
+        "request": {
+          "$ref": "#/$defs/MemoryWriteRequest"
+        }
+      },
+      "required": [
+        "request"
+      ],
+      "title": "MemoryIngestIntent",
+      "type": "object"
+    },
+    "MemoryProvenance": {
+      "additionalProperties": false,
+      "description": "Mirror of the downstream ``Provenance`` contract.",
+      "properties": {
+        "extraction_method": {
+          "default": "direct",
+          "maxLength": 100,
+          "title": "Extraction Method",
+          "type": "string"
+        },
+        "model": {
+          "anyOf": [
+            {
+              "maxLength": 200,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Model"
+        },
+        "repository": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Repository"
+        },
+        "session_id": {
+          "anyOf": [
+            {
+              "maxLength": 200,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Session Id"
+        },
+        "source": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Source",
+          "type": "string"
+        },
+        "source_agent_id": {
+          "anyOf": [
+            {
+              "maxLength": 200,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Agent Id"
+        },
+        "source_digest": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Digest"
+        },
+        "source_id": {
+          "anyOf": [
+            {
+              "maxLength": 500,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Id"
+        },
+        "source_range": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MemorySourceRange"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "source_trust": {
+          "default": 1.0,
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Source Trust",
+          "type": "number"
+        },
+        "tool": {
+          "anyOf": [
+            {
+              "maxLength": 200,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Tool"
+        },
+        "transformed_at": {
+          "format": "date-time",
+          "title": "Transformed At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source",
+        "transformed_at"
+      ],
+      "title": "MemoryProvenance",
+      "type": "object"
+    },
+    "MemorySourceRange": {
+      "additionalProperties": false,
+      "description": "Mirror of the downstream ``SourceRange`` contract.",
+      "properties": {
+        "end_line": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "End Line"
+        },
+        "end_offset": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "End Offset"
+        },
+        "start_line": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Start Line"
+        },
+        "start_offset": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Start Offset"
+        }
+      },
+      "title": "MemorySourceRange",
+      "type": "object"
+    },
+    "MemoryWriteRequest": {
+      "additionalProperties": false,
+      "description": "Mirror of the downstream ``MemoryWriteRequest`` contract.\n\n``consent`` is typed as ``None`` because topology never grants consent on\nanother subject's behalf, and ``dry_run`` stays at the downstream default\nbecause this repository plans effects rather than executing them.",
+      "properties": {
+        "assertion": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MemoryAssertion"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "confidence": {
+          "$ref": "#/$defs/MemoryConfidence"
+        },
+        "consent": {
+          "default": null,
+          "title": "Consent",
+          "type": "null"
+        },
+        "content": {
+          "maxLength": 64000,
+          "minLength": 1,
+          "title": "Content",
+          "type": "string"
+        },
+        "dry_run": {
+          "default": false,
+          "title": "Dry Run",
+          "type": "boolean"
+        },
+        "evidence": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/MemoryEvidenceRef"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "idempotency_key": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Idempotency Key"
+        },
+        "memory_class": {
+          "default": "observation",
+          "enum": [
+            "identity",
+            "preference",
+            "constraint",
+            "decision",
+            "episodic",
+            "semantic",
+            "procedural",
+            "observation",
+            "insight",
+            "meta"
+          ],
+          "title": "Memory Class",
+          "type": "string"
+        },
+        "metadata": {
+          "additionalProperties": true,
+          "title": "Metadata",
+          "type": "object"
+        },
+        "namespace": {
+          "maxLength": 300,
+          "minLength": 1,
+          "title": "Namespace",
+          "type": "string"
+        },
+        "provenance": {
+          "$ref": "#/$defs/MemoryProvenance"
+        },
+        "references": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "References",
+          "type": "array"
+        },
+        "source_observed_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Observed At"
+        },
+        "supersedes": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Supersedes",
+          "type": "array"
+        },
+        "tags": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Tags",
+          "type": "array"
+        },
+        "valid_from": {
+          "format": "date-time",
+          "title": "Valid From",
+          "type": "string"
+        },
+        "valid_to": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Valid To"
+        }
+      },
+      "required": [
+        "namespace",
+        "content",
+        "provenance",
+        "confidence",
+        "valid_from"
+      ],
+      "title": "MemoryWriteRequest",
+      "type": "object"
+    },
+    "PacketRef": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_hash": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Artifact Hash"
+        },
+        "packet_id": {
+          "title": "Packet Id",
+          "type": "string"
+        },
+        "packet_type": {
+          "title": "Packet Type",
+          "type": "string"
+        },
+        "packet_version": {
+          "title": "Packet Version",
+          "type": "string"
+        },
+        "semantic_hash": {
+          "title": "Semantic Hash",
+          "type": "string"
+        },
+        "source_revision": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Revision"
+        },
+        "subject_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Subject Id"
+        },
+        "uri": {
+          "title": "Uri",
+          "type": "string"
+        },
+        "validation_status": {
+          "enum": [
+            "passed",
+            "failed",
+            "not_run",
+            "blocked"
+          ],
+          "title": "Validation Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "packet_id",
+        "packet_type",
+        "packet_version",
+        "uri",
+        "semantic_hash",
+        "validation_status"
+      ],
+      "title": "PacketRef",
+      "type": "object"
+    },
+    "Producer": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "version": {
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "version"
+      ],
+      "title": "Producer",
+      "type": "object"
+    },
+    "PublicationCandidate": {
+      "additionalProperties": false,
+      "description": "A single topology fact lowered to a downstream memory intent.",
+      "properties": {
+        "candidate_id": {
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "candidate_kind": {
+          "enum": [
+            "entity",
+            "relationship"
+          ],
+          "title": "Candidate Kind",
+          "type": "string"
+        },
+        "eligibility": {
+          "$ref": "#/$defs/EligibilityDecision"
+        },
+        "idempotency_key": {
+          "maxLength": 300,
+          "minLength": 1,
+          "title": "Idempotency Key",
+          "type": "string"
+        },
+        "lowering": {
+          "$ref": "#/$defs/LoweringReceipt"
+        },
+        "memory_intent": {
+          "$ref": "#/$defs/MemoryIngestIntent"
+        },
+        "source_evidence_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Evidence Ids",
+          "type": "array"
+        },
+        "source_repository_model_packet_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Repository Model Packet Ids",
+          "type": "array"
+        },
+        "source_topology_entity_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Topology Entity Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "candidate_id",
+        "candidate_kind",
+        "source_topology_entity_ids",
+        "eligibility",
+        "lowering",
+        "memory_intent",
+        "idempotency_key"
+      ],
+      "title": "PublicationCandidate",
+      "type": "object"
+    },
+    "PublicationDiagnostic": {
+      "additionalProperties": false,
+      "description": "Operator-visible counter or note about the publication plan.",
+      "properties": {
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "count": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Count",
+          "type": "integer"
+        },
+        "detail": {
+          "title": "Detail",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "detail"
+      ],
+      "title": "PublicationDiagnostic",
+      "type": "object"
+    },
+    "SkippedCandidate": {
+      "additionalProperties": false,
+      "description": "A topology fact the versioned policy did not select for publication.",
+      "properties": {
+        "reason": {
+          "title": "Reason",
+          "type": "string"
+        },
+        "source_id": {
+          "title": "Source Id",
+          "type": "string"
+        },
+        "source_kind": {
+          "enum": [
+            "entity",
+            "relationship"
+          ],
+          "title": "Source Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_kind",
+        "source_id",
+        "reason"
+      ],
+      "title": "SkippedCandidate",
+      "type": "object"
+    }
+  },
+  "$id": "https://quantum-l9.dev/schemas/topology-publication-plan.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Derived, non-canonical plan of downstream memory effects.",
+  "properties": {
+    "candidates": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/PublicationCandidate"
+      },
+      "title": "Candidates",
+      "type": "array"
+    },
+    "diagnostics": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/PublicationDiagnostic"
+      },
+      "title": "Diagnostics",
+      "type": "array"
+    },
+    "plan_id": {
+      "title": "Plan Id",
+      "type": "string"
+    },
+    "plan_type": {
+      "const": "l9.topology-publication-plan",
+      "default": "l9.topology-publication-plan",
+      "title": "Plan Type",
+      "type": "string"
+    },
+    "plan_version": {
+      "default": "1.0.0",
+      "title": "Plan Version",
+      "type": "string"
+    },
+    "policy": {
+      "additionalProperties": true,
+      "title": "Policy",
+      "type": "object"
+    },
+    "policy_hash": {
+      "title": "Policy Hash",
+      "type": "string"
+    },
+    "producer": {
+      "$ref": "#/$defs/Producer"
+    },
+    "published_at": {
+      "format": "date-time",
+      "title": "Published At",
+      "type": "string"
+    },
+    "semantic_hash": {
+      "title": "Semantic Hash",
+      "type": "string"
+    },
+    "skipped_candidates": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/SkippedCandidate"
+      },
+      "title": "Skipped Candidates",
+      "type": "array"
+    },
+    "source_topology_packet": {
+      "$ref": "#/$defs/PacketRef"
+    },
+    "source_topology_semantic_hash": {
+      "title": "Source Topology Semantic Hash",
+      "type": "string"
+    }
+  },
+  "required": [
+    "plan_id",
+    "producer",
+    "source_topology_packet",
+    "source_topology_semantic_hash",
+    "policy",
+    "policy_hash",
+    "semantic_hash",
+    "published_at"
+  ],
+  "title": "PublicationPlan",
+  "type": "object"
+}

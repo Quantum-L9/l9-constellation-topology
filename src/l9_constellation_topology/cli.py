@@ -36,6 +36,11 @@ from l9_constellation_topology.packets import (
 from l9_constellation_topology.packets.repository_bundle import (
     build_repository_model_bundle_artifacts,
 )
+from l9_constellation_topology.publication import (
+    build_publication_plan_artifacts,
+    plan_publication_from_repository,
+    validate_publication_plan,
+)
 from l9_constellation_topology.renderers import (
     DEFAULT_FORMATS,
     SUPPORTED_FORMATS,
@@ -334,6 +339,45 @@ def cmd_export_neo4j(args: argparse.Namespace) -> int:
     return 0 if receipt.status == "passed" else 2
 
 
+def cmd_plan_publication(args: argparse.Namespace) -> int:
+    repository_root = Path(args.repo_root)
+    materialized, _ = load_topology_bundle(Path(args.input_bundle))
+    plan = plan_publication_from_repository(materialized, repository_root)
+    schema_errors = validate_publication_plan(plan, repository_root=repository_root)
+    if schema_errors:
+        for error in schema_errors:
+            print(f"publication plan schema error: {error}", file=sys.stderr)
+        return 2
+    receipt = _write_artifacts(
+        Path(args.out),
+        build_publication_plan_artifacts(plan),
+        dry_run=args.dry_run,
+        allow_overwrite=args.allow_overwrite,
+    )
+    _print_json(
+        {
+            "status": receipt.status,
+            "plan_id": plan.plan_id,
+            "plan_semantic_hash": plan.semantic_hash,
+            "policy_hash": plan.policy_hash,
+            "source_topology_packet_id": plan.source_topology_packet.packet_id,
+            "source_topology_semantic_hash": plan.source_topology_semantic_hash,
+            "counts": {
+                "eligible": len(plan.eligible_candidates),
+                "held": len(plan.held_candidates),
+                "rejected": len(plan.rejected_candidates),
+                "skipped": len(plan.skipped_candidates),
+            },
+            "note": (
+                "publication plan only; no memory, Graphiti, or Neo4j client is "
+                "present and no intent was dispatched"
+            ),
+            "outputs": [item.model_dump(mode="json") for item in receipt.results],
+        }
+    )
+    return 0 if receipt.status == "passed" else 2
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="l9-topology",
@@ -415,6 +459,17 @@ def build_parser() -> argparse.ArgumentParser:
     scan_many_parser.add_argument("--dry-run", action="store_true")
     scan_many_parser.add_argument("--allow-overwrite", action="store_true")
     scan_many_parser.set_defaults(handler=cmd_scan_many)
+
+    publication_parser = commands.add_parser(
+        "plan-publication",
+        help="Plan deterministic memory.ingest intents from a Topology Packet",
+    )
+    publication_parser.add_argument("--repo-root", default=".")
+    publication_parser.add_argument("--input-bundle", required=True)
+    publication_parser.add_argument("--out", required=True)
+    publication_parser.add_argument("--dry-run", action="store_true")
+    publication_parser.add_argument("--allow-overwrite", action="store_true")
+    publication_parser.set_defaults(handler=cmd_plan_publication)
 
     neo4j_parser = commands.add_parser("export-neo4j", help="Render a Neo4j candidate projection")
     neo4j_parser.add_argument("--input-bundle", required=True)

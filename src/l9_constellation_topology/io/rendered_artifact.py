@@ -20,6 +20,7 @@ ArtifactKind = Literal[
     "diagram",
     "debug-artifact",
     "commit-receipt",
+    "publication-plan",
 ]
 
 

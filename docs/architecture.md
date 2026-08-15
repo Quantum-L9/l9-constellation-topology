@@ -42,7 +42,9 @@ Topology Packet bundle + Commit Receipt
 | Artifact semantics | Repository Model Packet |
 | Repository and constellation semantics | Topology Packet |
 | Workflow state, retries, leases, registry | Postgres control plane |
-| Accepted graph relationships | Ingestion bridge and canonical graph |
+| Publication eligibility and memory lowering | `publication/` module (ADR-0021) |
+| Accepted graph relationships | Canonical graph, downstream |
+| Durable memory admission and execution | `l9-graphiti-memory` |
 | Temporal observations and rationale | Downstream memory boundary |
 | Human reports | Projection cache or packet attachments |
 
