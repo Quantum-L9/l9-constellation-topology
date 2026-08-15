@@ -246,6 +246,33 @@ def _provenance(
     )
 
 
+def _source_locators(
+    *,
+    policy: PublicationPolicy,
+    index: TopologyIndex,
+    evidence_refs: tuple[str, ...],
+) -> tuple[tuple[str, ...], tuple[str, ...]]:
+    """Collect the repository revisions and paths the evidence was observed at.
+
+    The downstream `EvidenceRef` contract is frozen and forbids extra fields, so it has
+    nowhere to carry either locator; today they survive only inside prose descriptions.
+    Lowering them into request metadata keeps a published record able to state which
+    commit it was true at without resolving its parent packet out of band.
+    """
+    revisions: set[str] = set()
+    paths: set[str] = set()
+    for ref in set(evidence_refs):
+        record = index.evidence_by_id.get(ref)
+        if record is None:
+            continue
+        if record.source_ref.source_revision:
+            revisions.add(record.source_ref.source_revision)
+        if record.source_ref.source_path:
+            paths.add(record.source_ref.source_path)
+    bound = policy.maximum_evidence_refs_per_candidate
+    return tuple(sorted(revisions)), tuple(sorted(paths))[:bound]
+
+
 def _metadata(
     *,
     packet: TopologyPacket,
@@ -254,6 +281,8 @@ def _metadata(
     policy: PublicationPolicy,
     conflicts: tuple[ConflictRecord, ...],
     unknowns: tuple[UnknownRecord, ...],
+    source_revisions: tuple[str, ...],
+    source_paths: tuple[str, ...],
 ) -> dict[str, Any]:
     return {
         "topology_packet_id": packet.packet_id,
@@ -266,6 +295,8 @@ def _metadata(
         "publication_policy": policy.identity,
         "observed_conflict_ids": [item.conflict_id for item in conflicts],
         "observed_unknown_ids": [item.unknown_id for item in unknowns],
+        "source_revisions": list(source_revisions),
+        "source_paths": list(source_paths),
     }
 
 
@@ -303,6 +334,11 @@ def _build(
     )
     conflicts = index.conflicts_by_subject.get(subject_id, ())
     unknowns = index.unknowns_by_subject.get(subject_id, ())
+    source_revisions, source_paths = _source_locators(
+        policy=policy,
+        index=index,
+        evidence_refs=evidence_refs,
+    )
 
     identity = candidate_identity(
         candidate_kind=candidate_kind,
@@ -342,6 +378,8 @@ def _build(
             policy=policy,
             conflicts=conflicts,
             unknowns=unknowns,
+            source_revisions=source_revisions,
+            source_paths=source_paths,
         ),
         idempotency_key=idempotency_key(
             identity,
