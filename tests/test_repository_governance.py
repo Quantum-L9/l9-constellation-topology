@@ -30,10 +30,13 @@ def test_initial_root_authority_files_exist() -> None:
     assert required <= present
 
 
-def test_twenty_initial_adrs_are_complete_and_indexed() -> None:
+def test_adrs_are_complete_indexed_and_sequentially_numbered() -> None:
     adr_dir = ROOT / "docs" / "adr"
     adr_paths = sorted(path for path in adr_dir.glob("[0-9][0-9][0-9][0-9]-*.md"))
-    assert len(adr_paths) == 20
+    assert len(adr_paths) == 21
+    numbers = [int(path.name[:4]) for path in adr_paths]
+    assert numbers == list(range(1, len(adr_paths) + 1)), "ADR numbers must not skip or repeat"
+
     index = (ROOT / "ADR_INDEX.md").read_text(encoding="utf-8")
     required_sections = (
         "## Context",
@@ -45,9 +48,29 @@ def test_twenty_initial_adrs_are_complete_and_indexed() -> None:
     )
     for path in adr_paths:
         text = path.read_text(encoding="utf-8")
-        assert "**Status:** Accepted" in text
+        assert "**Status:**" in text
         assert all(section in text for section in required_sections)
         assert f"docs/adr/{path.name}" in index
+
+
+def test_superseded_adrs_link_forward_and_backward() -> None:
+    """A superseded decision is preserved and cross-linked, never deleted."""
+    adr_dir = ROOT / "docs" / "adr"
+    for path in sorted(adr_dir.glob("[0-9][0-9][0-9][0-9]-*.md")):
+        text = path.read_text(encoding="utf-8")
+        if "**Status:** Accepted" in text:
+            continue
+        assert "Superseded" in text, f"{path.name} has an unrecognized status"
+        successors = [
+            other
+            for other in sorted(adr_dir.glob("[0-9][0-9][0-9][0-9]-*.md"))
+            if other.name in text
+        ]
+        assert successors, f"{path.name} does not link forward to its successor"
+        for successor in successors:
+            assert path.name in successor.read_text(encoding="utf-8"), (
+                f"{successor.name} does not link back to {path.name}"
+            )
 
 
 def test_build_spec_preserves_source_lineage_and_core_laws() -> None:

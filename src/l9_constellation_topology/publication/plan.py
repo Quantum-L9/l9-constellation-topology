@@ -155,9 +155,7 @@ def build_publication_plan(
 
     timestamp = published_at or utc_now()
     index = TopologyIndex.build(state)
-    context = EligibilityContext.build(
-        policy=policy, packet=packet, state=state, index=index
-    )
+    context = EligibilityContext.build(policy=policy, packet=packet, state=state, index=index)
     eligible_entity_kinds = set(policy.eligible_entity_kinds)
     eligible_edge_types = set(policy.eligible_edge_types)
 
@@ -225,9 +223,7 @@ def build_publication_plan(
             key=lambda item: item.candidate_id,
         )
     )
-    skipped_candidates = tuple(
-        sorted(skipped, key=lambda item: (item.source_kind, item.source_id))
-    )
+    skipped_candidates = tuple(sorted(skipped, key=lambda item: (item.source_kind, item.source_id)))
     diagnostics = _diagnostics(candidates, skipped_candidates)
     packet_ref = _topology_packet_ref(materialized)
     producer_name = f"{packet.producer.name}/{PUBLICATION_PRODUCER_SUFFIX}"

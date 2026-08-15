@@ -70,7 +70,9 @@ def require_publishable_topology(packet: TopologyPacket, policy: PublicationPoli
         )
 
 
-def _material_conflicts(candidate: LoweredCandidate, context: EligibilityContext) -> tuple[str, ...]:
+def _material_conflicts(
+    candidate: LoweredCandidate, context: EligibilityContext
+) -> tuple[str, ...]:
     fields = set(candidate.receipt.source_fields)
     material = []
     for entity_id in candidate.source_topology_entity_ids:

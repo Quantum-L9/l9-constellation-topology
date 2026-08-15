@@ -107,7 +107,9 @@ def test_candidate_and_idempotency_identity_are_deterministic(
     assert [item.idempotency_key for item in first.candidates] == [
         item.idempotency_key for item in second.candidates
     ]
-    assert all(item.idempotency_key.startswith("l9-topology-publication:") for item in first.candidates)
+    assert all(
+        item.idempotency_key.startswith("l9-topology-publication:") for item in first.candidates
+    )
     assert len({item.candidate_id for item in first.candidates}) == len(first.candidates)
 
 
@@ -169,9 +171,7 @@ def test_inferred_and_aggregated_intents_carry_admissible_evidence(
         checked += 1
         evidence = candidate.memory_intent.request.evidence
         assert evidence
-        assert any(
-            item.kind in {"inference", "aggregation", "source_excerpt"} for item in evidence
-        )
+        assert any(item.kind in {"inference", "aggregation", "source_excerpt"} for item in evidence)
         assert confidence.evidence_count == len(evidence)
     assert checked, "fixture topology produced no derived-confidence candidates"
 
@@ -299,11 +299,15 @@ def test_non_material_conflict_is_preserved_without_holding(
         published_at=FIXED_TIME,
     )
     candidate = next(
-        item for item in plan.candidates if item.source_topology_entity_ids == (repository.repository_id,)
+        item
+        for item in plan.candidates
+        if item.source_topology_entity_ids == (repository.repository_id,)
     )
     assert candidate.eligibility.status == "eligible"
     assert "conflict:immaterial" in candidate.lowering.observed_conflict_ids
-    assert "conflict:immaterial" in candidate.memory_intent.request.metadata["observed_conflict_ids"]
+    assert (
+        "conflict:immaterial" in candidate.memory_intent.request.metadata["observed_conflict_ids"]
+    )
 
 
 def test_material_unknown_holds_the_affected_candidate(
@@ -359,9 +363,7 @@ def test_subject_wide_unknown_is_always_material(
         published_at=FIXED_TIME,
     )
     assert context.known_entity_ids
-    assert any(
-        REASON_MATERIAL_UNKNOWN in item.eligibility.reasons for item in plan.held_candidates
-    )
+    assert any(REASON_MATERIAL_UNKNOWN in item.eligibility.reasons for item in plan.held_candidates)
 
 
 def test_unvalidated_topology_is_rejected(
@@ -382,7 +384,9 @@ def test_missing_lineage_rejects_every_candidate(
     materialized: MaterializedTopology, policy: PublicationPolicy
 ) -> None:
     stripped = materialized.packet.model_copy(
-        update={"inputs": materialized.packet.inputs.model_copy(update={"repository_model_packets": ()})}
+        update={
+            "inputs": materialized.packet.inputs.model_copy(update={"repository_model_packets": ()})
+        }
     )
     plan = build_publication_plan(
         MaterializedTopology(packet=stripped, state=materialized.state),

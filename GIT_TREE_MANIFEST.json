@@ -1040,7 +1040,7 @@
       "path": "evidence/live-qualify-2026-08-02/odoo-e2e-recipes/odoo-etc-e2e/odoo.conf"
     },
     {
-      "git_object_id": "d1c1dac56e40a9554ce48edeea08a128fe66634f",
+      "git_object_id": "b6f3e69c65a0cb46b538f9d6b2cf72ae2bc20ed3",
       "mode": "100644",
       "object_type": "blob",
       "path": "evidence/live-qualify-2026-08-02/run_gate_qualify.py"
@@ -1238,7 +1238,7 @@
       "path": "scripts/validate_workflows.py"
     },
     {
-      "git_object_id": "c24d247e957a51bbba4763a1c03b05e218bda072",
+      "git_object_id": "b1eeb4a05255eee5fd642bdef03e56322ae50015",
       "mode": "100755",
       "object_type": "blob",
       "path": "scripts/verify_determinism.py"
@@ -1544,7 +1544,7 @@
       "path": "src/l9_constellation_topology/publication/contracts.py"
     },
     {
-      "git_object_id": "3d7c9e7e076f7afa17345c5d7470e6960affbb73",
+      "git_object_id": "5c56413fb4181d0ebddc37d823c9328867371389",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/publication/eligibility.py"
@@ -1556,13 +1556,13 @@
       "path": "src/l9_constellation_topology/publication/identity.py"
     },
     {
-      "git_object_id": "b0863c4b9ba0aef8fc4848e77ad81d9756637227",
+      "git_object_id": "a128338275af0c16c73aac5de053b86ab8d72521",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/publication/lowering.py"
     },
     {
-      "git_object_id": "91bce7603598adcc0ea07fa1f60f2ffff58f889f",
+      "git_object_id": "8210cf52eb6ed9f437509899946d8fca7e7c3528",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/publication/plan.py"
@@ -2348,13 +2348,13 @@
       "path": "tests/test_packet_store_v5.py"
     },
     {
-      "git_object_id": "9d0ba54f695a8e5697b0a0ce207e4b65467af169",
+      "git_object_id": "11c2e7a59e0636c0ed7c14519f4481e8606800f5",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_publication_downstream_conformance.py"
     },
     {
-      "git_object_id": "8165f526abea2f71b897e111396221ce05ab881b",
+      "git_object_id": "aaed050e1edac1b370bbd3e5bc6474634f46acbc",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_publication_planning.py"
@@ -2390,7 +2390,7 @@
       "path": "tests/test_repository_aggregation_v5.py"
     },
     {
-      "git_object_id": "4755d97e385c5b7f67b1d6a19e5a8ef043b08e55",
+      "git_object_id": "caff84263958cd34215b300fa91fdef98ed37ed4",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_repository_governance.py"
@@ -2462,7 +2462,7 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:78c415d7c9328b68b3787aa131ba948841e58a11561a8dbe950cf54f7604ce3e",
+  "entries_sha256": "sha256:a946bef709bff56d739f1fa50400c3eee4933d23a5e7212d40b47ec262074407",
   "entry_count": 410,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"

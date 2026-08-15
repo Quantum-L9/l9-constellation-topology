@@ -148,9 +148,7 @@ def _source_trust(policy: PublicationPolicy, assessment: ConfidenceAssessment) -
 def _evidence_kind(policy: PublicationPolicy, record: EvidenceRecord) -> EvidenceKindName:
     evidence_class = str(record.evidence_class)
     if evidence_class not in policy.evidence_kind_by_class:
-        raise LoweringError(
-            f"publication policy has no evidence kind for class {evidence_class!r}"
-        )
+        raise LoweringError(f"publication policy has no evidence kind for class {evidence_class!r}")
     return policy.evidence_kind_by_class[evidence_class]
 
 
@@ -177,7 +175,11 @@ def _lower_evidence(
     """Lower topology evidence records into downstream evidence references."""
     resolved = tuple(
         sorted(
-            (index.evidence_by_id[ref] for ref in set(evidence_refs) if ref in index.evidence_by_id),
+            (
+                index.evidence_by_id[ref]
+                for ref in set(evidence_refs)
+                if ref in index.evidence_by_id
+            ),
             key=lambda record: record.evidence_id,
         )
     )

@@ -48,9 +48,7 @@ INPUTS = (
     ROOT / "tests/fixtures/repository_model_packets/l9-gate-sdk",
     ROOT / "tests/fixtures/repository_model_packets/l9-mcp-server",
 )
-CONTRACT_FIXTURE = (
-    ROOT / "tests/fixtures/downstream_contracts/l9-graphiti-memory-contract.json"
-)
+CONTRACT_FIXTURE = ROOT / "tests/fixtures/downstream_contracts/l9-graphiti-memory-contract.json"
 FIXED_TIME = datetime(2026, 3, 1, tzinfo=UTC)
 
 MIRRORS = {
@@ -105,7 +103,9 @@ def test_mirror_required_fields_are_never_weaker_than_downstream(
         downstream = contract["models"][name]["fields"]
         for field, spec in downstream.items():
             if spec["required"]:
-                assert mirror.model_fields[field].is_required(), f"{name}.{field} must stay required"
+                assert mirror.model_fields[field].is_required(), (
+                    f"{name}.{field} must stay required"
+                )
 
 
 def test_downstream_models_forbid_unknown_fields(contract: dict[str, Any]) -> None:
@@ -120,9 +120,9 @@ def test_mirror_enumerations_match_downstream_enums(contract: dict[str, Any]) ->
 
 
 def test_admission_rule_constants_match_downstream(contract: dict[str, Any]) -> None:
-    assert frozenset(
-        contract["evidence_requiring_confidence_methods"]
-    ) == EVIDENCE_REQUIRING_METHODS
+    assert (
+        frozenset(contract["evidence_requiring_confidence_methods"]) == EVIDENCE_REQUIRING_METHODS
+    )
     assert frozenset(contract["derivation_evidence_kinds"]) == DERIVATION_EVIDENCE_KINDS
 
 
