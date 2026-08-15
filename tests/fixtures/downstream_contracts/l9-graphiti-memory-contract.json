@@ -1,0 +1,227 @@
+{
+  "derivation_evidence_kinds": [
+    "inference",
+    "aggregation",
+    "source_excerpt"
+  ],
+  "downstream_repository": "Quantum-L9/l9-graphiti-memory",
+  "downstream_revision": "f690d3f928391264cbffb8f507ad9acbba339603",
+  "enums": {
+    "ConfidenceMethod": [
+      "explicit",
+      "extracted",
+      "inferred",
+      "aggregated",
+      "calibrated"
+    ],
+    "EvidenceKind": [
+      "explicit",
+      "source_excerpt",
+      "test",
+      "observation",
+      "inference",
+      "aggregation",
+      "governance_approval"
+    ],
+    "MemoryClass": [
+      "identity",
+      "preference",
+      "constraint",
+      "decision",
+      "episodic",
+      "semantic",
+      "procedural",
+      "observation",
+      "insight",
+      "meta"
+    ]
+  },
+  "evidence_requiring_confidence_methods": [
+    "inferred",
+    "aggregated"
+  ],
+  "models": {
+    "Confidence": {
+      "extra": "forbid",
+      "fields": {
+        "calibrated_at": {
+          "required": false
+        },
+        "evidence_count": {
+          "required": false
+        },
+        "method": {
+          "required": false
+        },
+        "policy_version": {
+          "required": false
+        },
+        "score": {
+          "required": false
+        }
+      }
+    },
+    "EvidenceRef": {
+      "extra": "forbid",
+      "fields": {
+        "description": {
+          "required": true
+        },
+        "kind": {
+          "required": true
+        },
+        "observed_at": {
+          "required": false
+        },
+        "source_digest": {
+          "required": false
+        },
+        "source_id": {
+          "required": false
+        },
+        "source_range": {
+          "required": false
+        }
+      }
+    },
+    "IngestMemoryIntent": {
+      "extra": "forbid",
+      "fields": {
+        "operation": {
+          "required": false
+        },
+        "request": {
+          "required": true
+        }
+      }
+    },
+    "MemoryAssertion": {
+      "extra": "forbid",
+      "fields": {
+        "object": {
+          "required": false
+        },
+        "predicate": {
+          "required": false
+        },
+        "subject": {
+          "required": false
+        }
+      }
+    },
+    "MemoryWriteRequest": {
+      "extra": "forbid",
+      "fields": {
+        "assertion": {
+          "required": false
+        },
+        "confidence": {
+          "required": false
+        },
+        "consent": {
+          "required": false
+        },
+        "content": {
+          "required": true
+        },
+        "dry_run": {
+          "required": false
+        },
+        "evidence": {
+          "required": false
+        },
+        "idempotency_key": {
+          "required": false
+        },
+        "memory_class": {
+          "required": false
+        },
+        "metadata": {
+          "required": false
+        },
+        "namespace": {
+          "required": true
+        },
+        "provenance": {
+          "required": true
+        },
+        "references": {
+          "required": false
+        },
+        "source_observed_at": {
+          "required": false
+        },
+        "supersedes": {
+          "required": false
+        },
+        "tags": {
+          "required": false
+        },
+        "valid_from": {
+          "required": false
+        },
+        "valid_to": {
+          "required": false
+        }
+      }
+    },
+    "Provenance": {
+      "extra": "forbid",
+      "fields": {
+        "extraction_method": {
+          "required": false
+        },
+        "model": {
+          "required": false
+        },
+        "repository": {
+          "required": false
+        },
+        "session_id": {
+          "required": false
+        },
+        "source": {
+          "required": true
+        },
+        "source_agent_id": {
+          "required": false
+        },
+        "source_digest": {
+          "required": false
+        },
+        "source_id": {
+          "required": false
+        },
+        "source_range": {
+          "required": false
+        },
+        "source_trust": {
+          "required": false
+        },
+        "tool": {
+          "required": false
+        },
+        "transformed_at": {
+          "required": false
+        }
+      }
+    },
+    "SourceRange": {
+      "extra": "forbid",
+      "fields": {
+        "end_line": {
+          "required": false
+        },
+        "end_offset": {
+          "required": false
+        },
+        "start_line": {
+          "required": false
+        },
+        "start_offset": {
+          "required": false
+        }
+      }
+    }
+  }
+}

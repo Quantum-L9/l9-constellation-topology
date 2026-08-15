@@ -30,11 +30,13 @@ adoption across the foundational chain.
 - Deliberately lose a callback and prove idempotent reconciliation.
 - Exhaust a retryable failure and inspect the dead-letter record.
 
-## R5: Downstream ingestion integration
+## R5: Downstream memory integration
 
-- Pass the validated Topology Packet to `l9-topology-ingestion-bridge`.
-- Prove the bridge does not depend on neighboring report files.
-- Verify candidate and publication-plan lineage.
+- Plan publication from the validated Topology Packet with `plan-publication`.
+- Verify candidate, evidence, and publication-plan lineage.
+- Validate every eligible `memory.ingest` intent against the bound
+  `l9-graphiti-memory` contract without dispatching it.
+- Remaining: live Gate dispatch and durable admission, both owned downstream.
 
 ## R6: Operational maturity
 

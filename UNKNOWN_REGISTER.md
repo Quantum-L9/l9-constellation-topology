@@ -7,7 +7,7 @@
 | U-001 | Canonical Python 3.12 results for the remediation commit | Local environment provides Python 3.13 and cannot download 3.12 because outbound DNS is unavailable | GitHub Actions `l9-pr-validate` on the exact remediation commit |
 | U-002 | Live GHCR/ORAS publication behavior | No registry credentials or live publication target were used locally | Staging push, pull, digest verification, and permission drill |
 | U-003 | Live Postgres scheduling, callback reconciliation, and dead-letter operation | Control-plane services are external to this repository | Staging Model B execution plus forced callback-loss and retry-exhaustion recovery |
-| U-004 | Real upstream and downstream packet compatibility | Only checked-in packet fixtures were available locally | Real `l9-meta-injector` Repository Model Packet through topology into `l9-topology-ingestion-bridge` |
+| U-004 | Live downstream dispatch and durable admission | Upstream compatibility and downstream contract conformance are now proven: a real `l9-meta-injector` Repository Model Packet compiles through this repository, and every eligible lowered intent validates against the bound `l9-graphiti-memory` typed boundary. Dispatch itself is out of scope here and was never performed | Gate dispatch and durable admission executed by `l9-graphiti-memory` against a live memory service |
 | U-005 | Local Ruff and mypy results | Tools are not installed locally and cannot be downloaded because outbound DNS is unavailable | Python 3.12 GitHub Actions validation with the frozen development environment |
 | U-006 | Approved production callback hostname | The control-plane DNS name is external and was not supplied | Commit the approved hostname and port into `.l9/callback-policy.yaml`, enable the production callback ID, and run the live callback drill |
 
@@ -16,7 +16,7 @@
 - Exact GitHub organization team slugs for `CODEOWNERS` remain unconfirmed. No guessed or invalid ownership entry is included.
 - Production signing-key custody, rotation, and revocation remain external security decisions.
 - Final control-API hosting and the long-term repository ownership of Model B orchestration remain external platform decisions.
-- Live graph promotion policy remains owned by `l9-topology-ingestion-bridge` and is intentionally absent here.
+- Publication planning lives here per ADR-0021, but live graph promotion, Gate dispatch, and durable admission remain owned by `l9-graphiti-memory` and are intentionally absent.
 - Final public release eligibility remains owner-controlled. The repository includes an explicit proprietary source license and package metadata preventing accidental public publication.
 
 No unsupported value was invented to close these Unknowns.

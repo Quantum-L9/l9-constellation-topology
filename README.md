@@ -9,17 +9,18 @@ l9-meta-injector
         ↓ validated Repository Model Packet(s)
 l9-constellation-topology
         ↓ validated immutable Topology Packet
-l9-topology-ingestion-bridge
-        ↓ promotion plans, candidates, and publication receipts
+        ↓ publication plan of memory.ingest intents
+l9-graphiti-memory
+        ↓ durable memory admission and execution
 ```
 
 The compiler aggregates artifact-level repository semantics into repository and constellation topology: capabilities, dependencies, governance, flows, impact, maturity, risk, conflicts, unknowns, and evidence lineage.
 
 ## Canonical boundaries
 
-The repository **owns** topology compilation, fail-closed validation, deterministic packet construction, optional report projections, and the topology stage worker.
+The repository **owns** topology compilation, fail-closed validation, deterministic packet construction, optional report projections, the topology stage worker, and — per ADR-0021 — publication planning: eligibility, destination-neutral memory lowering, and deterministic effect planning.
 
-It **does not own** source metadata injection, Neo4j or Graphiti mutation, the Postgres control-plane schema, global promotion policy, or source-repository mutation.
+It **does not own** source metadata injection, Neo4j or Graphiti mutation, durable memory admission, Gate dispatch, the Postgres control-plane schema, or source-repository mutation. Planning an effect is not performing one: `plan-publication` produces a document and dispatches nothing.
 
 Inter-stage communication uses versioned packets. Markdown, CSV, YAML, Mermaid, and graph exports are projections only.
 

@@ -37,12 +37,15 @@ The compiler consumes one or more validated Repository Model Packets, optionally
 - Topology Packet construction and validation
 - Pure report projections
 - Worker-side stage execution and callback contracts
+- Publication eligibility, destination-neutral memory lowering, and deterministic
+  effect planning (ADR-0021)
 
 ### Does not own
 
 - Artifact-level source understanding owned by `l9-meta-injector`
-- Canonical graph promotion owned by `l9-topology-ingestion-bridge`
+- Durable memory admission and execution owned by `l9-graphiti-memory`
 - Neo4j or Graphiti writes
+- Gate dispatch of the intents this repository plans
 - Postgres scheduler schema or state machine
 - Source-repository mutation
 - Full L9 Gate availability during the foundational phase

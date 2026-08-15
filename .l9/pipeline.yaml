@@ -11,10 +11,13 @@ stages:
       packet_type: l9.repository-model
       validation_status: passed
     output_packet_type: l9.topology
-  - id: plan-ingestion
-    target_repo: Quantum-L9/l9-topology-ingestion-bridge
+  # ADR-0021 internalized publication planning. The stage still consumes a
+  # validated Topology Packet, but it now runs inside this repository and emits a
+  # publication plan. Durable admission remains owned by l9-graphiti-memory.
+  - id: plan-publication
+    target_repo: Quantum-L9/l9-constellation-topology
     depends_on: [compile-topology]
     requires:
       packet_type: l9.topology
       validation_status: passed
-    output_packet_type: l9.effect-plan
+    output_packet_type: l9.topology-publication-plan

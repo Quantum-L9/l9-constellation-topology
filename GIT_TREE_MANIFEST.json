@@ -152,10 +152,16 @@
       "path": ".l9/packet-profile.yaml"
     },
     {
-      "git_object_id": "f68a6b0b8c10b323f6d78ba494bb575fca80f48d",
+      "git_object_id": "afd37a0d814990198aef4787b3feaf99d431f10d",
       "mode": "100644",
       "object_type": "blob",
       "path": ".l9/pipeline.yaml"
+    },
+    {
+      "git_object_id": "7a873252ce6f94c6d4ece19df6438eb089d00e79",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": ".l9/publication-policy.yaml"
     },
     {
       "git_object_id": "a5975fe3db649549b394c34eb99600736781540c",
@@ -182,7 +188,7 @@
       "path": ".python-version"
     },
     {
-      "git_object_id": "90e15af40cc6585003dcb36bfd586f44b28d74ab",
+      "git_object_id": "0843dfff0b4b25224341352154d0eb2e4eeec072",
       "mode": "100644",
       "object_type": "blob",
       "path": "ADR_INDEX.md"
@@ -200,13 +206,13 @@
       "path": "ALIGNMENT_AUDIT.md"
     },
     {
-      "git_object_id": "0c49264335860bd3a27f65ef91fe37e45ffe7a24",
+      "git_object_id": "658ea731d5bb52ee97e4127b4ded2207c9c84397",
       "mode": "100644",
       "object_type": "blob",
       "path": "ARCHITECTURE.md"
     },
     {
-      "git_object_id": "6f3c0d17c319e78129f777142466049e36f39a46",
+      "git_object_id": "40bff5b611e7072dc3373e023f91cc90f1b3c174",
       "mode": "100644",
       "object_type": "blob",
       "path": "BUILD_SPECIFICATION.md"
@@ -290,7 +296,7 @@
       "path": "MAINTAINERS.md"
     },
     {
-      "git_object_id": "8f3149c5bcf568a8d329d964991698a06e370d60",
+      "git_object_id": "7b28629e2a559c902d68decc40a2cad010326339",
       "mode": "100644",
       "object_type": "blob",
       "path": "MANIFEST.md"
@@ -308,7 +314,7 @@
       "path": "NOTICE.md"
     },
     {
-      "git_object_id": "194f525a1bea0f6457fd560804cc0f9c393697f8",
+      "git_object_id": "dfb7862fc9fdc87fa189820c38d1f0f3b2bb1d4b",
       "mode": "100644",
       "object_type": "blob",
       "path": "README.md"
@@ -326,7 +332,7 @@
       "path": "RELEASING.md"
     },
     {
-      "git_object_id": "9a2c3f1daa1c8a0cabd73a73138f3cbe85f9671a",
+      "git_object_id": "dcf6f89a9d3633f3b55e83be5b7a855b059503d8",
       "mode": "100644",
       "object_type": "blob",
       "path": "ROADMAP.md"
@@ -344,7 +350,7 @@
       "path": "SECURITY.md"
     },
     {
-      "git_object_id": "5b0eb7f58defb920b2b497d62be9e8101a91177f",
+      "git_object_id": "d0d9b0af1807662450081b62f8beab09e9c10cb6",
       "mode": "100644",
       "object_type": "blob",
       "path": "SPECIFICATION.md"
@@ -362,19 +368,19 @@
       "path": "SUPPORT.md"
     },
     {
-      "git_object_id": "cc686680f53bc8a4998190dc17a2c7852b310e5b",
+      "git_object_id": "ab58f2ccbf57d40ebb10455faff7ef21eda075bc",
       "mode": "100644",
       "object_type": "blob",
       "path": "THREAT_MODEL.md"
     },
     {
-      "git_object_id": "15e6d0fbff1a0fb64c72204da77d5b2208f4a893",
+      "git_object_id": "231e3d6009d4d3f005d56229dc4067a94057489e",
       "mode": "100644",
       "object_type": "blob",
       "path": "TRACEABILITY_MAP.yaml"
     },
     {
-      "git_object_id": "5b7219374d68f8ae81b193a2f1e86d39c673b3a9",
+      "git_object_id": "5a94e30c1a4b1dc9315fd6fbc7674d476c654755",
       "mode": "100644",
       "object_type": "blob",
       "path": "UNKNOWN_REGISTER.md"
@@ -620,10 +626,16 @@
       "path": "docs/adr/0019-use-idempotency-reuse-replay-and-reconciliation.md"
     },
     {
-      "git_object_id": "dc341529ca99a03e4b585e313e075abdab383336",
+      "git_object_id": "41c332efa0471840cb906cde679ec980e582322f",
       "mode": "100644",
       "object_type": "blob",
       "path": "docs/adr/0020-delegate-publication-planning-to-the-ingestion-bridge.md"
+    },
+    {
+      "git_object_id": "1bf00443ebc300c00f4999cfe5eb0617e1f9d6df",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "docs/adr/0021-internalize-publication-planning-and-memory-lowering.md"
     },
     {
       "git_object_id": "ab95afae42865b27222966fb9d0a5d1a4c4fee1b",
@@ -632,7 +644,7 @@
       "path": "docs/adr/README.md"
     },
     {
-      "git_object_id": "1a31e9655c69934e5c4469d4d2e16fe55aec3f79",
+      "git_object_id": "408ac80bf26f8ecc20727c60b9fbe5ebf81cb778",
       "mode": "100644",
       "object_type": "blob",
       "path": "docs/architecture.md"
@@ -692,7 +704,7 @@
       "path": "docs/archive/v4/machine-summary.json"
     },
     {
-      "git_object_id": "f8e73aa9a72d8da57a30e276a75e8a5de1936260",
+      "git_object_id": "2c7a1a53cb74695b368466f0c157028f58df6850",
       "mode": "100644",
       "object_type": "blob",
       "path": "docs/deployment.md"
@@ -728,6 +740,12 @@
       "path": "docs/packet-contracts.md"
     },
     {
+      "git_object_id": "1817897b1c69aabaf7a010fb904e0527168cf426",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "docs/publication-boundary.md"
+    },
+    {
       "git_object_id": "8fae7a1a8a61319ee06f47d198f6fe02888c1c80",
       "mode": "100644",
       "object_type": "blob",
@@ -750,6 +768,282 @@
       "mode": "100644",
       "object_type": "blob",
       "path": "docs/worker-contract.md"
+    },
+    {
+      "git_object_id": "2498714ec54768fc5a5d3cc80c4c91ae498f6fb7",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/A0-GATE-LIVE-QUALIFY-NONDESTRUCTIVE-20260802.json"
+    },
+    {
+      "git_object_id": "2a0a865e8d64a9acef835aa60a3e9376bd5269b9",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/CAMPAIGN-GATE-LIVE-QUALIFY-NONDESTRUCTIVE.json"
+    },
+    {
+      "git_object_id": "3bc6fefdfbd6dfc66701f7e6e08de2bcbcfa2ac2",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-004.json"
+    },
+    {
+      "git_object_id": "6b320f3e2542ee80366c090dcc82e1ec568490ad",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-008.json"
+    },
+    {
+      "git_object_id": "65f1a6e3a6080502625368e5ad607a81ddf3a48f",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-011.json"
+    },
+    {
+      "git_object_id": "734a6d9f69954610cb438af6964c77bcd5783859",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-012.json"
+    },
+    {
+      "git_object_id": "315bfc317b68815b21c037dcb4379ef180d03144",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-013.json"
+    },
+    {
+      "git_object_id": "1cabff7666d183ea97ba533c46acd5da0a3248f1",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-015.json"
+    },
+    {
+      "git_object_id": "f1649d5e9e9fe4f42e4f283454b47285e4d69bb6",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-018.json"
+    },
+    {
+      "git_object_id": "73ffa0ee44f74ad9c32d11097db5558a6a0f9f34",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-019.json"
+    },
+    {
+      "git_object_id": "4e928382edcc877d1570d7b4222a131676e9c556",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-020.json"
+    },
+    {
+      "git_object_id": "541513ab73774a3286a11528dbf94bff184073c1",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-021.json"
+    },
+    {
+      "git_object_id": "d4f340a6ba23fd1cf0ed40af2acaea173ab46332",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-022.json"
+    },
+    {
+      "git_object_id": "397ea084aa9482c288c62c10b6319642d0dba14b",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-023.json"
+    },
+    {
+      "git_object_id": "bec624ea4fbdbd5e64dcd5dc38cda8cd979773cc",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-025.json"
+    },
+    {
+      "git_object_id": "58c64896f325e065bf1b93162dab621e2031f7d5",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-026.json"
+    },
+    {
+      "git_object_id": "b0e27a357763b19901f50ec57da0599630570dd9",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-027.json"
+    },
+    {
+      "git_object_id": "180412dac754c10ba3dc5da63829c5abb18eeb8b",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-028.json"
+    },
+    {
+      "git_object_id": "b2a8018a68bd06c0b1e7d67634106efff65906fe",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-029.json"
+    },
+    {
+      "git_object_id": "d6509b36a5f32faf69bd3c01a16e6ccd44f14bc7",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-032.json"
+    },
+    {
+      "git_object_id": "7a29a185a227d7a49cf1a632c81f54f5fc89b216",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-034.json"
+    },
+    {
+      "git_object_id": "674ae888794abf4e82da81a57e227fd574b67888",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-035.json"
+    },
+    {
+      "git_object_id": "d5c51a828e21194776389192d4a6a0f0014ab8d5",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-036.json"
+    },
+    {
+      "git_object_id": "17504204790912a30dee38305b1cd6837eb3f47a",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-037.json"
+    },
+    {
+      "git_object_id": "7e58f331804ce4969a322699ac598062abbe4862",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-038.json"
+    },
+    {
+      "git_object_id": "3fdb750090ff4387a12d05c6aa76365498c41e97",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-042.json"
+    },
+    {
+      "git_object_id": "717f0b5ee9c13656bb2f4ad979003b286b844d84",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-045.json"
+    },
+    {
+      "git_object_id": "ac04846b9d3f39ebbf25117f4ce4ec253b33222a",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-046.json"
+    },
+    {
+      "git_object_id": "cc570c5d0ceee30f94ce41bd73e9e07b30c445b1",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-060.json"
+    },
+    {
+      "git_object_id": "fae71c02e3045a31b1ed9272aec2730235aaa325",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-061.json"
+    },
+    {
+      "git_object_id": "4c293c6c27c920a915cd7feaab2911174a06feb9",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/DEFER-GATE-062.json"
+    },
+    {
+      "git_object_id": "0fa7dc4902c8f2b4a33dc6dfc091d38d87b37d10",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/E2E-STACK-STATUS.json"
+    },
+    {
+      "git_object_id": "ed360f379ff78d7e7eaffff43f0427216938cdf5",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/GATE-059-REPOSITORY-TEST-EVIDENCE.json"
+    },
+    {
+      "git_object_id": "7545da35fbf183af4f645bf56b003bb3b6cc1005",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/GATE-066-REPOSITORY-TEST-EVIDENCE.json"
+    },
+    {
+      "git_object_id": "f36cf7ebec04ac5cb8df7d06f2e478e9a5586e59",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/GATE-QUALIFY-SUMMARY.json"
+    },
+    {
+      "git_object_id": "6bb3791f60fa47e785feb51697a9de3f320c9011",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/LIVE-INTEGRATION-EVIDENCE.json"
+    },
+    {
+      "git_object_id": "833ad9d912b6d48cba45f83ae90501f5c58c00b1",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/OPERATOR-APPROVE-SLIP.json"
+    },
+    {
+      "git_object_id": "50547b1fe46a5beae98f1c6551030556fc280c40",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/PROGRAM-COMPLETION-REPORT.json"
+    },
+    {
+      "git_object_id": "c2a93b3f8e80df9cf28387871c31d6b5770ffa45",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/PROGRAM-E2E-PROOF.json"
+    },
+    {
+      "git_object_id": "8ff68c1e956383ef89e7b3a212ef2bfe74e02fbe",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/README.md"
+    },
+    {
+      "git_object_id": "9a3da837a9bd5921b2c173b2973f58dd6c79c96d",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/STACK-HEALTH-SNAPSHOT.json"
+    },
+    {
+      "git_object_id": "411b4be0ba7374b1ac27203cad1d9bf458c57bf2",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/odoo-e2e-recipes/Dockerfile.odoo-e2e"
+    },
+    {
+      "git_object_id": "1bc6386f46dd71ba9ef3d138f8c2cef0fa78991b",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/odoo-e2e-recipes/constraints.odoo-e2e.txt"
+    },
+    {
+      "git_object_id": "e65b2968b8d583a3a83d2410c4279b597bb4c844",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/odoo-e2e-recipes/docker-compose.odoo-e2e.override.yml"
+    },
+    {
+      "git_object_id": "10fd0e40020551d3f739169c60a816cee43481f5",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/odoo-e2e-recipes/odoo-etc-e2e/odoo.conf"
+    },
+    {
+      "git_object_id": "b6f3e69c65a0cb46b538f9d6b2cf72ae2bc20ed3",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "evidence/live-qualify-2026-08-02/run_gate_qualify.py"
     },
     {
       "git_object_id": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
@@ -854,6 +1148,12 @@
       "path": "schemas/risk_register.schema.json"
     },
     {
+      "git_object_id": "7f031b405141171ef8adbc2134594b5ccdd7d52b",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "schemas/topology-publication-plan.schema.json"
+    },
+    {
       "git_object_id": "e234b8eb8cc54a2b38c504ff0e463675aeb120e7",
       "mode": "100644",
       "object_type": "blob",
@@ -884,7 +1184,7 @@
       "path": "scripts/generate_fixture_packets.py"
     },
     {
-      "git_object_id": "9e6905853c6407b109134783476a90799802f640",
+      "git_object_id": "d79780e6058a7825c728ac62c0339061ba776e5a",
       "mode": "100644",
       "object_type": "blob",
       "path": "scripts/generate_schemas.py"
@@ -938,7 +1238,7 @@
       "path": "scripts/validate_workflows.py"
     },
     {
-      "git_object_id": "c24d247e957a51bbba4763a1c03b05e218bda072",
+      "git_object_id": "b1eeb4a05255eee5fd642bdef03e56322ae50015",
       "mode": "100755",
       "object_type": "blob",
       "path": "scripts/verify_determinism.py"
@@ -950,7 +1250,7 @@
       "path": "src/l9_constellation_topology/__init__.py"
     },
     {
-      "git_object_id": "08875ac75a696f1e4fddfd563fb7e690c930e8dc",
+      "git_object_id": "8ce7fce3d7e08ad7b14365230e733b222882ef4d",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/cli.py"
@@ -1094,7 +1394,7 @@
       "path": "src/l9_constellation_topology/io/packet_bundle_output_sink.py"
     },
     {
-      "git_object_id": "af9826f060331f835baa2d790ee36925098913cc",
+      "git_object_id": "dc4a4db2e58543162505b6d159caf81e31f84075",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/io/rendered_artifact.py"
@@ -1224,6 +1524,54 @@
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/packets/validator.py"
+    },
+    {
+      "git_object_id": "cca75f9845d03dbb6a2392b1af9e5bc79e8b0b0f",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "src/l9_constellation_topology/publication/__init__.py"
+    },
+    {
+      "git_object_id": "05cd4d9594c8d9dcaa2aa6c841bf836cdcd72001",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "src/l9_constellation_topology/publication/bundle.py"
+    },
+    {
+      "git_object_id": "6a814aea1d19481514306eb4363b2468717d7ced",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "src/l9_constellation_topology/publication/contracts.py"
+    },
+    {
+      "git_object_id": "5c56413fb4181d0ebddc37d823c9328867371389",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "src/l9_constellation_topology/publication/eligibility.py"
+    },
+    {
+      "git_object_id": "fbbdc8751b8cf922c02cefb677df454a13e475bc",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "src/l9_constellation_topology/publication/identity.py"
+    },
+    {
+      "git_object_id": "a128338275af0c16c73aac5de053b86ab8d72521",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "src/l9_constellation_topology/publication/lowering.py"
+    },
+    {
+      "git_object_id": "8210cf52eb6ed9f437509899946d8fca7e7c3528",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "src/l9_constellation_topology/publication/plan.py"
+    },
+    {
+      "git_object_id": "53b30fe2fe67bbd1e7bda8698e1aa61ff326781f",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "src/l9_constellation_topology/publication/policy.py"
     },
     {
       "git_object_id": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
@@ -1622,6 +1970,12 @@
       "path": "tests/__init__.py"
     },
     {
+      "git_object_id": "736cc95ddf42253b5bf9597d9fc33589c46fbd3e",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/fixtures/downstream_contracts/l9-graphiti-memory-contract.json"
+    },
+    {
       "git_object_id": "01e847aa7fb39c911b4c36875ab12044cc536357",
       "mode": "100644",
       "object_type": "blob",
@@ -1994,6 +2348,18 @@
       "path": "tests/test_packet_store_v5.py"
     },
     {
+      "git_object_id": "11c2e7a59e0636c0ed7c14519f4481e8606800f5",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/test_publication_downstream_conformance.py"
+    },
+    {
+      "git_object_id": "aaed050e1edac1b370bbd3e5bc6474634f46acbc",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/test_publication_planning.py"
+    },
+    {
       "git_object_id": "5cda29f8d6d354b4ade98744355d16ccc981e82c",
       "mode": "100644",
       "object_type": "blob",
@@ -2024,7 +2390,7 @@
       "path": "tests/test_repository_aggregation_v5.py"
     },
     {
-      "git_object_id": "4755d97e385c5b7f67b1d6a19e5a8ef043b08e55",
+      "git_object_id": "caff84263958cd34215b300fa91fdef98ed37ed4",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_repository_governance.py"
@@ -2072,7 +2438,7 @@
       "path": "tests/test_workflow_contracts_v5.py"
     },
     {
-      "git_object_id": "65879b4655315d3f575b8e2ea11ec0c300af879a",
+      "git_object_id": "a9458c992b49449735aace922471c5aa4c4d7753",
       "mode": "100644",
       "object_type": "blob",
       "path": "uv.lock"
@@ -2096,8 +2462,8 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:8f441790ecf11e37162a7f23626060d55e6fe4ab74d337f38e93c5601a9e3fb2",
-  "entry_count": 349,
+  "entries_sha256": "sha256:a946bef709bff56d739f1fa50400c3eee4933d23a5e7212d40b47ec262074407",
+  "entry_count": 410,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
   ],

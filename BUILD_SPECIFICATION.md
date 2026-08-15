@@ -40,8 +40,9 @@ l9-meta-injector
         ↓ validated Repository Model Packet(s)
 l9-constellation-topology
         ↓ validated Topology Packet + Validation Receipt
-l9-topology-ingestion-bridge
-        ↓ promotion decisions, candidates, effect plans, publication receipts
+        ↓ publication plan: eligibility decisions and memory.ingest intents
+l9-graphiti-memory
+        ↓ durable admission, promotion decisions, publication receipts
 ```
 
 Execution control:
