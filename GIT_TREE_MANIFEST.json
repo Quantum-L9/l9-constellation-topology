@@ -188,7 +188,7 @@
       "path": ".python-version"
     },
     {
-      "git_object_id": "0843dfff0b4b25224341352154d0eb2e4eeec072",
+      "git_object_id": "49f9e0fcdcbfea78808373ba3c1e8451a86d143a",
       "mode": "100644",
       "object_type": "blob",
       "path": "ADR_INDEX.md"
@@ -296,7 +296,7 @@
       "path": "MAINTAINERS.md"
     },
     {
-      "git_object_id": "7b28629e2a559c902d68decc40a2cad010326339",
+      "git_object_id": "366e8b3eed9cd4abb483a79f4d05af7f6a063eb1",
       "mode": "100644",
       "object_type": "blob",
       "path": "MANIFEST.md"
@@ -638,6 +638,18 @@
       "path": "docs/adr/0021-internalize-publication-planning-and-memory-lowering.md"
     },
     {
+      "git_object_id": "e5f6e3d09ffb60438be50e8dd94845a3a2d54a80",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "docs/adr/0022-key-memory-effects-by-fact-not-snapshot.md"
+    },
+    {
+      "git_object_id": "0a8a7a7114bf7da0e95f2fccd075da9d75bcd367",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "docs/adr/0023-declare-field-cardinality-before-detecting-conflicts.md"
+    },
+    {
       "git_object_id": "ab95afae42865b27222966fb9d0a5d1a4c4fee1b",
       "mode": "100644",
       "object_type": "blob",
@@ -710,7 +722,7 @@
       "path": "docs/deployment.md"
     },
     {
-      "git_object_id": "58e8d062ecbb74fe8a007f4601f82bd27631596d",
+      "git_object_id": "d20927b3dcc38aa29caa07f8c357843250570d8b",
       "mode": "100644",
       "object_type": "blob",
       "path": "docs/design/l9-constellation-topology-spec.md"
@@ -740,7 +752,7 @@
       "path": "docs/packet-contracts.md"
     },
     {
-      "git_object_id": "1817897b1c69aabaf7a010fb904e0527168cf426",
+      "git_object_id": "f75d6fbcb8286d38378570710958b6c3fd735393",
       "mode": "100644",
       "object_type": "blob",
       "path": "docs/publication-boundary.md"
@@ -1238,7 +1250,7 @@
       "path": "scripts/validate_workflows.py"
     },
     {
-      "git_object_id": "b1eeb4a05255eee5fd642bdef03e56322ae50015",
+      "git_object_id": "915d300d182b0e4b8218468d2bcdff435b99c65e",
       "mode": "100755",
       "object_type": "blob",
       "path": "scripts/verify_determinism.py"
@@ -1248,6 +1260,12 @@
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/__init__.py"
+    },
+    {
+      "git_object_id": "f3cc6262197cbef4bd41575c7587c8af5c52be57",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "src/l9_constellation_topology/cardinality.py"
     },
     {
       "git_object_id": "8ce7fce3d7e08ad7b14365230e733b222882ef4d",
@@ -1274,13 +1292,13 @@
       "path": "src/l9_constellation_topology/compatibility/v4_models.py"
     },
     {
-      "git_object_id": "60ec58f6d5cab56eaf38e2e33dd9f83f7c4e88f1",
+      "git_object_id": "7155c55c2cd2e712993f5661069f0970f5227e17",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/compiler.py"
     },
     {
-      "git_object_id": "2889ce22eb71c1b2169dc0174acd1cc6d473536f",
+      "git_object_id": "fc826aa8cefc8d66517e67a41a82289cdac20d0e",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/config.py"
@@ -1538,7 +1556,7 @@
       "path": "src/l9_constellation_topology/publication/bundle.py"
     },
     {
-      "git_object_id": "6a814aea1d19481514306eb4363b2468717d7ced",
+      "git_object_id": "f7c48e2b7533f0049df02d530e9be9fdb9b24a02",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/publication/contracts.py"
@@ -1550,13 +1568,13 @@
       "path": "src/l9_constellation_topology/publication/eligibility.py"
     },
     {
-      "git_object_id": "fbbdc8751b8cf922c02cefb677df454a13e475bc",
+      "git_object_id": "1476b882a134fb057b9240fe9ec5e078d7299c23",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/publication/identity.py"
     },
     {
-      "git_object_id": "ff98dd37f060625400c6170a703ce6dd8a3ee239",
+      "git_object_id": "c29246fa863dd82a400f22e13e07c89a6cc3e379",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/publication/lowering.py"
@@ -1808,7 +1826,7 @@
       "path": "src/l9_constellation_topology/stages/observe_fallbacks.py"
     },
     {
-      "git_object_id": "0cd381eb36294ae8c8774e77115472d73b13370e",
+      "git_object_id": "18112271d1b02aa171a755098df88ca683628978",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/stages/reconcile_evidence.py"
@@ -2294,6 +2312,12 @@
       "path": "tests/test_evidence_v5.py"
     },
     {
+      "git_object_id": "b035a2f0b4de9596a923244edf479338c6a44c51",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/test_field_cardinality.py"
+    },
+    {
       "git_object_id": "b12f780a89e97749b99424f13d3cea41df15de5c",
       "mode": "100644",
       "object_type": "blob",
@@ -2354,7 +2378,13 @@
       "path": "tests/test_publication_downstream_conformance.py"
     },
     {
-      "git_object_id": "5950a5a59c77595e2970a733ed14835010a7b85a",
+      "git_object_id": "0e8aec712a6881eeb1fd546d171138ceaffec903",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/test_publication_effect_identity.py"
+    },
+    {
+      "git_object_id": "d31aaa2f262c869e62e2aff0f04fc011247f2f16",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_publication_planning.py"
@@ -2390,7 +2420,7 @@
       "path": "tests/test_repository_aggregation_v5.py"
     },
     {
-      "git_object_id": "caff84263958cd34215b300fa91fdef98ed37ed4",
+      "git_object_id": "581535ae9feafc59b5b504c05c7c25effbe32775",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_repository_governance.py"
@@ -2402,7 +2432,7 @@
       "path": "tests/test_runtime_boundaries_v5.py"
     },
     {
-      "git_object_id": "219c912507b909f5729e8a37479e1638d7272243",
+      "git_object_id": "54a5b3516386b972b64e2b8574b55be5e679737e",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_topology_compiler_v5.py"
@@ -2462,8 +2492,8 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:957e749af1451aa0eac785638376f227be191cc2ae1ee6353197611bb5bc57b3",
-  "entry_count": 410,
+  "entries_sha256": "sha256:126c39de63285267e4d3c7e3a6fcbaed84405cd78a9ee57303be780f469d09b8",
+  "entry_count": 415,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
   ],

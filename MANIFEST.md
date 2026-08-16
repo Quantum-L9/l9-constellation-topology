@@ -6,7 +6,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 
 ## Inventory
 
-**Tracked delivery files:** 411
+**Tracked delivery files:** 416
 
 - `.editorconfig` — editor encoding, indentation, and whitespace policy
 - `.env.example` — documented worker and control-plane environment variables
@@ -115,6 +115,8 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `docs/adr/0019-use-idempotency-reuse-replay-and-reconciliation.md` — accepted architecture decision record
 - `docs/adr/0020-delegate-publication-planning-to-the-ingestion-bridge.md` — accepted architecture decision record
 - `docs/adr/0021-internalize-publication-planning-and-memory-lowering.md` — accepted architecture decision record
+- `docs/adr/0022-key-memory-effects-by-fact-not-snapshot.md` — accepted architecture decision record
+- `docs/adr/0023-declare-field-cardinality-before-detecting-conflicts.md` — accepted architecture decision record
 - `docs/adr/README.md` — ADR directory governance and navigation
 - `docs/architecture.md` — architecture, contract, deployment, recovery, or model documentation
 - `docs/archive/v4/01_SPEC_ATTACK.md` — superseded v4 historical artifact retained for migration evidence
