@@ -79,7 +79,8 @@ def resolve_configuration(root: Path) -> ResolvedConfiguration:
         profile_hash=profile_hash,
         schema_contract_hash=_contract_hash(root),
         active_contract_versions={
-            "repository_model_packet": "1.0.0",
+            # 1.1.0 adds the assertion domain; 1.0.0 inputs remain accepted.
+            "repository_model_packet": "1.1.0",
             "topology_packet": "1.0.0",
             "validation_receipt": "1.0.0",
             "stage_dispatch": "1.0.0",

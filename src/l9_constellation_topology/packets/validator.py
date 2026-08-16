@@ -18,6 +18,11 @@ class PacketValidationError(ValueError):
         return f"{self.code}: {self.message}"
 
 
+#: Repository-model contract versions this consumer accepts. 1.1.0 adds the
+#: assertion domain; 1.0.0 packets predate it and still load, with an empty one.
+SUPPORTED_REPOSITORY_MODEL_VERSIONS: frozenset[str] = frozenset({"1.0.0", "1.1.0"})
+
+
 def repository_model_semantic_view(packet: RepositoryModelPacket) -> dict[str, object]:
     return {
         "packet_type": packet.packet_type,
@@ -29,6 +34,14 @@ def repository_model_semantic_view(packet: RepositoryModelPacket) -> dict[str, o
         "schema_hash": packet.schema_hash,
         "payload_refs": packet.payload_refs,
         "payload": packet.payload,
+        # Mirrors the producer: present exactly when interpretation ran, and
+        # omitted rather than hashed as null otherwise, so a 1.0.0 packet keeps
+        # the identity it was emitted with.
+        **(
+            {"interpretation_profile": packet.interpretation_profile}
+            if packet.interpretation_profile is not None
+            else {}
+        ),
     }
 
 
@@ -37,7 +50,7 @@ def validate_repository_model_packet(
     *,
     supported_versions: set[str] | None = None,
 ) -> None:
-    versions = supported_versions or {"1.0.0"}
+    versions = supported_versions or SUPPORTED_REPOSITORY_MODEL_VERSIONS
     if packet.packet_version not in versions:
         raise PacketValidationError(
             "unsupported-contract-version",

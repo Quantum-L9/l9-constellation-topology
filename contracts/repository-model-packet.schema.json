@@ -90,6 +90,28 @@
       "title": "ArtifactRecord",
       "type": "object"
     },
+    "AssertionSourceRange": {
+      "additionalProperties": false,
+      "description": "1-based inclusive line span inside ``source_path``.",
+      "properties": {
+        "end_line": {
+          "minimum": 1,
+          "title": "End Line",
+          "type": "integer"
+        },
+        "start_line": {
+          "minimum": 1,
+          "title": "Start Line",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "start_line",
+        "end_line"
+      ],
+      "title": "AssertionSourceRange",
+      "type": "object"
+    },
     "Authority": {
       "enum": [
         "source",
@@ -497,6 +519,38 @@
       "title": "EvidenceStrength",
       "type": "string"
     },
+    "InterpretationProfileRef": {
+      "additionalProperties": false,
+      "description": "Identity of the producer's interpretation profile, when it ran.",
+      "properties": {
+        "extractor_versions": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Extractor Versions",
+          "type": "object"
+        },
+        "profile_hash": {
+          "title": "Profile Hash",
+          "type": "string"
+        },
+        "profile_id": {
+          "title": "Profile Id",
+          "type": "string"
+        },
+        "profile_version": {
+          "title": "Profile Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "profile_id",
+        "profile_version",
+        "profile_hash"
+      ],
+      "title": "InterpretationProfileRef",
+      "type": "object"
+    },
     "PacketValidationRef": {
       "additionalProperties": false,
       "properties": {
@@ -572,6 +626,79 @@
       "title": "ProfileRef",
       "type": "object"
     },
+    "RepositoryModelAssertion": {
+      "additionalProperties": false,
+      "description": "A semantic claim the producing repository makes about itself.\n\nAdded by repository-model packet 1.1.0. Every field is required: an\nassertion that cannot cite an exact span in a hashed source file is not a\nclaim this pipeline is willing to carry.",
+      "properties": {
+        "assertion_id": {
+          "title": "Assertion Id",
+          "type": "string"
+        },
+        "authority": {
+          "title": "Authority",
+          "type": "string"
+        },
+        "confidence": {
+          "title": "Confidence",
+          "type": "string"
+        },
+        "evidence_class": {
+          "enum": [
+            "declared",
+            "observed"
+          ],
+          "title": "Evidence Class",
+          "type": "string"
+        },
+        "evidence_excerpt": {
+          "title": "Evidence Excerpt",
+          "type": "string"
+        },
+        "extractor_id": {
+          "title": "Extractor Id",
+          "type": "string"
+        },
+        "object": {
+          "title": "Object",
+          "type": "string"
+        },
+        "predicate": {
+          "title": "Predicate",
+          "type": "string"
+        },
+        "source_content_hash": {
+          "title": "Source Content Hash",
+          "type": "string"
+        },
+        "source_path": {
+          "title": "Source Path",
+          "type": "string"
+        },
+        "source_range": {
+          "$ref": "#/$defs/AssertionSourceRange"
+        },
+        "subject_id": {
+          "title": "Subject Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "assertion_id",
+        "subject_id",
+        "predicate",
+        "object",
+        "source_path",
+        "source_range",
+        "evidence_excerpt",
+        "source_content_hash",
+        "extractor_id",
+        "evidence_class",
+        "authority",
+        "confidence"
+      ],
+      "title": "RepositoryModelAssertion",
+      "type": "object"
+    },
     "RepositoryModelPayload": {
       "additionalProperties": false,
       "properties": {
@@ -582,6 +709,21 @@
           },
           "title": "Artifacts",
           "type": "array"
+        },
+        "assertions": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/RepositoryModelAssertion"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Assertions"
         },
         "capabilities": {
           "default": [],
@@ -826,6 +968,17 @@
       ],
       "default": null,
       "title": "Artifact Hash"
+    },
+    "interpretation_profile": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/InterpretationProfileRef"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
     },
     "packet_id": {
       "title": "Packet Id",
