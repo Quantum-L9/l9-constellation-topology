@@ -39,6 +39,7 @@ from l9_constellation_topology.stages.assess_maturity import run as assess_matur
 from l9_constellation_topology.stages.assess_risk import run as assess_risk
 from l9_constellation_topology.stages.build_graph import run as build_graph
 from l9_constellation_topology.stages.classify_roles import run as classify_roles
+from l9_constellation_topology.stages.derive_unknowns import run as derive_unknowns
 from l9_constellation_topology.stages.ingest_packets import adapt_packets
 from l9_constellation_topology.stages.normalize_models import run as normalize_models
 from l9_constellation_topology.stages.reconcile_evidence import run as reconcile_evidence
@@ -149,6 +150,7 @@ def compile_topology(
     normalized = normalize_models(adapt_packets(packets))
 
     evidence, evidence_conflicts, evidence_unknowns = reconcile_evidence(normalized.evidence)
+    declared_unknowns = derive_unknowns(normalized.diagnostics)
     repositories, repository_conflicts, repository_unknowns = aggregate_repositories.run(
         normalized.repositories
     )
@@ -191,7 +193,10 @@ def compile_topology(
         evidence=tuple(sorted(evidence, key=lambda item: item.evidence_id)),
         diagnostics=tuple(sorted(normalized.diagnostics, key=lambda item: item.diagnostic_id)),
         unknowns=tuple(
-            sorted(repository_unknowns + evidence_unknowns, key=lambda item: item.unknown_id)
+            sorted(
+                repository_unknowns + evidence_unknowns + declared_unknowns,
+                key=lambda item: item.unknown_id,
+            )
         ),
         conflicts=tuple(
             sorted(

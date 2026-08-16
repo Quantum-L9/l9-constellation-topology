@@ -21,7 +21,12 @@ def ingest_paths(paths: tuple[Path, ...]) -> tuple[RepositoryModelPacket, ...]:
 def adapt_packets(
     packets: tuple[RepositoryModelPacket, ...],
 ) -> tuple[NormalizedRepositoryModel, ...]:
-    adapters = {"1.0.0": RepositoryModelV1Adapter()}
+    # Dispatch on what the adapter declares it supports. Hardcoding a single version here
+    # duplicated the contract and drifted from it: the adapter accepted 1.1.0 and the
+    # validator permitted it, while this table still admitted only 1.0.0, so every
+    # assertion-bearing packet was rejected as unsupported before reaching it.
+    repository_model_v1 = RepositoryModelV1Adapter()
+    adapters = {version: repository_model_v1 for version in repository_model_v1.supported_versions}
     normalized: list[NormalizedRepositoryModel] = []
     for packet in packets:
         adapter = adapters.get(packet.packet_version)
