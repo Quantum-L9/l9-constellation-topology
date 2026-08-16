@@ -15,7 +15,8 @@ unclassified file scoped to `artifact_type` does not hold unrelated relationship
 
 from __future__ import annotations
 
-from typing import Any, Mapping
+from collections.abc import Mapping
+from typing import Any
 
 from l9_constellation_topology.domain import UnknownRecord
 from l9_constellation_topology.run import Diagnostic, stable_id

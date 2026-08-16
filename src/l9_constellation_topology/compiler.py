@@ -39,9 +39,9 @@ from l9_constellation_topology.stages.assess_maturity import run as assess_matur
 from l9_constellation_topology.stages.assess_risk import run as assess_risk
 from l9_constellation_topology.stages.build_graph import run as build_graph
 from l9_constellation_topology.stages.classify_roles import run as classify_roles
+from l9_constellation_topology.stages.derive_unknowns import run as derive_unknowns
 from l9_constellation_topology.stages.ingest_packets import adapt_packets
 from l9_constellation_topology.stages.normalize_models import run as normalize_models
-from l9_constellation_topology.stages.derive_unknowns import run as derive_unknowns
 from l9_constellation_topology.stages.reconcile_evidence import run as reconcile_evidence
 from l9_constellation_topology.stages.resolve_config import run as resolve_config
 from l9_constellation_topology.stages.validate_topology import run as validate_topology
