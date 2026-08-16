@@ -446,6 +446,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     for name in ("validate-packet", "validate"):
         validate_parser = commands.add_parser(name, help="Validate a Topology Packet bundle")
+        # Revalidating against the input bundles resolves checked-in JSON Schemas
+        # from the repository root, so the option must exist on this parser too.
+        validate_parser.add_argument("--repo-root", default=".")
         validate_parser.add_argument("--input-bundle", required=True)
         validate_parser.add_argument("--repository-bundle", action="append")
         validate_parser.set_defaults(handler=cmd_validate_packet)
