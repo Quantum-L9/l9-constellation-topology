@@ -108,7 +108,7 @@ def test_candidate_and_idempotency_identity_are_deterministic(
         item.idempotency_key for item in second.candidates
     ]
     assert all(
-        item.idempotency_key.startswith("l9-topology-publication:") for item in first.candidates
+        item.idempotency_key.startswith("l9-topology-publication/v2:") for item in first.candidates
     )
     assert len({item.candidate_id for item in first.candidates}) == len(first.candidates)
 
@@ -125,16 +125,43 @@ def test_candidate_and_skip_order_is_stable(
     )
 
 
-def test_idempotency_key_binds_topology_and_policy_identity(
+def test_policy_revision_alone_does_not_rekey_unchanged_facts(
     materialized: MaterializedTopology, policy: PublicationPolicy
 ) -> None:
+    """A policy version bump that changes no effect semantics changes no key.
+
+    Under v1 the whole policy hash was mixed into every key, so re-stamping the
+    policy version re-keyed every effect in the plan and downstream saw a plan
+    of brand-new facts. The facts had not moved; only the label on the rules
+    had. The plan hash still records the revision.
+    """
     baseline = _plan(materialized, policy, FIXED_TIME)
     shifted_policy = policy.model_copy(update={"version": "1.0.1"})
     shifted = build_publication_plan(materialized, shifted_policy, published_at=FIXED_TIME)
 
     assert baseline.policy_hash != shifted.policy_hash
+    assert [item.idempotency_key for item in baseline.candidates] == [
+        item.idempotency_key for item in shifted.candidates
+    ]
+
+
+def test_policy_change_that_moves_an_effect_does_rekey_it(
+    materialized: MaterializedTopology, policy: PublicationPolicy
+) -> None:
+    """A policy change with real effect semantics must change the keys.
+
+    Namespace is part of what an effect *is*, not merely of how it was
+    produced, so relocating published facts is a new set of effects.
+    """
+    baseline = _plan(materialized, policy, FIXED_TIME)
+    moved_policy = policy.model_copy(update={"namespace_root": "l9-topology-relocated"})
+    moved = build_publication_plan(materialized, moved_policy, published_at=FIXED_TIME)
+
     assert {item.idempotency_key for item in baseline.candidates}.isdisjoint(
-        {item.idempotency_key for item in shifted.candidates}
+        {item.idempotency_key for item in moved.candidates}
+    )
+    assert {item.candidate_id for item in baseline.candidates}.isdisjoint(
+        {item.candidate_id for item in moved.candidates}
     )
 
 

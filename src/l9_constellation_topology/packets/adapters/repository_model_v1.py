@@ -10,8 +10,14 @@ from l9_constellation_topology.domain import (
     EdgeRecord,
     RepositoryRecord,
 )
-from l9_constellation_topology.packets.repository_model import RepositoryModelPacket
-from l9_constellation_topology.packets.validator import validate_repository_model_packet
+from l9_constellation_topology.packets.repository_model import (
+    RepositoryModelAssertion,
+    RepositoryModelPacket,
+)
+from l9_constellation_topology.packets.validator import (
+    SUPPORTED_REPOSITORY_MODEL_VERSIONS,
+    validate_repository_model_packet,
+)
 from l9_constellation_topology.run.diagnostics import Diagnostic, normalize_diagnostic
 from l9_constellation_topology.run.evidence import EvidenceRecord
 
@@ -25,13 +31,17 @@ class NormalizedRepositoryModel:
     relationships: tuple[EdgeRecord, ...]
     evidence: tuple[EvidenceRecord, ...]
     diagnostics: tuple[Diagnostic, ...]
+    #: Empty for 1.0.0 inputs, which carry no assertion domain.
+    assertions: tuple[RepositoryModelAssertion, ...] = ()
 
 
 class RepositoryModelV1Adapter:
-    packet_version = "1.0.0"
+    #: Retained for callers that report the adapter's primary contract version.
+    packet_version = "1.1.0"
+    supported_versions = SUPPORTED_REPOSITORY_MODEL_VERSIONS
 
     def adapt(self, packet: RepositoryModelPacket) -> NormalizedRepositoryModel:
-        validate_repository_model_packet(packet, supported_versions={self.packet_version})
+        validate_repository_model_packet(packet, supported_versions=set(self.supported_versions))
         if packet.payload is None:
             raise ValueError("validated packet payload is unexpectedly absent")
         diagnostics = tuple(
@@ -46,4 +56,5 @@ class RepositoryModelV1Adapter:
             relationships=packet.payload.relationships,
             evidence=packet.payload.evidence,
             diagnostics=diagnostics,
+            assertions=packet.payload.assertions or (),
         )

@@ -23,6 +23,8 @@ from l9_constellation_topology.run.evidence import EvidenceRecord
 from .contracts import (
     DERIVATION_EVIDENCE_KINDS,
     EVIDENCE_REQUIRING_METHODS,
+    LOWERING_CONTRACT_VERSION,
+    MEMORY_INGEST_OPERATION,
     CandidateKind,
     ConfidenceMethodName,
     EvidenceKindName,
@@ -34,7 +36,13 @@ from .contracts import (
     MemoryProvenance,
     MemoryWriteRequest,
 )
-from .identity import bare_digest, candidate_id, candidate_identity, idempotency_key
+from .identity import (
+    IDEMPOTENCY_ALGORITHM_VERSION,
+    bare_digest,
+    candidate_id,
+    candidate_identity,
+    idempotency_key,
+)
 from .policy import PublicationPolicy
 
 ENTITY_EXTRACTION_METHOD = "topology-entity-aggregation"
@@ -293,6 +301,11 @@ def _metadata(
         ],
         "candidate_kind": candidate_kind,
         "publication_policy": policy.identity,
+        # The snapshot hashes above are provenance. These name the algorithm
+        # that produced this effect's identity, so a reader can tell which
+        # keying rules a published record was admitted under.
+        "idempotency_algorithm_version": IDEMPOTENCY_ALGORITHM_VERSION,
+        "lowering_contract_version": LOWERING_CONTRACT_VERSION,
         "observed_conflict_ids": [item.conflict_id for item in conflicts],
         "observed_unknown_ids": [item.unknown_id for item in unknowns],
         "source_revisions": list(source_revisions),
@@ -341,6 +354,7 @@ def _build(
     )
 
     identity = candidate_identity(
+        operation=MEMORY_INGEST_OPERATION,
         candidate_kind=candidate_kind,
         namespace=namespace,
         memory_class=memory_class,
@@ -383,8 +397,7 @@ def _build(
         ),
         idempotency_key=idempotency_key(
             identity,
-            topology_semantic_hash=packet.semantic_hash,
-            policy_hash=policy.policy_hash(),
+            lowering_contract_version=LOWERING_CONTRACT_VERSION,
         ),
     )
     key = request.idempotency_key

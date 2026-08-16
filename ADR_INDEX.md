@@ -27,6 +27,8 @@ changed decision requires a new ADR that explicitly supersedes the old record.
 | ADR-0019 | [Use idempotency, reuse, replay, and reconciliation](docs/adr/0019-use-idempotency-reuse-replay-and-reconciliation.md) | Accepted |
 | ADR-0020 | [Delegate publication planning to the ingestion bridge](docs/adr/0020-delegate-publication-planning-to-the-ingestion-bridge.md) | Superseded in part by ADR-0021 |
 | ADR-0021 | [Internalize publication planning and memory lowering](docs/adr/0021-internalize-publication-planning-and-memory-lowering.md) | Accepted |
+| ADR-0022 | [Key memory effects by the fact, not the snapshot](docs/adr/0022-key-memory-effects-by-fact-not-snapshot.md) | Accepted |
+| ADR-0023 | [Declare field cardinality before detecting conflicts](docs/adr/0023-declare-field-cardinality-before-detecting-conflicts.md) | Accepted |
 
 ## Decision order
 

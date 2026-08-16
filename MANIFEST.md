@@ -6,7 +6,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 
 ## Inventory
 
-**Tracked delivery files:** 411
+**Tracked delivery files:** 417
 
 - `.editorconfig` — editor encoding, indentation, and whitespace policy
 - `.env.example` — documented worker and control-plane environment variables
@@ -115,6 +115,8 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `docs/adr/0019-use-idempotency-reuse-replay-and-reconciliation.md` — accepted architecture decision record
 - `docs/adr/0020-delegate-publication-planning-to-the-ingestion-bridge.md` — accepted architecture decision record
 - `docs/adr/0021-internalize-publication-planning-and-memory-lowering.md` — accepted architecture decision record
+- `docs/adr/0022-key-memory-effects-by-fact-not-snapshot.md` — accepted architecture decision record
+- `docs/adr/0023-declare-field-cardinality-before-detecting-conflicts.md` — accepted architecture decision record
 - `docs/adr/README.md` — ADR directory governance and navigation
 - `docs/architecture.md` — architecture, contract, deployment, recovery, or model documentation
 - `docs/archive/v4/01_SPEC_ATTACK.md` — superseded v4 historical artifact retained for migration evidence
@@ -221,6 +223,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `src/l9_constellation_topology/compatibility/__init__.py` — production Python package implementation
 - `src/l9_constellation_topology/compatibility/repo_card_adapter.py` — production Python package implementation
 - `src/l9_constellation_topology/compatibility/v4_models.py` — production Python package implementation
+- `src/l9_constellation_topology/cardinality.py` — versioned field cardinality contract governing which divergent values are conflicts
 - `src/l9_constellation_topology/compiler.py` — production Python package implementation
 - `src/l9_constellation_topology/config.py` — production Python package implementation
 - `src/l9_constellation_topology/domain/__init__.py` — production Python package implementation
@@ -391,6 +394,8 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `tests/test_dependency_scanner.py` — unit, contract, integration, regression, or governance test
 - `tests/test_direct_observation_adapter_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_evidence_v5.py` — unit, contract, integration, regression, or governance test
+- `tests/test_publication_effect_identity.py` — unit, contract, integration, regression, or governance test
+- `tests/test_field_cardinality.py` — unit, contract, integration, regression, or governance test
 - `tests/test_generated_artifact_sync.py` — generated-artifact check/update and fail-closed regression tests
 - `tests/test_git_integrity.py` — Git path, mode, object-type, and blob-identity regression tests
 - `tests/test_graph_builder.py` — unit, contract, integration, regression, or governance test
@@ -408,6 +413,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `tests/test_report_projection_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_repository_aggregation_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_repository_governance.py` — unit, contract, integration, regression, or governance test
+- `tests/test_repository_model_assertions.py` — unit, contract, integration, regression, or governance test
 - `tests/test_runtime_boundaries_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_topology_compiler_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_topology_graph_v5.py` — unit, contract, integration, regression, or governance test

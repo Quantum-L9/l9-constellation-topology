@@ -1,3 +1,22 @@
+> **Partially superseded — historical design document.**
+>
+> This specification is retained as the design-time record of the v5 architecture.
+> Its treatment of **downstream publication** is no longer current: every passage
+> below that assigns publication planning, promotion policy, destination lowering,
+> or effect planning to a separate `l9-topology-ingestion-bridge` repository
+> describes [ADR-0020](../adr/0020-delegate-publication-planning-to-the-ingestion-bridge.md),
+> which [ADR-0021](../adr/0021-internalize-publication-planning-and-memory-lowering.md)
+> superseded with respect to repository placement.
+>
+> `l9-topology-ingestion-bridge` was never built. Publication planning and memory
+> lowering are now an internal module of this repository at
+> `src/l9_constellation_topology/publication/`, targeting the `memory.ingest`
+> intent dispatched through Gate. See [docs/publication-boundary.md](../publication-boundary.md)
+> for the current architecture. The planning/execution authority split that
+> ADR-0020 protected is preserved; only its repository placement changed.
+>
+> Read the bridge passages below as history, not as instructions.
+
 Below is the superseding implementation specification for l9-constellation-topology. It replaces the earlier sealed contract with the recursively refined packet-first, evidence-backed, Postgres-orchestrated Model B architecture.
 
 L9 Constellation Topology

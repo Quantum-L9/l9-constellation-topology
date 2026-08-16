@@ -103,10 +103,40 @@ Wall-clock time and checkout paths never participate in semantic identity;
 timestamp-bearing fields are stripped before hashing. Candidate, skip, and
 evidence order are stable.
 
-An idempotency key binds the semantic fact to the topology semantic identity and
-the policy identity. A fact republished from a newer Topology Packet therefore
-carries a new key, and downstream treats it as a distinct admission rather than a
-duplicate.
+## Effect identity
+
+An idempotency key identifies a *fact*, not the snapshot that carried it.
+
+The key is derived from the effect's own semantics — operation, namespace,
+memory class, normalized content, structured assertion, and the topology
+entities it came from — together with the lowering contract version. It is
+prefixed `l9-topology-publication/v2:` so the algorithm that produced it is
+explicit on the wire.
+
+Nothing global participates. The Topology Packet id and semantic hash, the
+Repository Model Packet ids, the publication plan identity, the policy hash, and
+every timestamp are deliberately excluded. Two consequences follow, and both are
+intended:
+
+- A change elsewhere in the constellation moves the Repository Model, topology,
+  and plan hashes while leaving untouched facts' keys alone, so downstream
+  recognizes them as the duplicates they are.
+- A change to what a fact asserts — its content, assertion, namespace, memory
+  class, or operation — produces a new key, so downstream admits it as the new
+  fact it is.
+
+Those global identifiers remain on every intent as provenance, in request
+metadata and in `MemoryProvenance`, which is what they actually describe: where
+a fact was observed, not which fact it is.
+
+This replaces identity v1, which mixed the whole topology semantic hash and the
+whole policy hash into every key. Under v1 any semantic change anywhere re-keyed
+every effect in the plan, so unchanged facts were readmitted as new ones. The
+algorithm changed exactly once, before any durable state depended on v1 keys.
+
+Note that this is a different key from the stage-dispatch idempotency key
+described in [recovery.md](recovery.md), which binds a whole compilation
+fingerprint because it governs compilation reuse rather than fact identity.
 
 ## Downstream conformance
 
