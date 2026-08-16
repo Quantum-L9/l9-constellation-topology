@@ -111,8 +111,10 @@ def test_absent_and_empty_assertion_domains_are_distinct() -> None:
     """
     absent = _packet("1.0.0", RepositoryModelPayload())
     empty = _packet("1.1.0", RepositoryModelPayload(assertions=()))
-    assert absent.payload is not None and absent.payload.assertions is None
-    assert empty.payload is not None and empty.payload.assertions == ()
+    assert absent.payload is not None
+    assert empty.payload is not None
+    assert absent.payload.assertions is None
+    assert empty.payload.assertions == ()
     assert absent.semantic_hash != empty.semantic_hash
 
 

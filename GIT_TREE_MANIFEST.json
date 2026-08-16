@@ -2426,7 +2426,7 @@
       "path": "tests/test_repository_governance.py"
     },
     {
-      "git_object_id": "068be3f1dec0817d1e795e8c783bc7f0c42ca604",
+      "git_object_id": "03aa051bef0b65c4a29d9584f01a157651d57b05",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_repository_model_assertions.py"
@@ -2498,7 +2498,7 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:8ca0ff39cfb1127df7138811c3b6882e74bf01fc74db381fedea9c1cdecd3cf7",
+  "entries_sha256": "sha256:492c9174072734055937e7490c4746b86e92ba9006e7beb635d1528ccb63a111",
   "entry_count": 416,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
