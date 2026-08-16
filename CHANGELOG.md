@@ -1,5 +1,32 @@
 # Changelog
 
+## Unreleased - pre-deployment repair: scan semantics, conflict cardinality, and effect identity
+
+- Repaired the bounded compatibility scan: staged packet bundles are now verified
+  back with the loader that owns the packet type their manifest declares, so the
+  synthetic `l9.repository-model` bundle is no longer judged against Topology
+  Packet semantics. An unrecognized packet type fails closed.
+- Replaced status-only commit failure reporting with a deterministic rendering of
+  the receipt's own reasons: failure stage, packet type, affected member, and
+  inner message, with a shared atomic-bundle cause printed once.
+- Introduced versioned reconciliation cardinality. Set-valued facts such as
+  languages, workflows, and governance references aggregate deterministically
+  instead of becoming false conflicts that held sound publication candidates;
+  single-valued incompatibility still conflicts; an undeclared field yields an
+  explicit unknown. The policy hash is bound into `TopologyPacket.policy_hashes`.
+- Replaced the snapshot-global `v1` publication idempotency key with the
+  explicitly versioned `v2` fact-local effect identity. An unrelated change
+  anywhere in a Topology Packet no longer re-keys every unchanged downstream
+  write. The algorithm version is encoded in the key namespace.
+- Added `HASH_LOCALITY_EVALUATION.json` and `make hash-locality`, recording where
+  topology, candidate, and effect identity moves under eleven controlled
+  perturbations, with per-case verdicts asserted by tests.
+- Made fixture generation byte-reproducible by pinning `created_at` and deriving
+  `source_revision` from sample content; `fixtures-check` and the generated golden
+  Topology Packet bundle now run inside `make validate`.
+- Reconciled the design specification with accepted ADR-0021: the external
+  ingestion bridge is marked superseded historical architecture throughout.
+
 ## Unreleased - release-integrity and trust-boundary remediation
 
 - Restored the complete `.github` and `.l9` surfaces to the deliverable and added a Git-index integrity gate.
@@ -14,7 +41,7 @@
 - Added `GIT_TREE_MANIFEST.json`, which binds every tracked entry except itself to its Git mode, object type, and blob ID.
 - Published OCI bundles through semantic-hash-derived staging tags and independently resolved the immutable registry descriptor before accepting publication.
 - Added read-only generated-artifact drift gates for checked-in schemas and Repository Model Packet fixtures, with explicit `schemas-update`/`fixtures-update` regeneration commands.
-- Wired the deterministic schema drift gate (`schemas-check`) into `make validate`; fixture drift is checked on demand via `make fixtures-check` pending deterministic fixture generation.
+- Wired the deterministic schema drift gate (`schemas-check`) into `make validate`; fixture drift was initially checked on demand via `make fixtures-check` pending deterministic fixture generation, and is now gated (see the pre-deployment repair entry above).
 - Synchronized AGENTS, README, DEVELOPMENT, RUNBOOK, and VALIDATION with the generated-artifact workflow.
 
 ## Unreleased - initial repository enrichment

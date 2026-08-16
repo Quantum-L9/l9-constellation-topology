@@ -1,6 +1,7 @@
 """Policy-governed output boundary."""
 
 from .composite_output_sink import CompositeOutputSink
+from .failure_report import commit_failure_message, format_commit_failure
 from .filesystem_output_sink import FileSystemOutputSink
 from .memory_output_sink import MemoryOutputSink
 from .output_sink import OutputSink
@@ -31,6 +32,8 @@ __all__ = [
     "WritePlan",
     "WritePlanEntry",
     "WritePolicy",
+    "commit_failure_message",
+    "format_commit_failure",
     "make_commit_receipt",
     "make_write_plan",
 ]

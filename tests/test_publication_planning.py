@@ -15,6 +15,8 @@ from l9_constellation_topology.domain.topology import TopologyState
 from l9_constellation_topology.packets.common import PacketValidationRef
 from l9_constellation_topology.packets.topology_packet import MaterializedTopology
 from l9_constellation_topology.publication import (
+    EFFECT_IDENTITY_ALGORITHM_VERSION,
+    IDEMPOTENCY_NAMESPACE,
     EligibilityContext,
     PublicationEligibilityError,
     PublicationPolicy,
@@ -22,6 +24,8 @@ from l9_constellation_topology.publication import (
     TopologyIndex,
     build_publication_plan,
     build_publication_plan_artifacts,
+    confidence_semantic_identity,
+    effect_semantic_view,
     eligible_intent_document,
     load_publication_policy,
     validate_publication_plan,
@@ -32,6 +36,8 @@ from l9_constellation_topology.publication.eligibility import (
     REASON_MISSING_LINEAGE,
     REASON_UNRESOLVED_ENTITY,
 )
+from l9_constellation_topology.publication.identity import LEGACY_IDEMPOTENCY_NAMESPACE_V1
+from l9_constellation_topology.run import canonical_json
 
 ROOT = Path(__file__).resolve().parents[1]
 INPUTS = (
@@ -108,8 +114,12 @@ def test_candidate_and_idempotency_identity_are_deterministic(
         item.idempotency_key for item in second.candidates
     ]
     assert all(
-        item.idempotency_key.startswith("l9-topology-publication:") for item in first.candidates
+        item.idempotency_key.startswith(f"{IDEMPOTENCY_NAMESPACE}:") for item in first.candidates
     )
+    # The namespace encodes the algorithm version so a v1 key and a v2 key can
+    # never be mistaken for one another downstream.
+    assert IDEMPOTENCY_NAMESPACE.endswith(f"/{EFFECT_IDENTITY_ALGORITHM_VERSION}")
+    assert IDEMPOTENCY_NAMESPACE != LEGACY_IDEMPOTENCY_NAMESPACE_V1
     assert len({item.candidate_id for item in first.candidates}) == len(first.candidates)
 
 
@@ -125,9 +135,15 @@ def test_candidate_and_skip_order_is_stable(
     )
 
 
-def test_idempotency_key_binds_topology_and_policy_identity(
+def test_effect_key_tracks_lowered_confidence_policy_version(
     materialized: MaterializedTopology, policy: PublicationPolicy
 ) -> None:
+    """A policy version bump changes what is written, so it changes the key.
+
+    ``Confidence.policy_version`` is part of the durable record, so bumping the
+    publication policy version is a real change to every lowered write rather
+    than a bookkeeping change.
+    """
     baseline = _plan(materialized, policy, FIXED_TIME)
     shifted_policy = policy.model_copy(update={"version": "1.0.1"})
     shifted = build_publication_plan(materialized, shifted_policy, published_at=FIXED_TIME)
@@ -136,6 +152,71 @@ def test_idempotency_key_binds_topology_and_policy_identity(
     assert {item.idempotency_key for item in baseline.candidates}.isdisjoint(
         {item.idempotency_key for item in shifted.candidates}
     )
+
+
+def test_unrelated_policy_change_preserves_unaffected_effect_keys(
+    materialized: MaterializedTopology, policy: PublicationPolicy
+) -> None:
+    """Changing policy that does not alter a write must not re-key that write.
+
+    Raising the evidence ceiling above what any candidate uses changes the
+    publication policy hash and therefore the plan, but changes no lowered
+    intent. Under the v1 algorithm every key moved; under v2 none may.
+    """
+    baseline = _plan(materialized, policy, FIXED_TIME)
+    assert all(
+        item.lowering.truncated_evidence_count == 0 for item in baseline.candidates
+    ), "fixture must not truncate evidence for this probe to be meaningful"
+
+    relaxed_policy = policy.model_copy(
+        update={"maximum_evidence_refs_per_candidate": policy.maximum_evidence_refs_per_candidate + 1}
+    )
+    relaxed = build_publication_plan(materialized, relaxed_policy, published_at=FIXED_TIME)
+
+    assert baseline.policy_hash != relaxed.policy_hash
+    assert {item.candidate_id for item in baseline.candidates} == {
+        item.candidate_id for item in relaxed.candidates
+    }
+    baseline_keys = {item.candidate_id: item.idempotency_key for item in baseline.candidates}
+    relaxed_keys = {item.candidate_id: item.idempotency_key for item in relaxed.candidates}
+    assert baseline_keys == relaxed_keys
+
+
+def test_effect_key_excludes_snapshot_global_identity(
+    materialized: MaterializedTopology, policy: PublicationPolicy
+) -> None:
+    """No snapshot-global identifier may appear in the effect semantic view."""
+    packet = materialized.packet
+    view = effect_semantic_view(
+        operation="memory.ingest",
+        fact_identity={"content": "fact"},
+        namespace="l9/topology/example",
+        memory_class="observation",
+        content="fact",
+        assertion=None,
+        confidence=confidence_semantic_identity(
+            score=1.0, method="explicit", evidence_count=0, policy_version="v1"
+        ),
+        evidence=(),
+    )
+    rendered = canonical_json(view)
+    for forbidden in (
+        packet.packet_id,
+        packet.semantic_hash,
+        packet.artifact_hash,
+        policy.policy_hash(),
+    ):
+        assert forbidden not in rendered
+    for forbidden_key in (
+        "topology_packet_id",
+        "topology_semantic_hash",
+        "plan_id",
+        "policy_hash",
+        "source_revision",
+        "created_at",
+        "published_at",
+    ):
+        assert forbidden_key not in rendered
 
 
 def test_every_candidate_preserves_evidence_and_lineage(

@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections import defaultdict
 
 from l9_constellation_topology.domain import CapabilityRecord, ConflictRecord
+from l9_constellation_topology.reconciliation import is_conflicting
 from l9_constellation_topology.run import stable_id
 
 
@@ -20,7 +21,7 @@ def run(
         items = grouped[capability_id]
         first = items[0]
         descriptions = tuple(sorted({item.description for item in items}))
-        if len(descriptions) > 1:
+        if is_conflicting("description", descriptions):
             conflicts.append(
                 ConflictRecord(
                     conflict_id=stable_id(

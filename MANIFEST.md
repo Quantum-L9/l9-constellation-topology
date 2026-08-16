@@ -6,7 +6,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 
 ## Inventory
 
-**Tracked delivery files:** 411
+**Tracked delivery files:** 421
 
 - `.editorconfig` — editor encoding, indentation, and whitespace policy
 - `.env.example` — documented worker and control-plane environment variables
@@ -55,6 +55,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `FIX_MAP.md` — confirmed finding to fix and validation mapping
 - `GOVERNANCE.md` — authority, approval, ADR, branch, and release governance
 - `GIT_TREE_MANIFEST.json` — Git-native mode, object-type, and blob-identity manifest
+- `HASH_LOCALITY_EVALUATION.json` — recorded topology, candidate, and downstream-effect identity locality matrix
 - `INITIAL_COMMIT.md` — clean initial-commit and push handoff
 - `LICENSE` — proprietary repository license terms
 - `MAINTAINERS.md` — maintainer roles and ownership responsibilities
@@ -207,6 +208,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `scripts/compile_topology_packet.py` — operator, build, generation, or validation command
 - `scripts/generate_fixture_packets.py` — operator, build, generation, or validation command
 - `scripts/git_tree_manifest.py` — deterministic Git tree manifest generator and validator
+- `scripts/evaluate_hash_locality.py` — operator, build, generation, or validation command
 - `scripts/generate_schemas.py` — operator, build, generation, or validation command
 - `scripts/generated_artifact_sync.py` — shared read-only generated-artifact drift detection and explicit update support
 - `scripts/render_topology_reports.py` — operator, build, generation, or validation command
@@ -237,6 +239,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `src/l9_constellation_topology/evidence.py` — production Python package implementation
 - `src/l9_constellation_topology/io/__init__.py` — production Python package implementation
 - `src/l9_constellation_topology/io/composite_output_sink.py` — production Python package implementation
+- `src/l9_constellation_topology/io/failure_report.py` — production Python package implementation
 - `src/l9_constellation_topology/io/filesystem_output_sink.py` — production Python package implementation
 - `src/l9_constellation_topology/io/memory_output_sink.py` — production Python package implementation
 - `src/l9_constellation_topology/io/output_sink.py` — production Python package implementation
@@ -250,6 +253,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `src/l9_constellation_topology/packets/adapters/__init__.py` — production Python package implementation
 - `src/l9_constellation_topology/packets/adapters/repository_model_v1.py` — production Python package implementation
 - `src/l9_constellation_topology/packets/bundle.py` — production Python package implementation
+- `src/l9_constellation_topology/packets/bundle_verification.py` — production Python package implementation
 - `src/l9_constellation_topology/packets/common.py` — production Python package implementation
 - `src/l9_constellation_topology/packets/control.py` — production Python package implementation
 - `src/l9_constellation_topology/packets/loader.py` — production Python package implementation
@@ -272,6 +276,8 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `src/l9_constellation_topology/publication/plan.py` — deterministic publication plan construction
 - `src/l9_constellation_topology/publication/policy.py` — versioned publication policy resolution
 - `src/l9_constellation_topology/py.typed` — production Python package implementation
+- `src/l9_constellation_topology/reconciliation/__init__.py` — production Python package implementation
+- `src/l9_constellation_topology/reconciliation/cardinality.py` — production Python package implementation
 - `src/l9_constellation_topology/renderers/__init__.py` — production Python package implementation
 - `src/l9_constellation_topology/renderers/common.py` — production Python package implementation
 - `src/l9_constellation_topology/renderers/csv_export.py` — production Python package implementation
@@ -387,6 +393,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `tests/test_architecture_boundary_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_assessments_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_cli_v5.py` — unit, contract, integration, regression, or governance test
+- `tests/test_conflict_cardinality.py` — unit, contract, integration, regression, or governance test
 - `tests/test_confirmed_findings_remediation.py` — adversarial regression tests for every confirmed audit finding
 - `tests/test_dependency_scanner.py` — unit, contract, integration, regression, or governance test
 - `tests/test_direct_observation_adapter_v5.py` — unit, contract, integration, regression, or governance test
@@ -394,6 +401,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `tests/test_generated_artifact_sync.py` — generated-artifact check/update and fail-closed regression tests
 - `tests/test_git_integrity.py` — Git path, mode, object-type, and blob-identity regression tests
 - `tests/test_graph_builder.py` — unit, contract, integration, regression, or governance test
+- `tests/test_hash_locality.py` — unit, contract, integration, regression, or governance test
 - `tests/test_impact.py` — unit, contract, integration, regression, or governance test
 - `tests/test_maturity.py` — unit, contract, integration, regression, or governance test
 - `tests/test_output_sink_v5.py` — unit, contract, integration, regression, or governance test
@@ -408,7 +416,9 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `tests/test_report_projection_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_repository_aggregation_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_repository_governance.py` — unit, contract, integration, regression, or governance test
+- `tests/test_repository_model_readiness.py` — unit, contract, integration, regression, or governance test
 - `tests/test_runtime_boundaries_v5.py` — unit, contract, integration, regression, or governance test
+- `tests/test_scan_compatibility_path.py` — unit, contract, integration, regression, or governance test
 - `tests/test_topology_compiler_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_topology_graph_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_transport_signature_v5.py` — unit, contract, integration, regression, or governance test

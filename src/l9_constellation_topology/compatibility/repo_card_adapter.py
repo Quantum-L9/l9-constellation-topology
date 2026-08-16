@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import datetime
 from pathlib import Path
 from typing import Literal
 
@@ -53,7 +54,14 @@ def adapt_repo_card(
     source_revision: str,
     packet_ref: str,
     repository_root: Path | None = None,
+    created_at: datetime | None = None,
 ) -> tuple[NormalizedRepositoryModel, tuple[UnknownRecord, ...]]:
+    """Adapt one scanned repository card into canonical records.
+
+    ``created_at`` is injected rather than read from the clock when a caller
+    needs byte-reproducible output. It never participates in semantic identity —
+    ``semantic_hash`` strips it — so supplying it changes emitted bytes only.
+    """
     repository_id = card.repo_id if card.repo_id.startswith("repo:") else f"repo:{card.repo_id}"
     confidence = _confidence(card.confidence)
     evidence_records = []
@@ -95,6 +103,7 @@ def adapt_repo_card(
             confidence=confidence,
             producer="l9-constellation-topology.legacy-scanner-adapter",
             producer_version="2.0.0",
+            created_at=created_at,
         )
         evidence_records.append(record)
         if source_path is not None:

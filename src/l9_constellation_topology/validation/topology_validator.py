@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from collections import Counter, defaultdict
 from collections.abc import Iterable
+from datetime import datetime
 from pathlib import Path, PurePosixPath
 
 from jsonschema import Draft202012Validator
@@ -26,6 +27,7 @@ from l9_constellation_topology.packets.validation_receipt import (
     ValidationReceipt,
     finalize_validation_receipt,
 )
+from l9_constellation_topology.run.evidence import utc_now
 
 
 def _check(
@@ -162,7 +164,13 @@ def validate_topology(
     input_bundles: tuple[RepositoryModelBundle, ...],
     *,
     schema_root: Path,
+    created_at: datetime | None = None,
 ) -> ValidationReceipt:
+    """Validate a compiled packet and return its immutable receipt.
+
+    ``created_at`` may be injected for byte-reproducible output. It is stripped
+    from the receipt's semantic view, so it never changes receipt identity.
+    """
     schema_results: list[ValidationCheck] = []
     invariant_results: list[ValidationCheck] = []
     evidence_results: list[ValidationCheck] = []
@@ -569,5 +577,6 @@ def validate_topology(
         evidence_results=tuple(evidence_results),
         cross_reference_results=tuple(cross_reference_results),
         semantic_hash="sha256:pending",
+        created_at=created_at if created_at is not None else utc_now(),
     )
     return finalize_validation_receipt(candidate)

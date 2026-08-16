@@ -31,6 +31,11 @@ class PacketBundleOutputSink(FileSystemOutputSink):
 
     Canonical packet bundles are immutable. An existing bundle may only be reused when every
     planned artifact is byte-identical; partial replacement is rejected.
+
+    A staged bundle is loaded back before it is published, using the loader that owns the
+    packet type the staged manifest declares. Both canonical Topology Packet bundles and the
+    Repository Model bundles produced by the compatibility scan are therefore verified under
+    their own contract rather than under one another's.
     """
 
     def __init__(
@@ -135,9 +140,11 @@ class PacketBundleOutputSink(FileSystemOutputSink):
             if staging_receipt.status != "passed":
                 return make_commit_receipt(plan, staging_receipt.results)
 
-            from l9_constellation_topology.packets.loader import load_topology_bundle
+            from l9_constellation_topology.packets.bundle_verification import (
+                verify_packet_bundle,
+            )
 
-            load_topology_bundle(staging)
+            verify_packet_bundle(staging)
             self._fsync_tree(staging)
             os.replace(staging, self.output_root)
             parent_descriptor = os.open(self.output_root.parent, os.O_RDONLY)

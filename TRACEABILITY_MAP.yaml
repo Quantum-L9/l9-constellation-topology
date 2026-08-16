@@ -169,7 +169,7 @@ changes:
       - tests/test_generated_artifact_sync.py
       - make schemas-check
       - make validate
-    status: implemented_schema_gate_enforced; fixture drift gate deferred pending deterministic fixture generation (non-deterministic created_at and repository-revision-bound source_revision)
+    status: implemented; fixture and hash-locality drift gates now enforced after fixture generation was made deterministic (pinned created_at, content-derived source_revision)
   - id: ACT-001
     source: src/l9_constellation_topology/publication/, .l9/publication-policy.yaml, docs/adr/0021-internalize-publication-planning-and-memory-lowering.md
     gap: ADR-0020 delegated publication planning to l9-topology-ingestion-bridge, a repository that was never built, so validated topology truth had no downstream path
@@ -195,4 +195,53 @@ changes:
       - tests/test_publication_planning.py::test_publication_policy_is_excluded_from_topology_configuration
       - tests/test_publication_planning.py::test_plan_is_derived_and_leaves_topology_packet_unchanged
       - make schemas-check
+    status: implemented
+  - id: ACT-004
+    source: src/l9_constellation_topology/packets/bundle_verification.py, src/l9_constellation_topology/io/packet_bundle_output_sink.py
+    gap: F-T0 - the packet bundle sink verified every staged bundle with load_topology_bundle, so the compatibility scan's synthetic l9.repository-model bundle was judged against Topology Packet semantics and always failed
+    fix: dispatch post-write verification on the packet type the staged manifest declares, keeping OutputSink the only write boundary, keeping verification enabled, and failing closed on an unrecognized packet type
+    validation:
+      - tests/test_scan_compatibility_path.py::test_scan_of_a_trivial_repository_succeeds_and_validates
+      - tests/test_scan_compatibility_path.py::test_scan_verifies_the_intermediate_bundle_as_a_repository_model
+      - tests/test_scan_compatibility_path.py::test_unknown_packet_type_fails_closed
+      - tests/test_scan_compatibility_path.py::test_scan_of_a_real_repository_compiles_and_leaves_it_untouched
+    status: implemented
+  - id: ACT-005
+    source: src/l9_constellation_topology/io/failure_report.py, src/l9_constellation_topology/cli.py
+    gap: >-
+      F-T2 - a failed bundle commit was reported only as its receipt status, producing
+      "direct observation bundle commit failed: failed" and discarding the inner
+      validation reasons the receipt already carried
+    fix: render the receipt deterministically with failure stage, packet type, affected member, and inner message; print a shared atomic-bundle cause once and name each affected member against it
+    validation:
+      - tests/test_scan_compatibility_path.py::test_commit_failure_reporting_names_stage_member_and_cause
+      - tests/test_scan_compatibility_path.py::test_commit_failure_reporting_repeats_a_shared_cause_only_once
+      - tests/test_scan_compatibility_path.py::test_tampered_repository_model_member_is_rejected_actionably
+    status: implemented
+  - id: ACT-006
+    source: src/l9_constellation_topology/reconciliation/cardinality.py, src/l9_constellation_topology/stages/reconcile_evidence.py
+    gap: any subject field observed with more than one distinct value became a conflict, so set-valued facts such as languages, workflows, and governance references produced false contradictions that held otherwise sound publication candidates
+    fix: declare single, set, and unknown cardinality as versioned compiler policy; conflict only on single-valued incompatibility, aggregate set-valued facts deterministically with full evidence retention, emit an explicit unknown for undeclared fields, and hash the policy into TopologyPacket.policy_hashes so a semantics change cannot reuse an older packet identity
+    validation:
+      - tests/test_conflict_cardinality.py
+      - tests/test_conflict_cardinality.py::test_reconciliation_policy_is_versioned_into_topology_identity
+      - tests/test_repository_model_readiness.py::test_enriched_declared_actions_aggregate_rather_than_conflict
+    status: implemented
+  - id: ACT-007
+    source: src/l9_constellation_topology/publication/identity.py, src/l9_constellation_topology/publication/lowering.py, HASH_LOCALITY_EVALUATION.json
+    gap: the v1 idempotency key bound every downstream effect to the whole Topology Packet semantic hash and the whole publication policy hash, so any unrelated change anywhere in a snapshot re-keyed every otherwise unchanged durable write
+    fix: introduce the explicitly versioned v2 fact-local effect identity built from operation, namespace, memory class, content, assertion, stable source fact identity, normalized confidence and evidence semantics, and lowering contract version; exclude snapshot-global identity, whole policy hash, repository-wide revision, timestamps and paths; encode the algorithm version in the key namespace
+    validation:
+      - tests/test_hash_locality.py
+      - tests/test_publication_planning.py::test_unrelated_policy_change_preserves_unaffected_effect_keys
+      - tests/test_publication_planning.py::test_effect_key_excludes_snapshot_global_identity
+      - make hash-locality
+    status: implemented; no durable v1 admission ever occurred because this repository has never contained a dispatch path, so no migration was required
+  - id: ACT-008
+    source: docs/design/l9-constellation-topology-spec.md, docs/publication-boundary.md, docs/evidence-model.md, docs/output-sink.md
+    gap: the design specification still presented l9-topology-ingestion-bridge as a current runtime component, contradicting accepted ADR-0021
+    fix: mark every ingestion-bridge claim as superseded historical architecture under ADR-0020, state the current internal publication pipeline, and document effect identity, cardinality, and packet-type-aware verification in the normative docs
+    validation:
+      - docs/adr/0021-internalize-publication-planning-and-memory-lowering.md
+      - tests/test_repository_governance.py
     status: implemented

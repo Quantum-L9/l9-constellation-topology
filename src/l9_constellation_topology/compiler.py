@@ -32,6 +32,10 @@ from l9_constellation_topology.packets.topology_packet import (
     MaterializedTopology,
     calculate_topology_semantic_hash,
 )
+from l9_constellation_topology.reconciliation import (
+    RECONCILIATION_POLICY_VERSION,
+    reconciliation_policy_hash,
+)
 from l9_constellation_topology.run import artifact_hash, canonical_bytes, semantic_hash, utc_now
 from l9_constellation_topology.stages import aggregate_capabilities, aggregate_repositories
 from l9_constellation_topology.stages.assess_impact import run as assess_impact
@@ -82,6 +86,13 @@ def _packet_ref(bundle: RepositoryModelBundle) -> PacketRef:
 
 
 def _policy_hashes(configuration: ResolvedConfiguration) -> dict[str, str]:
+    """Return every policy whose meaning can change compiled topology truth.
+
+    ``reconciliation`` is a compiler-owned policy rather than a checked-in
+    profile, but it decides what counts as an aggregate and what counts as a
+    contradiction. Binding it here puts it inside the topology semantic view, so
+    a change to reconciliation meaning cannot reuse an older packet identity.
+    """
     return {
         "topology": semantic_hash(configuration.topology_profile),
         "risk": semantic_hash(configuration.risk_profile),
@@ -89,6 +100,7 @@ def _policy_hashes(configuration: ResolvedConfiguration) -> dict[str, str]:
         "report": semantic_hash(configuration.report_profile),
         "packet": semantic_hash(configuration.packet_profile),
         "output": semantic_hash(configuration.output_policy),
+        "reconciliation": reconciliation_policy_hash(),
     }
 
 
@@ -116,6 +128,8 @@ def calculate_idempotency_key(
         "configuration_profile_hash": configuration.profile_hash,
         "schema_contract_hash": configuration.schema_contract_hash,
         "active_contract_versions": configuration.active_contract_versions,
+        "reconciliation_policy_version": RECONCILIATION_POLICY_VERSION,
+        "reconciliation_policy_hash": reconciliation_policy_hash(),
         "adapter_mode": adapter_mode,
     }
     return semantic_hash(identity)
@@ -134,7 +148,7 @@ def compile_topology(
     packets = tuple(bundle.packet for bundle in bundles)
     normalized = normalize_models(adapt_packets(packets))
 
-    evidence, evidence_conflicts = reconcile_evidence(normalized.evidence)
+    evidence, evidence_conflicts, evidence_unknowns = reconcile_evidence(normalized.evidence)
     repositories, repository_conflicts, repository_unknowns = aggregate_repositories.run(
         normalized.repositories
     )
@@ -176,7 +190,9 @@ def compile_topology(
         impact_indexes=tuple(sorted(impacts, key=lambda item: item.subject_id)),
         evidence=tuple(sorted(evidence, key=lambda item: item.evidence_id)),
         diagnostics=tuple(sorted(normalized.diagnostics, key=lambda item: item.diagnostic_id)),
-        unknowns=tuple(sorted(repository_unknowns, key=lambda item: item.unknown_id)),
+        unknowns=tuple(
+            sorted(repository_unknowns + evidence_unknowns, key=lambda item: item.unknown_id)
+        ),
         conflicts=tuple(
             sorted(
                 evidence_conflicts + repository_conflicts + capability_conflicts,
@@ -214,7 +230,13 @@ def compile_topology(
     digest = calculate_topology_semantic_hash(candidate)
     packet_id = f"packet:{digest.removeprefix('sha256:')}"
     candidate = candidate.model_copy(update={"packet_id": packet_id, "semantic_hash": digest})
-    receipt = validate_topology(candidate, state, bundles, schema_root=repository_root)
+    receipt = validate_topology(
+        candidate,
+        state,
+        bundles,
+        schema_root=repository_root,
+        created_at=created_at,
+    )
     if receipt.status != "passed":
         raise TopologyCompilationError(
             "topology validation failed; no outputs were committed", receipt

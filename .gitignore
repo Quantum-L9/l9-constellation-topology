@@ -18,3 +18,7 @@ outputs/*
 !outputs/.gitkeep
 *.tmp
 .DS_Store
+
+# Machine-local L4 autonomy phase state written by the governance tooling.
+# It records the local execution phase of the agent session, not repository content.
+.l9/autonomy/

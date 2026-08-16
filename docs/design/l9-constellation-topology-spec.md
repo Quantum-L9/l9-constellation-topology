@@ -1,3 +1,38 @@
+> **Status note — publication boundary superseded.**
+>
+> This design specification predates [ADR-0021](../adr/0021-internalize-publication-planning-and-memory-lowering.md).
+> Wherever it names `l9-topology-ingestion-bridge` as the component that owns
+> evidence-gated lowering, promotion policy, or effect planning, it describes the
+> **superseded** architecture of [ADR-0020](../adr/0020-delegate-publication-planning-to-the-ingestion-bridge.md).
+> That repository was never built, and no separate ingestion-bridge component is a
+> required runtime component of the current system.
+>
+> Publication planning is now an **internal module** of this repository at
+> `src/l9_constellation_topology/publication/`, reached through the
+> `plan-publication` command, and its output is the derived
+> `l9.topology-publication-plan`. The authority split ADR-0020 protected is
+> unchanged and is now a split between planning and execution rather than between
+> two repositories: durable admission remains owned by `l9-graphiti-memory`, and
+> this repository still contains no Neo4j client, no Graphiti client, no memory
+> service client, and no Gate dispatch.
+>
+> The current pipeline is:
+>
+> ```text
+> l9-meta-injector
+>         ↓ l9.repository-model
+> l9-constellation-topology
+>         ↓ l9.topology
+> internal publication planning
+>         ↓ l9.topology-publication-plan
+> external downstream admission and execution
+> ```
+>
+> Everything else in this document — the packet contracts, evidence model, worker
+> execution model, and compiler stages — remains current. See
+> [docs/publication-boundary.md](../publication-boundary.md) and
+> [ARCHITECTURE.md](../../ARCHITECTURE.md) for the authoritative current description.
+
 Below is the superseding implementation specification for l9-constellation-topology. It replaces the earlier sealed contract with the recursively refined packet-first, evidence-backed, Postgres-orchestrated Model B architecture.
 
 L9 Constellation Topology
@@ -43,9 +78,11 @@ l9-constellation-topology
         ↓
 Topology Packet
         ↓
-l9-topology-ingestion-bridge
+l9-topology-ingestion-bridge   [SUPERSEDED by ADR-0021: this stage is now the
+                                internal publication/ module of this repository]
         ↓
 Promotion Plan / Candidate / Publication Receipt Packets
+        [current: l9.topology-publication-plan]
 
 The complete autonomous execution path is:
 
@@ -108,9 +145,12 @@ Repository Model Packets
 → impact graph
 → Topology Packet
 
-l9-topology-ingestion-bridge
+l9-topology-ingestion-bridge — **superseded by ADR-0021**
 
-Owns evidence-gated lowering and publication planning:
+Owned evidence-gated lowering and publication planning. Those responsibilities are
+now discharged by the internal `publication/` module of this repository; the
+stage description below still holds, but it is an internal boundary rather than a
+separate repository:
 
 Topology Packet
 → evidence gate
@@ -1205,6 +1245,8 @@ stages:
       packet_type: l9.repository-model
       validation_status: passed
     output_packet_type: l9.topology
+  # SUPERSEDED by ADR-0021: publication planning is an internal stage of
+  # Quantum-L9/l9-constellation-topology and emits l9.topology-publication-plan.
   - id: plan-ingestion
     target_repo: Quantum-L9/l9-topology-ingestion-bridge
     depends_on:
@@ -2169,8 +2211,10 @@ The implementation shall not:
                         │
                         ▼
 ┌───────────────────────────────────────────────┐
-│ l9-topology-ingestion-bridge                  │
+│ l9-topology-ingestion-bridge   [SUPERSEDED]   │
 │ Evidence-gated publication compiler           │
+│ ADR-0021: now the internal publication/       │
+│ module of l9-constellation-topology           │
 └───────────────┬───────────────┬───────────────┘
                 │               │
                 ▼               ▼

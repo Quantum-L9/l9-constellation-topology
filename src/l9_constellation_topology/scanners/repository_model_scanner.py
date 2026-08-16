@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
 
 from l9_constellation_topology.compatibility.repo_card_adapter import adapt_repo_card
@@ -19,7 +20,12 @@ from l9_constellation_topology.packets import (
     ValidationReceipt,
 )
 from l9_constellation_topology.packets.validator import repository_model_semantic_view
-from l9_constellation_topology.run import artifact_hash, canonical_bytes, semantic_hash
+from l9_constellation_topology.run import (
+    artifact_hash,
+    canonical_bytes,
+    semantic_hash,
+    utc_now,
+)
 from l9_constellation_topology.scanners.repo_scanner import scan_repo
 from l9_constellation_topology.sources import compute_source_snapshot
 
@@ -30,16 +36,39 @@ class SyntheticRepositoryModelBundle:
     receipt: ValidationReceipt
 
 
-def scan_repository_model(source: RepoSource) -> SyntheticRepositoryModelBundle:
+def scan_repository_model(
+    source: RepoSource,
+    *,
+    created_at: datetime | None = None,
+    source_revision: str | None = None,
+) -> SyntheticRepositoryModelBundle:
+    """Observe a repository read-only and return a validated synthetic bundle.
+
+    Two inputs are ordinarily read from the environment and can instead be
+    injected, so that fixture generation and replay comparison are byte-
+    reproducible without changing normal runtime semantics:
+
+    ``created_at``
+        The emission stamp on every evidence record. Volatile by construction and
+        stripped from every semantic hash, so injecting it changes bytes only.
+
+    ``source_revision``
+        The revision the observation is attributed to. It defaults to the working
+        tree's git HEAD, which makes output depend on where the source happens to
+        be checked out. Passing a content-derived revision makes generation depend
+        only on the observed content.
+    """
     root = Path(source.local_path).resolve()
     snapshot = compute_source_snapshot(root)
+    revision = source_revision or snapshot.revision
     card = scan_repo(source)
     packet_ref = f"urn:l9:legacy-scan:{source.repo_id}:{snapshot.semantic_hash}"
     normalized, _ = adapt_repo_card(
         card,
-        source_revision=snapshot.revision,
+        source_revision=revision,
         packet_ref=packet_ref,
         repository_root=root,
+        created_at=created_at,
     )
     payload = RepositoryModelPayload(
         repositories=normalized.repositories,
@@ -54,7 +83,7 @@ def scan_repository_model(source: RepoSource) -> SyntheticRepositoryModelBundle:
         packet_id="packet:pending",
         subject=RepositorySubject(repository_id=normalized.repositories[0].repository_id),
         source_snapshot=SourceSnapshot(
-            revision=snapshot.revision,
+            revision=revision,
             semantic_hash=snapshot.semantic_hash,
         ),
         validation=PacketValidationRef(status="not_run"),
@@ -97,6 +126,7 @@ def scan_repository_model(source: RepoSource) -> SyntheticRepositoryModelBundle:
         schema_results=checks[1:],
         cross_reference_results=checks[:1],
         semantic_hash="sha256:pending",
+        created_at=created_at if created_at is not None else utc_now(),
     )
     receipt_digest = semantic_hash(receipt_candidate)
     receipt = receipt_candidate.model_copy(
