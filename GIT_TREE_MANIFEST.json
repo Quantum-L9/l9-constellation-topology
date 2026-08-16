@@ -122,7 +122,7 @@
       "path": ".github/workflows/l9-stage-worker.yml"
     },
     {
-      "git_object_id": "316c6bfb2652b5089e66ade5d0621c8c03f3b1b6",
+      "git_object_id": "5836099d4d7ba9cc1cb67222184295040dee2c27",
       "mode": "100644",
       "object_type": "blob",
       "path": ".gitignore"
@@ -1238,7 +1238,7 @@
       "path": "scripts/validate_nuclear_execution.py"
     },
     {
-      "git_object_id": "841fa67ed9297e4691b427a66202340b6d192bea",
+      "git_object_id": "baf147c85d31be59e02e63c63fe1c894c1a1aeff",
       "mode": "100755",
       "object_type": "blob",
       "path": "scripts/validate_release_readiness.py"
@@ -2492,7 +2492,7 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:e370987b8f9794bec1ac45b10854526452cf68a5aa3abe00e13c9ae39421e892",
+  "entries_sha256": "sha256:0ec05b9fea68261e1955a67f77d12fba7c057ea4c607302fb61863b0f0ada361",
   "entry_count": 415,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
