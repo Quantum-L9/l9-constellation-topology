@@ -72,9 +72,34 @@ def _key(identity) -> str:
 # --- the identity function itself -------------------------------------------
 
 
-def test_identical_facts_have_identical_identity() -> None:
-    assert _key(_identity()) == _key(_identity())
-    assert candidate_id(_identity()) == candidate_id(_identity())
+def test_equal_facts_built_independently_have_identical_identity() -> None:
+    """Two separately constructed descriptions of one fact must agree.
+
+    The payloads are built in different key order from separately allocated
+    values, so this exercises canonicalization rather than merely re-evaluating
+    one expression twice.
+    """
+    first = candidate_identity(
+        operation=MEMORY_INGEST_OPERATION,
+        candidate_kind="repository",
+        namespace="l9-topology/repository",
+        memory_class="semantic",
+        content="repo:golden is a FastAPI service",
+        assertion={"subject": "repo:golden", "predicate": "framework", "object": "fastapi"},
+        source_topology_entity_ids=("repo:golden",),
+    )
+    second = candidate_identity(
+        source_topology_entity_ids=tuple(["repo:" + "golden"]),
+        assertion={"object": "fastapi", "predicate": "framework", "subject": "repo:golden"},
+        content=" ".join(["repo:golden", "is", "a", "FastAPI", "service"]),
+        memory_class="semantic",
+        namespace="l9-topology/repository",
+        candidate_kind="repository",
+        operation=MEMORY_INGEST_OPERATION,
+    )
+    assert first is not second
+    assert candidate_id(first) == candidate_id(second)
+    assert _key(first) == _key(second)
 
 
 def test_key_carries_an_explicit_algorithm_version() -> None:

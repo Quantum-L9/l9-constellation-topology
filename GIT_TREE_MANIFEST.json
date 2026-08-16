@@ -2378,7 +2378,7 @@
       "path": "tests/test_publication_downstream_conformance.py"
     },
     {
-      "git_object_id": "0e8aec712a6881eeb1fd546d171138ceaffec903",
+      "git_object_id": "b71fa39a49ff6e31ef9c287fa267310a78ba2934",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_publication_effect_identity.py"
@@ -2492,7 +2492,7 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:126c39de63285267e4d3c7e3a6fcbaed84405cd78a9ee57303be780f469d09b8",
+  "entries_sha256": "sha256:e370987b8f9794bec1ac45b10854526452cf68a5aa3abe00e13c9ae39421e892",
   "entry_count": 415,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
