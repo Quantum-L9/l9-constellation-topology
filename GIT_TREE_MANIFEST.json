@@ -296,7 +296,7 @@
       "path": "MAINTAINERS.md"
     },
     {
-      "git_object_id": "ecd7e186fcb0a1fc390d6fe1ccbb33bc820b4080",
+      "git_object_id": "e47518a0fd7976b07274c44e74c3a54def0b806b",
       "mode": "100644",
       "object_type": "blob",
       "path": "MANIFEST.md"
@@ -1292,7 +1292,7 @@
       "path": "src/l9_constellation_topology/compatibility/v4_models.py"
     },
     {
-      "git_object_id": "7155c55c2cd2e712993f5661069f0970f5227e17",
+      "git_object_id": "381ac7897ab1f99b73009ae2ed3a937f40b1baeb",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/compiler.py"
@@ -1806,6 +1806,12 @@
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/stages/classify_roles.py"
+    },
+    {
+      "git_object_id": "8f80e85f4c9dd40d15006b1735b397158db4b4eb",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "src/l9_constellation_topology/stages/derive_unknowns.py"
     },
     {
       "git_object_id": "c1bd3a3412611ec9a8916b16bbb7a10791bc079d",
@@ -2456,6 +2462,12 @@
       "path": "tests/test_transport_signature_v5.py"
     },
     {
+      "git_object_id": "8d4eda05a80a4a2ea837c617785a7299713065ab",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/test_unknown_derivation.py"
+    },
+    {
       "git_object_id": "fce7288fced715e55adfe61829cc0bf582b6da36",
       "mode": "100644",
       "object_type": "blob",
@@ -2498,8 +2510,8 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:492c9174072734055937e7490c4746b86e92ba9006e7beb635d1528ccb63a111",
-  "entry_count": 416,
+  "entries_sha256": "sha256:5bf6021e7db04c1c05a8da1fb86f61bc151030c58e4c2a516cba9fb989a47f3a",
+  "entry_count": 418,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
   ],
