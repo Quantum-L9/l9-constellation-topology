@@ -2444,7 +2444,7 @@
       "path": "tests/test_repository_governance.py"
     },
     {
-      "git_object_id": "aacaf1a4bee4ca234bfdc089cfae2b2f3ff93cc0",
+      "git_object_id": "b4eb579c4cc281e2ca74591cb134cf24892c0e17",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_repository_model_readiness.py"
@@ -2522,7 +2522,7 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:9ea642dfe7137023ea31f88ac2126d844cb74e00608783692a60c47e55195bb7",
+  "entries_sha256": "sha256:33b8889628882dc3e0dc605e565ead205aa2aaa1cef155795be0cd62a85be184",
   "entry_count": 420,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"

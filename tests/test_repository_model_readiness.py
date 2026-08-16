@@ -10,6 +10,7 @@ facts the packet never asserted and lineage the plan could not cite.
 
 from __future__ import annotations
 
+import ast
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -217,27 +218,74 @@ def test_enriched_declared_actions_aggregate_rather_than_conflict(
     ] == []
 
 
-def test_canonical_ingress_never_reads_the_source_tree(
-    baseline_bundle: SyntheticRepositoryModelBundle, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    """Compilation must not fall back to observing a repository checkout.
+def _import_closure(entry_module: str) -> set[str]:
+    """Return every first-party module reachable from ``entry_module`` by import."""
+    source_root = ROOT / "src"
+    package = "l9_constellation_topology"
+
+    def module_file(name: str) -> Path | None:
+        candidate = source_root / (name.replace(".", "/") + ".py")
+        if candidate.is_file():
+            return candidate
+        candidate = source_root / name.replace(".", "/") / "__init__.py"
+        return candidate if candidate.is_file() else None
+
+    def first_party_imports(path: Path) -> set[str]:
+        found: set[str] = set()
+        for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
+            if isinstance(node, ast.Import):
+                found.update(alias.name for alias in node.names)
+            elif isinstance(node, ast.ImportFrom) and node.module and node.level == 0:
+                found.add(node.module)
+                found.update(f"{node.module}.{alias.name}" for alias in node.names)
+        return {name for name in found if name.startswith(package)}
+
+    seen: set[str] = set()
+    pending = [entry_module]
+    while pending:
+        name = pending.pop()
+        if name in seen:
+            continue
+        path = module_file(name)
+        if path is None:
+            continue
+        seen.add(name)
+        pending.extend(first_party_imports(path))
+    return seen
+
+
+def test_canonical_ingress_cannot_reach_source_observation() -> None:
+    """The compiler must not be able to observe a repository checkout at all.
 
     The scan compatibility path is allowed to observe a source tree. The canonical
     packet path is not: if it did, topology would assert facts its inputs never
     carried, and a publication plan could not honestly cite where they came from.
+
+    This is asserted statically over the compiler's import closure rather than by
+    patching an observation function, because a patch only proves that one call
+    did not happen on one input. If no scanner or source-snapshot module is
+    reachable from the compiler, no input can trigger a rescan.
     """
-    import l9_constellation_topology.scanners.repo_scanner as scanner_module
-    import l9_constellation_topology.sources.source_snapshot as snapshot_module
+    closure = _import_closure("l9_constellation_topology.compiler")
 
-    def _forbidden(*args: object, **kwargs: object) -> object:
-        raise AssertionError("canonical compilation must not observe a source repository")
+    observation_modules = sorted(
+        name
+        for name in closure
+        if ".scanners" in name or ".sources" in name or name.endswith(".repo_card_adapter")
+    )
+    assert observation_modules == [], (
+        f"canonical compilation reached source-observation modules: {observation_modules}"
+    )
+    # Sanity: the closure is real, not empty because the walker silently failed.
+    assert "l9_constellation_topology.stages.reconcile_evidence" in closure
+    assert "l9_constellation_topology.packets.loader" in closure
 
-    monkeypatch.setattr(snapshot_module, "compute_source_snapshot", _forbidden)
-    monkeypatch.setattr(scanner_module, "scan_repo", _forbidden)
 
-    result = compile_topology(ROOT, INPUTS, created_at=FIXED_TIME)
-
-    assert result.validation_receipt.status == "passed"
+def test_scan_path_is_the_only_route_to_source_observation() -> None:
+    """The compatibility scan may observe a source tree; nothing else may."""
+    closure = _import_closure("l9_constellation_topology.scanners.repository_model_scanner")
+    assert "l9_constellation_topology.scanners.repo_scanner" in closure
+    assert any(name.startswith("l9_constellation_topology.sources") for name in closure)
 
 
 def test_unsupported_packet_version_fails_closed(
