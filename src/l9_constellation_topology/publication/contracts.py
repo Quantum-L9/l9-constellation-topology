@@ -22,6 +22,11 @@ PUBLICATION_PLAN_TYPE = "l9.topology-publication-plan"
 PUBLICATION_PLAN_VERSION = "1.0.0"
 MEMORY_INGEST_OPERATION = "memory.ingest"
 
+#: Version of the rules that turn a canonical topology fact into a memory
+#: intent. It participates in memory-effect identity because the same fact
+#: lowered by different rules is a different effect.
+LOWERING_CONTRACT_VERSION = "lowering/v1"
+
 MemoryClassName = Literal[
     "identity",
     "preference",

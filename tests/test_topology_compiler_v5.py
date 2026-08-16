@@ -4,12 +4,14 @@ from pathlib import Path
 import pytest
 
 from l9_constellation_topology.compiler import (
+    CANONICAL_CREATED_AT,
     commit_compilation,
     compile_topology,
 )
 from l9_constellation_topology.domain import ConflictRecord
 from l9_constellation_topology.io import MemoryOutputSink, PacketBundleOutputSink, WritePolicy
 from l9_constellation_topology.packets import load_topology_bundle
+from l9_constellation_topology.run import artifact_hash, canonical_bytes
 from l9_constellation_topology.validation.topology_validator import validate_topology
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -46,6 +48,43 @@ def test_semantic_hash_ignores_execution_time() -> None:
     assert first.materialized.packet.semantic_hash == second.materialized.packet.semantic_hash
     assert first.materialized.packet.packet_id == second.materialized.packet.packet_id
     assert first.materialized.packet.artifact_hash != second.materialized.packet.artifact_hash
+
+
+def test_default_compile_is_byte_reproducible() -> None:
+    """Two default compiles of the same inputs must emit identical bytes.
+
+    Canonical compilation reads no clock, so reproducibility holds without
+    weakening ``artifact_hash``, which still covers the exact emitted bytes.
+    """
+    first = compile_topology(ROOT, INPUTS).materialized.packet
+    second = compile_topology(ROOT, INPUTS).materialized.packet
+    assert first.created_at == second.created_at == CANONICAL_CREATED_AT
+    assert first.semantic_hash == second.semantic_hash
+    assert first.artifact_hash == second.artifact_hash
+    assert canonical_bytes(first.model_dump(exclude={"artifact_hash"})) == canonical_bytes(
+        second.model_dump(exclude={"artifact_hash"})
+    )
+
+
+def test_artifact_hash_verifies_the_exact_emitted_bytes() -> None:
+    """``artifact_hash`` stays an exact-byte digest, including ``created_at``."""
+    packet = compile_topology(ROOT, INPUTS).materialized.packet
+    recomputed = artifact_hash(canonical_bytes(packet.model_dump(exclude={"artifact_hash"})))
+    assert packet.artifact_hash == recomputed
+
+
+def test_explicit_timestamp_changes_bytes_but_not_meaning() -> None:
+    default = compile_topology(ROOT, INPUTS).materialized.packet
+    injected = compile_topology(
+        ROOT, INPUTS, created_at=datetime(2026, 8, 16, tzinfo=UTC)
+    ).materialized.packet
+    assert injected.created_at != default.created_at
+    assert injected.artifact_hash != default.artifact_hash
+    assert injected.semantic_hash == default.semantic_hash
+    # The injected packet is still exactly what it claims to be.
+    assert injected.artifact_hash == artifact_hash(
+        canonical_bytes(injected.model_dump(exclude={"artifact_hash"}))
+    )
 
 
 def test_packet_bundle_round_trip(tmp_path: Path) -> None:

@@ -221,6 +221,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `src/l9_constellation_topology/compatibility/__init__.py` — production Python package implementation
 - `src/l9_constellation_topology/compatibility/repo_card_adapter.py` — production Python package implementation
 - `src/l9_constellation_topology/compatibility/v4_models.py` — production Python package implementation
+- `src/l9_constellation_topology/cardinality.py` — versioned field cardinality contract governing which divergent values are conflicts
 - `src/l9_constellation_topology/compiler.py` — production Python package implementation
 - `src/l9_constellation_topology/config.py` — production Python package implementation
 - `src/l9_constellation_topology/domain/__init__.py` — production Python package implementation
@@ -391,6 +392,8 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `tests/test_dependency_scanner.py` — unit, contract, integration, regression, or governance test
 - `tests/test_direct_observation_adapter_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_evidence_v5.py` — unit, contract, integration, regression, or governance test
+- `tests/test_publication_effect_identity.py` — unit, contract, integration, regression, or governance test
+- `tests/test_field_cardinality.py` — unit, contract, integration, regression, or governance test
 - `tests/test_generated_artifact_sync.py` — generated-artifact check/update and fail-closed regression tests
 - `tests/test_git_integrity.py` — Git path, mode, object-type, and blob-identity regression tests
 - `tests/test_graph_builder.py` — unit, contract, integration, regression, or governance test
