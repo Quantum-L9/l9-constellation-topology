@@ -310,6 +310,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `src/l9_constellation_topology/stages/assess_risk.py` — production Python package implementation
 - `src/l9_constellation_topology/stages/build_graph.py` — production Python package implementation
 - `src/l9_constellation_topology/stages/classify_roles.py` — production Python package implementation
+- `src/l9_constellation_topology/stages/derive_unknowns.py` — production Python package implementation
 - `src/l9_constellation_topology/stages/ingest_packets.py` — production Python package implementation
 - `src/l9_constellation_topology/stages/normalize_models.py` — production Python package implementation
 - `src/l9_constellation_topology/stages/observe_fallbacks.py` — production Python package implementation
@@ -416,6 +417,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `tests/test_repository_model_assertions.py` — unit, contract, integration, regression, or governance test
 - `tests/test_runtime_boundaries_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_topology_compiler_v5.py` — unit, contract, integration, regression, or governance test
+- `tests/test_unknown_derivation.py` — unit, contract, integration, regression, or governance test
 - `tests/test_topology_graph_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_transport_signature_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_validation.py` — unit, contract, integration, regression, or governance test
