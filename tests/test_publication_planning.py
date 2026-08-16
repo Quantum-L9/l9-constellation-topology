@@ -159,6 +159,47 @@ def test_every_candidate_preserves_evidence_and_lineage(
         assert provenance.tool == "l9-constellation-topology/publication"
 
 
+def test_published_records_state_the_revision_they_were_observed_at(
+    materialized: MaterializedTopology, policy: PublicationPolicy
+) -> None:
+    """A memory record must not need its parent packet to say which commit it holds for."""
+    plan = _plan(materialized, policy, FIXED_TIME)
+    known_revisions = {
+        record.source_ref.source_revision
+        for record in materialized.state.evidence
+        if record.source_ref.source_revision
+    }
+    assert known_revisions, "fixture must carry at least one revision-bound evidence record"
+
+    carrying = 0
+    for candidate in plan.candidates:
+        metadata = candidate.memory_intent.request.metadata
+        revisions = metadata["source_revisions"]
+        paths = metadata["source_paths"]
+        assert revisions == sorted(revisions)
+        assert paths == sorted(paths)
+        assert set(revisions) <= known_revisions
+        assert len(paths) <= policy.maximum_evidence_refs_per_candidate
+        if revisions:
+            carrying += 1
+    assert carrying == len(plan.candidates)
+
+
+def test_source_locators_do_not_change_idempotency_identity(
+    materialized: MaterializedTopology, policy: PublicationPolicy
+) -> None:
+    """Locators are descriptive metadata, so replay of an existing plan stays idempotent."""
+    plan = _plan(materialized, policy, FIXED_TIME)
+    for candidate in plan.candidates:
+        key = candidate.memory_intent.request.idempotency_key
+        assert key is not None
+        assert candidate.idempotency_key == key
+        assert not any(
+            locator in key
+            for locator in candidate.memory_intent.request.metadata["source_revisions"]
+        )
+
+
 def test_inferred_and_aggregated_intents_carry_admissible_evidence(
     materialized: MaterializedTopology, policy: PublicationPolicy
 ) -> None:
