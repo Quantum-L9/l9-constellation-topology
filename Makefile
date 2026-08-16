@@ -15,8 +15,11 @@ test:
 coverage:
 	$(UV) run pytest --cov=l9_constellation_topology --cov-report=term-missing -q
 
+# CI runs both `ruff check` and `ruff format --check`. Keep them together here so a
+# formatting-only failure cannot pass locally and then fail the PR validation job.
 lint:
 	$(UV) run ruff check .
+	$(UV) run ruff format --check .
 
 type:
 	$(UV) run mypy src/l9_constellation_topology

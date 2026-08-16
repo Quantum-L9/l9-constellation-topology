@@ -128,9 +128,7 @@ def _sample(
         return {"sampled_candidate_id": ABSENT, "sampled_effect_idempotency_key": ABSENT}
     return {
         "sampled_candidate_id": _verdict(before.candidate_id, after.candidate_id),
-        "sampled_effect_idempotency_key": _verdict(
-            before.idempotency_key, after.idempotency_key
-        ),
+        "sampled_effect_idempotency_key": _verdict(before.idempotency_key, after.idempotency_key),
     }
 
 
@@ -336,9 +334,7 @@ def build_matrix() -> dict[str, Any]:
     #    same write, so the effect key must move.
     weakened = _replace_repository(
         state,
-        confidence=subject_repository.confidence.model_copy(
-            update={"level": ConfidenceLevel.low}
-        ),
+        confidence=subject_repository.confidence.model_copy(update={"level": ConfidenceLevel.low}),
     )
     add(
         "local_evidence_strength",

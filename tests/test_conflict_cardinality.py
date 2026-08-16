@@ -149,9 +149,7 @@ def test_a_single_observed_value_is_never_divergent() -> None:
 
 
 def test_structured_values_differing_only_in_key_order_are_one_value() -> None:
-    _, conflicts, unknowns = _reconcile(
-        "name", ({"a": 1, "b": 2}, {"b": 2, "a": 1})
-    )
+    _, conflicts, unknowns = _reconcile("name", ({"a": 1, "b": 2}, {"b": 2, "a": 1}))
     assert conflicts == ()
     assert unknowns == ()
 

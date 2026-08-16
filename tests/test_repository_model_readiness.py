@@ -211,7 +211,9 @@ def test_enriched_declared_actions_aggregate_rather_than_conflict(
     result = compile_topology(ROOT, (bundle_path,), created_at=FIXED_TIME)
 
     assert [
-        conflict for conflict in result.materialized.state.conflicts if conflict.field == "declared_actions"
+        conflict
+        for conflict in result.materialized.state.conflicts
+        if conflict.field == "declared_actions"
     ] == []
 
 
@@ -261,6 +263,8 @@ def test_unsupported_packet_version_fails_closed(
 
     assert receipt.status == "failed"
     assert not destination.exists(), "a bundle that fails verification is never published"
-    rendered = "\n".join(format_commit_failure(receipt, stage="test", packet_type="l9.repository-model"))
+    rendered = "\n".join(
+        format_commit_failure(receipt, stage="test", packet_type="l9.repository-model")
+    )
     assert "9.9.9" in rendered
     assert "not supported" in rendered

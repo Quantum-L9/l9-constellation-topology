@@ -37,9 +37,7 @@ def format_commit_failure(
     lines = [header, f"{stage}: write plan {receipt.plan_id}"]
 
     if receipt.status == "blocked":
-        lines.append(
-            f"{stage}: the write plan was blocked before any artifact was written"
-        )
+        lines.append(f"{stage}: the write plan was blocked before any artifact was written")
 
     ordered = sorted(
         receipt.results,

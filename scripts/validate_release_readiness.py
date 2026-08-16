@@ -96,7 +96,7 @@ EXCLUDED_PARTS = {
 #: They are gitignored, so they are never delivered and never belong in MANIFEST.md,
 #: but this scanner walks the filesystem rather than the index and would otherwise
 #: report them as manifest omissions on any machine that has run the tooling.
-EXCLUDED_RELATIVE_PREFIXES = (".l9/autonomy/",)
+EXCLUDED_RELATIVE_PREFIXES = (".l9/autonomy/", ".l9/pr/")
 ALLOWED_THIN_NAMES = {"__init__.py", "py.typed", ".gitkeep"}
 THIN_FILE_EXEMPTIONS = {
     "src/l9_constellation_topology/models.py": "legacy compatibility re-export surface",

@@ -330,7 +330,9 @@ def _compile_scanned_sources(
             "compatibility_mode": "bounded-direct-observation-to-repository-model-packet",
         }
     )
-    return _commit_exit_code(receipt, stage="scan/topology-bundle-commit", packet_type="l9.topology")
+    return _commit_exit_code(
+        receipt, stage="scan/topology-bundle-commit", packet_type="l9.topology"
+    )
 
 
 def cmd_scan(args: argparse.Namespace) -> int:

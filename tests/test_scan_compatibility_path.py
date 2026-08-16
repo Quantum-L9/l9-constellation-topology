@@ -235,7 +235,9 @@ def test_commit_failure_reporting_names_stage_member_and_cause(
     )
 
     lines = format_commit_failure(
-        failed, stage="scan/trivial/repository-model-bundle-commit", packet_type="l9.repository-model"
+        failed,
+        stage="scan/trivial/repository-model-bundle-commit",
+        packet_type="l9.repository-model",
     )
 
     rendered = "\n".join(lines)

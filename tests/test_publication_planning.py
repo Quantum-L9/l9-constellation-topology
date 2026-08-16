@@ -164,12 +164,14 @@ def test_unrelated_policy_change_preserves_unaffected_effect_keys(
     intent. Under the v1 algorithm every key moved; under v2 none may.
     """
     baseline = _plan(materialized, policy, FIXED_TIME)
-    assert all(
-        item.lowering.truncated_evidence_count == 0 for item in baseline.candidates
-    ), "fixture must not truncate evidence for this probe to be meaningful"
+    assert all(item.lowering.truncated_evidence_count == 0 for item in baseline.candidates), (
+        "fixture must not truncate evidence for this probe to be meaningful"
+    )
 
     relaxed_policy = policy.model_copy(
-        update={"maximum_evidence_refs_per_candidate": policy.maximum_evidence_refs_per_candidate + 1}
+        update={
+            "maximum_evidence_refs_per_candidate": policy.maximum_evidence_refs_per_candidate + 1
+        }
     )
     relaxed = build_publication_plan(materialized, relaxed_policy, published_at=FIXED_TIME)
 
