@@ -50,19 +50,6 @@ CONTRACT_REFERENCE_PREFIX = "contract-reference"
 SERVICE_ACTION_PREFIX = "capability:service-action"
 HTTP_ROUTE_PREFIX = "capability:http-route"
 
-#: Predicates with an explicit projection. Every other predicate — supported,
-#: auxiliary, or unsupported — stays a claim and nothing else.
-PROJECTED_PREDICATES: frozenset[str] = frozenset(
-    {
-        "authority.canonical_contract",
-        "http.route",
-        "package.dependency",
-        "repository.replaced_by",
-        "service.action",
-    }
-)
-
-
 @dataclass(frozen=True)
 class ClaimProjection:
     """Everything a claim set projected, plus which claims projected anything."""
@@ -246,6 +233,8 @@ def _project_http_route(
     return (capability,), (), ()
 
 
+#: The projection table. Every predicate absent from it — supported, auxiliary,
+#: or unsupported — stays a claim and nothing else.
 _PROJECTORS = {
     "authority.canonical_contract": _project_canonical_contract,
     "http.route": _project_http_route,
@@ -253,6 +242,18 @@ _PROJECTORS = {
     "repository.replaced_by": _project_replaced_by,
     "service.action": _project_service_action,
 }
+
+#: Derived from the table rather than restated beside it, so the set a reader
+#: consults and the set the compiler applies cannot drift apart.
+PROJECTED_PREDICATES: frozenset[str] = frozenset(_PROJECTORS)
+
+_UNPROJECTABLE = PROJECTED_PREDICATES - {
+    predicate for predicate in PROJECTED_PREDICATES if is_projectable(predicate)
+}
+if _UNPROJECTABLE:  # pragma: no cover - guarded at import; a build error
+    raise ValueError(
+        f"projection declared for predicates the registry withholds: {sorted(_UNPROJECTABLE)}"
+    )
 
 
 def project_claims(claims: tuple[SemanticClaimRecord, ...]) -> ClaimProjection:

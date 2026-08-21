@@ -25,6 +25,7 @@ from .contracts import (
 from .eligibility import (
     SKIP_EDGE_TYPE,
     SKIP_ENTITY_KIND,
+    SKIP_UNSTATEABLE_CLAIM,
     EligibilityContext,
     decide,
     require_publishable_topology,
@@ -32,6 +33,7 @@ from .eligibility import (
 from .identity import plan_id, publication_semantic_hash
 from .lowering import (
     LoweredCandidate,
+    LoweringError,
     TopologyIndex,
     lower_capability,
     lower_relationship,
@@ -194,12 +196,23 @@ def build_publication_plan(
         )
 
     if "semantic_claim" in eligible_entity_kinds:
-        lowered.extend(
-            lower_semantic_claim(
-                record, policy=policy, packet=packet, index=index, published_at=timestamp
-            )
-            for record in state.semantic_claims
-        )
+        for record in state.semantic_claims:
+            try:
+                lowered.append(
+                    lower_semantic_claim(
+                        record, policy=policy, packet=packet, index=index, published_at=timestamp
+                    )
+                )
+            except LoweringError:
+                # The claim survives in canonical topology either way; what cannot
+                # be done is state it downstream as a subject/predicate/object.
+                skipped.append(
+                    SkippedCandidate(
+                        source_kind="claim",
+                        source_id=record.claim_id,
+                        reason=SKIP_UNSTATEABLE_CLAIM,
+                    )
+                )
     else:
         skipped.extend(
             SkippedCandidate(

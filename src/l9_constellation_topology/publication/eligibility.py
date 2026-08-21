@@ -26,6 +26,10 @@ REASON_ADMITTED = "policy.admitted"
 
 SKIP_ENTITY_KIND = "policy.entity_kind_not_selected"
 SKIP_EDGE_TYPE = "policy.edge_type_not_selected"
+#: A claim whose subject, predicate, or object is empty cannot be stated as a
+#: triple downstream. Recording it as skipped keeps it visible; letting the
+#: lowering error escape would fail the whole plan over one malformed claim.
+SKIP_UNSTATEABLE_CLAIM = "claim.not_expressible_as_assertion"
 
 
 class PublicationEligibilityError(ValueError):

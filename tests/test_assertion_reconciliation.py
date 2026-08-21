@@ -268,3 +268,45 @@ def test_predicates_are_adjudicated_once_by_the_right_policy() -> None:
     _, claim_conflicts, claim_unknowns, _ = reconcile_assertions(assertions, evidence)
     assert [item.field for item in claim_conflicts] == ["package.name"]
     assert claim_unknowns == ()
+
+
+def test_a_claim_that_cannot_be_stated_is_skipped_with_a_reason() -> None:
+    """One malformed claim must not fail the whole plan, or vanish quietly."""
+    from datetime import UTC, datetime
+    from pathlib import Path
+
+    from l9_constellation_topology.compiler import compile_topology
+    from l9_constellation_topology.publication import (
+        build_publication_plan,
+        load_publication_policy,
+    )
+    from l9_constellation_topology.publication.eligibility import SKIP_UNSTATEABLE_CLAIM
+
+    root = Path(__file__).resolve().parents[1]
+    fixed = datetime(2026, 7, 21, tzinfo=UTC)
+    result = compile_topology(
+        root,
+        (root / "tests/fixtures/repository_model_packets/l9-assertion-sample",),
+        created_at=fixed,
+    )
+    state = result.materialized.state
+    # An object no downstream assertion can carry. The claim still exists in
+    # canonical topology; only its statement downstream is impossible.
+    damaged = state.model_copy(
+        update={
+            "semantic_claims": (
+                state.semantic_claims[0].model_copy(update={"object": ""}),
+                *state.semantic_claims[1:],
+            )
+        }
+    )
+    plan = build_publication_plan(
+        result.materialized.model_copy(update={"state": damaged}),
+        load_publication_policy(root),
+        published_at=fixed,
+    )
+    skipped = [item for item in plan.skipped_candidates if item.reason == SKIP_UNSTATEABLE_CLAIM]
+    assert [item.source_id for item in skipped] == [state.semantic_claims[0].claim_id]
+    # Every other claim published normally.
+    claim_candidates = [item for item in plan.candidates if item.candidate_kind == "claim"]
+    assert len(claim_candidates) == len(state.semantic_claims) - 1
