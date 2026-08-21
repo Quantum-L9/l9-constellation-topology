@@ -11,6 +11,7 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 WORKFLOW_ROOT = ROOT / ".github" / "workflows"
+GOVERNANCE_ROOT = ROOT / ".github" / "governance"
 EXPECTED = {
     "l9-pr-validate.yml",
     "l9-ingress.yml",
@@ -26,6 +27,50 @@ def _load(path: Path) -> dict[str, object]:
     if not isinstance(data, dict):
         raise ValueError(f"workflow is not a mapping: {path}")
     return data
+
+
+def _trigger_events(data: dict[str, object]) -> list[str]:
+    # YAML 1.1 can fold the `on` key to boolean True; BaseLoader keeps it as the string
+    # "on". Accept either so the trigger set is discovered regardless of loader behavior.
+    triggers = data.get("on")
+    if triggers is None:
+        triggers = data.get("True")
+    if isinstance(triggers, str):
+        return [triggers]
+    if isinstance(triggers, dict):
+        return sorted(str(key) for key in triggers)
+    if isinstance(triggers, list):
+        return sorted(str(item) for item in triggers)
+    return []
+
+
+def _check_analysis_profile_events(data: dict[str, object], text: str) -> list[str]:
+    """Verify every trigger event maps to a profile that permits it (audit F-06 / R-06)."""
+
+    errors: list[str] = []
+    events = _trigger_events(data)
+    if not events:
+        return ["l9-analysis.yml: cannot determine trigger events"]
+    mapping = dict(re.findall(r"(\w+)\)\s+profile=(\w+)", text))
+    try:
+        profiles_doc = yaml.safe_load(
+            (GOVERNANCE_ROOT / "execution-profiles.yaml").read_text(encoding="utf-8")
+        )
+        profiles = profiles_doc["profiles"]
+    except (OSError, ValueError, KeyError, TypeError, yaml.YAMLError) as exc:
+        return [f"l9-analysis.yml: cannot load execution profiles: {exc}"]
+    for event in events:
+        selected = mapping.get(event)
+        if selected is None:
+            errors.append(f"l9-analysis.yml: no governed profile is selected for event {event}")
+            continue
+        profile = profiles.get(selected)
+        if not isinstance(profile, dict):
+            errors.append(f"l9-analysis.yml: selected profile is undefined: {selected}")
+            continue
+        if event not in profile.get("allowed_events", []):
+            errors.append(f"l9-analysis.yml: profile {selected} does not permit event {event}")
+    return errors
 
 
 def _steps(data: dict[str, object]) -> list[dict[str, str]]:
@@ -119,6 +164,10 @@ def main() -> int:
         ):
             if required not in text:
                 errors.append(f"l9-stage-worker.yml: missing exact-revision control {required}")
+
+    if "l9-analysis.yml" in loaded:
+        data, _, text = loaded["l9-analysis.yml"]
+        errors.extend(_check_analysis_profile_events(data, text))
 
     result = {
         "status": "failed" if errors else "passed",

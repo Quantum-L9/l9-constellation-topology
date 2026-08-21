@@ -6,7 +6,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 
 ## Inventory
 
-**Tracked delivery files:** 417
+**Tracked delivery files:** 422
 
 - `.editorconfig` — editor encoding, indentation, and whitespace policy
 - `.env.example` — documented worker and control-plane environment variables
@@ -137,6 +137,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `docs/publication-boundary.md` — architecture, contract, deployment, recovery, or model documentation
 - `docs/recovery.md` — architecture, contract, deployment, recovery, or model documentation
 - `docs/report-lifecycle.md` — architecture, contract, deployment, recovery, or model documentation
+- `docs/runbooks/merge-gate-enforcement.md` — operator runbook for enforcing the governed merge gate on main
 - `docs/topology-model.md` — architecture, contract, deployment, recovery, or model documentation
 - `docs/worker-contract.md` — architecture, contract, deployment, recovery, or model documentation
 - `evidence/live-qualify-2026-08-02/A0-GATE-LIVE-QUALIFY-NONDESTRUCTIVE-20260802.json` — live-qualification campaign authorization record
@@ -334,6 +335,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `src/l9_constellation_topology/worker/callback.py` — production Python package implementation
 - `src/l9_constellation_topology/worker/control_packet.py` — production Python package implementation
 - `src/l9_constellation_topology/worker/errors.py` — production Python package implementation
+- `src/l9_constellation_topology/worker/execution_authority.py` — production Python package implementation
 - `src/l9_constellation_topology/worker/failure.py` — production Python package implementation
 - `src/l9_constellation_topology/worker/packet_store.py` — production Python package implementation
 - `src/l9_constellation_topology/worker/registry.py` — production Python package implementation
@@ -395,6 +397,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `tests/test_dependency_scanner.py` — unit, contract, integration, regression, or governance test
 - `tests/test_direct_observation_adapter_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_evidence_v5.py` — unit, contract, integration, regression, or governance test
+- `tests/test_execution_authority_v5.py` — adversarial coverage for the execution-lease trust boundary
 - `tests/test_publication_effect_identity.py` — unit, contract, integration, regression, or governance test
 - `tests/test_field_cardinality.py` — unit, contract, integration, regression, or governance test
 - `tests/test_generated_artifact_sync.py` — generated-artifact check/update and fail-closed regression tests

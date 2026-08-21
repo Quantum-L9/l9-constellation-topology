@@ -127,9 +127,18 @@ class FileSystemOutputSink:
         self._planned = make_write_plan(tuple(entries), issues=tuple(sorted(set(issues))))
         return self._planned
 
-    def _atomic_write(self, target: Path, content: bytes) -> None:
+    def _atomic_write(self, target: Path, content: bytes, *, exclusive: bool = False) -> None:
         target.parent.mkdir(parents=True, exist_ok=True)
         if not self.policy.atomic_writes:
+            if exclusive:
+                # Exclusive create without an atomic replace: fail closed if the file
+                # appeared after planning. os.O_EXCL rejects an existing destination.
+                descriptor = os.open(target, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o644)
+                with os.fdopen(descriptor, "wb") as handle:
+                    handle.write(content)
+                    handle.flush()
+                    os.fsync(handle.fileno())
+                return
             target.write_bytes(content)
             return
         descriptor, temporary_name = tempfile.mkstemp(
@@ -143,12 +152,45 @@ class FileSystemOutputSink:
                 handle.write(content)
                 handle.flush()
                 os.fsync(handle.fileno())
-            os.replace(temporary, target)
+            if exclusive:
+                # Link the staged bytes into place only if the destination is still
+                # absent; a file that raced into existence after planning is not clobbered.
+                os.link(temporary, target)
+            else:
+                os.replace(temporary, target)
         finally:
             if temporary.exists():
                 temporary.unlink()
 
+    def _revalidate_entry(self, entry: WritePlanEntry) -> str | None:
+        """Re-read the target immediately before mutating it (kills plan/commit TOCTOU).
+
+        Returns a stale-plan reason string when current state no longer matches the plan;
+        ``None`` when the planned action is still safe to perform.
+        """
+
+        target = self._resolve_destination(entry.intent.artifact.destination_path)
+        current_hash: str | None = None
+        if target.is_file():
+            current_hash = artifact_hash(target.read_bytes())
+        elif target.exists():
+            return "destination is no longer a regular file"
+        if current_hash != entry.existing_hash:
+            return "target changed between plan and commit"
+        if entry.action == "create" and current_hash is not None:
+            return "destination was created after planning"
+        if entry.action == "replace":
+            expected = entry.intent.expected_existing_hash
+            if expected is not None and expected != current_hash:
+                return "existing hash no longer matches expected hash"
+            if current_hash is None:
+                return "destination disappeared before replacement"
+        return None
+
     def commit(self) -> CommitReceipt:
+        # The plan is advisory: whatever state it captured may be stale by now. Keep the
+        # planned decisions, but revalidate each mutating entry against current on-disk
+        # state immediately before its side effect and fail closed on any drift.
         plan = self.plan()
         if plan.status == "blocked":
             return make_commit_receipt(plan, (), blocked=True)
@@ -177,9 +219,21 @@ class FileSystemOutputSink:
                     )
                 )
                 continue
+            stale_reason = self._revalidate_entry(entry)
+            if stale_reason is not None:
+                results.append(
+                    CommitArtifactResult(
+                        logical_id=artifact.logical_id,
+                        destination_path=artifact.destination_path,
+                        status="failed",
+                        content_hash=artifact.content_hash,
+                        message=f"stale plan: {stale_reason}",
+                    )
+                )
+                continue
             target = self._resolve_destination(artifact.destination_path)
             try:
-                self._atomic_write(target, artifact.content)
+                self._atomic_write(target, artifact.content, exclusive=entry.action == "create")
             except OSError as exc:
                 results.append(
                     CommitArtifactResult(

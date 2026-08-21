@@ -104,6 +104,11 @@ jobs:
           L9_CONTROL_API_URL: ${{ vars.L9_CONTROL_API_URL }}
           L9_CALLBACK_TOKEN: ${{ secrets.L9_CALLBACK_TOKEN }}
           L9_PACKET_REGISTRY_FILE: ${{ runner.temp }}/l9-topology-worker/packet-registry.sqlite3
+          # Audit F-03: a fresh hosted runner has a fresh local store, so a local lease
+          # cannot suppress cross-run replay. Production requires the authoritative
+          # (external Postgres) control-plane lease and fails closed when it is
+          # unavailable — it never silently falls back to the runner-local backend.
+          L9_EXECUTION_AUTHORITY_MODE: ${{ vars.L9_EXECUTION_AUTHORITY_MODE || 'control-plane' }}
         run: |
           ${RUNNER_TEMP}/l9-exact-worker-env/bin/l9-topology-worker \
             --dispatch-file /tmp/l9-stage-dispatch.json \
