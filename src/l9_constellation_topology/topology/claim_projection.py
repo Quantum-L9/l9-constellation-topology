@@ -50,6 +50,7 @@ CONTRACT_REFERENCE_PREFIX = "contract-reference"
 SERVICE_ACTION_PREFIX = "capability:service-action"
 HTTP_ROUTE_PREFIX = "capability:http-route"
 
+
 @dataclass(frozen=True)
 class ClaimProjection:
     """Everything a claim set projected, plus which claims projected anything."""

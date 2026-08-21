@@ -1964,7 +1964,7 @@
       "path": "src/l9_constellation_topology/topology/capability_builder.py"
     },
     {
-      "git_object_id": "d0bf99d887a7200fa3205d8083ab5ed555a97a15",
+      "git_object_id": "9befeda8e4e13d617f3135afdef43371848b5e99",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/topology/claim_projection.py"
@@ -2744,7 +2744,7 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:2e67a5552e6f5e8d8f3fe1315fc1635f2d14575168c6f1949cd8633d14393a76",
+  "entries_sha256": "sha256:e4ed66a59959f9fdb6d6ff38dcbf70c2b9dfeaa26c975f67bdd27888986fa795",
   "entry_count": 457,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
