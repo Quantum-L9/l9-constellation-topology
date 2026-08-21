@@ -1232,7 +1232,7 @@
       "path": "scripts/compile_topology_packet.py"
     },
     {
-      "git_object_id": "365be15d137732ef843a5e2caa6af145131610d5",
+      "git_object_id": "d6ec7f18632a982e80f1dd72d3ce2c7f18266b08",
       "mode": "100644",
       "object_type": "blob",
       "path": "scripts/evaluate_hash_locality.py"
@@ -1262,7 +1262,7 @@
       "path": "scripts/git_tree_manifest.py"
     },
     {
-      "git_object_id": "340131cebc7b1910c72af410fed51cd81feb76ae",
+      "git_object_id": "ebd18cebbfb59a4418e23a00dcbbb06bf528e264",
       "mode": "100644",
       "object_type": "blob",
       "path": "scripts/qualify_repository_model_assertions.py"
@@ -1622,7 +1622,7 @@
       "path": "src/l9_constellation_topology/packets/validator.py"
     },
     {
-      "git_object_id": "9b5376f7edcd5ae5ae5493b700c4fd0e861b5ea4",
+      "git_object_id": "516a5f8a73f7b7d60b15147676ec826c47efea3f",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/publication/__init__.py"
@@ -1652,13 +1652,13 @@
       "path": "src/l9_constellation_topology/publication/identity.py"
     },
     {
-      "git_object_id": "ac8a321fe88dc330a9bdf681e7f783e9f86a88ba",
+      "git_object_id": "a62bf0b7f9ace7476fb51b6c3de569bce7698958",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/publication/lowering.py"
     },
     {
-      "git_object_id": "87b69e5957de71f07541e2bc7723a11a3ad8418c",
+      "git_object_id": "a88d1893aeee4cadf4c4948b339a08584b5c4f2a",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/publication/plan.py"
@@ -1982,7 +1982,7 @@
       "path": "src/l9_constellation_topology/topology/flow_builder.py"
     },
     {
-      "git_object_id": "dfd8db032a207b99cb21bb337404a781fc31b45c",
+      "git_object_id": "1033d853aa0d9c91f4ea9341a98f8843948dad3d",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/topology/graph_builder.py"
@@ -2594,13 +2594,13 @@
       "path": "tests/test_packet_store_v5.py"
     },
     {
-      "git_object_id": "1a9237b0dcca90fcd290aafa72dde2c7f4a12fcb",
+      "git_object_id": "98f418c97a86bfb7116d0d9de4ab1384f25d88c1",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_publication_downstream_conformance.py"
     },
     {
-      "git_object_id": "a2e7b7970008183ec238a6bc37926f45c84f6cce",
+      "git_object_id": "a3f26ceda1db8714b7e81aa7c25c43191b4305a3",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_publication_effect_identity.py"
@@ -2672,7 +2672,7 @@
       "path": "tests/test_scan_compatibility_path.py"
     },
     {
-      "git_object_id": "2a6c559c66fbe01dcb9971797767f5aa4416cf88",
+      "git_object_id": "db5f98be093c5b1949e634d648d207fe13d072f2",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_semantic_claim_activation.py"
@@ -2744,7 +2744,7 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:e4ed66a59959f9fdb6d6ff38dcbf70c2b9dfeaa26c975f67bdd27888986fa795",
+  "entries_sha256": "sha256:7359155f3126c7020b75f747a5a3fe3213e29bead38513571f64fb640a81fcb7",
   "entry_count": 457,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
