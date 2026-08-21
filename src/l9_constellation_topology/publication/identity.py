@@ -20,22 +20,39 @@ IDEMPOTENCY_NAMESPACE = "l9-topology-publication"
 #: Algorithm version for memory-effect identity.
 #:
 #: v1 bound each key to the whole Topology Packet semantic hash and the whole
-#: publication policy hash. That conflated two different things: the identity of
-#: a *snapshot* and the identity of a *fact*. Any semantic change anywhere in
-#: any source repository moved the topology hash and therefore re-keyed every
-#: effect in the plan, including the ones whose facts had not changed at all.
+#: publication policy hash. That conflated the identity of a *snapshot* with the
+#: identity of a *fact*: a semantic change anywhere in any source repository
+#: moved the topology hash and re-keyed every effect in the plan, including the
+#: ones whose facts had not changed at all.
 #:
-#: v2 keys an effect by the effect's own semantics. A fact that did not change
-#: keeps its key across unrelated snapshot movement; a fact that did change gets
-#: a new one. Global snapshot hashes remain on the intent as provenance, which
-#: is what they actually describe.
-IDEMPOTENCY_ALGORITHM_VERSION = "v2"
+#: v2 fixed that by keying an effect by the fact alone. It then made the mirror
+#: mistake. Downstream, ``idempotency_key`` names an *operation*: a request whose
+#: key matches an existing record is answered ``DUPLICATE`` and its content is
+#: not admitted. Under v2 a re-publication of the same fact with materially
+#: stronger evidence, weaker evidence, or a recalibrated confidence carried the
+#: previous key, so downstream read a genuinely new epistemic state as a retry of
+#: the old one and discarded it.
+#:
+#: v3 separates the two identities that were being conflated in both directions:
+#:
+#: ``candidate_id``
+#:     the logical fact. Stable while only evidence strength moves.
+#:
+#: the effect key
+#:     the exact durable admission being requested — the fact, the contract used
+#:     to lower it, the local evidence supporting it, and the confidence claimed
+#:     for it. Two calls carrying one v3 key request the same durable operation,
+#:     which is what the downstream contract means by a retry.
+#:
+#: Global snapshot hashes remain on the intent as provenance, which is what they
+#: actually describe.
+IDEMPOTENCY_ALGORITHM_VERSION = "v3"
 #: Alias used by the hash-locality evaluator and its contract tests.
 EFFECT_IDENTITY_ALGORITHM_VERSION = IDEMPOTENCY_ALGORITHM_VERSION
 
 #: Domain separator, so an effect identity can never collide with another
 #: digest computed over similarly-shaped data.
-_EFFECT_IDENTITY_DOMAIN = "l9.memory-effect-id/v2"
+_EFFECT_IDENTITY_DOMAIN = "l9.memory-effect-id/v3"
 
 #: Timestamp-bearing fields of the mirrored memory contract. They carry no
 #: semantic meaning for plan identity, so they are stripped before hashing in
@@ -126,34 +143,112 @@ def candidate_id(identity: dict[str, Any]) -> str:
     return f"publication-candidate:{digest}"
 
 
+def confidence_semantics(
+    *,
+    score: float,
+    method: str,
+    evidence_count: int,
+    confidence_policy_version: str,
+) -> dict[str, Any]:
+    """Return the confidence claim this write is making.
+
+    A recalibrated score, a different derivation method, a different supporting
+    count, or a different confidence policy all change what is being asserted
+    about how strongly the fact is known — which makes the write a different
+    write. ``calibrated_at`` is absent: when a score was computed is not part of
+    what the score claims.
+    """
+    return {
+        "score": score,
+        "method": method,
+        "evidence_count": evidence_count,
+        "confidence_policy_version": confidence_policy_version,
+    }
+
+
+def evidence_semantics(
+    *,
+    evidence_kind: str,
+    source_content_digest: str | None,
+    stable_source_locator: str | None,
+) -> dict[str, Any]:
+    """Return one supporting evidence item as it bears on the requested write.
+
+    Three things only: what kind of evidence it is, the digest of the bytes it
+    reads, and where those bytes live. Deliberately absent are the observation
+    timestamp, the parent packet identity, the repository revision, and the
+    topology evidence id — all of which move when the surrounding snapshot moves
+    while the local bytes supporting this fact stay exactly the same.
+    """
+    return {
+        "evidence_kind": evidence_kind,
+        "source_content_digest": source_content_digest,
+        "stable_source_locator": stable_source_locator,
+    }
+
+
+def effect_identity(
+    identity: dict[str, Any],
+    *,
+    lowering_contract_version: str,
+    local_evidence: tuple[dict[str, Any], ...],
+    confidence: dict[str, Any],
+    derivation_kind: str | None = None,
+) -> dict[str, Any]:
+    """Return the canonical identity of the exact durable admission requested."""
+    return {
+        "domain": _EFFECT_IDENTITY_DOMAIN,
+        "candidate_id": candidate_id(identity),
+        "lowering_contract_version": lowering_contract_version,
+        # Sorted so that the order evidence happened to be resolved in cannot
+        # change the key. Two writes supported by the same evidence are one write.
+        "local_evidence_semantics": sorted(
+            local_evidence, key=lambda item: publication_semantic_hash(item)
+        ),
+        "derivation_kind": derivation_kind,
+        "confidence_semantics": confidence,
+    }
+
+
 def idempotency_key(
     identity: dict[str, Any],
     *,
     lowering_contract_version: str,
+    local_evidence: tuple[dict[str, Any], ...] = (),
+    confidence: dict[str, Any] | None = None,
+    derivation_kind: str | None = None,
 ) -> str:
-    """Return the fact-local identity of a single memory effect.
+    """Return the identity of the exact durable write this intent requests.
 
-    The key is a function of the fact and of the contract used to lower it,
-    and of nothing else. Two consequences follow, and both are intended:
+    Downstream, a matching key means "this is the same operation you already
+    performed", and the request is answered ``DUPLICATE`` without admitting its
+    content. So the key must move exactly when the requested operation differs,
+    and three groups of inputs follow from that:
 
-    * An unrelated edit somewhere else in the constellation moves the RMP,
-      topology, and plan hashes but leaves this key alone, so downstream sees
-      the unchanged fact as the duplicate it is.
-    * A change to what this fact actually asserts — its content, assertion,
-      namespace, memory class, or operation — produces a new key, so
-      downstream admits it as the new fact it is.
+    * The **fact** — via ``candidate_id``: content, structured assertion,
+      namespace, memory class, operation. A different fact is a different write.
+    * The **lowering contract** — the same topology fact lowered by different
+      rules is a different write.
+    * The **local epistemic state** — the evidence supporting this fact and the
+      confidence claimed for it. Re-publishing a fact with stronger evidence, or
+      weaker, or a recalibrated score, requests a genuinely different durable
+      admission; keying it as a retry of the previous write is what causes
+      downstream to answer ``DUPLICATE`` and silently drop the new state.
 
-    The lowering contract version participates because a different lowering
-    of the same topology fact is a different effect.
+    Everything that describes the *snapshot* rather than this write stays out:
+    the topology packet id and semantic hash, the plan id and hash, the whole-RMP
+    hash, the repository revision when the local source bytes are unchanged, the
+    evidence of unrelated facts, the checkout path, and every timestamp.
     """
-    digest = publication_semantic_hash(
-        {
-            "domain": _EFFECT_IDENTITY_DOMAIN,
-            "candidate_id": candidate_id(identity),
-            "lowering_contract_version": lowering_contract_version,
-        }
+    return f"{IDEMPOTENCY_NAMESPACE}/{IDEMPOTENCY_ALGORITHM_VERSION}:" + publication_semantic_hash(
+        effect_identity(
+            identity,
+            lowering_contract_version=lowering_contract_version,
+            local_evidence=local_evidence,
+            confidence=confidence or {},
+            derivation_kind=derivation_kind,
+        )
     ).removeprefix(_SHA_PREFIX)
-    return f"{IDEMPOTENCY_NAMESPACE}/{IDEMPOTENCY_ALGORITHM_VERSION}:{digest}"
 
 
 def plan_id(semantic_digest: str) -> str:

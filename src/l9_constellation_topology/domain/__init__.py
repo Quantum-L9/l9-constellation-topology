@@ -3,6 +3,7 @@
 from .artifact import ArtifactRecord
 from .assessment import ConflictRecord, ImpactIndex, MaturityAssessment, RiskRecord, UnknownRecord
 from .capability import CapabilityRecord
+from .claim import ClaimCardinality, ClaimSupport, SemanticClaimRecord
 from .confidence import (
     Authority,
     Completeness,
@@ -22,6 +23,8 @@ __all__ = [
     "ArtifactRecord",
     "Authority",
     "CapabilityRecord",
+    "ClaimCardinality",
+    "ClaimSupport",
     "Completeness",
     "ConfidenceAssessment",
     "ConfidenceLevel",
@@ -39,6 +42,7 @@ __all__ = [
     "MaturityAssessment",
     "RepositoryRecord",
     "RiskRecord",
+    "SemanticClaimRecord",
     "TopologyState",
     "UnknownRecord",
 ]

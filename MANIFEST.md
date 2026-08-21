@@ -202,6 +202,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `schemas/maturity-assessment.schema.json` — canonical or compatibility domain JSON Schema
 - `schemas/repo_card.schema.json` — canonical or compatibility domain JSON Schema
 - `schemas/repository-record.schema.json` — canonical or compatibility domain JSON Schema
+- `schemas/semantic-claim-record.schema.json` — canonical or compatibility domain JSON Schema
 - `schemas/risk-record.schema.json` — canonical or compatibility domain JSON Schema
 - `schemas/risk_register.schema.json` — canonical or compatibility domain JSON Schema
 - `schemas/topology-publication-plan.schema.json` — canonical or compatibility domain JSON Schema
@@ -234,6 +235,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `src/l9_constellation_topology/domain/assessment.py` — production Python package implementation
 - `src/l9_constellation_topology/domain/base.py` — production Python package implementation
 - `src/l9_constellation_topology/domain/capability.py` — production Python package implementation
+- `src/l9_constellation_topology/domain/claim.py` — production Python package implementation
 - `src/l9_constellation_topology/domain/confidence.py` — production Python package implementation
 - `src/l9_constellation_topology/domain/diagnostic.py` — typed diagnostic conservation domain model
 - `src/l9_constellation_topology/domain/edge.py` — production Python package implementation
@@ -256,6 +258,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `src/l9_constellation_topology/packets/__init__.py` — production Python package implementation
 - `src/l9_constellation_topology/packets/adapters/__init__.py` — production Python package implementation
 - `src/l9_constellation_topology/packets/adapters/repository_model_v1.py` — production Python package implementation
+- `src/l9_constellation_topology/packets/assertion_evidence.py` — production Python package implementation
 - `src/l9_constellation_topology/packets/bundle.py` — production Python package implementation
 - `src/l9_constellation_topology/packets/bundle_verification.py` — production Python package implementation
 - `src/l9_constellation_topology/packets/common.py` — production Python package implementation
@@ -282,6 +285,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `src/l9_constellation_topology/py.typed` — production Python package implementation
 - `src/l9_constellation_topology/reconciliation/__init__.py` — production Python package implementation
 - `src/l9_constellation_topology/reconciliation/cardinality.py` — production Python package implementation
+- `src/l9_constellation_topology/reconciliation/predicates.py` — production Python package implementation
 - `src/l9_constellation_topology/renderers/__init__.py` — production Python package implementation
 - `src/l9_constellation_topology/renderers/common.py` — production Python package implementation
 - `src/l9_constellation_topology/renderers/csv_export.py` — production Python package implementation
@@ -321,11 +325,13 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `src/l9_constellation_topology/stages/ingest_packets.py` — production Python package implementation
 - `src/l9_constellation_topology/stages/normalize_models.py` — production Python package implementation
 - `src/l9_constellation_topology/stages/observe_fallbacks.py` — production Python package implementation
+- `src/l9_constellation_topology/stages/reconcile_assertions.py` — production Python package implementation
 - `src/l9_constellation_topology/stages/reconcile_evidence.py` — production Python package implementation
 - `src/l9_constellation_topology/stages/resolve_config.py` — production Python package implementation
 - `src/l9_constellation_topology/stages/validate_topology.py` — production Python package implementation
 - `src/l9_constellation_topology/topology/__init__.py` — production Python package implementation
 - `src/l9_constellation_topology/topology/capability_builder.py` — production Python package implementation
+- `src/l9_constellation_topology/topology/claim_projection.py` — production Python package implementation
 - `src/l9_constellation_topology/topology/classifier.py` — production Python package implementation
 - `src/l9_constellation_topology/topology/flow_builder.py` — production Python package implementation
 - `src/l9_constellation_topology/topology/graph_builder.py` — production Python package implementation
@@ -393,6 +399,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `tests/fixtures/topology_packets/foundational-two-repo/payload/impact-indexes.json` — deterministic packet, source, or regression fixture
 - `tests/fixtures/topology_packets/foundational-two-repo/payload/maturity.json` — deterministic packet, source, or regression fixture
 - `tests/fixtures/topology_packets/foundational-two-repo/payload/repository-records.json` — deterministic packet, source, or regression fixture
+- `tests/fixtures/topology_packets/foundational-two-repo/payload/semantic-claims.json` — generated packet fixture payload
 - `tests/fixtures/topology_packets/foundational-two-repo/payload/risks.json` — deterministic packet, source, or regression fixture
 - `tests/fixtures/topology_packets/foundational-two-repo/payload/unknowns.json` — deterministic packet, source, or regression fixture
 - `tests/fixtures/topology_packets/foundational-two-repo/receipts/validation-receipt.json` — deterministic packet, source, or regression fixture

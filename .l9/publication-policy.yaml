@@ -8,7 +8,7 @@ namespace_root: l9.constellation
 # Topology entity kinds eligible for lowering into durable-memory observations.
 # Artifact entities are deliberately excluded: file-level inventory is already
 # carried by the Topology Packet payload and would publish per-file noise.
-eligible_entity_kinds: [repository, capability]
+eligible_entity_kinds: [repository, capability, semantic_claim]
 
 # Edge taxonomy members eligible for lowering into structured memory assertions.
 # CONTAINS is excluded because repository-to-artifact containment restates the
@@ -33,6 +33,10 @@ eligible_edge_types:
 # MemoryClass members; this repository never invents a downstream enum.
 entity_memory_class: observation
 relationship_memory_class: semantic
+# A reconciled repository-model assertion is a semantic claim about a subject,
+# so it lands in the same class as a compiled relationship rather than as a raw
+# observation: it is a subject/predicate/object statement, not an inventory line.
+claim_memory_class: semantic
 
 # Deterministic topology-confidence to memory-confidence mapping. Scores are
 # ceilings, never upgrades: a lowered fact can lose confidence but never gain it.
@@ -81,6 +85,10 @@ require_resolved_lineage: true
 hold_on_material_conflict: true
 hold_on_material_unknown: true
 hold_on_missing_required_evidence: true
+# A claim whose predicate has no declared rule in the predicate registry is held
+# rather than published: it is preserved, evidenced, and diagnosed, but what it
+# means is not something publication may decide on its own.
+hold_on_unsupported_predicate: true
 
 # Upper bound on lowered evidence references per candidate. Truncation is
 # recorded on the lowering receipt and in plan diagnostics; it is never silent.

@@ -1,0 +1,196 @@
+{
+  "$defs": {
+    "Authority": {
+      "enum": [
+        "source",
+        "validated-machine",
+        "derived",
+        "candidate",
+        "unknown"
+      ],
+      "title": "Authority",
+      "type": "string"
+    },
+    "Completeness": {
+      "enum": [
+        "partial",
+        "sufficient",
+        "complete"
+      ],
+      "title": "Completeness",
+      "type": "string"
+    },
+    "ConfidenceAssessment": {
+      "additionalProperties": false,
+      "properties": {
+        "authority": {
+          "$ref": "#/$defs/Authority"
+        },
+        "completeness": {
+          "$ref": "#/$defs/Completeness"
+        },
+        "conflict_status": {
+          "$ref": "#/$defs/ConflictStatus",
+          "default": "none"
+        },
+        "derivation_method": {
+          "$ref": "#/$defs/DerivationMethod"
+        },
+        "evidence_strength": {
+          "$ref": "#/$defs/EvidenceStrength"
+        },
+        "level": {
+          "$ref": "#/$defs/ConfidenceLevel"
+        }
+      },
+      "required": [
+        "level",
+        "evidence_strength",
+        "derivation_method",
+        "authority",
+        "completeness"
+      ],
+      "title": "ConfidenceAssessment",
+      "type": "object"
+    },
+    "ConfidenceLevel": {
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "title": "ConfidenceLevel",
+      "type": "string"
+    },
+    "ConflictStatus": {
+      "enum": [
+        "none",
+        "possible",
+        "confirmed"
+      ],
+      "title": "ConflictStatus",
+      "type": "string"
+    },
+    "DerivationMethod": {
+      "enum": [
+        "declared",
+        "deterministic",
+        "cross-record",
+        "heuristic",
+        "model-assisted",
+        "unknown"
+      ],
+      "title": "DerivationMethod",
+      "type": "string"
+    },
+    "EvidenceStrength": {
+      "enum": [
+        "none",
+        "weak",
+        "corroborated",
+        "direct"
+      ],
+      "title": "EvidenceStrength",
+      "type": "string"
+    }
+  },
+  "$id": "https://quantum-l9.dev/schemas/semantic-claim-record.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "One reconciled semantic claim, with the evidence that supports it.",
+  "properties": {
+    "authority": {
+      "$ref": "#/$defs/Authority"
+    },
+    "cardinality": {
+      "enum": [
+        "single",
+        "set",
+        "unknown"
+      ],
+      "title": "Cardinality",
+      "type": "string"
+    },
+    "claim_id": {
+      "title": "Claim Id",
+      "type": "string"
+    },
+    "confidence": {
+      "$ref": "#/$defs/ConfidenceAssessment"
+    },
+    "conflict_ids": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Conflict Ids",
+      "type": "array"
+    },
+    "conflict_status": {
+      "$ref": "#/$defs/ConflictStatus",
+      "default": "none"
+    },
+    "evidence_refs": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Evidence Refs",
+      "type": "array"
+    },
+    "object": {
+      "title": "Object",
+      "type": "string"
+    },
+    "predicate": {
+      "title": "Predicate",
+      "type": "string"
+    },
+    "projected": {
+      "default": false,
+      "title": "Projected",
+      "type": "boolean"
+    },
+    "projected_entity_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Projected Entity Ids",
+      "type": "array"
+    },
+    "source_assertion_ids": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Source Assertion Ids",
+      "type": "array"
+    },
+    "subject_id": {
+      "title": "Subject Id",
+      "type": "string"
+    },
+    "support": {
+      "enum": [
+        "set",
+        "single",
+        "auxiliary",
+        "unsupported"
+      ],
+      "title": "Support",
+      "type": "string"
+    }
+  },
+  "required": [
+    "claim_id",
+    "subject_id",
+    "predicate",
+    "object",
+    "confidence",
+    "authority",
+    "cardinality",
+    "support"
+  ],
+  "title": "SemanticClaimRecord",
+  "type": "object"
+}

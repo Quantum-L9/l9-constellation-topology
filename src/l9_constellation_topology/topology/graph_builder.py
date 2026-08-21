@@ -55,8 +55,12 @@ def build_topology_graph(
     artifacts: tuple[ArtifactRecord, ...],
     capabilities: tuple[CapabilityRecord, ...],
     declared_edges: tuple[CanonicalEdgeRecord, ...] = (),
+    external_nodes: tuple[CanonicalGraphRecord, ...] = (),
 ) -> tuple[tuple[CanonicalGraphRecord, ...], tuple[CanonicalEdgeRecord, ...]]:
-    nodes: list[CanonicalGraphRecord] = []
+    # External nodes are seeded first so a repository, artifact, or capability
+    # that shares an identity with one wins the dedup below: an entity this
+    # compile actually observed always outranks a reference to one it did not.
+    nodes: list[CanonicalGraphRecord] = list(external_nodes)
     edges: dict[str, CanonicalEdgeRecord] = {edge.edge_id: edge for edge in declared_edges}
 
     for repository in repositories:
@@ -186,7 +190,9 @@ def build_topology_graph(
             )
             edges[relation.edge_id] = relation
 
-    deduped_nodes = {node.entity_id: node for node in nodes}
+    deduped_nodes: dict[str, CanonicalGraphRecord] = {}
+    for node in nodes:
+        deduped_nodes[node.entity_id] = node
     edge_records = tuple(sorted(edges.values(), key=lambda item: item.edge_id))
     graph_edges = tuple(
         CanonicalGraphRecord(

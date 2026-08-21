@@ -13,5 +13,8 @@ def run(
     artifacts: tuple[ArtifactRecord, ...],
     capabilities: tuple[CapabilityRecord, ...],
     declared_edges: tuple[EdgeRecord, ...],
+    external_nodes: tuple[GraphRecord, ...] = (),
 ) -> tuple[tuple[GraphRecord, ...], tuple[EdgeRecord, ...]]:
-    return build_topology_graph(repositories, artifacts, capabilities, declared_edges)
+    return build_topology_graph(
+        repositories, artifacts, capabilities, declared_edges, external_nodes
+    )

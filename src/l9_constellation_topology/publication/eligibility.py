@@ -21,6 +21,7 @@ REASON_UNRESOLVED_ENTITY = "lineage.unresolved_topology_entity"
 REASON_MATERIAL_CONFLICT = "conflict.unresolved_material"
 REASON_MATERIAL_UNKNOWN = "unknown.unresolved_material"
 REASON_MISSING_EVIDENCE = "evidence.required_but_missing"
+REASON_UNSUPPORTED_PREDICATE = "predicate.unsupported_by_registry"
 REASON_ADMITTED = "policy.admitted"
 
 SKIP_ENTITY_KIND = "policy.entity_kind_not_selected"
@@ -119,6 +120,15 @@ def decide(candidate: LoweredCandidate, context: EligibilityContext) -> Eligibil
         and not candidate.has_resolved_evidence
     ):
         holds.append(REASON_MISSING_EVIDENCE)
+    # A claim whose predicate the registry does not declare is well formed and
+    # fully evidenced; what its objects *mean* together is what is unknown. It is
+    # held under a reason of its own so plan diagnostics say so, rather than
+    # disappearing into a generic unknown or being skipped without a word.
+    if (
+        policy.hold_on_unsupported_predicate
+        and candidate.receipt.predicate_support == "unsupported"
+    ):
+        holds.append(REASON_UNSUPPORTED_PREDICATE)
 
     if rejections:
         return EligibilityDecision(status="rejected", reasons=tuple(sorted(set(rejections))))

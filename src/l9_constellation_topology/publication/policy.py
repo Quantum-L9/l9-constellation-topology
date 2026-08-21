@@ -54,6 +54,7 @@ class PublicationPolicy(FrozenModel):
     eligible_edge_types: tuple[str, ...]
     entity_memory_class: MemoryClassName
     relationship_memory_class: MemoryClassName
+    claim_memory_class: MemoryClassName = "semantic"
     confidence_score_by_level: dict[str, float]
     confidence_conflict_ceiling: dict[str, float]
     confidence_method_by_derivation: dict[str, ConfidenceMethodName]
@@ -72,6 +73,10 @@ class PublicationPolicy(FrozenModel):
     hold_on_material_conflict: bool = True
     hold_on_material_unknown: bool = True
     hold_on_missing_required_evidence: bool = True
+    #: Hold a claim whose predicate the registry does not declare. Such a
+    #: claim is well formed and fully evidenced; what is unknown is what it
+    #: *means*, which is not something publication should decide silently.
+    hold_on_unsupported_predicate: bool = True
     maximum_evidence_refs_per_candidate: int = Field(default=32, ge=1)
 
     @property

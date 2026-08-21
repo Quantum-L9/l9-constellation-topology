@@ -42,6 +42,9 @@ from .identity import (
     EFFECT_IDENTITY_ALGORITHM_VERSION,
     candidate_id,
     candidate_identity,
+    confidence_semantics,
+    effect_identity,
+    evidence_semantics,
     idempotency_key,
     plan_id,
 )
@@ -52,6 +55,7 @@ from .lowering import (
     lower_capability,
     lower_relationship,
     lower_repository,
+    lower_semantic_claim,
 )
 from .plan import build_publication_plan, plan_publication_from_repository
 from .policy import (
@@ -90,14 +94,18 @@ __all__ = [
     "build_publication_plan_artifacts",
     "candidate_id",
     "candidate_identity",
+    "confidence_semantics",
     "decide",
+    "effect_identity",
     "eligible_intent_document",
     "eligible_intents_bytes",
+    "evidence_semantics",
     "idempotency_key",
     "load_publication_policy",
     "lower_capability",
     "lower_relationship",
     "lower_repository",
+    "lower_semantic_claim",
     "plan_id",
     "plan_publication_from_repository",
     "publication_plan_bytes",

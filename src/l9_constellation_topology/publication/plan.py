@@ -36,6 +36,7 @@ from .lowering import (
     lower_capability,
     lower_relationship,
     lower_repository,
+    lower_semantic_claim,
 )
 from .policy import PublicationPolicy, load_publication_policy
 
@@ -190,6 +191,21 @@ def build_publication_plan(
                 source_kind="entity", source_id=record.capability_id, reason=SKIP_ENTITY_KIND
             )
             for record in state.capability_records
+        )
+
+    if "semantic_claim" in eligible_entity_kinds:
+        lowered.extend(
+            lower_semantic_claim(
+                record, policy=policy, packet=packet, index=index, published_at=timestamp
+            )
+            for record in state.semantic_claims
+        )
+    else:
+        skipped.extend(
+            SkippedCandidate(
+                source_kind="claim", source_id=record.claim_id, reason=SKIP_ENTITY_KIND
+            )
+            for record in state.semantic_claims
         )
 
     if "artifact" in eligible_entity_kinds:

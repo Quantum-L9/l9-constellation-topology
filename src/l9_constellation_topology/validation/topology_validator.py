@@ -104,6 +104,9 @@ def _record_evidence_refs(
         for capability in state.capability_records
     )
     records.extend(
+        (claim.claim_id, claim.evidence_refs, claim.authority) for claim in state.semantic_claims
+    )
+    records.extend(
         (edge.edge_id, edge.evidence_refs, edge.confidence.authority) for edge in state.edge_records
     )
     records.extend(
@@ -222,6 +225,7 @@ def validate_topology(
         ("repository-record.schema.json", state.repository_records),
         ("artifact-record.schema.json", state.artifact_records),
         ("capability-record.schema.json", state.capability_records),
+        ("semantic-claim-record.schema.json", state.semantic_claims),
         ("edge-record.schema.json", state.edge_records),
         ("flow-record.schema.json", state.flow_records),
         ("graph-record.schema.json", state.graph_records),
@@ -297,6 +301,7 @@ def validate_topology(
         "repository": tuple(record.repository_id for record in state.repository_records),
         "artifact": tuple(record.artifact_id for record in state.artifact_records),
         "capability": tuple(record.capability_id for record in state.capability_records),
+        "semantic-claim": tuple(record.claim_id for record in state.semantic_claims),
         "edge": tuple(record.edge_id for record in state.edge_records),
         "flow": tuple(record.flow_id for record in state.flow_records),
         "graph": tuple(record.entity_id for record in state.graph_records),

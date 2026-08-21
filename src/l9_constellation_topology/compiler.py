@@ -33,7 +33,9 @@ from l9_constellation_topology.packets.topology_packet import (
     calculate_topology_semantic_hash,
 )
 from l9_constellation_topology.reconciliation import (
+    PREDICATE_POLICY_VERSION,
     RECONCILIATION_POLICY_VERSION,
+    predicate_policy_hash,
     reconciliation_policy_hash,
 )
 from l9_constellation_topology.run import artifact_hash, canonical_bytes, semantic_hash
@@ -46,10 +48,15 @@ from l9_constellation_topology.stages.classify_roles import run as classify_role
 from l9_constellation_topology.stages.derive_unknowns import run as derive_unknowns
 from l9_constellation_topology.stages.ingest_packets import adapt_packets
 from l9_constellation_topology.stages.normalize_models import run as normalize_models
+from l9_constellation_topology.stages.reconcile_assertions import run as reconcile_assertions
 from l9_constellation_topology.stages.reconcile_evidence import run as reconcile_evidence
 from l9_constellation_topology.stages.resolve_config import run as resolve_config
 from l9_constellation_topology.stages.validate_topology import run as validate_topology
 from l9_constellation_topology.topology.capability_builder import build_capabilities
+from l9_constellation_topology.topology.claim_projection import (
+    apply_projection,
+    project_claims,
+)
 from l9_constellation_topology.topology.flow_builder import build_flows
 
 COMPILER_NAME = "l9-constellation-topology"
@@ -115,6 +122,11 @@ def _policy_hashes(configuration: ResolvedConfiguration) -> dict[str, str]:
         "packet": semantic_hash(configuration.packet_profile),
         "output": semantic_hash(configuration.output_policy),
         "reconciliation": reconciliation_policy_hash(),
+        # The predicate registry decides whether two assertions on one subject
+        # aggregate, contradict, or stay unresolved, and which claims project
+        # into relations. That is compiled topology truth, so it belongs inside
+        # the topology semantic view alongside the other reconciliation rules.
+        "assertion_predicates": predicate_policy_hash(),
     }
 
 
@@ -144,6 +156,8 @@ def calculate_idempotency_key(
         "active_contract_versions": configuration.active_contract_versions,
         "reconciliation_policy_version": RECONCILIATION_POLICY_VERSION,
         "reconciliation_policy_hash": reconciliation_policy_hash(),
+        "predicate_policy_version": PREDICATE_POLICY_VERSION,
+        "predicate_policy_hash": predicate_policy_hash(),
         "adapter_mode": adapter_mode,
     }
     return semantic_hash(identity)
@@ -174,17 +188,28 @@ def compile_topology(
             for key, values in configuration.topology_profile.get("role_taxonomy", {}).items()
         },
     )
+    # Assertions reconcile against the already-reconciled evidence pool, which
+    # is where their own evidence records live after passing through the adapter.
+    claims, claim_conflicts, claim_unknowns, claim_diagnostics = reconcile_assertions(
+        normalized.assertions, evidence
+    )
+    projection = project_claims(claims)
+    claims = apply_projection(claims, projection)
+
     capabilities = build_capabilities(
         repositories,
         normalized.artifacts,
         normalized.capabilities,
     )
-    capabilities, capability_conflicts = aggregate_capabilities.run(capabilities)
+    capabilities, capability_conflicts = aggregate_capabilities.run(
+        capabilities + projection.capabilities
+    )
     graph_records, edge_records = build_graph(
         repositories,
         normalized.artifacts,
         capabilities,
-        normalized.relationships,
+        normalized.relationships + projection.edges,
+        projection.nodes,
     )
     flows = build_flows(edge_records)
     impacts = assess_impact(repositories, edge_records)
@@ -195,6 +220,7 @@ def compile_topology(
         repository_records=tuple(sorted(repositories, key=lambda item: item.repository_id)),
         artifact_records=tuple(sorted(normalized.artifacts, key=lambda item: item.artifact_id)),
         capability_records=tuple(sorted(capabilities, key=lambda item: item.capability_id)),
+        semantic_claims=tuple(sorted(claims, key=lambda item: item.claim_id)),
         edge_records=tuple(sorted(edge_records, key=lambda item: item.edge_id)),
         flow_records=tuple(sorted(flows, key=lambda item: item.flow_id)),
         graph_records=tuple(
@@ -204,16 +230,21 @@ def compile_topology(
         maturity=tuple(sorted(maturity, key=lambda item: item.subject_id)),
         impact_indexes=tuple(sorted(impacts, key=lambda item: item.subject_id)),
         evidence=tuple(sorted(evidence, key=lambda item: item.evidence_id)),
-        diagnostics=tuple(sorted(normalized.diagnostics, key=lambda item: item.diagnostic_id)),
+        diagnostics=tuple(
+            sorted(
+                normalized.diagnostics + claim_diagnostics,
+                key=lambda item: item.diagnostic_id,
+            )
+        ),
         unknowns=tuple(
             sorted(
-                repository_unknowns + evidence_unknowns + declared_unknowns,
+                repository_unknowns + evidence_unknowns + declared_unknowns + claim_unknowns,
                 key=lambda item: item.unknown_id,
             )
         ),
         conflicts=tuple(
             sorted(
-                evidence_conflicts + repository_conflicts + capability_conflicts,
+                evidence_conflicts + repository_conflicts + capability_conflicts + claim_conflicts,
                 key=lambda item: item.conflict_id,
             )
         ),

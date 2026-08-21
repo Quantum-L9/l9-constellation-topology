@@ -9,6 +9,7 @@ TOPOLOGY_PAYLOAD_FIELDS: tuple[str, ...] = (
     "repository_records",
     "artifact_records",
     "capability_records",
+    "semantic_claims",
     "edge_records",
     "flow_records",
     "graph_records",
