@@ -1,6 +1,6 @@
 # ADR-0020: Delegate publication planning to the ingestion bridge
 
-- **Status:** Accepted
+- **Status:** Superseded in part by [ADR-0021](0021-internalize-publication-planning-and-memory-lowering.md)
 - **Date:** 2026-07-21
 - **Decision owner:** Repository maintainers
 - **Scope:** `l9-constellation-topology`
@@ -37,7 +37,16 @@ Topology compilation and canonical graph promotion require different authority. 
 - Architecture checks reject graph-client imports.
 - End-to-end tests require the bridge to consume the Topology Packet without report files.
 
+## Supersession
+
+[ADR-0021](0021-internalize-publication-planning-and-memory-lowering.md) supersedes
+the repository-placement decision only. Publication planning, lowering, and
+effect planning now live inside `l9-constellation-topology`. Every prohibition
+recorded here remains in force: no Neo4j client, no Graphiti client, and no
+durable graph mutation in this repository.
+
 ## Related artifacts
 
 - `contracts/topology-packet.schema.json`
 - `docs/architecture.md`
+- [ADR-0021](0021-internalize-publication-planning-and-memory-lowering.md)

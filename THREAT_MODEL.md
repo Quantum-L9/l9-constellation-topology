@@ -19,7 +19,10 @@
 5. Compiler domain to OutputSink.
 6. Local bundle to immutable OCI packet store.
 7. Worker callback to the external Postgres control plane.
-8. Topology Packet to `l9-topology-ingestion-bridge`.
+8. Topology Packet to the internal publication planner.
+9. Publication plan to `l9-graphiti-memory`. This repository plans intents and
+   never dispatches them, so no durable memory or graph write crosses this edge
+   under its own authority.
 
 ## Primary threats and controls
 

@@ -122,7 +122,7 @@
       "path": ".github/workflows/l9-stage-worker.yml"
     },
     {
-      "git_object_id": "316c6bfb2652b5089e66ade5d0621c8c03f3b1b6",
+      "git_object_id": "5836099d4d7ba9cc1cb67222184295040dee2c27",
       "mode": "100644",
       "object_type": "blob",
       "path": ".gitignore"
@@ -152,10 +152,16 @@
       "path": ".l9/packet-profile.yaml"
     },
     {
-      "git_object_id": "f68a6b0b8c10b323f6d78ba494bb575fca80f48d",
+      "git_object_id": "afd37a0d814990198aef4787b3feaf99d431f10d",
       "mode": "100644",
       "object_type": "blob",
       "path": ".l9/pipeline.yaml"
+    },
+    {
+      "git_object_id": "7a873252ce6f94c6d4ece19df6438eb089d00e79",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": ".l9/publication-policy.yaml"
     },
     {
       "git_object_id": "a5975fe3db649549b394c34eb99600736781540c",
@@ -182,7 +188,7 @@
       "path": ".python-version"
     },
     {
-      "git_object_id": "90e15af40cc6585003dcb36bfd586f44b28d74ab",
+      "git_object_id": "49f9e0fcdcbfea78808373ba3c1e8451a86d143a",
       "mode": "100644",
       "object_type": "blob",
       "path": "ADR_INDEX.md"
@@ -200,13 +206,13 @@
       "path": "ALIGNMENT_AUDIT.md"
     },
     {
-      "git_object_id": "0c49264335860bd3a27f65ef91fe37e45ffe7a24",
+      "git_object_id": "658ea731d5bb52ee97e4127b4ded2207c9c84397",
       "mode": "100644",
       "object_type": "blob",
       "path": "ARCHITECTURE.md"
     },
     {
-      "git_object_id": "6f3c0d17c319e78129f777142466049e36f39a46",
+      "git_object_id": "40bff5b611e7072dc3373e023f91cc90f1b3c174",
       "mode": "100644",
       "object_type": "blob",
       "path": "BUILD_SPECIFICATION.md"
@@ -290,7 +296,7 @@
       "path": "MAINTAINERS.md"
     },
     {
-      "git_object_id": "3454289a810e26661692f0a5a3126812a3c1fef2",
+      "git_object_id": "836ecc5a8337c3cfbbc1341f655cf4b8db814fdb",
       "mode": "100644",
       "object_type": "blob",
       "path": "MANIFEST.md"
@@ -308,7 +314,7 @@
       "path": "NOTICE.md"
     },
     {
-      "git_object_id": "194f525a1bea0f6457fd560804cc0f9c393697f8",
+      "git_object_id": "dfb7862fc9fdc87fa189820c38d1f0f3b2bb1d4b",
       "mode": "100644",
       "object_type": "blob",
       "path": "README.md"
@@ -326,7 +332,7 @@
       "path": "RELEASING.md"
     },
     {
-      "git_object_id": "9a2c3f1daa1c8a0cabd73a73138f3cbe85f9671a",
+      "git_object_id": "dcf6f89a9d3633f3b55e83be5b7a855b059503d8",
       "mode": "100644",
       "object_type": "blob",
       "path": "ROADMAP.md"
@@ -344,7 +350,7 @@
       "path": "SECURITY.md"
     },
     {
-      "git_object_id": "5b0eb7f58defb920b2b497d62be9e8101a91177f",
+      "git_object_id": "d0d9b0af1807662450081b62f8beab09e9c10cb6",
       "mode": "100644",
       "object_type": "blob",
       "path": "SPECIFICATION.md"
@@ -362,19 +368,19 @@
       "path": "SUPPORT.md"
     },
     {
-      "git_object_id": "cc686680f53bc8a4998190dc17a2c7852b310e5b",
+      "git_object_id": "ab58f2ccbf57d40ebb10455faff7ef21eda075bc",
       "mode": "100644",
       "object_type": "blob",
       "path": "THREAT_MODEL.md"
     },
     {
-      "git_object_id": "15e6d0fbff1a0fb64c72204da77d5b2208f4a893",
+      "git_object_id": "231e3d6009d4d3f005d56229dc4067a94057489e",
       "mode": "100644",
       "object_type": "blob",
       "path": "TRACEABILITY_MAP.yaml"
     },
     {
-      "git_object_id": "5b7219374d68f8ae81b193a2f1e86d39c673b3a9",
+      "git_object_id": "5a94e30c1a4b1dc9315fd6fbc7674d476c654755",
       "mode": "100644",
       "object_type": "blob",
       "path": "UNKNOWN_REGISTER.md"
@@ -458,7 +464,7 @@
       "path": "contracts/report-manifest.schema.json"
     },
     {
-      "git_object_id": "381bbd41705f4fa9abf762a97a214f2b9d7ccece",
+      "git_object_id": "1baa5769a633bc311753148d4f0aed3a75b9d2d0",
       "mode": "100644",
       "object_type": "blob",
       "path": "contracts/repository-model-packet.schema.json"
@@ -620,10 +626,28 @@
       "path": "docs/adr/0019-use-idempotency-reuse-replay-and-reconciliation.md"
     },
     {
-      "git_object_id": "dc341529ca99a03e4b585e313e075abdab383336",
+      "git_object_id": "41c332efa0471840cb906cde679ec980e582322f",
       "mode": "100644",
       "object_type": "blob",
       "path": "docs/adr/0020-delegate-publication-planning-to-the-ingestion-bridge.md"
+    },
+    {
+      "git_object_id": "1bf00443ebc300c00f4999cfe5eb0617e1f9d6df",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "docs/adr/0021-internalize-publication-planning-and-memory-lowering.md"
+    },
+    {
+      "git_object_id": "e5f6e3d09ffb60438be50e8dd94845a3a2d54a80",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "docs/adr/0022-key-memory-effects-by-fact-not-snapshot.md"
+    },
+    {
+      "git_object_id": "0a8a7a7114bf7da0e95f2fccd075da9d75bcd367",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "docs/adr/0023-declare-field-cardinality-before-detecting-conflicts.md"
     },
     {
       "git_object_id": "ab95afae42865b27222966fb9d0a5d1a4c4fee1b",
@@ -632,7 +656,7 @@
       "path": "docs/adr/README.md"
     },
     {
-      "git_object_id": "1a31e9655c69934e5c4469d4d2e16fe55aec3f79",
+      "git_object_id": "408ac80bf26f8ecc20727c60b9fbe5ebf81cb778",
       "mode": "100644",
       "object_type": "blob",
       "path": "docs/architecture.md"
@@ -692,13 +716,13 @@
       "path": "docs/archive/v4/machine-summary.json"
     },
     {
-      "git_object_id": "f8e73aa9a72d8da57a30e276a75e8a5de1936260",
+      "git_object_id": "2c7a1a53cb74695b368466f0c157028f58df6850",
       "mode": "100644",
       "object_type": "blob",
       "path": "docs/deployment.md"
     },
     {
-      "git_object_id": "58e8d062ecbb74fe8a007f4601f82bd27631596d",
+      "git_object_id": "d20927b3dcc38aa29caa07f8c357843250570d8b",
       "mode": "100644",
       "object_type": "blob",
       "path": "docs/design/l9-constellation-topology-spec.md"
@@ -726,6 +750,12 @@
       "mode": "100644",
       "object_type": "blob",
       "path": "docs/packet-contracts.md"
+    },
+    {
+      "git_object_id": "f75d6fbcb8286d38378570710958b6c3fd735393",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "docs/publication-boundary.md"
     },
     {
       "git_object_id": "8fae7a1a8a61319ee06f47d198f6fe02888c1c80",
@@ -1028,7 +1058,7 @@
       "path": "evidence/live-qualify-2026-08-02/odoo-e2e-recipes/odoo-etc-e2e/odoo.conf"
     },
     {
-      "git_object_id": "d1c1dac56e40a9554ce48edeea08a128fe66634f",
+      "git_object_id": "b6f3e69c65a0cb46b538f9d6b2cf72ae2bc20ed3",
       "mode": "100644",
       "object_type": "blob",
       "path": "evidence/live-qualify-2026-08-02/run_gate_qualify.py"
@@ -1136,6 +1166,12 @@
       "path": "schemas/risk_register.schema.json"
     },
     {
+      "git_object_id": "7f031b405141171ef8adbc2134594b5ccdd7d52b",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "schemas/topology-publication-plan.schema.json"
+    },
+    {
       "git_object_id": "e234b8eb8cc54a2b38c504ff0e463675aeb120e7",
       "mode": "100644",
       "object_type": "blob",
@@ -1166,7 +1202,7 @@
       "path": "scripts/generate_fixture_packets.py"
     },
     {
-      "git_object_id": "9e6905853c6407b109134783476a90799802f640",
+      "git_object_id": "d79780e6058a7825c728ac62c0339061ba776e5a",
       "mode": "100644",
       "object_type": "blob",
       "path": "scripts/generate_schemas.py"
@@ -1208,7 +1244,7 @@
       "path": "scripts/validate_nuclear_execution.py"
     },
     {
-      "git_object_id": "841fa67ed9297e4691b427a66202340b6d192bea",
+      "git_object_id": "baf147c85d31be59e02e63c63fe1c894c1a1aeff",
       "mode": "100755",
       "object_type": "blob",
       "path": "scripts/validate_release_readiness.py"
@@ -1220,7 +1256,7 @@
       "path": "scripts/validate_workflows.py"
     },
     {
-      "git_object_id": "c24d247e957a51bbba4763a1c03b05e218bda072",
+      "git_object_id": "915d300d182b0e4b8218468d2bcdff435b99c65e",
       "mode": "100755",
       "object_type": "blob",
       "path": "scripts/verify_determinism.py"
@@ -1232,7 +1268,13 @@
       "path": "src/l9_constellation_topology/__init__.py"
     },
     {
-      "git_object_id": "08875ac75a696f1e4fddfd563fb7e690c930e8dc",
+      "git_object_id": "f3cc6262197cbef4bd41575c7587c8af5c52be57",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "src/l9_constellation_topology/cardinality.py"
+    },
+    {
+      "git_object_id": "8ce7fce3d7e08ad7b14365230e733b222882ef4d",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/cli.py"
@@ -1256,13 +1298,13 @@
       "path": "src/l9_constellation_topology/compatibility/v4_models.py"
     },
     {
-      "git_object_id": "60ec58f6d5cab56eaf38e2e33dd9f83f7c4e88f1",
+      "git_object_id": "381ac7897ab1f99b73009ae2ed3a937f40b1baeb",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/compiler.py"
     },
     {
-      "git_object_id": "2889ce22eb71c1b2169dc0174acd1cc6d473536f",
+      "git_object_id": "f4b220995bc4136680f928c06b1f206c5389cbac",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/config.py"
@@ -1376,7 +1418,7 @@
       "path": "src/l9_constellation_topology/io/packet_bundle_output_sink.py"
     },
     {
-      "git_object_id": "af9826f060331f835baa2d790ee36925098913cc",
+      "git_object_id": "dc4a4db2e58543162505b6d159caf81e31f84075",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/io/rendered_artifact.py"
@@ -1418,7 +1460,7 @@
       "path": "src/l9_constellation_topology/packets/adapters/__init__.py"
     },
     {
-      "git_object_id": "c48735b89f0c5e58373fd000d96e3dd060a5b4d4",
+      "git_object_id": "edbb7cfb6ed11c4ce988fa229c39b72aac3e08b7",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/packets/adapters/repository_model_v1.py"
@@ -1472,7 +1514,7 @@
       "path": "src/l9_constellation_topology/packets/repository_bundle.py"
     },
     {
-      "git_object_id": "78bf67eef471f041a87a52c192c45455dae0b5be",
+      "git_object_id": "0a0590e39ed52b13f57c0832791c33a11d1de765",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/packets/repository_model.py"
@@ -1502,10 +1544,58 @@
       "path": "src/l9_constellation_topology/packets/validation_receipt.py"
     },
     {
-      "git_object_id": "1646e7287d824ab1916ad2917e3d55e79fa0a719",
+      "git_object_id": "a5a9efe6c01b1a61faedaf5088d1235d3a8883e9",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/packets/validator.py"
+    },
+    {
+      "git_object_id": "cca75f9845d03dbb6a2392b1af9e5bc79e8b0b0f",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "src/l9_constellation_topology/publication/__init__.py"
+    },
+    {
+      "git_object_id": "05cd4d9594c8d9dcaa2aa6c841bf836cdcd72001",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "src/l9_constellation_topology/publication/bundle.py"
+    },
+    {
+      "git_object_id": "f7c48e2b7533f0049df02d530e9be9fdb9b24a02",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "src/l9_constellation_topology/publication/contracts.py"
+    },
+    {
+      "git_object_id": "5c56413fb4181d0ebddc37d823c9328867371389",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "src/l9_constellation_topology/publication/eligibility.py"
+    },
+    {
+      "git_object_id": "1476b882a134fb057b9240fe9ec5e078d7299c23",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "src/l9_constellation_topology/publication/identity.py"
+    },
+    {
+      "git_object_id": "c29246fa863dd82a400f22e13e07c89a6cc3e379",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "src/l9_constellation_topology/publication/lowering.py"
+    },
+    {
+      "git_object_id": "8210cf52eb6ed9f437509899946d8fca7e7c3528",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "src/l9_constellation_topology/publication/plan.py"
+    },
+    {
+      "git_object_id": "53b30fe2fe67bbd1e7bda8698e1aa61ff326781f",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "src/l9_constellation_topology/publication/policy.py"
     },
     {
       "git_object_id": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
@@ -1724,7 +1814,13 @@
       "path": "src/l9_constellation_topology/stages/classify_roles.py"
     },
     {
-      "git_object_id": "c1bd3a3412611ec9a8916b16bbb7a10791bc079d",
+      "git_object_id": "8f80e85f4c9dd40d15006b1735b397158db4b4eb",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "src/l9_constellation_topology/stages/derive_unknowns.py"
+    },
+    {
+      "git_object_id": "bd952f0aaadc980ac68ebcf25b6e45f0d2c4b22b",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/stages/ingest_packets.py"
@@ -1742,7 +1838,7 @@
       "path": "src/l9_constellation_topology/stages/observe_fallbacks.py"
     },
     {
-      "git_object_id": "0cd381eb36294ae8c8774e77115472d73b13370e",
+      "git_object_id": "18112271d1b02aa171a755098df88ca683628978",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/stages/reconcile_evidence.py"
@@ -1910,6 +2006,12 @@
       "path": "tests/__init__.py"
     },
     {
+      "git_object_id": "736cc95ddf42253b5bf9597d9fc33589c46fbd3e",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/fixtures/downstream_contracts/l9-graphiti-memory-contract.json"
+    },
+    {
       "git_object_id": "01e847aa7fb39c911b4c36875ab12044cc536357",
       "mode": "100644",
       "object_type": "blob",
@@ -1994,37 +2096,37 @@
       "path": "tests/fixtures/legacy_v4_outputs/topology_report.md"
     },
     {
-      "git_object_id": "abdce05d8a157db7dc128dc2f96fe68c6f8b75e6",
+      "git_object_id": "f810aba75b96a64fb2968d753c3638bfd4040ae2",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/repository_model_packets/l9-gate-sdk/manifest.json"
     },
     {
-      "git_object_id": "157be954498424965d5a273b6033addc1ee2774c",
+      "git_object_id": "a5e29bc305bd0b5884cad99ec1f04bd9b00a149b",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/repository_model_packets/l9-gate-sdk/packet.json"
     },
     {
-      "git_object_id": "f47a902822a8724ffb16d7b7736d815522d38082",
+      "git_object_id": "e1a22807eb35336da8571b20582050c9f7b06ad0",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/repository_model_packets/l9-gate-sdk/receipts/validation-receipt.json"
     },
     {
-      "git_object_id": "5b0e5de670ac525f5995c5cd296d2cb9a035ec0b",
+      "git_object_id": "91ed25cb47d63206a054cec522fd2d137b31cabf",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/repository_model_packets/l9-mcp-server/manifest.json"
     },
     {
-      "git_object_id": "09b7073ebb8a7a1581c3d413d4f9cfe8e29e3407",
+      "git_object_id": "0b7512450e13b5548833d277dd084e12de26a997",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/repository_model_packets/l9-mcp-server/packet.json"
     },
     {
-      "git_object_id": "746944c29b3a5bb62d239a0e31292cfc02c9f7a2",
+      "git_object_id": "f120ae0302cb17ec3a2254ae04026b156ba39384",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/repository_model_packets/l9-mcp-server/receipts/validation-receipt.json"
@@ -2090,25 +2192,25 @@
       "path": "tests/fixtures/sample_constellation/l9-mcp-server/src/l9_mcp_server/__init__.py"
     },
     {
-      "git_object_id": "323e38bae912b27b218b9cf3a835c5576cc00325",
+      "git_object_id": "60f8d16823e1a62f6506b535786fc9425061e788",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/topology_packets/foundational-two-repo/manifest.json"
     },
     {
-      "git_object_id": "7241dfc5ff2ff85d995606aafc74a52e830ea418",
+      "git_object_id": "3927ee5feca9c775c2826af8c085ec00202b83e5",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/topology_packets/foundational-two-repo/packet.json"
     },
     {
-      "git_object_id": "754a8f5cd7421918335d320c841a374e09d563e4",
+      "git_object_id": "41e71c7bb4bbd6881279869bc6f1fd786ed394a5",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/topology_packets/foundational-two-repo/payload/artifact-records.json"
     },
     {
-      "git_object_id": "818685abff2fde87fe843e01a2c3af019b00bbaf",
+      "git_object_id": "5a26406314aa83175ec5de3782edd35248942e89",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/topology_packets/foundational-two-repo/payload/capability-records.json"
@@ -2126,25 +2228,25 @@
       "path": "tests/fixtures/topology_packets/foundational-two-repo/payload/diagnostics.json"
     },
     {
-      "git_object_id": "c1ebaea30a187cf821657c3982a8566d40f8a6ae",
+      "git_object_id": "9c80004a5b396e5a9e6d902f8025df5478e9d937",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/topology_packets/foundational-two-repo/payload/edge-records.json"
     },
     {
-      "git_object_id": "f6f66edc6f15f048e102cb684e0f02663d60f0ee",
+      "git_object_id": "997394aae3fb18b2c8f68834099ac8c983d1bece",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/topology_packets/foundational-two-repo/payload/evidence.json"
     },
     {
-      "git_object_id": "28f7cb5356c2c1bfd171055646c57353ec194239",
+      "git_object_id": "cb3ad6ee662d4a3d49a3422a3ef30da208d299b1",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/topology_packets/foundational-two-repo/payload/flow-records.json"
     },
     {
-      "git_object_id": "68d0cf9f175883bd0e83de0ff8a283a5009ada6a",
+      "git_object_id": "7c566569f3e0f23e9542041a66466353dfbee3f4",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/topology_packets/foundational-two-repo/payload/graph-records.json"
@@ -2156,31 +2258,31 @@
       "path": "tests/fixtures/topology_packets/foundational-two-repo/payload/impact-indexes.json"
     },
     {
-      "git_object_id": "4be20e616a6ff822f958f81ed756cbbfa1544dad",
+      "git_object_id": "8e7ce0e563df55db560bd4e77765255aceaa7bda",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/topology_packets/foundational-two-repo/payload/maturity.json"
     },
     {
-      "git_object_id": "3dd60112228a1ebf1a7a228a7f867caf8af98f3d",
+      "git_object_id": "cfd7b81a25442c8f31eb39404fb402ac7504f6e9",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/topology_packets/foundational-two-repo/payload/repository-records.json"
     },
     {
-      "git_object_id": "c19d1b6c2e6b1c4a8f9459c8b519b31c6e2131af",
+      "git_object_id": "1db18d073536f973be88bbb62c740a002e60dbb8",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/topology_packets/foundational-two-repo/payload/risks.json"
     },
     {
-      "git_object_id": "749c90385480c0594022c4a0baa9de45530cc2c4",
+      "git_object_id": "418dbbd2ec46e5aa06c812de6cb9d671542d1273",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/topology_packets/foundational-two-repo/payload/unknowns.json"
     },
     {
-      "git_object_id": "279a7f6d1753d0107f3d5250aaba074098ff8422",
+      "git_object_id": "5bbeced9574fd0235037ef202055dddf3f33b210",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/topology_packets/foundational-two-repo/receipts/validation-receipt.json"
@@ -2234,6 +2336,12 @@
       "path": "tests/test_execution_authority_v5.py"
     },
     {
+      "git_object_id": "b035a2f0b4de9596a923244edf479338c6a44c51",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/test_field_cardinality.py"
+    },
+    {
       "git_object_id": "b12f780a89e97749b99424f13d3cea41df15de5c",
       "mode": "100644",
       "object_type": "blob",
@@ -2270,7 +2378,7 @@
       "path": "tests/test_output_sink_v5.py"
     },
     {
-      "git_object_id": "a3a72b70a98a873611022996fed1e4dc2268b7b7",
+      "git_object_id": "14ad39a7f064716d8d4f1acff367c2053a34562a",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_packet_ingress_v5.py"
@@ -2286,6 +2394,24 @@
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_packet_store_v5.py"
+    },
+    {
+      "git_object_id": "11c2e7a59e0636c0ed7c14519f4481e8606800f5",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/test_publication_downstream_conformance.py"
+    },
+    {
+      "git_object_id": "b71fa39a49ff6e31ef9c287fa267310a78ba2934",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/test_publication_effect_identity.py"
+    },
+    {
+      "git_object_id": "d31aaa2f262c869e62e2aff0f04fc011247f2f16",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/test_publication_planning.py"
     },
     {
       "git_object_id": "5cda29f8d6d354b4ade98744355d16ccc981e82c",
@@ -2318,10 +2444,16 @@
       "path": "tests/test_repository_aggregation_v5.py"
     },
     {
-      "git_object_id": "4755d97e385c5b7f67b1d6a19e5a8ef043b08e55",
+      "git_object_id": "581535ae9feafc59b5b504c05c7c25effbe32775",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_repository_governance.py"
+    },
+    {
+      "git_object_id": "03aa051bef0b65c4a29d9584f01a157651d57b05",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/test_repository_model_assertions.py"
     },
     {
       "git_object_id": "4062520dca6edc47bfbee8e3a9d782cbb45a398e",
@@ -2330,7 +2462,7 @@
       "path": "tests/test_runtime_boundaries_v5.py"
     },
     {
-      "git_object_id": "219c912507b909f5729e8a37479e1638d7272243",
+      "git_object_id": "54a5b3516386b972b64e2b8574b55be5e679737e",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_topology_compiler_v5.py"
@@ -2346,6 +2478,12 @@
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_transport_signature_v5.py"
+    },
+    {
+      "git_object_id": "8d4eda05a80a4a2ea837c617785a7299713065ab",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/test_unknown_derivation.py"
     },
     {
       "git_object_id": "fce7288fced715e55adfe61829cc0bf582b6da36",
@@ -2390,8 +2528,8 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:4f035cf7fa3e4654f2d1a046ebea04054f4df71634e18644f6b7b6d1229e1042",
-  "entry_count": 398,
+  "entries_sha256": "sha256:40b5c28e2b680f3be321e820cab853fc08575421c38127090ed6772591c2f915",
+  "entry_count": 421,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
   ],

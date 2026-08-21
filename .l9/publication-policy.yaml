@@ -1,0 +1,87 @@
+id: foundational-topology-publication
+version: 1.0.0
+
+# Namespace root for every lowered memory intent. Deterministic and independent
+# of the checkout location: a namespace is never derived from a filesystem path.
+namespace_root: l9.constellation
+
+# Topology entity kinds eligible for lowering into durable-memory observations.
+# Artifact entities are deliberately excluded: file-level inventory is already
+# carried by the Topology Packet payload and would publish per-file noise.
+eligible_entity_kinds: [repository, capability]
+
+# Edge taxonomy members eligible for lowering into structured memory assertions.
+# CONTAINS is excluded because repository-to-artifact containment restates the
+# artifact inventory rather than a constellation-level relational fact.
+eligible_edge_types:
+  - DEPENDS_ON
+  - IMPLEMENTS
+  - EXPOSES
+  - VALIDATED_BY
+  - GOVERNED_BY
+  - OWNED_BY
+  - DOCUMENTED_BY
+  - PRODUCES
+  - CONSUMES
+  - DERIVED_FROM
+  - SUPERSEDES
+  - ROUTES_TO
+  - PUBLISHES_TO
+  - MEMBER_OF
+
+# Downstream memory classes. Both values are existing l9-graphiti-memory
+# MemoryClass members; this repository never invents a downstream enum.
+entity_memory_class: observation
+relationship_memory_class: semantic
+
+# Deterministic topology-confidence to memory-confidence mapping. Scores are
+# ceilings, never upgrades: a lowered fact can lose confidence but never gain it.
+confidence_score_by_level:
+  low: 0.3
+  medium: 0.6
+  high: 0.9
+
+# Applied when the source assessment records a conflict on the subject.
+confidence_conflict_ceiling:
+  none: 1.0
+  possible: 0.5
+  confirmed: 0.3
+
+# Topology derivation method to downstream ConfidenceMethod. `unknown` maps to
+# the most conservative supported method rather than to an optimistic one.
+confidence_method_by_derivation:
+  declared: extracted
+  deterministic: aggregated
+  cross-record: aggregated
+  heuristic: inferred
+  model-assisted: inferred
+  unknown: inferred
+
+# Topology evidence authority to downstream Provenance.source_trust.
+source_trust_by_authority:
+  source: 1.0
+  validated-machine: 0.9
+  derived: 0.7
+  candidate: 0.5
+  unknown: 0.3
+
+# Topology evidence class to downstream EvidenceKind.
+evidence_kind_by_class:
+  observed: observation
+  declared: explicit
+  derived: inference
+  assisted: inference
+  projected: inference
+  validated: test
+  committed: explicit
+
+# Fail-closed switches. Disabling any of these is an architecture decision.
+require_validated_topology: true
+require_resolved_lineage: true
+hold_on_material_conflict: true
+hold_on_material_unknown: true
+hold_on_missing_required_evidence: true
+
+# Upper bound on lowered evidence references per candidate. Truncation is
+# recorded on the lowering receipt and in plan diagnostics; it is never silent.
+maximum_evidence_refs_per_candidate: 32

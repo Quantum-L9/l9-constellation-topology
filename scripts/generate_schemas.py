@@ -39,6 +39,7 @@ from l9_constellation_topology.packets import (
     ValidationReceipt,
     ValidationRequestPayload,
 )
+from l9_constellation_topology.publication import PublicationPlan
 from l9_constellation_topology.run import EvidenceRecord
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -154,6 +155,14 @@ def build_schema_artifacts() -> tuple[GeneratedArtifact, ...]:
         "maturity-assessment.schema.json": (
             MaturityAssessment,
             "https://quantum-l9.dev/schemas/maturity-assessment.schema.json",
+        ),
+        # The publication plan is a derived artifact, not canonical packet truth,
+        # so it lives beside the record schemas. Adding it to contracts/ would
+        # change schema_contract_hash and therefore every Topology Packet's
+        # semantic identity, which the canonicality invariant forbids.
+        "topology-publication-plan.schema.json": (
+            PublicationPlan,
+            "https://quantum-l9.dev/schemas/topology-publication-plan.schema.json",
         ),
     }
     return tuple(

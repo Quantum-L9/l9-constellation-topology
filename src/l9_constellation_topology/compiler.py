@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 
 from l9_constellation_topology.config import ResolvedConfiguration
@@ -32,13 +32,14 @@ from l9_constellation_topology.packets.topology_packet import (
     MaterializedTopology,
     calculate_topology_semantic_hash,
 )
-from l9_constellation_topology.run import artifact_hash, canonical_bytes, semantic_hash, utc_now
+from l9_constellation_topology.run import artifact_hash, canonical_bytes, semantic_hash
 from l9_constellation_topology.stages import aggregate_capabilities, aggregate_repositories
 from l9_constellation_topology.stages.assess_impact import run as assess_impact
 from l9_constellation_topology.stages.assess_maturity import run as assess_maturity
 from l9_constellation_topology.stages.assess_risk import run as assess_risk
 from l9_constellation_topology.stages.build_graph import run as build_graph
 from l9_constellation_topology.stages.classify_roles import run as classify_roles
+from l9_constellation_topology.stages.derive_unknowns import run as derive_unknowns
 from l9_constellation_topology.stages.ingest_packets import adapt_packets
 from l9_constellation_topology.stages.normalize_models import run as normalize_models
 from l9_constellation_topology.stages.reconcile_evidence import run as reconcile_evidence
@@ -49,6 +50,20 @@ from l9_constellation_topology.topology.flow_builder import build_flows
 
 COMPILER_NAME = "l9-constellation-topology"
 COMPILER_VERSION = "2.0.0"
+
+#: The ``created_at`` stamped into a canonical compile.
+#:
+#: Canonical compilation must be byte-reproducible: the same semantic inputs
+#: must produce the same emitted bytes and therefore the same ``artifact_hash``.
+#: Reading the wall clock here would break that for a value that carries no
+#: semantic meaning, so canonical compiles stamp a fixed, obviously synthetic
+#: instant instead. Real execution time belongs in operational and validation
+#: receipts, which record it in their own right.
+#:
+#: A caller may still inject a deliberate ``created_at``. That changes the
+#: emitted packet bytes and so must change ``artifact_hash``, while leaving
+#: ``semantic_hash`` untouched — ``created_at`` is outside the semantic view.
+CANONICAL_CREATED_AT = datetime(1970, 1, 1, tzinfo=UTC)
 
 
 @dataclass(frozen=True)
@@ -134,7 +149,8 @@ def compile_topology(
     packets = tuple(bundle.packet for bundle in bundles)
     normalized = normalize_models(adapt_packets(packets))
 
-    evidence, evidence_conflicts = reconcile_evidence(normalized.evidence)
+    evidence, evidence_conflicts, evidence_unknowns = reconcile_evidence(normalized.evidence)
+    declared_unknowns = derive_unknowns(normalized.diagnostics)
     repositories, repository_conflicts, repository_unknowns = aggregate_repositories.run(
         normalized.repositories
     )
@@ -176,7 +192,12 @@ def compile_topology(
         impact_indexes=tuple(sorted(impacts, key=lambda item: item.subject_id)),
         evidence=tuple(sorted(evidence, key=lambda item: item.evidence_id)),
         diagnostics=tuple(sorted(normalized.diagnostics, key=lambda item: item.diagnostic_id)),
-        unknowns=tuple(sorted(repository_unknowns, key=lambda item: item.unknown_id)),
+        unknowns=tuple(
+            sorted(
+                repository_unknowns + evidence_unknowns + declared_unknowns,
+                key=lambda item: item.unknown_id,
+            )
+        ),
         conflicts=tuple(
             sorted(
                 evidence_conflicts + repository_conflicts + capability_conflicts,
@@ -188,7 +209,7 @@ def compile_topology(
     input_refs = tuple(
         sorted((_packet_ref(bundle) for bundle in bundles), key=lambda ref: ref.packet_id)
     )
-    timestamp = created_at or utc_now()
+    timestamp = created_at if created_at is not None else CANONICAL_CREATED_AT
     candidate = TopologyPacket(
         packet_id="packet:pending",
         producer=Producer(name=COMPILER_NAME, version=COMPILER_VERSION),

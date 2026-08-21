@@ -75,7 +75,7 @@ Production activation requires all of the following:
 - GHCR package permissions are restricted to required repositories;
 - callback policy is enabled only after exact expected hosts, port, and segment-bound path are committed; endpoints require HTTPS and dedicated authentication;
 - a real `l9-meta-injector` packet passes through the compiler;
-- `l9-topology-ingestion-bridge` consumes the resulting packet without report-file dependencies;
+- `plan-publication` produces a schema-valid publication plan from the resulting packet without report-file dependencies, and its eligible intents validate against the bound `l9-graphiti-memory` contract;
 - retry, dropped-callback reconciliation, dead-letter, and manual replay drills are executed.
 
 Local tests prove the worker contract and file-store vertical slice. They do not substitute for the external control-plane and GHCR drills.

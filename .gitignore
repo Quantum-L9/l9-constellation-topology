@@ -18,3 +18,8 @@ outputs/*
 !outputs/.gitkeep
 *.tmp
 .DS_Store
+
+# Agent runtime state written by the governance L4 / PR flow. Session-local:
+# phase and release receipts, PR remediation handoff. Never part of delivery.
+.l9/autonomy/
+.l9/pr/

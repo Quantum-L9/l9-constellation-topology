@@ -1,9 +1,8 @@
 # Architecture Decision Record Index
 
-The following 20 ADRs define the highest-priority architectural decisions for the
-initial repository baseline. Accepted ADRs are immutable except for clerical fixes
-and links. A changed decision requires a new ADR that explicitly supersedes the old
-record.
+The following 21 ADRs define the highest-priority architectural decisions for this
+repository. Accepted ADRs are immutable except for clerical fixes and links. A
+changed decision requires a new ADR that explicitly supersedes the old record.
 
 | ID | Decision | Status |
 |---|---|---|
@@ -26,7 +25,10 @@ record.
 | ADR-0017 | [Require signed exact-revision worker execution](docs/adr/0017-require-signed-exact-revision-worker-execution.md) | Accepted |
 | ADR-0018 | [Use immutable OCI packet storage and an external registry](docs/adr/0018-use-immutable-oci-packet-storage-and-an-external-registry.md) | Accepted |
 | ADR-0019 | [Use idempotency, reuse, replay, and reconciliation](docs/adr/0019-use-idempotency-reuse-replay-and-reconciliation.md) | Accepted |
-| ADR-0020 | [Delegate publication planning to the ingestion bridge](docs/adr/0020-delegate-publication-planning-to-the-ingestion-bridge.md) | Accepted |
+| ADR-0020 | [Delegate publication planning to the ingestion bridge](docs/adr/0020-delegate-publication-planning-to-the-ingestion-bridge.md) | Superseded in part by ADR-0021 |
+| ADR-0021 | [Internalize publication planning and memory lowering](docs/adr/0021-internalize-publication-planning-and-memory-lowering.md) | Accepted |
+| ADR-0022 | [Key memory effects by the fact, not the snapshot](docs/adr/0022-key-memory-effects-by-fact-not-snapshot.md) | Accepted |
+| ADR-0023 | [Declare field cardinality before detecting conflicts](docs/adr/0023-declare-field-cardinality-before-detecting-conflicts.md) | Accepted |
 
 ## Decision order
 
