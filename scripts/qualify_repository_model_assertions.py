@@ -157,7 +157,13 @@ def build_report(bundles: dict[str, Path]) -> dict[str, Any]:
     }
 
 
-def main(argv: Sequence[str] | None = None) -> int:
+def main(argv: Sequence[str] | None = None) -> None:
+    """Write or print the qualification report.
+
+    No exit code is returned: this command either completes or raises. Bad
+    arguments exit through ``parser.error``, and an unreadable or invalid
+    bundle raises out of the compiler rather than being reported as a status.
+    """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--bundle",
@@ -181,7 +187,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     report = json.dumps(build_report(bundles), indent=2, sort_keys=True) + "\n"
     if args.out is None:
         print(report, end="")
-        return 0
+        return
     # The destination comes from the command line, so it is resolved and confined
     # to this repository before anything is written. A qualification report has no
     # business landing outside the tree it reports on.
@@ -191,8 +197,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     destination.parent.mkdir(parents=True, exist_ok=True)
     destination.write_text(report, encoding="utf-8")
     print(f"wrote {destination.relative_to(ROOT)}")
-    return 0
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    main()

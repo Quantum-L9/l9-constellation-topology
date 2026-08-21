@@ -387,7 +387,6 @@ def _build(
     index: TopologyIndex,
     candidate_kind: CandidateKind,
     entity_ids: tuple[str, ...],
-    subject_id: str,
     content: str,
     assertion: MemoryAssertion | None,
     assessment: ConfidenceAssessment,
@@ -397,6 +396,13 @@ def _build(
     published_at: datetime,
     provenance: AssertionProvenance = NO_ASSERTION_PROVENANCE,
 ) -> LoweredCandidate:
+    # The subject is the first entity the fact was lowered from, in every kind:
+    # a repository, a capability, a relationship's source, a claim's subject.
+    # It used to be a second parameter that callers had to keep in agreement with
+    # this one, which nothing enforced.
+    if not entity_ids:
+        raise LoweringError("a lowered fact must name at least one topology entity")
+    subject_id = entity_ids[0]
     owning_repository_id = index.owning_repository_by_entity.get(subject_id)
     namespace = _namespace(policy, owning_repository_id)
     memory_class = {
@@ -532,7 +538,6 @@ def lower_repository(
         index=index,
         candidate_kind="entity",
         entity_ids=(record.repository_id,),
-        subject_id=record.repository_id,
         content=content,
         assertion=None,
         assessment=record.confidence,
@@ -570,7 +575,6 @@ def lower_capability(
         index=index,
         candidate_kind="entity",
         entity_ids=(record.capability_id,),
-        subject_id=record.capability_id,
         content=content,
         assertion=None,
         assessment=record.confidence,
@@ -614,7 +618,6 @@ def lower_relationship(
         index=index,
         candidate_kind="relationship",
         entity_ids=(record.source_id, record.target_id),
-        subject_id=record.source_id,
         content=content,
         assertion=assertion,
         assessment=record.confidence,
@@ -662,7 +665,6 @@ def lower_semantic_claim(
         # resolve. A claim's object is frequently an external name, and naming it
         # as a topology entity would assert a membership that was never observed.
         entity_ids=(record.subject_id,),
-        subject_id=record.subject_id,
         content=content,
         assertion=assertion,
         assessment=record.confidence,
