@@ -270,7 +270,8 @@ def test_claims_lower_to_structured_memory_assertions(state) -> None:
     triples = set()
     for candidate in claim_candidates:
         assertion = candidate.memory_intent.request.assertion
-        assert assertion is not None and assertion.is_structured
+        assert assertion is not None
+        assert assertion.is_structured
         triples.add((assertion.subject, assertion.predicate, assertion.object))
         metadata = candidate.memory_intent.request.metadata
         assert metadata["publication_candidate_id"] == candidate.candidate_id

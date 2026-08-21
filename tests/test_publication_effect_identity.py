@@ -67,6 +67,19 @@ def _identity(**overrides):
     return candidate_identity(**base)
 
 
+def _restated_identity():
+    """The same fact as ``_identity()``, assembled from separately built values."""
+    return candidate_identity(
+        source_topology_entity_ids=tuple(["repo:" + "golden"]),
+        assertion={"object": "fastapi", "predicate": "framework", "subject": "repo:golden"},
+        content=" ".join(["repo:golden", "is", "a", "FastAPI", "service"]),
+        memory_class="semantic",
+        namespace="/".join(("l9-topology", "repository")),
+        candidate_kind="repository",
+        operation=MEMORY_INGEST_OPERATION,
+    )
+
+
 def _key(identity) -> str:
     return idempotency_key(identity, lowering_contract_version=LOWERING_CONTRACT_VERSION)
 
@@ -271,7 +284,43 @@ def _effect_key(
 
 
 def test_identical_epistemic_state_is_the_same_write() -> None:
-    assert _effect_key(local_evidence=(_evidence(),)) == _effect_key(local_evidence=(_evidence(),))
+    """Two independently described writes over one epistemic state are one write.
+
+    The two descriptions are assembled from separately allocated values in
+    different argument order, so this exercises canonicalization rather than
+    re-evaluating one expression twice.
+    """
+    first = _effect_key(
+        local_evidence=(
+            evidence_semantics(
+                evidence_kind="explicit",
+                source_content_digest="a" * 64,
+                stable_source_locator="pyproject.toml",
+            ),
+        ),
+        confidence=confidence_semantics(
+            score=0.9,
+            method="extracted",
+            evidence_count=1,
+            confidence_policy_version="l9-topology-publication/1.0.0",
+        ),
+    )
+    second = _effect_key(
+        confidence=confidence_semantics(
+            confidence_policy_version="l9-topology-publication/" + "1.0.0",
+            evidence_count=1,
+            method="extracted",
+            score=float("0.9"),
+        ),
+        local_evidence=(
+            evidence_semantics(
+                stable_source_locator="/".join(("pyproject.toml",)),
+                source_content_digest="a" * 32 + "a" * 32,
+                evidence_kind="explicit",
+            ),
+        ),
+    )
+    assert first == second
 
 
 def test_evidence_order_does_not_change_the_write() -> None:
@@ -296,8 +345,9 @@ def test_evidence_order_does_not_change_the_write() -> None:
 def test_a_change_of_supporting_evidence_is_a_different_write(local_evidence) -> None:
     baseline = _effect_key(local_evidence=(_evidence(),))
     assert _effect_key(local_evidence=local_evidence) != baseline
-    # ...and the logical fact is untouched throughout.
-    assert candidate_id(_identity()) == candidate_id(_identity())
+    # ...and the logical fact is untouched throughout: an identity assembled
+    # from separately built values still names the same candidate.
+    assert candidate_id(_identity()) == candidate_id(_restated_identity())
 
 
 @pytest.mark.parametrize(
@@ -336,9 +386,10 @@ def test_the_fact_identity_ignores_evidence_and_confidence_entirely() -> None:
 
     # The two writes disagree about how well the fact is known...
     assert strong != weak
-    # ...and the fact identity, computed from the same description, is unmoved by
-    # either, because neither is an argument to it.
-    assert candidate_id(identity) == candidate_id(_identity())
+    # ...and the fact identity is unmoved by either, because neither is an
+    # argument to it. The comparison is against a separately assembled
+    # description of the same fact, not a re-evaluation of the same expression.
+    assert candidate_id(identity) == candidate_id(_restated_identity())
 
 
 def test_compiled_plans_separate_fact_identity_from_write_identity(

@@ -181,9 +181,16 @@ def main(argv: Sequence[str] | None = None) -> int:
     report = json.dumps(build_report(bundles), indent=2, sort_keys=True) + "\n"
     if args.out is None:
         print(report, end="")
-    else:
-        args.out.write_text(report, encoding="utf-8")
-        print(f"wrote {args.out}")
+        return 0
+    # The destination comes from the command line, so it is resolved and confined
+    # to this repository before anything is written. A qualification report has no
+    # business landing outside the tree it reports on.
+    destination = args.out.resolve()
+    if not destination.is_relative_to(ROOT):
+        parser.error(f"--out must stay inside {ROOT}; got {destination}")
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.write_text(report, encoding="utf-8")
+    print(f"wrote {destination.relative_to(ROOT)}")
     return 0
 
 

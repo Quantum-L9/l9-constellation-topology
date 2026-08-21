@@ -74,6 +74,15 @@ SAME = "same"
 CHANGED = "changed"
 ABSENT = "absent"
 
+#: Sample roles, named once so a case cannot silently claim the wrong one.
+AFFECTED_REPOSITORY = "affected repository entity"
+AFFECTED_RELATIONSHIP = "affected relationship"
+UNAFFECTED_RELATIONSHIP = "unaffected relationship"
+
+#: The verdict shared by every case where the fact holds and the write moves.
+FACT_HOLDS_WRITE_MOVES = "candidate identity holds; the effect key moves"
+BOTH_IDENTITIES_MOVE = "the affected candidate and effect key both move"
+
 
 def _recompile(packet: TopologyPacket, state: TopologyState) -> MaterializedTopology:
     """Re-derive snapshot identity from a perturbed state.
@@ -322,7 +331,7 @@ def _drop_repository_evidence(state: TopologyState) -> TopologyState:
     subject = state.repository_records[0]
     if len(subject.evidence_refs) < 2:
         raise ValueError("sampled repository must cite more than one evidence record")
-    dropped = sorted(subject.evidence_refs)[0]
+    dropped = min(subject.evidence_refs)
     return _replace_repository(
         state,
         evidence_refs=tuple(ref for ref in subject.evidence_refs if ref != dropped),
@@ -401,7 +410,7 @@ def build_matrix() -> dict[str, Any]:
         materialized,
         policy,
         unrelated_entities,
-        "unaffected relationship",
+        UNAFFECTED_RELATIONSHIP,
         sampled_kind="relationship",
     )
 
@@ -414,7 +423,7 @@ def build_matrix() -> dict[str, Any]:
         _recompile(packet, state),
         policy,
         unrelated_entities,
-        "unaffected relationship",
+        UNAFFECTED_RELATIONSHIP,
         sampled_kind="relationship",
     )
 
@@ -426,7 +435,7 @@ def build_matrix() -> dict[str, Any]:
         materialized,
         policy,
         unrelated_entities,
-        "unaffected relationship",
+        UNAFFECTED_RELATIONSHIP,
         published_at=SHIFTED_TIME,
         sampled_kind="relationship",
     )
@@ -443,7 +452,7 @@ def build_matrix() -> dict[str, Any]:
         ),
         policy,
         unrelated_entities,
-        "unaffected relationship",
+        UNAFFECTED_RELATIONSHIP,
         sampled_kind="relationship",
     )
 
@@ -459,7 +468,7 @@ def build_matrix() -> dict[str, Any]:
         ),
         policy,
         unrelated_entities,
-        "unaffected relationship",
+        UNAFFECTED_RELATIONSHIP,
         sampled_kind="relationship",
     )
 
@@ -467,11 +476,11 @@ def build_matrix() -> dict[str, Any]:
     add(
         "published_fact_content",
         "rename the sampled repository, changing its published content",
-        "the affected candidate and effect key both move",
+        BOTH_IDENTITIES_MOVE,
         _recompile(packet, _replace_repository(state, name="renamed-repository")),
         policy,
         repository_entities,
-        "affected repository entity",
+        AFFECTED_REPOSITORY,
     )
 
     # 7. The published structured assertion.
@@ -487,11 +496,11 @@ def build_matrix() -> dict[str, Any]:
     add(
         "published_assertion",
         "change the predicate of the sampled published relationship",
-        "the affected candidate and effect key both move",
+        BOTH_IDENTITIES_MOVE,
         _recompile(packet, state.model_copy(update={"edge_records": tuple(reasserted)})),
         policy,
         asserted_entities,
-        "affected relationship",
+        AFFECTED_RELATIONSHIP,
         sampled_kind="relationship",
     )
 
@@ -502,7 +511,7 @@ def build_matrix() -> dict[str, Any]:
     add(
         "unchanged_fact_confidence_change",
         "materially weaken the confidence of one otherwise identical fact",
-        "candidate identity holds; the effect key moves",
+        FACT_HOLDS_WRITE_MOVES,
         _recompile(
             packet,
             _replace_repository(
@@ -514,7 +523,7 @@ def build_matrix() -> dict[str, Any]:
         ),
         policy,
         repository_entities,
-        "affected repository entity",
+        AFFECTED_REPOSITORY,
     )
 
     # 8a. The same fact, the same evidence, the same confidence. Re-deriving the
@@ -526,7 +535,7 @@ def build_matrix() -> dict[str, Any]:
         _recompile(packet, state.model_copy(update={"evidence": state.evidence})),
         policy,
         repository_entities,
-        "affected repository entity",
+        AFFECTED_REPOSITORY,
     )
 
     # 8b. More evidence for the same fact. The claim is the same claim; the
@@ -534,11 +543,11 @@ def build_matrix() -> dict[str, Any]:
     add(
         "unchanged_fact_stronger_evidence",
         "add a corroborating evidence record to one otherwise identical fact",
-        "candidate identity holds; the effect key moves",
+        FACT_HOLDS_WRITE_MOVES,
         _recompile(packet, _add_repository_evidence(state)),
         policy,
         repository_entities,
-        "affected repository entity",
+        AFFECTED_REPOSITORY,
     )
 
     # 8c. Less evidence for the same fact. Symmetric to 8b: losing support is as
@@ -546,11 +555,11 @@ def build_matrix() -> dict[str, Any]:
     add(
         "unchanged_fact_weaker_evidence",
         "drop a supporting evidence record from one otherwise identical fact",
-        "candidate identity holds; the effect key moves",
+        FACT_HOLDS_WRITE_MOVES,
         _recompile(packet, _drop_repository_evidence(state)),
         policy,
         repository_entities,
-        "affected repository entity",
+        AFFECTED_REPOSITORY,
     )
 
     # 8d. Only when the evidence was observed. Nothing about the fact or its
@@ -568,7 +577,7 @@ def build_matrix() -> dict[str, Any]:
         ),
         policy,
         repository_entities,
-        "affected repository entity",
+        AFFECTED_REPOSITORY,
     )
 
     # 8e. A new commit that leaves the supporting bytes untouched. The evidence
@@ -588,7 +597,7 @@ def build_matrix() -> dict[str, Any]:
         ),
         policy,
         repository_entities,
-        "affected repository entity",
+        AFFECTED_REPOSITORY,
     )
 
     # 8f. The supporting bytes changed while the published text did not. The fact
@@ -597,7 +606,7 @@ def build_matrix() -> dict[str, Any]:
     add(
         "local_source_content_changes_but_claim_text_remains_same",
         "change the digest of the cited source content, leaving the fact's text alone",
-        "candidate identity holds; the effect key moves",
+        FACT_HOLDS_WRITE_MOVES,
         _recompile(
             packet,
             _remap_repository_evidence(
@@ -607,7 +616,7 @@ def build_matrix() -> dict[str, Any]:
         ),
         policy,
         repository_entities,
-        "affected repository entity",
+        AFFECTED_REPOSITORY,
     )
 
     # 9. Destination namespace.
@@ -618,7 +627,7 @@ def build_matrix() -> dict[str, Any]:
         materialized,
         policy.model_copy(update={"namespace_root": "l9.relocated"}),
         unrelated_entities,
-        "unaffected relationship",
+        UNAFFECTED_RELATIONSHIP,
         sampled_kind="relationship",
     )
 
@@ -630,7 +639,7 @@ def build_matrix() -> dict[str, Any]:
         materialized,
         policy.model_copy(update={"relationship_memory_class": "insight"}),
         unrelated_entities,
-        "unaffected relationship",
+        UNAFFECTED_RELATIONSHIP,
         sampled_kind="relationship",
     )
 
@@ -649,7 +658,7 @@ def build_matrix() -> dict[str, Any]:
             }
         ),
         unrelated_entities,
-        "unaffected relationship",
+        UNAFFECTED_RELATIONSHIP,
         sampled_kind="relationship",
     )
 

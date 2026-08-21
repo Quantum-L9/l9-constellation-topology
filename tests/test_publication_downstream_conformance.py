@@ -175,7 +175,9 @@ def test_claim_intents_carry_a_structured_assertion(
         assertion = request["assertion"]
         assert assertion is not None
         assert set(assertion) <= assertion_fields
-        assert assertion["subject"] and assertion["predicate"] and assertion["object"]
+        assert assertion["subject"]
+        assert assertion["predicate"]
+        assert assertion["object"]
         assert len(assertion["subject"]) <= 500
         assert len(assertion["predicate"]) <= 200
         assert len(assertion["object"]) <= 2_000

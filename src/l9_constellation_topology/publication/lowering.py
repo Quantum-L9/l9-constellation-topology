@@ -59,6 +59,25 @@ class LoweringError(ValueError):
 
 
 @dataclass(frozen=True)
+class AssertionProvenance:
+    """Where a lowered fact came from in the repository-model assertion domain.
+
+    Grouped rather than passed as three more parameters: only claim lowering
+    supplies any of them, and they always travel together.
+    """
+
+    source_assertion_ids: tuple[str, ...] = ()
+    predicate: str | None = None
+    #: Registry classification of the predicate. ``unsupported`` is what holds
+    #: such a candidate, so it is recorded rather than inferred downstream.
+    support: str | None = None
+
+
+#: The absence of assertion provenance, for facts not lowered from an assertion.
+NO_ASSERTION_PROVENANCE = AssertionProvenance()
+
+
+@dataclass(frozen=True)
 class LoweredCandidate:
     """A lowered fact awaiting an eligibility decision."""
 
@@ -376,9 +395,7 @@ def _build(
     source_fields: tuple[str, ...],
     extraction_method: str,
     published_at: datetime,
-    source_assertion_ids: tuple[str, ...] = (),
-    assertion_predicate: str | None = None,
-    predicate_support: str | None = None,
+    provenance: AssertionProvenance = NO_ASSERTION_PROVENANCE,
 ) -> LoweredCandidate:
     owning_repository_id = index.owning_repository_by_entity.get(subject_id)
     namespace = _namespace(policy, owning_repository_id)
@@ -447,8 +464,8 @@ def _build(
             source_revisions=source_revisions,
             source_paths=source_paths,
             publication_candidate_id=candidate_id(identity),
-            source_assertion_ids=source_assertion_ids,
-            assertion_predicate=assertion_predicate,
+            source_assertion_ids=provenance.source_assertion_ids,
+            assertion_predicate=provenance.predicate,
         ),
         idempotency_key=idempotency_key(
             identity,
@@ -482,9 +499,9 @@ def _build(
             observed_conflict_ids=tuple(item.conflict_id for item in conflicts),
             observed_unknown_ids=tuple(item.unknown_id for item in unknowns),
             owning_repository_id=owning_repository_id,
-            source_assertion_ids=source_assertion_ids,
-            assertion_predicate=assertion_predicate,
-            predicate_support=predicate_support,
+            source_assertion_ids=provenance.source_assertion_ids,
+            assertion_predicate=provenance.predicate,
+            predicate_support=provenance.support,
         ),
         identity=identity,
         candidate_id=candidate_id(identity),
@@ -656,7 +673,9 @@ def lower_semantic_claim(
         source_fields=("subject_id", "predicate", "object", record.predicate),
         extraction_method=CLAIM_EXTRACTION_METHOD,
         published_at=published_at,
-        source_assertion_ids=record.source_assertion_ids,
-        assertion_predicate=record.predicate,
-        predicate_support=record.support,
+        provenance=AssertionProvenance(
+            source_assertion_ids=record.source_assertion_ids,
+            predicate=record.predicate,
+            support=record.support,
+        ),
     )

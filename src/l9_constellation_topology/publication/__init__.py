@@ -49,6 +49,7 @@ from .identity import (
     plan_id,
 )
 from .lowering import (
+    AssertionProvenance,
     LoweredCandidate,
     LoweringError,
     TopologyIndex,
@@ -69,6 +70,7 @@ __all__ = [
     "MEMORY_INGEST_OPERATION",
     "PUBLICATION_PLAN_TYPE",
     "PUBLICATION_PLAN_VERSION",
+    "AssertionProvenance",
     "EligibilityContext",
     "EligibilityDecision",
     "LoweredCandidate",

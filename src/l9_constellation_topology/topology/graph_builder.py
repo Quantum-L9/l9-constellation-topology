@@ -50,6 +50,65 @@ def _edge(
     )
 
 
+#: Artifact types that also state a relationship, beyond mere containment.
+_ARTIFACT_RELATION_BY_TYPE = {
+    "architecture-decision": CanonicalEdgeType.governed_by,
+    "governance": CanonicalEdgeType.governed_by,
+    "documentation": CanonicalEdgeType.documented_by,
+    "ci-workflow": CanonicalEdgeType.validated_by,
+}
+
+
+def _artifact_graph(
+    artifact: ArtifactRecord,
+) -> tuple[CanonicalGraphRecord, tuple[CanonicalEdgeRecord, ...]]:
+    """Return the node and edges one artifact contributes."""
+    node = CanonicalGraphRecord(
+        record_type="node",
+        label="Artifact",
+        entity_id=artifact.artifact_id,
+        properties={
+            "repository_id": artifact.repository_id,
+            "source_path": artifact.source_path,
+            "artifact_type": artifact.artifact_type,
+            "content_hash": artifact.content_hash,
+        },
+        evidence_refs=artifact.evidence_refs,
+        confidence=artifact.confidence,
+    )
+    relations: list[CanonicalEdgeRecord] = [
+        _edge(
+            artifact.repository_id,
+            artifact.artifact_id,
+            CanonicalEdgeType.contains,
+            evidence_refs=artifact.evidence_refs,
+            confidence=artifact.confidence,
+        )
+    ]
+    semantic_type = _ARTIFACT_RELATION_BY_TYPE.get(artifact.artifact_type)
+    if semantic_type is not None:
+        relations.append(
+            _edge(
+                artifact.repository_id,
+                artifact.artifact_id,
+                semantic_type,
+                evidence_refs=artifact.evidence_refs,
+                confidence=artifact.confidence,
+            )
+        )
+    relations.extend(
+        _edge(
+            artifact.artifact_id,
+            capability_id,
+            CanonicalEdgeType.implements,
+            evidence_refs=artifact.evidence_refs,
+            confidence=artifact.confidence,
+        )
+        for capability_id in artifact.capabilities
+    )
+    return node, tuple(relations)
+
+
 def build_topology_graph(
     repositories: tuple[RepositoryRecord, ...],
     artifacts: tuple[ArtifactRecord, ...],
@@ -112,53 +171,10 @@ def build_topology_graph(
             edges[edge.edge_id] = edge
 
     for artifact in artifacts:
-        nodes.append(
-            CanonicalGraphRecord(
-                record_type="node",
-                label="Artifact",
-                entity_id=artifact.artifact_id,
-                properties={
-                    "repository_id": artifact.repository_id,
-                    "source_path": artifact.source_path,
-                    "artifact_type": artifact.artifact_type,
-                    "content_hash": artifact.content_hash,
-                },
-                evidence_refs=artifact.evidence_refs,
-                confidence=artifact.confidence,
-            )
-        )
-        contains = _edge(
-            artifact.repository_id,
-            artifact.artifact_id,
-            CanonicalEdgeType.contains,
-            evidence_refs=artifact.evidence_refs,
-            confidence=artifact.confidence,
-        )
-        edges[contains.edge_id] = contains
-        semantic_type = {
-            "architecture-decision": CanonicalEdgeType.governed_by,
-            "governance": CanonicalEdgeType.governed_by,
-            "documentation": CanonicalEdgeType.documented_by,
-            "ci-workflow": CanonicalEdgeType.validated_by,
-        }.get(artifact.artifact_type)
-        if semantic_type is not None:
-            relation = _edge(
-                artifact.repository_id,
-                artifact.artifact_id,
-                semantic_type,
-                evidence_refs=artifact.evidence_refs,
-                confidence=artifact.confidence,
-            )
-            edges[relation.edge_id] = relation
-        for capability_id in artifact.capabilities:
-            relation = _edge(
-                artifact.artifact_id,
-                capability_id,
-                CanonicalEdgeType.implements,
-                evidence_refs=artifact.evidence_refs,
-                confidence=artifact.confidence,
-            )
-            edges[relation.edge_id] = relation
+        artifact_node, artifact_edges = _artifact_graph(artifact)
+        nodes.append(artifact_node)
+        for edge in artifact_edges:
+            edges[edge.edge_id] = edge
 
     for capability in capabilities:
         nodes.append(
