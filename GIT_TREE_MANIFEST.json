@@ -2594,7 +2594,7 @@
       "path": "tests/test_packet_store_v5.py"
     },
     {
-      "git_object_id": "11c2e7a59e0636c0ed7c14519f4481e8606800f5",
+      "git_object_id": "1a9237b0dcca90fcd290aafa72dde2c7f4a12fcb",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_publication_downstream_conformance.py"
@@ -2672,7 +2672,7 @@
       "path": "tests/test_scan_compatibility_path.py"
     },
     {
-      "git_object_id": "253e3628d33d81511b5af47498c96204dfe57458",
+      "git_object_id": "2a6c559c66fbe01dcb9971797767f5aa4416cf88",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_semantic_claim_activation.py"
@@ -2744,7 +2744,7 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:e0c03b8297875ff89824f40629418b903e9e164b516ac096cc13bdfd1428537c",
+  "entries_sha256": "sha256:1c4d5c5a80a851ab1e01e8d97871a5a47f107d61a872c24c07ae51197582e990",
   "entry_count": 457,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
