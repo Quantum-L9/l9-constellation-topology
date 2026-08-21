@@ -276,12 +276,12 @@ def test_packet_bundle_commit_is_atomic_on_staging_failure(
     original = FileSystemOutputSink._atomic_write
     calls = 0
 
-    def fail_after_first(self, path: Path, content: bytes) -> None:
+    def fail_after_first(self, path: Path, content: bytes, *, exclusive: bool = False) -> None:
         nonlocal calls
         calls += 1
         if calls == 2:
             raise OSError("simulated staging failure")
-        original(self, path, content)
+        original(self, path, content, exclusive=exclusive)
 
     monkeypatch.setattr(FileSystemOutputSink, "_atomic_write", fail_after_first)
     receipt = commit_compilation(result, PacketBundleOutputSink(target))

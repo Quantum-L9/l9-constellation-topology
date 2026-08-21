@@ -114,12 +114,26 @@
           ],
           "default": null
         },
+        "dispatch_nonce": {
+          "title": "Dispatch Nonce",
+          "type": "string"
+        },
+        "expires_at": {
+          "format": "date-time",
+          "title": "Expires At",
+          "type": "string"
+        },
         "input_packets": {
           "items": {
             "$ref": "#/$defs/PacketRef"
           },
           "title": "Input Packets",
           "type": "array"
+        },
+        "issued_at": {
+          "format": "date-time",
+          "title": "Issued At",
+          "type": "string"
         },
         "output_uri": {
           "anyOf": [
@@ -165,7 +179,10 @@
         "target_repository",
         "target_revision",
         "input_packets",
-        "profile"
+        "profile",
+        "issued_at",
+        "expires_at",
+        "dispatch_nonce"
       ],
       "title": "StageDispatchData",
       "type": "object"
