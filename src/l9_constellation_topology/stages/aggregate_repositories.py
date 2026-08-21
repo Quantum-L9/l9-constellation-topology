@@ -1,48 +1,43 @@
-"""Establish repository boundaries, merge duplicate records, and resolve dependencies."""
+"""Establish repository boundaries, merge duplicate records, and resolve dependencies.
+
+Set-valued repository facts are unioned across duplicate records. Only the
+single-valued facts that identify the repository itself — its name and the
+revision it was observed at — can contradict one another, and those remain
+blocking conflicts.
+"""
 
 from __future__ import annotations
 
 from collections import defaultdict
 
 from l9_constellation_topology.domain import ConflictRecord, RepositoryRecord, UnknownRecord
+from l9_constellation_topology.reconciliation import is_conflicting
 from l9_constellation_topology.run import stable_id
+
+#: Repository facts that admit exactly one true value per repository identity.
+_IDENTIFYING_FIELDS = ("source_revision", "name")
 
 
 def _merge_records(
     records: list[RepositoryRecord],
 ) -> tuple[RepositoryRecord, tuple[ConflictRecord, ...]]:
     first = records[0]
-    revisions = tuple(sorted({record.source_revision for record in records}))
-    names = tuple(sorted({record.name for record in records}))
+    all_evidence = tuple(sorted({ref for record in records for ref in record.evidence_refs}))
     conflicts: list[ConflictRecord] = []
-    if len(revisions) > 1:
+    for field in _IDENTIFYING_FIELDS:
+        values = tuple(sorted({getattr(record, field) for record in records}))
+        if not is_conflicting(field, values):
+            continue
         conflicts.append(
             ConflictRecord(
                 conflict_id=stable_id(
                     "conflict",
-                    {"id": first.repository_id, "field": "source_revision", "values": revisions},
+                    {"id": first.repository_id, "field": field, "values": values},
                 ),
                 subject_id=first.repository_id,
-                field="source_revision",
-                values=revisions,
-                evidence_refs=tuple(
-                    sorted({ref for record in records for ref in record.evidence_refs})
-                ),
-                blocking=True,
-            )
-        )
-    if len(names) > 1:
-        conflicts.append(
-            ConflictRecord(
-                conflict_id=stable_id(
-                    "conflict", {"id": first.repository_id, "field": "name", "values": names}
-                ),
-                subject_id=first.repository_id,
-                field="name",
-                values=names,
-                evidence_refs=tuple(
-                    sorted({ref for record in records for ref in record.evidence_refs})
-                ),
+                field=field,
+                values=values,
+                evidence_refs=all_evidence,
                 blocking=True,
             )
         )

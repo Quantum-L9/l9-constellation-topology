@@ -12,7 +12,7 @@ from collections import defaultdict
 
 from l9_constellation_topology.cardinality import Cardinality, cardinality_of
 from l9_constellation_topology.domain import ConflictRecord, UnknownRecord
-from l9_constellation_topology.run import EvidenceRecord, stable_id
+from l9_constellation_topology.run import EvidenceRecord, canonical_json, stable_id
 
 
 def run(
@@ -25,9 +25,14 @@ def run(
 
     conflicts: list[ConflictRecord] = []
     unknowns: list[UnknownRecord] = []
-    for (subject_id, field), records in sorted(by_subject_field.items()):
-        values = tuple(sorted({str(record.value) for record in records}))
-        if field is None or len(values) <= 1:
+    for (subject_id, field), records in sorted(
+        by_subject_field.items(), key=lambda item: (item[0][0], item[0][1] or "")
+    ):
+        # Values may be structured, so distinctness is decided canonically: two
+        # mappings that differ only in key order are one value, not two.
+        distinct = {canonical_json(record.value): record.value for record in records}
+        values = tuple(sorted(str(value) for value in distinct.values()))
+        if field is None or len(distinct) < 2:
             continue
         evidence_refs = tuple(sorted(record.evidence_id for record in records))
         cardinality = cardinality_of(field)

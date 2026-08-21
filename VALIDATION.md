@@ -91,24 +91,33 @@ that report is invalid.
 
 ## Generated-artifact drift guard
 
-Checked-in JSON Schemas and Repository Model Packet fixtures are derived outputs.
-`scripts/generated_artifact_sync.py` provides read-only drift detection (`find_drift`)
-and explicit mutation (`synchronize`) so validation never rewrites the worktree.
+Checked-in JSON Schemas, packet fixtures, and the hash-locality evaluation are derived
+outputs. `scripts/generated_artifact_sync.py` provides read-only drift detection
+(`find_drift`) and explicit mutation (`synchronize`) so validation never rewrites the
+worktree.
 
 ```bash
-make schemas-check     # read-only: fail on missing/stale checked-in schemas
-make fixtures-check     # read-only: fail on missing/stale fixture packets
-make generated-check    # both of the above
-make schemas-update     # explicit regeneration
-make fixtures-update    # explicit regeneration
+make schemas-check          # read-only: fail on missing/stale checked-in schemas
+make fixtures-check         # read-only: fail on missing/stale fixture packets
+make hash-locality          # read-only: fail on drifted identity-locality evidence
+make generated-check        # all of the above
+make schemas-update         # explicit regeneration
+make fixtures-update        # explicit regeneration
+make hash-locality-update   # explicit regeneration
 ```
 
-- `make validate` includes `schemas-check` (deterministic) and fails on schema drift.
-- `fixtures-check` is retained as an on-demand diagnostic and is intentionally excluded
-  from `make validate`: fixture packets embed a wall-clock `created_at` and the live
-  repository revision as `source_revision`, so a byte-for-byte regeneration check cannot
-  pass in steady state. It becomes gate-eligible once fixture generation is made
-  deterministic (recorded as a follow-up in `ROADMAP.md`).
+- `make validate` includes `generated-check` and fails on any generated drift.
+- `fixtures-check` is gate-eligible. Fixture generation pins `created_at` to a fixed
+  instant and derives `source_revision` from the sample tree's own content hash rather
+  than from this repository's live `HEAD`, so regeneration is byte-for-byte reproducible
+  at any commit. Both injected inputs are volatile rather than semantic: every semantic
+  hash strips timestamps, so pinning them changes emitted bytes only. The golden Topology
+  Packet bundle is generated from the Repository Model fixtures for the same reason, so a
+  change in compiler meaning appears as a reviewable fixture diff instead of a
+  hand-edited packet drifting from the code.
+- `hash-locality` regenerates `HASH_LOCALITY_EVALUATION.json` and fails when recorded
+  identity locality drifts. `tests/test_hash_locality.py` additionally asserts the
+  expected verdict of every case, so regeneration cannot bless a wrong answer.
 - `tests/test_generated_artifact_sync.py` covers missing, stale, explicit-update, and
   duplicate-destination (fail-closed) behavior of the drift helper.
 

@@ -2,13 +2,20 @@
 
 from __future__ import annotations
 
+from datetime import datetime
+
 from l9_constellation_topology.io import RenderedArtifact
 from l9_constellation_topology.packets.common import (
     PacketBundleManifest,
     PacketFileEntry,
     PacketValidationRef,
 )
-from l9_constellation_topology.run import artifact_hash, canonical_bytes, semantic_hash
+from l9_constellation_topology.run import (
+    artifact_hash,
+    canonical_bytes,
+    semantic_hash,
+    utc_now,
+)
 from l9_constellation_topology.scanners.repository_model_scanner import (
     SyntheticRepositoryModelBundle,
 )
@@ -16,7 +23,14 @@ from l9_constellation_topology.scanners.repository_model_scanner import (
 
 def build_repository_model_bundle_artifacts(
     bundle: SyntheticRepositoryModelBundle,
+    *,
+    created_at: datetime | None = None,
 ) -> tuple[RenderedArtifact, ...]:
+    """Render the bundle files for a synthetic Repository Model Packet.
+
+    ``created_at`` stamps the bundle manifest. It is injectable so fixture
+    generation is byte-reproducible; it carries no semantic weight.
+    """
     packet = bundle.packet.model_copy(
         update={
             "validation": PacketValidationRef(
@@ -72,6 +86,7 @@ def build_repository_model_bundle_artifacts(
         semantic_hash=packet.semantic_hash,
         artifact_hash=semantic_hash(entries),
         files=entries,
+        created_at=created_at if created_at is not None else utc_now(),
     )
     manifest_content = canonical_bytes(manifest) + b"\n"
     manifest_artifact = RenderedArtifact(

@@ -45,9 +45,9 @@ adoption across the foundational chain.
 - Add production observability through the shared L9 platform boundary.
 - Measure compiler performance and introduce optimization only from evidence.
 
-## R7: Generated-artifact determinism
+## R7: Generated-artifact determinism — delivered
 
-- Make Repository Model Packet fixture generation deterministic (stable `created_at` and a source-content-derived `source_revision` independent of the live repository HEAD) so `make fixtures-check` becomes gate-eligible and can join `schemas-check` inside `make validate`.
+- Repository Model Packet fixture generation is deterministic: `created_at` is pinned and `source_revision` is derived from the sample tree's own content rather than the live repository HEAD. `make fixtures-check` is gate-eligible and runs inside `make validate` through `generated-check`, alongside the golden Topology Packet bundle and the hash-locality evaluation.
 
 ## Explicitly deferred
 

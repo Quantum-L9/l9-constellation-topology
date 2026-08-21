@@ -27,12 +27,14 @@ from l9_constellation_topology.io import (
     RenderedArtifact,
     WriteIntent,
     WritePolicy,
+    format_commit_failure,
 )
 from l9_constellation_topology.packets import (
     PacketLoadError,
     load_repository_model_bundle,
     load_topology_bundle,
 )
+from l9_constellation_topology.packets.bundle_verification import BundleVerificationError
 from l9_constellation_topology.packets.repository_bundle import (
     build_repository_model_bundle_artifacts,
 )
@@ -55,6 +57,40 @@ from l9_constellation_topology.validation.topology_validator import validate_top
 
 def _print_json(value: object) -> None:
     print(canonical_json(value))
+
+
+def _report_commit_failure(
+    receipt: CommitReceipt,
+    *,
+    stage: str,
+    packet_type: str | None = None,
+) -> None:
+    """Write the receipt's own reasons to stderr before a nonzero exit."""
+    if receipt.status == "passed":
+        return
+    for line in format_commit_failure(receipt, stage=stage, packet_type=packet_type):
+        print(line, file=sys.stderr)
+
+
+def _format_verification_error(exc: BundleVerificationError) -> tuple[str, ...]:
+    """Render a bundle verification failure with its actionable coordinates."""
+    lines = [f"ERROR: {exc.stage}: {exc.code}"]
+    if exc.packet_type is not None:
+        lines.append(f"ERROR: {exc.stage}: packet type {exc.packet_type}")
+    if exc.member is not None:
+        lines.append(f"ERROR: {exc.stage}: member {exc.member}")
+    lines.extend(f"ERROR: {line}" for line in str(exc).splitlines())
+    return tuple(lines)
+
+
+def _commit_exit_code(
+    receipt: CommitReceipt,
+    *,
+    stage: str,
+    packet_type: str | None = None,
+) -> int:
+    _report_commit_failure(receipt, stage=stage, packet_type=packet_type)
+    return 0 if receipt.status == "passed" else 2
 
 
 def _write_artifacts(
@@ -104,7 +140,7 @@ def cmd_compile_packet(args: argparse.Namespace) -> int:
             "outputs": [item.model_dump(mode="json") for item in receipt.results],
         }
     )
-    return 0 if receipt.status == "passed" else 2
+    return _commit_exit_code(receipt, stage="compile-packet", packet_type="l9.topology")
 
 
 def cmd_validate_packet(args: argparse.Namespace) -> int:
@@ -162,7 +198,7 @@ def cmd_render_report(args: argparse.Namespace) -> int:
             "outputs": [item.model_dump(mode="json") for item in receipt.results],
         }
     )
-    return 0 if receipt.status == "passed" else 2
+    return _commit_exit_code(receipt, stage="render-report")
 
 
 def cmd_impact(args: argparse.Namespace) -> int:
@@ -238,13 +274,26 @@ def cmd_verify_determinism(args: argparse.Namespace) -> int:
 
 
 def _write_synthetic_bundle(source: RepoSource, destination: Path) -> None:
+    """Commit the synthetic Repository Model bundle for one observed source.
+
+    The bundle is written through ``OutputSink`` and verified back as an
+    ``l9.repository-model`` bundle, exactly as the canonical ingress would read
+    it. A failure here reports the sink's own reasons rather than its status.
+    """
     synthetic = scan_repository_model(source)
     sink = PacketBundleOutputSink(destination, allow_overwrite=True)
     for artifact in build_repository_model_bundle_artifacts(synthetic):
         sink.enqueue(WriteIntent(artifact=artifact))
     receipt = sink.commit()
     if receipt.status != "passed":
-        raise RuntimeError(f"direct observation bundle commit failed: {receipt.status}")
+        detail = "\n".join(
+            format_commit_failure(
+                receipt,
+                stage=f"scan/{source.repo_id}/repository-model-bundle-commit",
+                packet_type=synthetic.packet.packet_type,
+            )
+        )
+        raise RuntimeError(detail)
 
 
 def _compile_scanned_sources(
@@ -281,7 +330,9 @@ def _compile_scanned_sources(
             "compatibility_mode": "bounded-direct-observation-to-repository-model-packet",
         }
     )
-    return 0 if receipt.status == "passed" else 2
+    return _commit_exit_code(
+        receipt, stage="scan/topology-bundle-commit", packet_type="l9.topology"
+    )
 
 
 def cmd_scan(args: argparse.Namespace) -> int:
@@ -336,7 +387,7 @@ def cmd_export_neo4j(args: argparse.Namespace) -> int:
             "outputs": [item.model_dump(mode="json") for item in receipt.results],
         }
     )
-    return 0 if receipt.status == "passed" else 2
+    return _commit_exit_code(receipt, stage="export-neo4j")
 
 
 def cmd_plan_publication(args: argparse.Namespace) -> int:
@@ -375,7 +426,7 @@ def cmd_plan_publication(args: argparse.Namespace) -> int:
             "outputs": [item.model_dump(mode="json") for item in receipt.results],
         }
     )
-    return 0 if receipt.status == "passed" else 2
+    return _commit_exit_code(receipt, stage="plan-publication")
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -397,6 +448,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     for name in ("validate-packet", "validate"):
         validate_parser = commands.add_parser(name, help="Validate a Topology Packet bundle")
+        # Revalidating against the input bundles resolves checked-in JSON Schemas
+        # from the repository root, so the option must exist on this parser too.
+        validate_parser.add_argument("--repo-root", default=".")
         validate_parser.add_argument("--input-bundle", required=True)
         validate_parser.add_argument("--repository-bundle", action="append")
         validate_parser.set_defaults(handler=cmd_validate_packet)
@@ -489,8 +543,13 @@ def run(argv: Sequence[str] | None = None) -> int:
         print(str(exc), file=sys.stderr)
         print(canonical_json(exc.receipt), file=sys.stderr)
         return 2
+    except BundleVerificationError as exc:
+        for line in _format_verification_error(exc):
+            print(line, file=sys.stderr)
+        return 2
     except (PacketLoadError, ValueError, OSError, RuntimeError, json.JSONDecodeError) as exc:
-        print(f"ERROR: {exc}", file=sys.stderr)
+        for line in str(exc).splitlines() or [repr(exc)]:
+            print(f"ERROR: {line}", file=sys.stderr)
         return 2
 
 

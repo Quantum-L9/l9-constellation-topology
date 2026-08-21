@@ -87,6 +87,7 @@ _SET_VALUED: frozenset[str] = frozenset(
         "governed_by",
         # ArtifactRecord
         "capabilities",
+        "declared_actions",
         "dependencies",
     }
 )

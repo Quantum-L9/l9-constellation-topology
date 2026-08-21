@@ -1,7 +1,7 @@
 UV ?= uv
 PYTHON ?= python
 
-.PHONY: sync compile test coverage lint type contracts workflows architecture readiness schemas-check schemas-update fixtures-check fixtures-update generated-check generated-update git-manifest git-integrity determinism build validate clean
+.PHONY: sync compile test coverage lint type contracts workflows architecture readiness schemas-check schemas-update fixtures-check fixtures-update generated-check generated-update git-manifest git-integrity determinism hash-locality hash-locality-update build validate clean
 
 sync:
 	$(UV) sync --frozen --extra dev
@@ -15,8 +15,11 @@ test:
 coverage:
 	$(UV) run pytest --cov=l9_constellation_topology --cov-report=term-missing -q
 
+# CI runs both `ruff check` and `ruff format --check`. Keep them together here so a
+# formatting-only failure cannot pass locally and then fail the PR validation job.
 lint:
 	$(UV) run ruff check .
+	$(UV) run ruff format --check .
 
 type:
 	$(UV) run mypy src/l9_constellation_topology
@@ -39,20 +42,21 @@ schemas-check:
 schemas-update:
 	$(UV) run $(PYTHON) scripts/generate_schemas.py
 
-# NOTE: fixture packets embed a wall-clock `created_at` and the live repository
-# HEAD as `source_revision`, so a byte-for-byte regeneration check is only
-# meaningful at the exact commit the fixtures were generated at. It is retained
-# as an on-demand diagnostic and is intentionally NOT part of `validate` until
-# fixture generation is made deterministic (see ROADMAP / follow-up).
+# Fixture generation pins `created_at` and derives `source_revision` from the
+# sample tree's own content, so regeneration is byte-for-byte reproducible at any
+# commit and this check is part of `validate`.
 fixtures-check:
 	$(UV) run $(PYTHON) scripts/generate_fixture_packets.py --check
 
 fixtures-update:
 	$(UV) run $(PYTHON) scripts/generate_fixture_packets.py
 
-generated-check: schemas-check fixtures-check
+hash-locality-update:
+	$(UV) run $(PYTHON) scripts/evaluate_hash_locality.py
 
-generated-update: schemas-update fixtures-update
+generated-check: schemas-check fixtures-check hash-locality
+
+generated-update: schemas-update fixtures-update hash-locality-update
 
 git-manifest:
 	$(UV) run $(PYTHON) scripts/git_tree_manifest.py
@@ -63,10 +67,13 @@ git-integrity:
 determinism:
 	$(UV) run $(PYTHON) scripts/verify_determinism.py
 
+hash-locality:
+	$(UV) run $(PYTHON) scripts/evaluate_hash_locality.py --check
+
 build:
 	$(UV) build
 
-validate: compile coverage lint type contracts workflows architecture readiness schemas-check git-integrity determinism build
+validate: compile coverage lint type contracts workflows architecture readiness generated-check git-integrity determinism hash-locality build
 
 clean:
 	rm -rf .coverage coverage.xml htmlcov build dist .pytest_cache .ruff_cache .mypy_cache .wheel-smoke

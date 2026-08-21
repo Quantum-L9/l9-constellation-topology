@@ -1,5 +1,6 @@
 """Explicit topology validation stage."""
 
+from datetime import datetime
 from pathlib import Path
 
 from l9_constellation_topology.domain import TopologyState
@@ -15,5 +16,12 @@ def run(
     input_bundles: tuple[RepositoryModelBundle, ...],
     *,
     schema_root: Path,
+    created_at: datetime | None = None,
 ) -> ValidationReceipt:
-    return validate_topology(packet, state, input_bundles, schema_root=schema_root)
+    return validate_topology(
+        packet,
+        state,
+        input_bundles,
+        schema_root=schema_root,
+        created_at=created_at,
+    )

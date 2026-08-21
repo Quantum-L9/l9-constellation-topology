@@ -31,6 +31,25 @@ def test_cli_compile_validate_and_render(tmp_path: Path) -> None:
     assert receipt.status == "passed"
     assert len(materialized.state.repository_records) == 2
     assert run(["validate-packet", "--input-bundle", str(bundle)]) == 0
+    # Revalidating against the input bundles resolves checked-in JSON Schemas from
+    # the repository root. The option was missing from this parser, so the path
+    # raised AttributeError before any validation ran.
+    assert (
+        run(
+            [
+                "validate-packet",
+                "--repo-root",
+                str(ROOT),
+                "--input-bundle",
+                str(bundle),
+                "--repository-bundle",
+                str(INPUT_A),
+                "--repository-bundle",
+                str(INPUT_B),
+            ]
+        )
+        == 0
+    )
     assert (
         run(
             [

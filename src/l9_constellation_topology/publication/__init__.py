@@ -38,7 +38,13 @@ from .eligibility import (
     decide,
     require_publishable_topology,
 )
-from .identity import candidate_id, candidate_identity, idempotency_key, plan_id
+from .identity import (
+    EFFECT_IDENTITY_ALGORITHM_VERSION,
+    candidate_id,
+    candidate_identity,
+    idempotency_key,
+    plan_id,
+)
 from .lowering import (
     LoweredCandidate,
     LoweringError,
@@ -55,6 +61,7 @@ from .policy import (
 )
 
 __all__ = [
+    "EFFECT_IDENTITY_ALGORITHM_VERSION",
     "MEMORY_INGEST_OPERATION",
     "PUBLICATION_PLAN_TYPE",
     "PUBLICATION_PLAN_VERSION",

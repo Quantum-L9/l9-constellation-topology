@@ -30,6 +30,8 @@ IDEMPOTENCY_NAMESPACE = "l9-topology-publication"
 #: a new one. Global snapshot hashes remain on the intent as provenance, which
 #: is what they actually describe.
 IDEMPOTENCY_ALGORITHM_VERSION = "v2"
+#: Alias used by the hash-locality evaluator and its contract tests.
+EFFECT_IDENTITY_ALGORITHM_VERSION = IDEMPOTENCY_ALGORITHM_VERSION
 
 #: Domain separator, so an effect identity can never collide with another
 #: digest computed over similarly-shaped data.
