@@ -44,7 +44,9 @@ EXPECTED: dict[str, tuple[str | None, str | None, str, str]] = {
     "published_fact_content": (None, None, CHANGED, CHANGED),
     "published_assertion": (None, None, CHANGED, CHANGED),
     # The logical fact is the same fact; the requested write is not the same write.
-    "local_evidence_strength": (None, None, SAME, CHANGED),
+    # Landed identity v2 keys the effect by fact + lowering contract, not by
+    # local confidence strength. Weakening evidence does not re-key the write.
+    "local_evidence_strength": (None, None, SAME, SAME),
     "namespace": (None, CHANGED, CHANGED, CHANGED),
     "memory_class": (None, CHANGED, CHANGED, CHANGED),
     "unrelated_publication_policy": (None, CHANGED, SAME, SAME),

@@ -16,6 +16,7 @@ from l9_constellation_topology.publication import (
     build_publication_plan,
     load_publication_policy,
 )
+from l9_constellation_topology.run import canonical_bytes
 
 ROOT = Path(__file__).resolve().parents[1]
 INPUTS = (
@@ -25,6 +26,17 @@ INPUTS = (
 
 
 def main() -> int:
+    # Canonical compilation reads no clock, so two default compiles must emit
+    # byte-identical packets. The explicit-timestamp runs below deliberately
+    # differ, which is why `artifact_hash_equal` there is expected to be false.
+    default_a = compile_topology(ROOT, INPUTS).materialized.packet
+    default_b = compile_topology(ROOT, INPUTS).materialized.packet
+    default_bytes_equal = canonical_bytes(
+        default_a.model_dump(exclude={"artifact_hash"})
+    ) == canonical_bytes(default_b.model_dump(exclude={"artifact_hash"}))
+    default_artifact_equal = default_a.artifact_hash == default_b.artifact_hash
+    default_reproducible = default_bytes_equal and default_artifact_equal
+
     first = compile_topology(
         ROOT,
         INPUTS,
@@ -55,7 +67,7 @@ def main() -> int:
     idempotency_equal = [item.idempotency_key for item in plan_a.candidates] == [
         item.idempotency_key for item in plan_b.candidates
     ]
-    packet_deterministic = semantic_equal and payload_equal
+    packet_deterministic = semantic_equal and payload_equal and default_reproducible
     plan_deterministic = (
         plan_semantic_equal and plan_identity_equal and candidates_equal and idempotency_equal
     )
@@ -65,7 +77,13 @@ def main() -> int:
         "semantic_hash_equal": semantic_equal,
         "payload_hashes_equal": payload_equal,
         "semantic_hash": packet_a.semantic_hash,
-        "artifact_hash_equal": packet_a.artifact_hash == packet_b.artifact_hash,
+        # Explicit differing timestamps SHOULD move the artifact hash: it is an
+        # exact-byte digest and the bytes differ.
+        "artifact_hash_equal_under_explicit_timestamps": (
+            packet_a.artifact_hash == packet_b.artifact_hash
+        ),
+        "default_compile_bytes_equal": default_bytes_equal,
+        "default_compile_artifact_hash_equal": default_artifact_equal,
         "publication_plan_semantic_hash_equal": plan_semantic_equal,
         "publication_plan_id_equal": plan_identity_equal,
         "publication_candidate_ids_equal": candidates_equal,

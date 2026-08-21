@@ -8,6 +8,10 @@ from typing import Any
 import yaml
 from pydantic import Field
 
+from l9_constellation_topology.cardinality import (
+    FIELD_CARDINALITY_CONTRACT_ID,
+    FIELD_CARDINALITY_CONTRACT_VERSION,
+)
 from l9_constellation_topology.domain.base import FrozenModel
 from l9_constellation_topology.run.evidence import artifact_hash, semantic_hash
 
@@ -75,9 +79,13 @@ def resolve_configuration(root: Path) -> ResolvedConfiguration:
         profile_hash=profile_hash,
         schema_contract_hash=_contract_hash(root),
         active_contract_versions={
-            "repository_model_packet": "1.0.0",
+            # 1.1.0 adds the assertion domain; 1.0.0 inputs remain accepted.
+            "repository_model_packet": "1.1.0",
             "topology_packet": "1.0.0",
             "validation_receipt": "1.0.0",
             "stage_dispatch": "1.0.0",
+            # Reconciliation semantics change topology truth, so the cardinality
+            # contract binds to compiler identity like any other active contract.
+            FIELD_CARDINALITY_CONTRACT_ID: FIELD_CARDINALITY_CONTRACT_VERSION,
         },
     )

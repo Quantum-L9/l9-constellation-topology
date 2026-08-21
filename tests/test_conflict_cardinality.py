@@ -138,7 +138,7 @@ def test_unknown_cardinality_does_not_invent_a_conflict() -> None:
     assert len(unknowns) == 1
     assert unknowns[0].field == "a_field_with_no_declared_cardinality"
     assert set(unknowns[0].evidence_refs) == {record.evidence_id for record in evidence}
-    assert "no declared cardinality" in unknowns[0].reason
+    assert "cardinality is not declared" in unknowns[0].reason
 
 
 def test_a_single_observed_value_is_never_divergent() -> None:

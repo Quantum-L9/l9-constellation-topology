@@ -33,7 +33,7 @@ def test_initial_root_authority_files_exist() -> None:
 def test_adrs_are_complete_indexed_and_sequentially_numbered() -> None:
     adr_dir = ROOT / "docs" / "adr"
     adr_paths = sorted(path for path in adr_dir.glob("[0-9][0-9][0-9][0-9]-*.md"))
-    assert len(adr_paths) == 21
+    assert len(adr_paths) == 23
     numbers = [int(path.name[:4]) for path in adr_paths]
     assert numbers == list(range(1, len(adr_paths) + 1)), "ADR numbers must not skip or repeat"
 

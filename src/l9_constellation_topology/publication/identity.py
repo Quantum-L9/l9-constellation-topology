@@ -15,24 +15,27 @@ from l9_constellation_topology.run.evidence import semantic_hash
 _SHA_PREFIX = "sha256:"
 _BARE_SHA256 = re.compile(r"^[a-f0-9]{64}$")
 
-#: Algorithm version of the downstream effect identity. ``v1`` bound every effect
-#: to the whole Topology Packet hash and the whole publication policy hash, so an
-#: unrelated change anywhere in a snapshot re-keyed every otherwise unchanged
-#: durable write. ``v2`` keys an effect on its own semantics.
-EFFECT_IDENTITY_ALGORITHM_VERSION = "v2"
+IDEMPOTENCY_NAMESPACE = "l9-topology-publication"
 
-#: Version of the lowering shape itself. A change to how a topology fact becomes a
-#: memory write is a change to the requested effect, even when the fact is equal.
-LOWERING_CONTRACT_VERSION = "1.0.0"
+#: Algorithm version for memory-effect identity.
+#:
+#: v1 bound each key to the whole Topology Packet semantic hash and the whole
+#: publication policy hash. That conflated two different things: the identity of
+#: a *snapshot* and the identity of a *fact*. Any semantic change anywhere in
+#: any source repository moved the topology hash and therefore re-keyed every
+#: effect in the plan, including the ones whose facts had not changed at all.
+#:
+#: v2 keys an effect by the effect's own semantics. A fact that did not change
+#: keeps its key across unrelated snapshot movement; a fact that did change gets
+#: a new one. Global snapshot hashes remain on the intent as provenance, which
+#: is what they actually describe.
+IDEMPOTENCY_ALGORITHM_VERSION = "v2"
+#: Alias used by the hash-locality evaluator and its contract tests.
+EFFECT_IDENTITY_ALGORITHM_VERSION = IDEMPOTENCY_ALGORITHM_VERSION
 
-#: Namespace of a lowered effect key. The algorithm version is encoded in the
-#: namespace so a v1 key and a v2 key can never collide or be mistaken for one
-#: another downstream.
-IDEMPOTENCY_NAMESPACE = f"l9-topology-publication/{EFFECT_IDENTITY_ALGORITHM_VERSION}"
-
-#: Retained for provenance and migration reasoning: the ``v1`` namespace, which
-#: no longer keys any effect this repository plans.
-LEGACY_IDEMPOTENCY_NAMESPACE_V1 = "l9-topology-publication"
+#: Domain separator, so an effect identity can never collide with another
+#: digest computed over similarly-shaped data.
+_EFFECT_IDENTITY_DOMAIN = "l9.memory-effect-id/v2"
 
 #: Timestamp-bearing fields of the mirrored memory contract. They carry no
 #: semantic meaning for plan identity, so they are stripped before hashing in
@@ -91,6 +94,7 @@ def bare_digest(value: str | None) -> str | None:
 
 def candidate_identity(
     *,
+    operation: str,
     candidate_kind: str,
     namespace: str,
     memory_class: str,
@@ -98,8 +102,15 @@ def candidate_identity(
     assertion: dict[str, str | None] | None,
     source_topology_entity_ids: tuple[str, ...],
 ) -> dict[str, Any]:
-    """Return the canonical semantic identity of a single publication fact."""
+    """Return the canonical semantic identity of a single publication fact.
+
+    Everything here describes the effect itself: what operation it performs,
+    where it lands, and what it asserts. Nothing here describes the snapshot
+    that happened to carry it — no packet id, no topology hash, no plan hash,
+    no wall clock. Those live on the intent as provenance instead.
+    """
     return {
+        "operation": operation,
         "candidate_kind": candidate_kind,
         "namespace": namespace,
         "memory_class": memory_class,
@@ -115,98 +126,34 @@ def candidate_id(identity: dict[str, Any]) -> str:
     return f"publication-candidate:{digest}"
 
 
-def evidence_semantic_identity(
+def idempotency_key(
+    identity: dict[str, Any],
     *,
-    kind: str,
-    source_digest: str | None,
-    source_path: str | None,
-    line_number: int | None,
-    derivation_id: str | None = None,
-) -> dict[str, Any]:
-    """Return the local semantic identity of one supporting evidence reference.
+    lowering_contract_version: str,
+) -> str:
+    """Return the fact-local identity of a single memory effect.
 
-    Evidence is bound by what it *is* — its kind, the exact digest of the content
-    it was read from, and a bounded locator within that source — never by the
-    repository-wide revision it happened to be observed at. An unchanged file
-    supporting an unchanged fact keeps the same evidence identity across
-    commits that touched other files.
+    The key is a function of the fact and of the contract used to lower it,
+    and of nothing else. Two consequences follow, and both are intended:
 
-    ``evidence_id`` is deliberately excluded: upstream derives it from a source
-    reference that embeds the whole-repository revision, so binding it would
-    reintroduce exactly the global coupling this algorithm removes. It remains in
-    provenance and in the plan's lineage.
+    * An unrelated edit somewhere else in the constellation moves the RMP,
+      topology, and plan hashes but leaves this key alone, so downstream sees
+      the unchanged fact as the duplicate it is.
+    * A change to what this fact actually asserts — its content, assertion,
+      namespace, memory class, or operation — produces a new key, so
+      downstream admits it as the new fact it is.
+
+    The lowering contract version participates because a different lowering
+    of the same topology fact is a different effect.
     """
-    return {
-        "kind": kind,
-        "source_digest": source_digest,
-        "source_path": source_path,
-        "line_number": line_number,
-        "derivation_id": derivation_id,
-    }
-
-
-def confidence_semantic_identity(
-    *,
-    score: float,
-    method: str,
-    evidence_count: int,
-    policy_version: str,
-) -> dict[str, Any]:
-    """Return the normalized confidence semantics of a requested write.
-
-    Confidence is part of the durable record, so a material confidence change for
-    the same fact is a different effect and is meant to re-key.
-    """
-    return {
-        "score": score,
-        "method": method,
-        "evidence_count": evidence_count,
-        "policy_version": policy_version,
-    }
-
-
-def effect_semantic_view(
-    *,
-    operation: str,
-    fact_identity: dict[str, Any],
-    namespace: str,
-    memory_class: str,
-    content: str,
-    assertion: dict[str, str | None] | None,
-    confidence: dict[str, Any],
-    evidence: tuple[dict[str, Any], ...],
-) -> dict[str, Any]:
-    """Return every local semantic difference that distinguishes one durable write.
-
-    Included is what the downstream store would actually record: the operation,
-    where it lands, what it says, how sure it is, and what supports it.
-
-    Excluded — deliberately and by name — is everything global to the snapshot
-    that produced it: the Topology Packet id and semantic hash, the Repository
-    Model Packet hash, the publication plan id and semantic hash, the whole
-    publication policy hash, the repository-wide source revision, wall-clock
-    stamps, checkout paths, and any container's artifact hash. Those remain on
-    the candidate as provenance, where they belong; they do not decide whether
-    two requested writes are the same write.
-    """
-    return {
-        "algorithm": EFFECT_IDENTITY_ALGORITHM_VERSION,
-        "lowering_contract_version": LOWERING_CONTRACT_VERSION,
-        "operation": operation,
-        "fact": fact_identity,
-        "namespace": namespace,
-        "memory_class": memory_class,
-        "content": content,
-        "assertion": assertion,
-        "confidence": confidence,
-        "evidence": list(evidence),
-    }
-
-
-def effect_idempotency_key(view: dict[str, Any]) -> str:
-    """Return the deterministic downstream key for one requested effect."""
-    digest = publication_semantic_hash(view).removeprefix(_SHA_PREFIX)
-    return f"{IDEMPOTENCY_NAMESPACE}:{digest}"
+    digest = publication_semantic_hash(
+        {
+            "domain": _EFFECT_IDENTITY_DOMAIN,
+            "candidate_id": candidate_id(identity),
+            "lowering_contract_version": lowering_contract_version,
+        }
+    ).removeprefix(_SHA_PREFIX)
+    return f"{IDEMPOTENCY_NAMESPACE}/{IDEMPOTENCY_ALGORITHM_VERSION}:{digest}"
 
 
 def plan_id(semantic_digest: str) -> str:

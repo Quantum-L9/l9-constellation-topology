@@ -18,11 +18,13 @@ from l9_constellation_topology.domain.edge import EdgeRecord
 from l9_constellation_topology.domain.repository import RepositoryRecord
 from l9_constellation_topology.domain.topology import TopologyState
 from l9_constellation_topology.packets.topology_packet import TopologyPacket
-from l9_constellation_topology.run.evidence import EvidenceRecord, canonical_json
+from l9_constellation_topology.run.evidence import EvidenceRecord
 
 from .contracts import (
     DERIVATION_EVIDENCE_KINDS,
     EVIDENCE_REQUIRING_METHODS,
+    LOWERING_CONTRACT_VERSION,
+    MEMORY_INGEST_OPERATION,
     CandidateKind,
     ConfidenceMethodName,
     EvidenceKindName,
@@ -35,13 +37,11 @@ from .contracts import (
     MemoryWriteRequest,
 )
 from .identity import (
+    IDEMPOTENCY_ALGORITHM_VERSION,
     bare_digest,
     candidate_id,
     candidate_identity,
-    confidence_semantic_identity,
-    effect_idempotency_key,
-    effect_semantic_view,
-    evidence_semantic_identity,
+    idempotency_key,
 )
 from .policy import PublicationPolicy
 
@@ -68,22 +68,6 @@ class LoweredCandidate:
     idempotency_key: str
     has_resolved_evidence: bool
     requires_evidence: bool
-
-
-@dataclass(frozen=True)
-class LoweredEvidence:
-    """Downstream evidence references plus their local semantic identities.
-
-    ``refs`` is what the downstream store receives. ``semantic_identities`` is
-    what decides whether two requested writes are supported by the same evidence,
-    and is deliberately free of repository-wide revisions and evidence ids.
-    """
-
-    refs: tuple[MemoryEvidenceRef, ...]
-    resolved_ids: tuple[str, ...]
-    truncated: int
-    derivation_kind: EvidenceKindName | None
-    semantic_identities: tuple[dict[str, Any], ...]
 
 
 @dataclass(frozen=True)
@@ -177,14 +161,8 @@ def _evidence_kind(policy: PublicationPolicy, record: EvidenceRecord) -> Evidenc
 
 
 def _evidence_description(record: EvidenceRecord) -> str:
-    """Describe one evidence record using only locally observable facts.
-
-    The parent packet id is not used as a fallback locator: it is snapshot-global
-    lineage, and letting it into an evidence description would make an otherwise
-    unchanged description move with every recompilation of a changed repository.
-    """
     subject = record.field or record.subject_id
-    location = record.source_ref.source_path or record.source_ref.uri
+    location = record.source_ref.source_path or record.source_ref.uri or record.source_ref.packet_id
     suffix = f" from {location}" if location else ""
     description = (
         f"Topology stage {record.stage} recorded {record.evidence_class} "
@@ -201,7 +179,7 @@ def _lower_evidence(
     published_at: datetime,
     required_method: ConfidenceMethodName,
     subject_id: str,
-) -> LoweredEvidence:
+) -> tuple[tuple[MemoryEvidenceRef, ...], tuple[str, ...], int, EvidenceKindName | None]:
     """Lower topology evidence records into downstream evidence references."""
     resolved = tuple(
         sorted(
@@ -246,36 +224,11 @@ def _lower_evidence(
                 observed_at=published_at,
             )
         )
-
-    identities = [
-        evidence_semantic_identity(
-            kind=_evidence_kind(policy, record),
-            source_digest=bare_digest(record.source_ref.content_hash),
-            source_path=record.source_ref.source_path,
-            line_number=record.source_ref.line_number,
-        )
-        for record in kept
-    ]
-    if derivation_kind is not None:
-        identities.append(
-            evidence_semantic_identity(
-                kind=derivation_kind,
-                source_digest=None,
-                source_path=None,
-                line_number=None,
-                derivation_id=f"{required_method}:{subject_id}:{len(resolved)}",
-            )
-        )
-    # Order the semantic identities by their own content. The lowered refs are
-    # ordered by upstream evidence id, and an evidence id embeds the whole-
-    # repository revision, so inheriting that order would let an unrelated commit
-    # permute an otherwise identical supporting set and re-key the effect.
-    return LoweredEvidence(
-        refs=tuple(lowered),
-        resolved_ids=tuple(record.evidence_id for record in resolved),
-        truncated=truncated,
-        derivation_kind=derivation_kind,
-        semantic_identities=tuple(sorted(identities, key=canonical_json)),
+    return (
+        tuple(lowered),
+        tuple(record.evidence_id for record in resolved),
+        truncated,
+        derivation_kind,
     )
 
 
@@ -348,6 +301,11 @@ def _metadata(
         ],
         "candidate_kind": candidate_kind,
         "publication_policy": policy.identity,
+        # The snapshot hashes above are provenance. These name the algorithm
+        # that produced this effect's identity, so a reader can tell which
+        # keying rules a published record was admitted under.
+        "idempotency_algorithm_version": IDEMPOTENCY_ALGORITHM_VERSION,
+        "lowering_contract_version": LOWERING_CONTRACT_VERSION,
         "observed_conflict_ids": [item.conflict_id for item in conflicts],
         "observed_unknown_ids": [item.unknown_id for item in unknowns],
         "source_revisions": list(source_revisions),
@@ -379,7 +337,7 @@ def _build(
         else policy.relationship_memory_class
     )
     method = _confidence_method(policy, assessment)
-    evidence = _lower_evidence(
+    lowered_evidence, resolved_ids, truncated, derivation_kind = _lower_evidence(
         policy=policy,
         index=index,
         evidence_refs=evidence_refs,
@@ -387,8 +345,6 @@ def _build(
         required_method=method,
         subject_id=subject_id,
     )
-    lowered_evidence = evidence.refs
-    resolved_ids = evidence.resolved_ids
     conflicts = index.conflicts_by_subject.get(subject_id, ())
     unknowns = index.unknowns_by_subject.get(subject_id, ())
     source_revisions, source_paths = _source_locators(
@@ -398,6 +354,7 @@ def _build(
     )
 
     identity = candidate_identity(
+        operation=MEMORY_INGEST_OPERATION,
         candidate_kind=candidate_kind,
         namespace=namespace,
         memory_class=memory_class,
@@ -405,33 +362,10 @@ def _build(
         assertion=assertion.model_dump(mode="json") if assertion is not None else None,
         source_topology_entity_ids=entity_ids,
     )
-    confidence = MemoryConfidence(
-        score=_confidence_score(policy, assessment),
-        method=method,
-        evidence_count=len(lowered_evidence),
-        policy_version=policy.confidence_policy_version,
-        calibrated_at=published_at,
-    )
-    lowered_content = content[:64_000]
-    effect_view = effect_semantic_view(
-        operation=MemoryIngestIntent.model_fields["operation"].default,
-        fact_identity=identity,
-        namespace=namespace,
-        memory_class=memory_class,
-        content=lowered_content,
-        assertion=assertion.model_dump(mode="json") if assertion is not None else None,
-        confidence=confidence_semantic_identity(
-            score=confidence.score,
-            method=confidence.method,
-            evidence_count=confidence.evidence_count,
-            policy_version=confidence.policy_version,
-        ),
-        evidence=evidence.semantic_identities,
-    )
     request = MemoryWriteRequest(
         namespace=namespace,
         memory_class=memory_class,
-        content=lowered_content,
+        content=content[:64_000],
         assertion=assertion,
         provenance=_provenance(
             policy=policy,
@@ -442,7 +376,13 @@ def _build(
             published_at=published_at,
         ),
         evidence=lowered_evidence,
-        confidence=confidence,
+        confidence=MemoryConfidence(
+            score=_confidence_score(policy, assessment),
+            method=method,
+            evidence_count=len(lowered_evidence),
+            policy_version=policy.confidence_policy_version,
+            calibrated_at=published_at,
+        ),
         valid_from=published_at,
         tags=("l9-topology", f"topology-{candidate_kind}"),
         metadata=_metadata(
@@ -455,7 +395,10 @@ def _build(
             source_revisions=source_revisions,
             source_paths=source_paths,
         ),
-        idempotency_key=effect_idempotency_key(effect_view),
+        idempotency_key=idempotency_key(
+            identity,
+            lowering_contract_version=LOWERING_CONTRACT_VERSION,
+        ),
     )
     key = request.idempotency_key
     if key is None:
@@ -468,8 +411,8 @@ def _build(
         receipt=LoweringReceipt(
             source_fields=source_fields,
             resolved_evidence_ids=resolved_ids,
-            truncated_evidence_count=evidence.truncated,
-            derivation_evidence_kind=evidence.derivation_kind,
+            truncated_evidence_count=truncated,
+            derivation_evidence_kind=derivation_kind,
             confidence_level=str(assessment.level),
             confidence_method=method,
             conflict_status=str(assessment.conflict_status),
@@ -493,18 +436,10 @@ def lower_repository(
     index: TopologyIndex,
     published_at: datetime,
 ) -> LoweredCandidate:
-    """Lower a repository record into a durable-memory observation.
-
-    The published content states what is true of the repository, not which commit
-    it was read at. Binding the whole-repository revision into the content would
-    make this effect's identity move on every commit, including commits that
-    changed nothing this fact asserts. The revision stays in provenance and in
-    ``metadata.source_revisions``, where a published record can still say which
-    revision it was observed at without being re-keyed by unrelated churn.
-    """
+    """Lower a repository record into a durable-memory observation."""
     content = (
         f"Repository {record.name} ({record.repository_id}) has primary role "
-        f"{record.primary_role}. "
+        f"{record.primary_role} at source revision {record.source_revision}. "
         f"Languages: {_describe_list(record.languages)}. "
         f"Package managers: {_describe_list(record.package_managers)}."
     )
@@ -519,10 +454,6 @@ def lower_repository(
         assertion=None,
         assessment=record.confidence,
         evidence_refs=record.evidence_refs,
-        # ``source_revision`` remains a source field even though it left the
-        # published content: it still produces this intent's provenance and
-        # metadata, so an unresolved or contradictory revision must still hold
-        # the candidate. Only its contribution to effect *identity* was removed.
         source_fields=(
             "name",
             "repository_id",

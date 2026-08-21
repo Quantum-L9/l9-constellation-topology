@@ -92,12 +92,25 @@ EXCLUDED_PARTS = {
     "build",
     "dist",
 }
-#: Working-tree paths that are machine-local state rather than repository content.
-#: They are gitignored, so they are never delivered and never belong in MANIFEST.md,
-#: but this scanner walks the filesystem rather than the index and would otherwise
-#: report them as manifest omissions on any machine that has run the tooling.
-EXCLUDED_RELATIVE_PREFIXES = (".l9/autonomy/", ".l9/pr/")
+#: Repository-relative prefixes holding agent runtime state rather than
+#: delivered files: L4 local-autonomy phase and release receipts, and the PR
+#: remediation handoff. They are written into the worktree by the governance
+#: release flow, are git-ignored, and are never part of the delivery inventory,
+#: so a readiness scan must not report them as manifest omissions.
+EXCLUDED_RELATIVE_PREFIXES = (
+    ".l9/autonomy/",
+    ".l9/pr/",
+)
 ALLOWED_THIN_NAMES = {"__init__.py", "py.typed", ".gitkeep"}
+
+
+def _is_excluded(path: Path) -> bool:
+    if any(part in EXCLUDED_PARTS or part.endswith(".egg-info") for part in path.parts):
+        return True
+    relative = path.relative_to(ROOT).as_posix()
+    return relative.startswith(EXCLUDED_RELATIVE_PREFIXES)
+
+
 THIN_FILE_EXEMPTIONS = {
     "src/l9_constellation_topology/models.py": "legacy compatibility re-export surface",
     "src/l9_constellation_topology/stages/resolve_config.py": "typed stage adapter",
@@ -129,16 +142,11 @@ class Finding:
 def _repository_files() -> set[str]:
     files: set[str] = set()
     for path in ROOT.rglob("*"):
-        if not path.is_file() or any(
-            part in EXCLUDED_PARTS or part.endswith(".egg-info") for part in path.parts
-        ):
+        if not path.is_file() or _is_excluded(path):
             continue
         if path.name in {".coverage", "coverage.xml"}:
             continue
-        relative = path.relative_to(ROOT).as_posix()
-        if relative.startswith(EXCLUDED_RELATIVE_PREFIXES):
-            continue
-        files.add(relative)
+        files.add(path.relative_to(ROOT).as_posix())
     return files
 
 
@@ -293,9 +301,7 @@ def collect_findings() -> list[Finding]:
             )
             continue
         for path in sorted(scan_root.rglob("*")):
-            if not path.is_file() or any(
-                part in EXCLUDED_PARTS or part.endswith(".egg-info") for part in path.parts
-            ):
+            if not path.is_file() or _is_excluded(path):
                 continue
             if path.is_relative_to(ROOT / "docs" / "archive"):
                 continue

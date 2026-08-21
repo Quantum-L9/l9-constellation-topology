@@ -19,8 +19,7 @@ outputs/*
 *.tmp
 .DS_Store
 
-# Machine-local L4 autonomy phase state written by the governance tooling.
-# It records the local execution phase of the agent session, not repository content.
+# Agent runtime state written by the governance L4 / PR flow. Session-local:
+# phase and release receipts, PR remediation handoff. Never part of delivery.
 .l9/autonomy/
-# Machine-local PR-gate handoff written by the governance publish path.
 .l9/pr/
