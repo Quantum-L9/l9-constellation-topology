@@ -1,0 +1,140 @@
+{
+  "canonical_ingress": "repository-model-packet",
+  "dispatches_performed": 0,
+  "effect_identity_algorithm": "v3",
+  "predicate_policy_version": "1.0.0",
+  "schema": "l9.assertion-activation-qualification/v1",
+  "source_rescan_performed": false,
+  "specimens": [
+    {
+      "assertion_conservation_check": "passed",
+      "assertion_count_in": 77,
+      "assertion_loss_count": 0,
+      "claim_derived_unknown_count": 0,
+      "conflicts_generated": [
+        {
+          "field": "package.name",
+          "subject_id": "repo:golden-repo",
+          "values": [
+            "@l9/golden-packet-client",
+            "l9-service"
+          ]
+        }
+      ],
+      "dispatches_performed": 0,
+      "interpretation_profile": "meta-injector-repository-interpretation/1.0.0",
+      "name": "golden-repo",
+      "predicates_in": {
+        "authority.canonical_contract": 8,
+        "authority.canonical_contract_count": 2,
+        "contract.declares_invariants": 3,
+        "contract.invariant": 7,
+        "http.handler_body_marker": 1,
+        "http.route": 13,
+        "http.route_handler": 13,
+        "package.build_backend": 1,
+        "package.dependency": 14,
+        "package.framework": 1,
+        "package.name": 2,
+        "package.packaging_system": 1,
+        "package.python_constraint": 1,
+        "package.server": 1,
+        "package.version": 1,
+        "repository.disclaimed_role": 1,
+        "repository.replaced_by": 1,
+        "repository.self_described_role": 1,
+        "repository.status": 1,
+        "service.action": 2,
+        "service.name": 1,
+        "service.version": 1
+      },
+      "predicates_lost": [],
+      "predicates_out": {
+        "authority.canonical_contract": 4,
+        "authority.canonical_contract_count": 1,
+        "contract.declares_invariants": 3,
+        "contract.invariant": 5,
+        "http.handler_body_marker": 1,
+        "http.route": 6,
+        "http.route_handler": 6,
+        "package.build_backend": 1,
+        "package.dependency": 14,
+        "package.framework": 1,
+        "package.name": 2,
+        "package.packaging_system": 1,
+        "package.python_constraint": 1,
+        "package.server": 1,
+        "package.version": 1,
+        "repository.disclaimed_role": 1,
+        "repository.replaced_by": 1,
+        "repository.self_described_role": 1,
+        "repository.status": 1,
+        "service.action": 2,
+        "service.name": 1,
+        "service.version": 1
+      },
+      "producer": "l9-meta-injector.repository-model/4.0.0",
+      "publication_candidate_count": 118,
+      "publication_claim_candidate_count": 56,
+      "publication_claim_status_counts": {
+        "eligible": 54,
+        "held": 2
+      },
+      "repository_model_packet_id": "packet:f713ee46620d70a9ed2454b3dffc981084d693ab07e58af20d5b754fb7fa7239",
+      "repository_model_packet_version": "1.1.0",
+      "repository_model_semantic_hash": "sha256:f713ee46620d70a9ed2454b3dffc981084d693ab07e58af20d5b754fb7fa7239",
+      "semantic_claim_count_out": 56,
+      "source_revision": "git:0b9f9202c80fc066e8c23dc1d783b99a2789160b",
+      "topology_packet_id": "packet:b868ceeea6162bf77ebb9e3111bfd70174d6521f330de4b89aa7214a3850622e",
+      "topology_projection_counts": {
+        "authority.canonical_contract": 4,
+        "http.route": 6,
+        "package.dependency": 14,
+        "repository.replaced_by": 1,
+        "service.action": 2
+      },
+      "topology_validation_status": "passed",
+      "unsupported_predicates_preserved": []
+    },
+    {
+      "assertion_conservation_check": "passed",
+      "assertion_count_in": 4,
+      "assertion_loss_count": 0,
+      "claim_derived_unknown_count": 0,
+      "conflicts_generated": [],
+      "dispatches_performed": 0,
+      "interpretation_profile": "meta-injector-repository-interpretation/1.0.0",
+      "name": "l9-ops-mcp",
+      "predicates_in": {
+        "package.build_backend": 1,
+        "package.dependency": 1,
+        "package.name": 1,
+        "package.packaging_system": 1
+      },
+      "predicates_lost": [],
+      "predicates_out": {
+        "package.build_backend": 1,
+        "package.dependency": 1,
+        "package.name": 1,
+        "package.packaging_system": 1
+      },
+      "producer": "l9-meta-injector.repository-model/4.0.0",
+      "publication_candidate_count": 120,
+      "publication_claim_candidate_count": 4,
+      "publication_claim_status_counts": {
+        "eligible": 4
+      },
+      "repository_model_packet_id": "packet:38ea90f973e3936c8bb4a94fca29354aae476c989c92585176e5bd90969f977c",
+      "repository_model_packet_version": "1.1.0",
+      "repository_model_semantic_hash": "sha256:38ea90f973e3936c8bb4a94fca29354aae476c989c92585176e5bd90969f977c",
+      "semantic_claim_count_out": 4,
+      "source_revision": "git:70f8bbc3154cc3be277edf43c5c0048c4a2662c6",
+      "topology_packet_id": "packet:a1ada8e6b9c5c76d6752cf3a382428c4d057c8a7cda55d6aca1b9fdf9134063b",
+      "topology_projection_counts": {
+        "package.dependency": 1
+      },
+      "topology_validation_status": "passed",
+      "unsupported_predicates_preserved": []
+    }
+  ]
+}

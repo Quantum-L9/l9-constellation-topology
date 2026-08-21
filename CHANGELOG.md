@@ -1,5 +1,48 @@
 # Changelog
 
+## Unreleased - semantic assertion activation and durable write identity
+
+- Activated the repository-model 1.1.0 assertion domain end to end. Assertions
+  survived the adapter and were then dropped by `normalize_models`, so every
+  semantic claim a repository made about itself was discarded between ingress and
+  topology. They are now carried, reconciled into `SemanticClaimRecord`s, and
+  published as structured subject/predicate/object memory assertions.
+- Bound every assertion to a topology `EvidenceRecord` keyed on the *source
+  file's* digest rather than the repository snapshot's, preserving the producer's
+  assertion id, extractor, exact span, and read excerpt.
+- Added a versioned predicate registry declaring which predicates aggregate,
+  which can contradict, which are auxiliary, and which have no rule at all. Its
+  hash is bound into `TopologyPacket.policy_hashes`. An unsupported predicate is
+  preserved with its evidence, a diagnostic, and a predicate-scoped unknown; it
+  is never aggregated, contradicted, discarded, or projected.
+- Projected only the predicates with an explicit mapping. External names become
+  explicitly-labelled external identities, so a package dependency never becomes
+  an observed constellation repository and a route observation never becomes a
+  verdict about whether its handler works.
+- Added the `cross-assertion-conservation` validation check: an assertion that
+  reaches the compiler and leaves no trace now fails the compile, by identity
+  rather than by count.
+- Stopped `reconcile_evidence` adjudicating assertion predicates under the
+  field-cardinality contract, which had reported multi-valued predicates as
+  undeclared-cardinality unknowns and held nearly every claim in a plan for a
+  doubt that did not exist.
+- Replaced the `v2` effect identity with `v3`, which separates the identity of a
+  *fact* from the identity of the exact durable *write* requested. Under `v2` a
+  re-publication carrying revised evidence or confidence reused the previous key,
+  and downstream — where the key names an operation — answered `DUPLICATE` and
+  discarded the new epistemic state. Snapshot-level hashes remain excluded.
+- Recorded `EFFECT_IDENTITY_MIGRATION_PREFLIGHT.json`, the checked evidence that
+  no `v2` key ever reached durable memory, which is what makes adopting `v3`
+  directly rather than migrating a safe decision.
+- Extended `HASH_LOCALITY_EVALUATION.json` to seventeen cases covering both
+  directions of the identity contract, with per-case verdicts asserted by tests.
+- Added `scripts/qualify_repository_model_assertions.py` and `QUALIFICATION.json`,
+  recording activation results against real repository-model packets produced by
+  the bound `l9-meta-injector` from `cryptoxdog/golden-repo` and
+  `Quantum-L9/L9-Ops-MCP`. Zero assertion loss, zero dispatches.
+- Repository-model 1.0.0 inputs carry no assertion domain and compile exactly as
+  before, inventing no claims.
+
 ## Unreleased - pre-deployment repair: scan semantics, conflict cardinality, and effect identity
 
 - Repaired the bounded compatibility scan: staged packet bundles are now verified

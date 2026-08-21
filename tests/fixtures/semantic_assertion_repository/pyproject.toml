@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "l9-assertion-fixture-service"
+version = "0.3.0"
+description = "Fixture microservice observed by the repository-model producer"
+readme = "README.md"
+packages = [{include = "engine"}]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = ">=0.135.1,<0.137.0"
+uvicorn = {extras = ["standard"], version = ">=0.32,<0.47"}
+pydantic = "^2.10.0"
+httpx = "^0.28.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

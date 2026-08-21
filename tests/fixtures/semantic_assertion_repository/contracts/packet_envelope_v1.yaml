@@ -1,0 +1,13 @@
+protocol:
+  id: l9.packet_envelope
+  title: L9 PacketEnvelope
+  version: 1.0.0
+  status: canonical
+  purpose: >-
+    Canonical execution protocol for node-to-node execution.
+  invariants:
+    - Every request enters through Gate; direct ingress is not gate-compatible.
+    - The tenant_context is immutable once the envelope is sealed.
+    - Packets are derived, never mutated in place.
+    - Replay is explicit and is never inferred from a retry.
+    - Lineage is reconstructable from the parent packet identifiers alone.
