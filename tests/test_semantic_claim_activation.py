@@ -323,3 +323,37 @@ def test_a_sparse_1_0_0_constellation_invents_no_claims() -> None:
     )
     assert conservation.status == "passed"
     assert conservation.details["input_assertion_count"] == 0
+
+
+def test_topology_identity_moves_when_a_claim_moves() -> None:
+    """Semantic movement must move the packet hash, or identity could be reused."""
+    from l9_constellation_topology.packets.payloads import topology_payload_hashes
+    from l9_constellation_topology.packets.topology_packet import (
+        calculate_topology_semantic_hash,
+    )
+    from l9_constellation_topology.reconciliation import predicate_policy_hash
+
+    result = compile_topology(ROOT, (ASSERTION_BUNDLE,), created_at=FIXED_TIME)
+    packet, state = result.materialized.packet, result.materialized.state
+
+    # The claim domain participates in the payload hashes the semantic view binds.
+    assert "semantic_claims" in packet.payload_hashes
+    restated = state.model_copy(
+        update={
+            "semantic_claims": tuple(
+                claim.model_copy(update={"object": "restated"})
+                if claim.predicate == "package.framework"
+                else claim
+                for claim in state.semantic_claims
+            )
+        }
+    )
+    moved = packet.model_copy(update={"payload_hashes": topology_payload_hashes(restated)})
+    assert calculate_topology_semantic_hash(moved) != packet.semantic_hash
+
+    # ...and so does the registry that decides what a predicate means.
+    assert packet.policy_hashes["assertion_predicates"] == predicate_policy_hash()
+    rekeyed = packet.model_copy(
+        update={"policy_hashes": {**packet.policy_hashes, "assertion_predicates": "sha256:changed"}}
+    )
+    assert calculate_topology_semantic_hash(rekeyed) != packet.semantic_hash
