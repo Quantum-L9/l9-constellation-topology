@@ -1640,7 +1640,7 @@
       "path": "src/l9_constellation_topology/publication/contracts.py"
     },
     {
-      "git_object_id": "12aa490ad9b384f808be2dad7376a669e5fb5ffd",
+      "git_object_id": "a868ba4d1440bccc73208d5fec46e1f6b33d1399",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/publication/eligibility.py"
@@ -1658,7 +1658,7 @@
       "path": "src/l9_constellation_topology/publication/lowering.py"
     },
     {
-      "git_object_id": "e4497c1ca11f9ab018841618d9e64a394bcf98ef",
+      "git_object_id": "87b69e5957de71f07541e2bc7723a11a3ad8418c",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/publication/plan.py"
@@ -1964,7 +1964,7 @@
       "path": "src/l9_constellation_topology/topology/capability_builder.py"
     },
     {
-      "git_object_id": "1e6678ca708dec50d692e05a143f8a5db44d7781",
+      "git_object_id": "d0bf99d887a7200fa3205d8083ab5ed555a97a15",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/topology/claim_projection.py"
@@ -2468,7 +2468,7 @@
       "path": "tests/test_architecture_boundary_v5.py"
     },
     {
-      "git_object_id": "0b27e874f272b52200a390cc20f0309ff5cffdb9",
+      "git_object_id": "7cc2d2a040a29d34bb720b5ae66dcf90309cb3b2",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_assertion_reconciliation.py"
@@ -2744,7 +2744,7 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:1c4d5c5a80a851ab1e01e8d97871a5a47f107d61a872c24c07ae51197582e990",
+  "entries_sha256": "sha256:2e67a5552e6f5e8d8f3fe1315fc1635f2d14575168c6f1949cd8633d14393a76",
   "entry_count": 457,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
