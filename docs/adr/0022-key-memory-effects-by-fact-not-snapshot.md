@@ -1,6 +1,7 @@
 # ADR-0022: Key memory effects by the fact, not the snapshot
 
-- **Status:** Accepted
+- **Status:** Accepted; effect-identity algorithm superseded by
+  [ADR-0025](0025-separate-fact-identity-from-durable-write-identity.md)
 - **Date:** 2026-08-16
 - **Decision owner:** Repository maintainers
 - **Scope:** `l9-constellation-topology`

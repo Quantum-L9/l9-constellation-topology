@@ -21,6 +21,7 @@ from l9_constellation_topology.domain import (
     MaturityAssessment,
     RepositoryRecord,
     RiskRecord,
+    SemanticClaimRecord,
 )
 from l9_constellation_topology.io import CommitReceipt
 from l9_constellation_topology.packets import (
@@ -127,6 +128,10 @@ def build_schema_artifacts() -> tuple[GeneratedArtifact, ...]:
         "capability-record.schema.json": (
             CapabilityRecord,
             "https://quantum-l9.dev/schemas/capability-record.schema.json",
+        ),
+        "semantic-claim-record.schema.json": (
+            SemanticClaimRecord,
+            "https://quantum-l9.dev/schemas/semantic-claim-record.schema.json",
         ),
         "edge-record.schema.json": (
             EdgeRecord,

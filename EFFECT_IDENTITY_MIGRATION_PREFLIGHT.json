@@ -1,0 +1,43 @@
+{
+  "schema": "l9.effect-identity-migration-preflight/v1",
+  "question": "Have any v2 memory-effect keys been dispatched into durable memory?",
+  "superseded_algorithm": "v2",
+  "adopted_algorithm": "v3",
+  "durable_v2_dispatch_found": false,
+  "dispatch_surface_present": false,
+  "decision": "adopt_v3_directly",
+  "rationale": "No dispatch surface exists in this repository, no committed artifact carries a v2 key, and the bound downstream revision contains no trace of this repository's idempotency namespace. There is no durable v2 state for v3 keys to collide with or orphan, so v3 is adopted directly rather than migrated.",
+  "evidence": [
+    {
+      "claim": "This repository plans effects and never executes them.",
+      "source": "docs/adr/0021-internalize-publication-planning-and-memory-lowering.md",
+      "detail": "The publication boundary owns eligibility, lowering, and planning only; Gate dispatch, MemoryService calls, and RecordStore writes are all out of scope for this repository."
+    },
+    {
+      "claim": "No module can reach a memory, Graphiti, or Neo4j client.",
+      "source": "scripts/architecture_boundary_check.py",
+      "detail": "The architecture boundary check fails the build on any import of a graph client, and tests/test_effect_identity_migration_preflight.py re-checks the same property against the current source tree."
+    },
+    {
+      "claim": "No v2 key appears in any committed artifact.",
+      "source": "tests/test_effect_identity_migration_preflight.py",
+      "detail": "A repository-wide scan for the 'l9-topology-publication/v2:' prefix finds no occurrence, so no plan carrying v2 keys was ever recorded here."
+    },
+    {
+      "claim": "The bound downstream revision holds no record keyed by this namespace.",
+      "source": "tests/fixtures/downstream_contracts/l9-graphiti-memory-contract.json",
+      "detail": "Quantum-L9/l9-graphiti-memory at revision f690d3f928391264cbffb8f507ad9acbba339603 contains no occurrence of 'l9-topology-publication' or 'l9.memory-effect-id' in source, fixtures, or migrations."
+    },
+    {
+      "claim": "No automation invokes the publication planner.",
+      "source": ".github/workflows",
+      "detail": "The 'plan-publication' CLI command is reachable only by hand; no workflow, Makefile target, or script calls it, so no scheduled run could have emitted keys unobserved."
+    },
+    {
+      "claim": "v2 had a narrow window and no consumer.",
+      "source": "git log",
+      "detail": "v2 landed in 3507b05 and this change supersedes it, with no release cut and no downstream integration opened in between."
+    }
+  ],
+  "if_durable_v2_dispatch_were_found": "HALT and produce a migration plan. This contract does not authorize live inspection of durable memory, nor any migration of it."
+}

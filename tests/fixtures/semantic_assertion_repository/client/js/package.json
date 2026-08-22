@@ -1,0 +1,6 @@
+{
+  "name": "@l9/assertion-fixture-client",
+  "version": "0.3.0",
+  "description": "Browser client published from the same repository as the Python service",
+  "license": "UNLICENSED"
+}

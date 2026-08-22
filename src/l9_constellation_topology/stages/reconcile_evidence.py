@@ -4,6 +4,17 @@ Divergence is only a conflict where the field's declared cardinality makes two
 values mutually exclusive. Set-valued fields aggregate downstream, and fields
 whose cardinality is undeclared are surfaced as unknowns rather than being
 turned into conflicts that were never observed.
+
+Assertion-derived evidence is deduplicated here but deliberately not classified
+here. Its ``field`` is an assertion *predicate*, whose arity is declared by the
+predicate registry rather than by the field-cardinality contract this stage
+reads. Judging it here would apply the wrong policy and reach the wrong answer
+in both directions: fourteen values of ``package.dependency`` would be reported
+as an undeclared-cardinality unknown, and two competing values of
+``package.name`` would be reported as an unknown rather than as the conflict
+they are. ``reconcile_assertions`` owns that judgement, with the right registry;
+two stages adjudicating one fact under two policies is how a fact ends up both
+aggregated and contradicted.
 """
 
 from __future__ import annotations
@@ -12,6 +23,7 @@ from collections import defaultdict
 
 from l9_constellation_topology.cardinality import Cardinality, cardinality_of
 from l9_constellation_topology.domain import ConflictRecord, UnknownRecord
+from l9_constellation_topology.packets.assertion_evidence import ASSERTION_EVIDENCE_STAGE
 from l9_constellation_topology.run import EvidenceRecord, canonical_json, stable_id
 
 
@@ -21,6 +33,8 @@ def run(
     by_id = {record.evidence_id: record for record in evidence}
     by_subject_field: dict[tuple[str, str | None], list[EvidenceRecord]] = defaultdict(list)
     for record in by_id.values():
+        if record.stage == ASSERTION_EVIDENCE_STAGE:
+            continue
         by_subject_field[(record.subject_id, record.field)].append(record)
 
     conflicts: list[ConflictRecord] = []

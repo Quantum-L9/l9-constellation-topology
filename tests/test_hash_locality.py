@@ -43,10 +43,19 @@ EXPECTED: dict[str, tuple[str | None, str | None, str, str]] = {
     "unrelated_topology_fact": (CHANGED, None, SAME, SAME),
     "published_fact_content": (None, None, CHANGED, CHANGED),
     "published_assertion": (None, None, CHANGED, CHANGED),
-    # The logical fact is the same fact; the requested write is not the same write.
-    # Landed identity v2 keys the effect by fact + lowering contract, not by
-    # local confidence strength. Weakening evidence does not re-key the write.
-    "local_evidence_strength": (None, None, SAME, SAME),
+    # The four cases below are the ones v2 got wrong in the opposite direction to
+    # v1. The logical fact is unchanged, so candidate identity must hold — but the
+    # requested durable write is not the same write, and downstream answers a
+    # repeated key with DUPLICATE rather than admitting the new epistemic state.
+    "unchanged_fact_confidence_change": (None, None, SAME, CHANGED),
+    "unchanged_fact_stronger_evidence": (None, None, SAME, CHANGED),
+    "unchanged_fact_weaker_evidence": (None, None, SAME, CHANGED),
+    "local_source_content_changes_but_claim_text_remains_same": (None, None, SAME, CHANGED),
+    # ...and the three that must stay put, so v3 does not simply re-key on
+    # everything and call the problem solved.
+    "unchanged_fact_same_evidence_same_confidence": (SAME, SAME, SAME, SAME),
+    "evidence_timestamp_only": (None, None, SAME, SAME),
+    "source_repository_revision_only_with_same_local_content": (None, None, SAME, SAME),
     "namespace": (None, CHANGED, CHANGED, CHANGED),
     "memory_class": (None, CHANGED, CHANGED, CHANGED),
     "unrelated_publication_policy": (None, CHANGED, SAME, SAME),
@@ -95,6 +104,9 @@ def test_unrelated_changes_move_no_shared_effect_key(recorded: dict[str, object]
         "unrelated_repository_fact",
         "unrelated_topology_fact",
         "unrelated_publication_policy",
+        "unchanged_fact_same_evidence_same_confidence",
+        "evidence_timestamp_only",
+        "source_repository_revision_only_with_same_local_content",
     ):
         case = _by_case(recorded)[case_name]
         assert case["shared_candidates"] > 0, case_name
@@ -106,3 +118,21 @@ def test_evaluation_records_the_active_algorithm_and_no_dispatch(
 ) -> None:
     assert recorded["effect_identity_algorithm"] == EFFECT_IDENTITY_ALGORITHM_VERSION
     assert recorded["dispatches_performed"] == 0
+
+
+def test_only_the_perturbed_write_moves_in_the_localized_cases(
+    recorded: dict[str, object],
+) -> None:
+    """A case that must re-key one write must not re-key the whole plan.
+
+    Without this, v3 could satisfy every "effect key moves" row by keying on
+    something global again — the exact failure v1 was, wearing v3's number.
+    """
+    for case_name in (
+        "unchanged_fact_confidence_change",
+        "unchanged_fact_stronger_evidence",
+        "unchanged_fact_weaker_evidence",
+    ):
+        case = _by_case(recorded)[case_name]
+        assert case["shared_candidates"] > 1, case_name
+        assert case["shared_candidates_with_changed_effect_key"] == 1, case_name

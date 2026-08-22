@@ -56,7 +56,7 @@ ConfidenceMethodName = Literal[
     "calibrated",
 ]
 EligibilityStatus = Literal["eligible", "held", "rejected"]
-CandidateKind = Literal["entity", "relationship"]
+CandidateKind = Literal["entity", "relationship", "claim"]
 
 #: Downstream admission requires one of these kinds when the confidence method
 #: is inferred or aggregated.
@@ -175,6 +175,13 @@ class LoweringReceipt(FrozenModel):
     observed_conflict_ids: tuple[str, ...] = ()
     observed_unknown_ids: tuple[str, ...] = ()
     owning_repository_id: str | None = None
+    #: Producer assertions this candidate was reconciled from. Empty for facts
+    #: that were not lowered from the assertion domain.
+    source_assertion_ids: tuple[str, ...] = ()
+    assertion_predicate: str | None = None
+    #: How the predicate registry classified the predicate. ``unsupported`` is
+    #: recorded rather than hidden: it is why such a candidate is held.
+    predicate_support: str | None = None
 
 
 class EligibilityDecision(FrozenModel):

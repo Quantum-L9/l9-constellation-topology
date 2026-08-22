@@ -32,6 +32,18 @@
       "additionalProperties": false,
       "description": "Record exactly which topology facts and rules produced an intent.",
       "properties": {
+        "assertion_predicate": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Assertion Predicate"
+        },
         "confidence_level": {
           "title": "Confidence Level",
           "type": "string"
@@ -100,12 +112,32 @@
           "default": null,
           "title": "Owning Repository Id"
         },
+        "predicate_support": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Predicate Support"
+        },
         "resolved_evidence_ids": {
           "default": [],
           "items": {
             "type": "string"
           },
           "title": "Resolved Evidence Ids",
+          "type": "array"
+        },
+        "source_assertion_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Assertion Ids",
           "type": "array"
         },
         "source_fields": {
@@ -781,7 +813,8 @@
         "candidate_kind": {
           "enum": [
             "entity",
-            "relationship"
+            "relationship",
+            "claim"
           ],
           "title": "Candidate Kind",
           "type": "string"
@@ -878,7 +911,8 @@
         "source_kind": {
           "enum": [
             "entity",
-            "relationship"
+            "relationship",
+            "claim"
           ],
           "title": "Source Kind",
           "type": "string"

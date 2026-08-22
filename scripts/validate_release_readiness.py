@@ -122,6 +122,13 @@ MARKER_RE = re.compile(
 )
 MARKER_EXEMPTIONS = {
     "scripts/validate_release_readiness.py": ("no-stub policy", "MARKER_RE ="),
+    # Fixture input, not project source. The marker on this line is the thing the
+    # repository-model producer observes to emit `http.handler_body_marker`, and
+    # the compiler's contract is that observing it never becomes a verdict about
+    # the handler. Removing the marker would remove the coverage that proves it.
+    # Owner: the assertion-activation fixture; remove when that predicate is no
+    # longer part of the interpretation profile.
+    "tests/fixtures/semantic_assertion_repository/engine/main.py": ("route to the engine handler",),
     ".github/workflows/l9-pr-validate.yml": ("no-stub policy",),
     "CHANGELOG.md": ("no-stub", "placeholder bodies"),
     "RUNBOOK.md": ("no-stub gate",),

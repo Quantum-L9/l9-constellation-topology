@@ -108,7 +108,7 @@ def test_candidate_and_idempotency_identity_are_deterministic(
         item.idempotency_key for item in second.candidates
     ]
     assert all(
-        item.idempotency_key.startswith("l9-topology-publication/v2:") for item in first.candidates
+        item.idempotency_key.startswith("l9-topology-publication/v3:") for item in first.candidates
     )
     assert len({item.candidate_id for item in first.candidates}) == len(first.candidates)
 
@@ -125,24 +125,57 @@ def test_candidate_and_skip_order_is_stable(
     )
 
 
-def test_policy_revision_alone_does_not_rekey_unchanged_facts(
+def test_inert_policy_change_does_not_rekey_unchanged_facts(
     materialized: MaterializedTopology, policy: PublicationPolicy
 ) -> None:
-    """A policy version bump that changes no effect semantics changes no key.
+    """A policy change that changes no requested write changes no key.
 
-    Under v1 the whole policy hash was mixed into every key, so re-stamping the
-    policy version re-keyed every effect in the plan and downstream saw a plan
-    of brand-new facts. The facts had not moved; only the label on the rules
-    had. The plan hash still records the revision.
+    Under v1 the whole policy hash was mixed into every key, so any policy edit
+    re-keyed every effect in the plan and downstream saw a plan of brand-new
+    facts. The facts had not moved; only the rules had. Raising the evidence
+    ceiling above what any candidate actually uses is the clean case: no lowered
+    request differs by a single field afterwards. The plan hash still records it.
     """
     baseline = _plan(materialized, policy, FIXED_TIME)
-    shifted_policy = policy.model_copy(update={"version": "1.0.1"})
-    shifted = build_publication_plan(materialized, shifted_policy, published_at=FIXED_TIME)
+    inert_policy = policy.model_copy(
+        update={
+            "maximum_evidence_refs_per_candidate": policy.maximum_evidence_refs_per_candidate + 1
+        }
+    )
+    shifted = build_publication_plan(materialized, inert_policy, published_at=FIXED_TIME)
 
     assert baseline.policy_hash != shifted.policy_hash
     assert [item.idempotency_key for item in baseline.candidates] == [
         item.idempotency_key for item in shifted.candidates
     ]
+
+
+def test_confidence_policy_revision_rekeys_every_effect(
+    materialized: MaterializedTopology, policy: PublicationPolicy
+) -> None:
+    """A policy version bump is not inert: every request carries the version.
+
+    ``MemoryConfidence.policy_version`` is a field of the durable write, derived
+    from the publication policy version. Bumping the version therefore changes
+    what every request asks downstream to store. Reusing the previous key would
+    have downstream answer ``DUPLICATE`` and keep the superseded version stamped
+    on the record — the same class of silent loss v3 exists to prevent.
+
+    The logical facts have not moved, so candidate identity must hold throughout.
+    """
+    baseline = _plan(materialized, policy, FIXED_TIME)
+    shifted_policy = policy.model_copy(update={"version": "1.0.1"})
+    shifted = build_publication_plan(materialized, shifted_policy, published_at=FIXED_TIME)
+
+    assert [item.candidate_id for item in baseline.candidates] == [
+        item.candidate_id for item in shifted.candidates
+    ]
+    assert {item.idempotency_key for item in baseline.candidates}.isdisjoint(
+        {item.idempotency_key for item in shifted.candidates}
+    )
+    assert {
+        item.memory_intent.request.confidence.policy_version for item in shifted.candidates
+    } == {"l9-topology-publication/1.0.1"}
 
 
 def test_policy_change_that_moves_an_effect_does_rekey_it(

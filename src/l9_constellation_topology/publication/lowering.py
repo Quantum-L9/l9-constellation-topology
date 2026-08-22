@@ -13,6 +13,7 @@ from typing import Any
 
 from l9_constellation_topology.domain.assessment import ConflictRecord, UnknownRecord
 from l9_constellation_topology.domain.capability import CapabilityRecord
+from l9_constellation_topology.domain.claim import SemanticClaimRecord
 from l9_constellation_topology.domain.confidence import ConfidenceAssessment
 from l9_constellation_topology.domain.edge import EdgeRecord
 from l9_constellation_topology.domain.repository import RepositoryRecord
@@ -41,17 +42,39 @@ from .identity import (
     bare_digest,
     candidate_id,
     candidate_identity,
+    confidence_semantics,
+    evidence_semantics,
     idempotency_key,
 )
 from .policy import PublicationPolicy
 
 ENTITY_EXTRACTION_METHOD = "topology-entity-aggregation"
 RELATIONSHIP_EXTRACTION_METHOD = "topology-relationship-compilation"
+CLAIM_EXTRACTION_METHOD = "repository-model-assertion-reconciliation"
 PUBLICATION_TOOL = "l9-constellation-topology/publication"
 
 
 class LoweringError(ValueError):
     """Raised when a topology fact cannot be lowered under the active policy."""
+
+
+@dataclass(frozen=True)
+class AssertionProvenance:
+    """Where a lowered fact came from in the repository-model assertion domain.
+
+    Grouped rather than passed as three more parameters: only claim lowering
+    supplies any of them, and they always travel together.
+    """
+
+    source_assertion_ids: tuple[str, ...] = ()
+    predicate: str | None = None
+    #: Registry classification of the predicate. ``unsupported`` is what holds
+    #: such a candidate, so it is recorded rather than inferred downstream.
+    support: str | None = None
+
+
+#: The absence of assertion provenance, for facts not lowered from an assertion.
+NO_ASSERTION_PROVENANCE = AssertionProvenance()
 
 
 @dataclass(frozen=True)
@@ -179,8 +202,22 @@ def _lower_evidence(
     published_at: datetime,
     required_method: ConfidenceMethodName,
     subject_id: str,
-) -> tuple[tuple[MemoryEvidenceRef, ...], tuple[str, ...], int, EvidenceKindName | None]:
-    """Lower topology evidence records into downstream evidence references."""
+) -> tuple[
+    tuple[MemoryEvidenceRef, ...],
+    tuple[str, ...],
+    int,
+    EvidenceKindName | None,
+    tuple[EvidenceRecord, ...],
+]:
+    """Lower topology evidence records into downstream evidence references.
+
+    The kept topology records are returned alongside the lowered refs because
+    effect identity needs what the downstream ``EvidenceRef`` contract has no
+    field for: the source path the evidence was read at. Recomputing it from the
+    lowered ref is impossible, and keying on the topology evidence id instead
+    would bind the effect to the repository revision, which is exactly the
+    coupling v3 removes.
+    """
     resolved = tuple(
         sorted(
             (
@@ -229,6 +266,25 @@ def _lower_evidence(
         tuple(record.evidence_id for record in resolved),
         truncated,
         derivation_kind,
+        kept,
+    )
+
+
+def _local_evidence_semantics(
+    policy: PublicationPolicy,
+    kept: tuple[EvidenceRecord, ...],
+) -> tuple[dict[str, Any], ...]:
+    """Return the evidence this write rests on, in snapshot-independent terms."""
+    return tuple(
+        evidence_semantics(
+            evidence_kind=str(_evidence_kind(policy, record)),
+            source_content_digest=bare_digest(record.source_ref.content_hash),
+            # The path, never the packet id or repository revision: the same file
+            # at the same content is the same support for the claim regardless of
+            # which commit it was read at.
+            stable_source_locator=record.source_ref.source_path or record.source_ref.uri,
+        )
+        for record in kept
     )
 
 
@@ -291,6 +347,9 @@ def _metadata(
     unknowns: tuple[UnknownRecord, ...],
     source_revisions: tuple[str, ...],
     source_paths: tuple[str, ...],
+    publication_candidate_id: str,
+    source_assertion_ids: tuple[str, ...],
+    assertion_predicate: str | None,
 ) -> dict[str, Any]:
     return {
         "topology_packet_id": packet.packet_id,
@@ -310,6 +369,14 @@ def _metadata(
         "observed_unknown_ids": [item.unknown_id for item in unknowns],
         "source_revisions": list(source_revisions),
         "source_paths": list(source_paths),
+        # Names the logical fact rather than this particular write, so a later
+        # execution layer can correlate successive operations on one fact and
+        # resolve supersession against durable state. Topology does not fabricate
+        # downstream record identities, so ``MemoryWriteRequest.supersedes`` stays
+        # empty: a new effect key means "a new operation", not "replace record X".
+        "publication_candidate_id": publication_candidate_id,
+        "source_assertion_ids": list(source_assertion_ids),
+        "assertion_predicate": assertion_predicate,
     }
 
 
@@ -320,7 +387,6 @@ def _build(
     index: TopologyIndex,
     candidate_kind: CandidateKind,
     entity_ids: tuple[str, ...],
-    subject_id: str,
     content: str,
     assertion: MemoryAssertion | None,
     assessment: ConfidenceAssessment,
@@ -328,16 +394,24 @@ def _build(
     source_fields: tuple[str, ...],
     extraction_method: str,
     published_at: datetime,
+    provenance: AssertionProvenance = NO_ASSERTION_PROVENANCE,
 ) -> LoweredCandidate:
+    # The subject is the first entity the fact was lowered from, in every kind:
+    # a repository, a capability, a relationship's source, a claim's subject.
+    # It used to be a second parameter that callers had to keep in agreement with
+    # this one, which nothing enforced.
+    if not entity_ids:
+        raise LoweringError("a lowered fact must name at least one topology entity")
+    subject_id = entity_ids[0]
     owning_repository_id = index.owning_repository_by_entity.get(subject_id)
     namespace = _namespace(policy, owning_repository_id)
-    memory_class = (
-        policy.entity_memory_class
-        if candidate_kind == "entity"
-        else policy.relationship_memory_class
-    )
+    memory_class = {
+        "entity": policy.entity_memory_class,
+        "relationship": policy.relationship_memory_class,
+        "claim": policy.claim_memory_class,
+    }[candidate_kind]
     method = _confidence_method(policy, assessment)
-    lowered_evidence, resolved_ids, truncated, derivation_kind = _lower_evidence(
+    lowered_evidence, resolved_ids, truncated, derivation_kind, kept_evidence = _lower_evidence(
         policy=policy,
         index=index,
         evidence_refs=evidence_refs,
@@ -362,6 +436,13 @@ def _build(
         assertion=assertion.model_dump(mode="json") if assertion is not None else None,
         source_topology_entity_ids=entity_ids,
     )
+    confidence = MemoryConfidence(
+        score=_confidence_score(policy, assessment),
+        method=method,
+        evidence_count=len(lowered_evidence),
+        policy_version=policy.confidence_policy_version,
+        calibrated_at=published_at,
+    )
     request = MemoryWriteRequest(
         namespace=namespace,
         memory_class=memory_class,
@@ -376,13 +457,7 @@ def _build(
             published_at=published_at,
         ),
         evidence=lowered_evidence,
-        confidence=MemoryConfidence(
-            score=_confidence_score(policy, assessment),
-            method=method,
-            evidence_count=len(lowered_evidence),
-            policy_version=policy.confidence_policy_version,
-            calibrated_at=published_at,
-        ),
+        confidence=confidence,
         valid_from=published_at,
         tags=("l9-topology", f"topology-{candidate_kind}"),
         metadata=_metadata(
@@ -394,10 +469,21 @@ def _build(
             unknowns=unknowns,
             source_revisions=source_revisions,
             source_paths=source_paths,
+            publication_candidate_id=candidate_id(identity),
+            source_assertion_ids=provenance.source_assertion_ids,
+            assertion_predicate=provenance.predicate,
         ),
         idempotency_key=idempotency_key(
             identity,
             lowering_contract_version=LOWERING_CONTRACT_VERSION,
+            local_evidence=_local_evidence_semantics(policy, kept_evidence),
+            confidence=confidence_semantics(
+                score=confidence.score,
+                method=str(confidence.method),
+                evidence_count=confidence.evidence_count,
+                confidence_policy_version=confidence.policy_version,
+            ),
+            derivation_kind=str(derivation_kind) if derivation_kind is not None else None,
         ),
     )
     key = request.idempotency_key
@@ -419,6 +505,9 @@ def _build(
             observed_conflict_ids=tuple(item.conflict_id for item in conflicts),
             observed_unknown_ids=tuple(item.unknown_id for item in unknowns),
             owning_repository_id=owning_repository_id,
+            source_assertion_ids=provenance.source_assertion_ids,
+            assertion_predicate=provenance.predicate,
+            predicate_support=provenance.support,
         ),
         identity=identity,
         candidate_id=candidate_id(identity),
@@ -449,7 +538,6 @@ def lower_repository(
         index=index,
         candidate_kind="entity",
         entity_ids=(record.repository_id,),
-        subject_id=record.repository_id,
         content=content,
         assertion=None,
         assessment=record.confidence,
@@ -487,7 +575,6 @@ def lower_capability(
         index=index,
         candidate_kind="entity",
         entity_ids=(record.capability_id,),
-        subject_id=record.capability_id,
         content=content,
         assertion=None,
         assessment=record.confidence,
@@ -531,7 +618,6 @@ def lower_relationship(
         index=index,
         candidate_kind="relationship",
         entity_ids=(record.source_id, record.target_id),
-        subject_id=record.source_id,
         content=content,
         assertion=assertion,
         assessment=record.confidence,
@@ -539,4 +625,59 @@ def lower_relationship(
         source_fields=("source_id", "edge_type", "target_id", "direction"),
         extraction_method=RELATIONSHIP_EXTRACTION_METHOD,
         published_at=published_at,
+    )
+
+
+def lower_semantic_claim(
+    record: SemanticClaimRecord,
+    *,
+    policy: PublicationPolicy,
+    packet: TopologyPacket,
+    index: TopologyIndex,
+    published_at: datetime,
+) -> LoweredCandidate:
+    """Lower a reconciled semantic claim into a structured memory assertion.
+
+    The downstream assertion is the claim verbatim — subject, predicate, object —
+    so a claim publishes as the triple it is even when no richer graph projection
+    exists for its predicate. The prose ``content`` restates the same triple and
+    adds nothing to it: a reader of the content alone learns exactly what the
+    assertion says, and no more.
+    """
+    assertion = MemoryAssertion(
+        subject=record.subject_id[:500],
+        predicate=record.predicate[:200],
+        object=record.object[:2_000],
+    )
+    if not assertion.is_structured:
+        raise LoweringError(f"claim {record.claim_id} does not provide a structured assertion")
+    content = (
+        f"Repository-model assertion: {record.subject_id} {record.predicate} {record.object}. "
+        f"Cardinality {record.cardinality}; registry support {record.support}; "
+        f"conflict status {record.conflict_status}."
+    )
+    return _build(
+        policy=policy,
+        packet=packet,
+        index=index,
+        candidate_kind="claim",
+        # The subject is the only topology entity a claim is guaranteed to
+        # resolve. A claim's object is frequently an external name, and naming it
+        # as a topology entity would assert a membership that was never observed.
+        entity_ids=(record.subject_id,),
+        content=content,
+        assertion=assertion,
+        assessment=record.confidence,
+        evidence_refs=record.evidence_refs,
+        # The predicate is a source field, so a conflict or unknown recorded
+        # against that predicate is material to exactly this claim and not to
+        # unrelated facts about the same repository.
+        source_fields=("subject_id", "predicate", "object", record.predicate),
+        extraction_method=CLAIM_EXTRACTION_METHOD,
+        published_at=published_at,
+        provenance=AssertionProvenance(
+            source_assertion_ids=record.source_assertion_ids,
+            predicate=record.predicate,
+            support=record.support,
+        ),
     )

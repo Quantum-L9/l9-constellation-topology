@@ -11,8 +11,12 @@ from collections import Counter
 from datetime import datetime
 from pathlib import Path
 
+from l9_constellation_topology.domain.claim import SemanticClaimRecord
 from l9_constellation_topology.packets.refs import PacketRef
-from l9_constellation_topology.packets.topology_packet import MaterializedTopology
+from l9_constellation_topology.packets.topology_packet import (
+    MaterializedTopology,
+    TopologyPacket,
+)
 from l9_constellation_topology.run.evidence import utc_now
 
 from .contracts import (
@@ -25,6 +29,7 @@ from .contracts import (
 from .eligibility import (
     SKIP_EDGE_TYPE,
     SKIP_ENTITY_KIND,
+    SKIP_UNSTATEABLE_CLAIM,
     EligibilityContext,
     decide,
     require_publishable_topology,
@@ -32,10 +37,12 @@ from .eligibility import (
 from .identity import plan_id, publication_semantic_hash
 from .lowering import (
     LoweredCandidate,
+    LoweringError,
     TopologyIndex,
     lower_capability,
     lower_relationship,
     lower_repository,
+    lower_semantic_claim,
 )
 from .policy import PublicationPolicy, load_publication_policy
 
@@ -142,6 +149,45 @@ def _diagnostics(
     return tuple(diagnostics)
 
 
+def _lower_claims(
+    claims: tuple[SemanticClaimRecord, ...],
+    *,
+    policy: PublicationPolicy,
+    packet: TopologyPacket,
+    index: TopologyIndex,
+    published_at: datetime,
+    selected: bool,
+) -> tuple[list[LoweredCandidate], list[SkippedCandidate]]:
+    """Lower semantic claims, recording rather than raising on the ones that cannot be."""
+    lowered: list[LoweredCandidate] = []
+    skipped: list[SkippedCandidate] = []
+    for record in claims:
+        if not selected:
+            skipped.append(
+                SkippedCandidate(
+                    source_kind="claim", source_id=record.claim_id, reason=SKIP_ENTITY_KIND
+                )
+            )
+            continue
+        try:
+            lowered.append(
+                lower_semantic_claim(
+                    record, policy=policy, packet=packet, index=index, published_at=published_at
+                )
+            )
+        except LoweringError:
+            # The claim survives in canonical topology either way; what cannot be
+            # done is state it downstream as a subject/predicate/object.
+            skipped.append(
+                SkippedCandidate(
+                    source_kind="claim",
+                    source_id=record.claim_id,
+                    reason=SKIP_UNSTATEABLE_CLAIM,
+                )
+            )
+    return lowered, skipped
+
+
 def build_publication_plan(
     materialized: MaterializedTopology,
     policy: PublicationPolicy,
@@ -191,6 +237,17 @@ def build_publication_plan(
             )
             for record in state.capability_records
         )
+
+    claim_lowered, claim_skipped = _lower_claims(
+        state.semantic_claims,
+        policy=policy,
+        packet=packet,
+        index=index,
+        published_at=timestamp,
+        selected="semantic_claim" in eligible_entity_kinds,
+    )
+    lowered.extend(claim_lowered)
+    skipped.extend(claim_skipped)
 
     if "artifact" in eligible_entity_kinds:
         raise ValueError(

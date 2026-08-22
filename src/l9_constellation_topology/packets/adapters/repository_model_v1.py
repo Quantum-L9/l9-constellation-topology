@@ -10,6 +10,7 @@ from l9_constellation_topology.domain import (
     EdgeRecord,
     RepositoryRecord,
 )
+from l9_constellation_topology.packets.assertion_evidence import assertion_evidence_records
 from l9_constellation_topology.packets.repository_model import (
     RepositoryModelAssertion,
     RepositoryModelPacket,
@@ -48,13 +49,17 @@ class RepositoryModelV1Adapter:
             normalize_diagnostic(raw, source_packet_id=packet.packet_id, index=index)
             for index, raw in enumerate(packet.payload.diagnostics)
         )
+        # Assertion evidence is built here, where the parent packet is still in
+        # hand. Downstream stages see assertions as bare claims, and the packet
+        # identity, source revision, and producer that make the evidence
+        # attributable are only available at this boundary.
         return NormalizedRepositoryModel(
             packet_id=packet.packet_id,
             repositories=packet.payload.repositories,
             artifacts=packet.payload.artifacts,
             capabilities=packet.payload.capabilities,
             relationships=packet.payload.relationships,
-            evidence=packet.payload.evidence,
+            evidence=packet.payload.evidence + assertion_evidence_records(packet),
             diagnostics=diagnostics,
             assertions=packet.payload.assertions or (),
         )

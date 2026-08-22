@@ -47,6 +47,11 @@ ROOT = Path(__file__).resolve().parents[1]
 INPUTS = (
     ROOT / "tests/fixtures/repository_model_packets/l9-gate-sdk",
     ROOT / "tests/fixtures/repository_model_packets/l9-mcp-server",
+    # Included so semantic-claim intents — the kind that carries a structured
+    # subject/predicate/object assertion — are validated against the downstream
+    # boundary too. Without it this seam would only ever see entity and
+    # relationship intents, and the newest lowering would go unchecked.
+    ROOT / "tests/fixtures/repository_model_packets/l9-assertion-sample",
 )
 CONTRACT_FIXTURE = ROOT / "tests/fixtures/downstream_contracts/l9-graphiti-memory-contract.json"
 FIXED_TIME = datetime(2026, 3, 1, tzinfo=UTC)
@@ -80,6 +85,17 @@ def intents() -> list[dict[str, Any]]:
     document = eligible_intent_document(plan)
     assert document["intents"], "fixture topology produced no eligible intents"
     return list(document["intents"])
+
+
+@pytest.fixture(scope="module")
+def claim_intents(intents: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    selected = [
+        intent
+        for intent in intents
+        if intent["request"]["metadata"].get("candidate_kind") == "claim"
+    ]
+    assert selected, "fixture topology produced no eligible semantic-claim intents"
+    return selected
 
 
 def test_contract_fixture_records_the_bound_downstream_revision(
@@ -147,6 +163,28 @@ def test_intents_satisfy_the_downstream_shape_offline(
         if request["confidence"]["method"] in contract["evidence_requiring_confidence_methods"]:
             kinds = {item["kind"] for item in request["evidence"]}
             assert kinds & set(contract["derivation_evidence_kinds"])
+
+
+def test_claim_intents_carry_a_structured_assertion(
+    claim_intents: list[dict[str, Any]], contract: dict[str, Any]
+) -> None:
+    """A claim publishes as the triple it is, within downstream field bounds."""
+    assertion_fields = set(contract["models"]["MemoryAssertion"]["fields"])
+    for intent in claim_intents:
+        request = intent["request"]
+        assertion = request["assertion"]
+        assert assertion is not None
+        assert set(assertion) <= assertion_fields
+        assert assertion["subject"]
+        assert assertion["predicate"]
+        assert assertion["object"]
+        assert len(assertion["subject"]) <= 500
+        assert len(assertion["predicate"]) <= 200
+        assert len(assertion["object"]) <= 2_000
+        assert request["metadata"]["assertion_predicate"] == assertion["predicate"]
+        assert request["metadata"]["source_assertion_ids"]
+        # Topology never fabricates a downstream record identity.
+        assert request["supersedes"] == []
 
 
 @pytest.mark.skipif(

@@ -1,0 +1,10 @@
+service:
+  name: "l9-assertion-fixture-review-system"
+  version: "1.2.0"
+  description: "Spec-driven engine surface used to validate assertion wiring"
+
+actions:
+  - name: "execute"
+    description: "Execute an action request"
+  - name: "describe"
+    description: "Describe the available actions"

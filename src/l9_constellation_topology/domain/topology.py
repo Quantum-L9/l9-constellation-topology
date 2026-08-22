@@ -8,6 +8,7 @@ from .artifact import ArtifactRecord
 from .assessment import ConflictRecord, ImpactIndex, MaturityAssessment, RiskRecord, UnknownRecord
 from .base import FrozenModel
 from .capability import CapabilityRecord
+from .claim import SemanticClaimRecord
 from .diagnostic import DiagnosticRecord
 from .edge import EdgeRecord, GraphRecord
 from .flow import FlowRecord
@@ -18,6 +19,7 @@ class TopologyState(FrozenModel):
     repository_records: tuple[RepositoryRecord, ...] = ()
     artifact_records: tuple[ArtifactRecord, ...] = ()
     capability_records: tuple[CapabilityRecord, ...] = ()
+    semantic_claims: tuple[SemanticClaimRecord, ...] = ()
     edge_records: tuple[EdgeRecord, ...] = ()
     flow_records: tuple[FlowRecord, ...] = ()
     graph_records: tuple[GraphRecord, ...] = ()

@@ -15,6 +15,7 @@ from l9_constellation_topology.domain import (
     EdgeType,
     TopologyState,
 )
+from l9_constellation_topology.packets.assertion_evidence import ASSERTION_EVIDENCE_STAGE
 from l9_constellation_topology.packets.common import Producer, ValidationStatus
 from l9_constellation_topology.packets.loader import RepositoryModelBundle
 from l9_constellation_topology.packets.payloads import topology_payload_hashes
@@ -102,6 +103,9 @@ def _record_evidence_refs(
     records.extend(
         (capability.capability_id, capability.evidence_refs, capability.confidence.authority)
         for capability in state.capability_records
+    )
+    records.extend(
+        (claim.claim_id, claim.evidence_refs, claim.authority) for claim in state.semantic_claims
     )
     records.extend(
         (edge.edge_id, edge.evidence_refs, edge.confidence.authority) for edge in state.edge_records
@@ -222,6 +226,7 @@ def validate_topology(
         ("repository-record.schema.json", state.repository_records),
         ("artifact-record.schema.json", state.artifact_records),
         ("capability-record.schema.json", state.capability_records),
+        ("semantic-claim-record.schema.json", state.semantic_claims),
         ("edge-record.schema.json", state.edge_records),
         ("flow-record.schema.json", state.flow_records),
         ("graph-record.schema.json", state.graph_records),
@@ -297,6 +302,7 @@ def validate_topology(
         "repository": tuple(record.repository_id for record in state.repository_records),
         "artifact": tuple(record.artifact_id for record in state.artifact_records),
         "capability": tuple(record.capability_id for record in state.capability_records),
+        "semantic-claim": tuple(record.claim_id for record in state.semantic_claims),
         "edge": tuple(record.edge_id for record in state.edge_records),
         "flow": tuple(record.flow_id for record in state.flow_records),
         "graph": tuple(record.entity_id for record in state.graph_records),
@@ -499,6 +505,55 @@ def validate_topology(
                 "preserved_count": preserved_diagnostic_count,
                 "expected_source_packets": tuple(sorted(expected_diagnostic_sources)),
                 "actual_source_packets": tuple(sorted(diagnostic_source_packets)),
+            },
+        )
+    )
+
+    # Assertion conservation. An assertion that reaches the compiler and leaves
+    # no trace is the failure this whole domain exists to prevent, and a count
+    # alone would not catch it: it must be locatable afterwards, by identity, in
+    # both the evidence pool and the claim set.
+    input_assertion_ids: set[str] = set()
+    for bundle in input_bundles:
+        if bundle.packet.payload is None or not bundle.packet.payload.assertions:
+            continue
+        input_assertion_ids.update(
+            assertion.assertion_id for assertion in bundle.packet.payload.assertions
+        )
+    evidenced_assertion_ids: set[str] = set()
+    for record in state.evidence:
+        if record.stage != ASSERTION_EVIDENCE_STAGE or not isinstance(record.value, dict):
+            continue
+        assertion_id = record.value.get("assertion_id")
+        if isinstance(assertion_id, str):
+            evidenced_assertion_ids.add(assertion_id)
+    claimed_assertion_ids = {
+        assertion_id
+        for claim in state.semantic_claims
+        for assertion_id in claim.source_assertion_ids
+    }
+    unevidenced = tuple(sorted(input_assertion_ids - evidenced_assertion_ids))
+    unclaimed = tuple(sorted(input_assertion_ids - claimed_assertion_ids))
+    invented = tuple(sorted(claimed_assertion_ids - input_assertion_ids))
+    cross_reference_results.append(
+        _check(
+            check_id="cross-assertion-conservation",
+            check_class="cross-reference",
+            rule="input_assertions_conserved",
+            passed=not (unevidenced or unclaimed or invented),
+            success=(
+                "Every input assertion is carried by an evidence record and named by "
+                "a semantic claim, and no claim cites an assertion no input made."
+            ),
+            failure="One or more input assertions were lost, or a claim cites an unknown one.",
+            details={
+                "input_assertion_count": len(input_assertion_ids),
+                "evidenced_assertion_count": len(evidenced_assertion_ids),
+                "claimed_assertion_count": len(claimed_assertion_ids),
+                "semantic_claim_count": len(state.semantic_claims),
+                "assertions_without_evidence": unevidenced,
+                "assertions_without_claim": unclaimed,
+                "claims_citing_unknown_assertions": invented,
             },
         )
     )
