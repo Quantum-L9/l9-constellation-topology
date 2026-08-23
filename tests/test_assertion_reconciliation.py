@@ -15,6 +15,7 @@ from l9_constellation_topology.domain.confidence import Authority, ConflictStatu
 from l9_constellation_topology.packets.assertion_evidence import (
     ASSERTION_EVIDENCE_STAGE,
     assertion_evidence_record,
+    assertion_semantic_inputs,
 )
 from l9_constellation_topology.packets.repository_model import (
     AssertionSourceRange,
@@ -85,7 +86,7 @@ def _reconcile(assertions: tuple[RepositoryModelAssertion, ...]):
     evidence = tuple(
         assertion_evidence_record(assertion, packet=packet) for assertion in assertions
     )
-    return reconcile_assertions(assertions, evidence)
+    return reconcile_assertions(assertion_semantic_inputs(assertions), evidence)
 
 
 def test_registry_classifications_are_disjoint_and_complete() -> None:
@@ -265,7 +266,9 @@ def test_predicates_are_adjudicated_once_by_the_right_policy() -> None:
     assert unknowns == ()
 
     # The predicate registry reaches the correct verdicts instead.
-    _, claim_conflicts, claim_unknowns, _ = reconcile_assertions(assertions, evidence)
+    _, claim_conflicts, claim_unknowns, _ = reconcile_assertions(
+        assertion_semantic_inputs(assertions), evidence
+    )
     assert [item.field for item in claim_conflicts] == ["package.name"]
     assert claim_unknowns == ()
 

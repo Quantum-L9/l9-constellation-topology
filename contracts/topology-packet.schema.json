@@ -191,7 +191,16 @@
     },
     "TopologyInputs": {
       "additionalProperties": false,
+      "description": "Every packet a compile was computed from.\n\nTwo input classes, kept in separate fields rather than one list of refs.\nRepository Model Packets are canonical source observation; corpus\nintelligence is auxiliary analysis over exactly those packets. A single\nmerged list would make the compiler ask \"what type is this?\" at every use,\nand would let a corpus packet arrive with no Repository Model Packets behind\nit \u2014 an analysis of nothing, which the type here makes unrepresentable.",
       "properties": {
+        "corpus_intelligence_packets": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/PacketRef"
+          },
+          "title": "Corpus Intelligence Packets",
+          "type": "array"
+        },
         "repository_model_packets": {
           "items": {
             "$ref": "#/$defs/PacketRef"
@@ -237,7 +246,7 @@
       "type": "string"
     },
     "packet_version": {
-      "default": "1.0.0",
+      "default": "1.1.0",
       "title": "Packet Version",
       "type": "string"
     },

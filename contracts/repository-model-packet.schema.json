@@ -250,6 +250,28 @@
       "title": "ConflictStatus",
       "type": "string"
     },
+    "CsvLocator": {
+      "additionalProperties": false,
+      "description": "A row of a delimited file.",
+      "properties": {
+        "kind": {
+          "const": "csv",
+          "default": "csv",
+          "title": "Kind",
+          "type": "string"
+        },
+        "row": {
+          "minimum": 1,
+          "title": "Row",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "row"
+      ],
+      "title": "CsvLocator",
+      "type": "object"
+    },
     "DerivationMethod": {
       "enum": [
         "declared",
@@ -270,6 +292,33 @@
       ],
       "title": "Direction",
       "type": "string"
+    },
+    "DocxLocator": {
+      "additionalProperties": false,
+      "description": "A block within a Word document body, by ordinal and block kind.",
+      "properties": {
+        "block_index": {
+          "minimum": 0,
+          "title": "Block Index",
+          "type": "integer"
+        },
+        "block_kind": {
+          "title": "Block Kind",
+          "type": "string"
+        },
+        "kind": {
+          "const": "docx",
+          "default": "docx",
+          "title": "Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "block_index",
+        "block_kind"
+      ],
+      "title": "DocxLocator",
+      "type": "object"
     },
     "EdgeRecord": {
       "additionalProperties": false,
@@ -335,7 +384,10 @@
         "SUPERSEDES",
         "ROUTES_TO",
         "PUBLISHES_TO",
-        "MEMBER_OF"
+        "MEMBER_OF",
+        "DUPLICATE_OF",
+        "BLOCKED_BY",
+        "REFERENCES"
       ],
       "title": "EdgeType",
       "type": "string"
@@ -457,6 +509,56 @@
           "default": null,
           "title": "Line Number"
         },
+        "locator": {
+          "anyOf": [
+            {
+              "discriminator": {
+                "mapping": {
+                  "csv": "#/$defs/CsvLocator",
+                  "docx": "#/$defs/DocxLocator",
+                  "html": "#/$defs/HtmlLocator",
+                  "line": "#/$defs/LineLocator",
+                  "notebook": "#/$defs/NotebookLocator",
+                  "pdf": "#/$defs/PdfLocator",
+                  "pptx": "#/$defs/PptxLocator",
+                  "spreadsheet": "#/$defs/SpreadsheetLocator"
+                },
+                "propertyName": "kind"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/LineLocator"
+                },
+                {
+                  "$ref": "#/$defs/PdfLocator"
+                },
+                {
+                  "$ref": "#/$defs/DocxLocator"
+                },
+                {
+                  "$ref": "#/$defs/PptxLocator"
+                },
+                {
+                  "$ref": "#/$defs/SpreadsheetLocator"
+                },
+                {
+                  "$ref": "#/$defs/NotebookLocator"
+                },
+                {
+                  "$ref": "#/$defs/CsvLocator"
+                },
+                {
+                  "$ref": "#/$defs/HtmlLocator"
+                }
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Locator"
+        },
         "packet_id": {
           "anyOf": [
             {
@@ -519,6 +621,28 @@
       "title": "EvidenceStrength",
       "type": "string"
     },
+    "HtmlLocator": {
+      "additionalProperties": false,
+      "description": "A node, by an index stable under the producer's own traversal order.",
+      "properties": {
+        "kind": {
+          "const": "html",
+          "default": "html",
+          "title": "Kind",
+          "type": "string"
+        },
+        "stable_node_index": {
+          "minimum": 0,
+          "title": "Stable Node Index",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "stable_node_index"
+      ],
+      "title": "HtmlLocator",
+      "type": "object"
+    },
     "InterpretationProfileRef": {
       "additionalProperties": false,
       "description": "Identity of the producer's interpretation profile, when it ran.",
@@ -551,6 +675,61 @@
       "title": "InterpretationProfileRef",
       "type": "object"
     },
+    "LineLocator": {
+      "additionalProperties": false,
+      "description": "A 1-based inclusive line span, for a format that has lines.",
+      "properties": {
+        "end_line": {
+          "minimum": 1,
+          "title": "End Line",
+          "type": "integer"
+        },
+        "kind": {
+          "const": "line",
+          "default": "line",
+          "title": "Kind",
+          "type": "string"
+        },
+        "start_line": {
+          "minimum": 1,
+          "title": "Start Line",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "start_line",
+        "end_line"
+      ],
+      "title": "LineLocator",
+      "type": "object"
+    },
+    "NotebookLocator": {
+      "additionalProperties": false,
+      "description": "A notebook cell by ordinal and declared cell type.",
+      "properties": {
+        "cell_index": {
+          "minimum": 0,
+          "title": "Cell Index",
+          "type": "integer"
+        },
+        "cell_type": {
+          "title": "Cell Type",
+          "type": "string"
+        },
+        "kind": {
+          "const": "notebook",
+          "default": "notebook",
+          "title": "Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "cell_index",
+        "cell_type"
+      ],
+      "title": "NotebookLocator",
+      "type": "object"
+    },
     "PacketValidationRef": {
       "additionalProperties": false,
       "properties": {
@@ -581,6 +760,62 @@
         "status"
       ],
       "title": "PacketValidationRef",
+      "type": "object"
+    },
+    "PdfLocator": {
+      "additionalProperties": false,
+      "description": "A block on a page. A PDF page is not a line and has no line numbers.",
+      "properties": {
+        "block_index": {
+          "minimum": 0,
+          "title": "Block Index",
+          "type": "integer"
+        },
+        "kind": {
+          "const": "pdf",
+          "default": "pdf",
+          "title": "Kind",
+          "type": "string"
+        },
+        "page_number": {
+          "minimum": 1,
+          "title": "Page Number",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "page_number",
+        "block_index"
+      ],
+      "title": "PdfLocator",
+      "type": "object"
+    },
+    "PptxLocator": {
+      "additionalProperties": false,
+      "description": "A shape on a slide.",
+      "properties": {
+        "kind": {
+          "const": "pptx",
+          "default": "pptx",
+          "title": "Kind",
+          "type": "string"
+        },
+        "shape_index": {
+          "minimum": 0,
+          "title": "Shape Index",
+          "type": "integer"
+        },
+        "slide_number": {
+          "minimum": 1,
+          "title": "Slide Number",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "slide_number",
+        "shape_index"
+      ],
+      "title": "PptxLocator",
       "type": "object"
     },
     "Producer": {
@@ -950,6 +1185,32 @@
         "semantic_hash"
       ],
       "title": "SourceSnapshot",
+      "type": "object"
+    },
+    "SpreadsheetLocator": {
+      "additionalProperties": false,
+      "description": "A cell or range on a named sheet, in the workbook's own A1 vocabulary.",
+      "properties": {
+        "cell_or_range": {
+          "title": "Cell Or Range",
+          "type": "string"
+        },
+        "kind": {
+          "const": "spreadsheet",
+          "default": "spreadsheet",
+          "title": "Kind",
+          "type": "string"
+        },
+        "sheet": {
+          "title": "Sheet",
+          "type": "string"
+        }
+      },
+      "required": [
+        "sheet",
+        "cell_or_range"
+      ],
+      "title": "SpreadsheetLocator",
       "type": "object"
     }
   },

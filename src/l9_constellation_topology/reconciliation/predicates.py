@@ -50,9 +50,17 @@ PredicateSupport = Literal["set", "single", "auxiliary", "unsupported"]
 
 PREDICATE_POLICY_ID = "l9-topology-assertion-predicates"
 
-#: 1.0.0 is the first registry. It covers the Meta interpretation profile that
-#: repository-model 1.1.0 producers currently emit.
-PREDICATE_POLICY_VERSION = "1.0.0"
+#: 1.1.0 adds the document work vocabulary: the predicates a decoder reads out of
+#: plans, roadmaps, trackers, and WIP documents. 1.0.0 covered only the Meta
+#: interpretation profile for source repositories.
+#:
+#: The work predicates are declared here, in the same registry, on purpose. A
+#: separate conflict model for Word documents would mean two answers to the
+#: question "does this repository have one status or several", decided by which
+#: file format happened to state it — and a `.docx` saying ``Complete`` beside a
+#: `.md` saying ``WIP`` is exactly the contradiction a reader needs surfaced, not
+#: one routed into a different subsystem.
+PREDICATE_POLICY_VERSION = "1.1.0"
 
 #: Predicates whose objects are simultaneously true. These aggregate.
 SET_VALUED_PREDICATES: frozenset[str] = frozenset(
@@ -66,6 +74,18 @@ SET_VALUED_PREDICATES: frozenset[str] = frozenset(
         "repository.disclaimed_role",
         "repository.self_described_role",
         "service.action",
+        # Document work vocabulary. A document has many headings, a plan names
+        # many open tasks, and a roadmap names many milestones: several objects
+        # of each are simultaneously true, so count alone is never a conflict.
+        "document.heading",
+        "work.task.open",
+        "work.task.completed",
+        "work.milestone",
+        "work.depends_on",
+        "work.blocked_by",
+        "work.references",
+        "work.supersedes",
+        "work.superseded_by",
     }
 )
 
@@ -84,6 +104,13 @@ SINGLE_VALUED_PREDICATES: frozenset[str] = frozenset(
         "repository.status",
         "service.name",
         "service.version",
+        # A document has one title, is in one state, and is one kind of thing at
+        # a time. Two answers to any of these is a real contradiction: a plan
+        # declaring both `WIP` and `Complete` is the finding, and aggregating the
+        # two into a set would report it as two facts and lose it.
+        "document.title",
+        "work.status",
+        "work.kind",
     }
 )
 

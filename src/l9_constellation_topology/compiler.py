@@ -32,6 +32,7 @@ from l9_constellation_topology.packets.topology_packet import (
     MaterializedTopology,
     calculate_topology_semantic_hash,
 )
+from l9_constellation_topology.packets.assertion_evidence import assertion_semantic_inputs
 from l9_constellation_topology.reconciliation import (
     PREDICATE_POLICY_VERSION,
     RECONCILIATION_POLICY_VERSION,
@@ -191,7 +192,7 @@ def compile_topology(
     # Assertions reconcile against the already-reconciled evidence pool, which
     # is where their own evidence records live after passing through the adapter.
     claims, claim_conflicts, claim_unknowns, claim_diagnostics = reconcile_assertions(
-        normalized.assertions, evidence
+        assertion_semantic_inputs(normalized.assertions), evidence
     )
     projection = project_claims(claims)
     claims = apply_projection(claims, projection)
