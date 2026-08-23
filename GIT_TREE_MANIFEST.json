@@ -1340,7 +1340,7 @@
       "path": "src/l9_constellation_topology/cardinality.py"
     },
     {
-      "git_object_id": "96c6de169a8ee9461dd88f743eda8063fd2f03bd",
+      "git_object_id": "7ffbb7fa94f230b492fb825fc906cdc82cd61dd6",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/cli.py"
@@ -1586,7 +1586,7 @@
       "path": "src/l9_constellation_topology/packets/bundle.py"
     },
     {
-      "git_object_id": "4c63fe77c55416c961f56b6494f1650526a3a225",
+      "git_object_id": "3394855c0921f650da7735188c3541f565f6b843",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/packets/bundle_verification.py"
@@ -1616,7 +1616,7 @@
       "path": "src/l9_constellation_topology/packets/corpus_evidence.py"
     },
     {
-      "git_object_id": "d77e947931f14ba331b2afc3bb3fabafac657413",
+      "git_object_id": "f1fd30ac36c41238139ec05f41d43e197989a9ea",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/packets/corpus_intelligence.py"
@@ -2948,7 +2948,7 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:e8ab675d6be0715e78a7332e08a0a2706c119ec27bb60a6cedf735ce25a777f3",
+  "entries_sha256": "sha256:f14ac6d73a0efc684ea77258ad2394eb5f8a30ab9f999bc6801055d4d72c2e5d",
   "entry_count": 491,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
