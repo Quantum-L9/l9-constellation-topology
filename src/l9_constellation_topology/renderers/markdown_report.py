@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
+
 from l9_constellation_topology.domain.edge import EdgeType
+from l9_constellation_topology.domain.reasoning import TopologyReasoningCandidate
 from l9_constellation_topology.domain.topology import TopologyState
 from l9_constellation_topology.io import RenderedArtifact
 from l9_constellation_topology.models import TopologyReport
@@ -27,8 +30,7 @@ def render_topology_markdown(materialized: MaterializedTopology) -> str:
         "",
         "## Repository Inventory",
         "",
-        "| Repository | Role | Revision | Languages | Confidence |",
-        "|---|---|---|---|---|",
+        *_table("Repository", "Role", "Revision", "Languages", "Confidence"),
     ]
     for repository in state.repository_records:
         lines.append(
@@ -48,7 +50,7 @@ def render_topology_markdown(materialized: MaterializedTopology) -> str:
     lines.extend(("", "## Dependency Topology", ""))
     dependency_edges = [edge for edge in state.edge_records if edge.edge_type.value == "DEPENDS_ON"]
     if dependency_edges:
-        lines.extend(("| Source | Target | Confidence |", "|---|---|---|"))
+        lines.extend(_table("Source", "Target", "Confidence"))
         for edge in dependency_edges:
             lines.append(
                 f"| `{edge.source_id}` | `{edge.target_id}` | {edge.confidence.level.value} |"
@@ -58,7 +60,7 @@ def render_topology_markdown(materialized: MaterializedTopology) -> str:
 
     lines.extend(("", "## Risks", ""))
     if state.risks:
-        lines.extend(("| Subject | Severity | Category | Finding |", "|---|---|---|---|"))
+        lines.extend(_table("Subject", "Severity", "Category", "Finding"))
         for risk in state.risks:
             lines.append(
                 f"| `{risk.subject_id}` | {risk.severity} | {risk.category} | {risk.description} |"
@@ -68,7 +70,7 @@ def render_topology_markdown(materialized: MaterializedTopology) -> str:
 
     lines.extend(("", "## Maturity", ""))
     if state.maturity:
-        lines.extend(("| Subject | Score | Band | Profile |", "|---|---|---|---|"))
+        lines.extend(_table("Subject", "Score", "Band", "Profile"))
         for assessment in state.maturity:
             lines.append(
                 f"| `{assessment.subject_id}` | {assessment.score}/{assessment.maximum_score} | "
@@ -122,6 +124,31 @@ READINESS_DISCLAIMER = (
 )
 
 
+def _table(*headers: str) -> tuple[str, str]:
+    """Return a header row and the separator that must match its width.
+
+    The separator is derived from the header rather than written beside it. Six
+    copies of ``|---|---|---|---|`` were previously spelled out, and a table
+    whose separator has a different column count from its header renders as
+    plain text in most viewers — a failure that is invisible in the source.
+    """
+    return ("| " + " | ".join(headers) + " |", "|" + "---|" * len(headers))
+
+
+def _row(*cells: str) -> str:
+    """Return one table row."""
+    return "| " + " | ".join(cells) + " |"
+
+
+def _routing_movement(row: TopologyReasoningCandidate) -> str:
+    """How topology's routing compares to the producer's, in one word."""
+    if row.escalated:
+        return "escalated"
+    if row.deescalated:
+        return "de-escalated"
+    return "unchanged"
+
+
 def _candidate_table(state: TopologyState, candidate_type: str) -> list[str]:
     """Render one candidate class, with the structure topology measured for it."""
     rows = [
@@ -134,8 +161,14 @@ def _candidate_table(state: TopologyState, candidate_type: str) -> list[str]:
     lines = [
         CANDIDATE_DISCLAIMER,
         "",
-        "| Candidate | Members | Confidence | Structural support | Ambiguity | Readiness |",
-        "|---|---|---|---|---|---|",
+        *_table(
+            "Candidate",
+            "Members",
+            "Confidence",
+            "Structural support",
+            "Ambiguity",
+            "Readiness",
+        ),
     ]
     for candidate in rows:
         evidence = candidate.structural_evidence
@@ -158,129 +191,146 @@ def _candidate_table(state: TopologyState, candidate_type: str) -> list[str]:
     return lines
 
 
+def _corpus_overview(state: TopologyState) -> list[str]:
+    """The corpus and its roots. Empty when no corpus was compiled."""
+    if not state.corpus_records:
+        return ["No corpus intelligence was compiled into this topology."]
+    lines = list(_table("Corpus", "Source snapshot", "Analysis", "Roots"))
+    lines.extend(
+        _row(
+            f"`{corpus.corpus_id}`",
+            f"`{corpus.corpus_source_snapshot_id}`",
+            f"`{corpus.corpus_analysis_id}`",
+            str(len(corpus.root_ids)),
+        )
+        for corpus in state.corpus_records
+    )
+    lines.extend(("", *_table("Root", "Identity", "Revision", "Repository")))
+    lines.extend(
+        _row(
+            f"`{root.root_id}`",
+            root.identity_class,
+            f"`{root.source_revision}`",
+            f"`{root.repository_id}`" if root.repository_id else "none observed",
+        )
+        for root in state.root_records
+    )
+    return lines
+
+
+def _duplicate_section(state: TopologyState) -> list[str]:
+    """Byte-identical artifacts, and the hash that decided each pair."""
+    duplicates = [edge for edge in state.edge_records if edge.edge_type is EdgeType.duplicate_of]
+    if not duplicates:
+        return ["No byte-identical artifacts were observed."]
+    lines = [
+        "_Byte identity only. Every pair below carries the same content hash; "
+        "no similarity score contributes to this table._",
+        "",
+        *_table("Artifact", "Duplicate of", "Cluster", "Content hash"),
+    ]
+    lines.extend(
+        _row(
+            f"`{edge.source_id}`",
+            f"`{edge.target_id}`",
+            f"`{edge.properties.get('duplicate_cluster_id', '')}`",
+            f"`{str(edge.properties.get('content_hash', ''))[:23]}…`",
+        )
+        for edge in duplicates
+    )
+    return lines
+
+
+def _work_relation_section(state: TopologyState) -> list[str]:
+    """Explicitly declared work relations, with how each target resolved."""
+    work_edges = [edge for edge in state.edge_records if "target_resolution" in edge.properties]
+    if not work_edges:
+        return ["No explicit work relationships were declared."]
+    lines = list(_table("Source", "Relation", "Target", "Resolution"))
+    lines.extend(
+        _row(
+            f"`{edge.source_id}`",
+            edge.edge_type.value,
+            f"`{edge.target_id}`",
+            str(edge.properties.get("target_resolution")),
+        )
+        for edge in work_edges
+    )
+    return lines
+
+
+def _readiness_section(state: TopologyState) -> list[str]:
+    """Readiness counts. Never a score — see the disclaimer it carries."""
+    if not state.readiness_evidence:
+        return ["No readiness evidence was compiled."]
+    lines = [
+        READINESS_DISCLAIMER,
+        "",
+        *_table("Subject", "Source", "Tests", "CI", "Docs", "Open tasks", "Blocked", "Gaps"),
+    ]
+    lines.extend(
+        _row(
+            f"`{readiness.subject_id}`",
+            str(readiness.source_artifact_count),
+            str(readiness.test_artifact_count),
+            str(readiness.ci_definition_count),
+            str(readiness.documentation_count),
+            str(readiness.open_task_count),
+            str(readiness.blocked_count),
+            str(readiness.coverage_gap_count),
+        )
+        for readiness in state.readiness_evidence
+    )
+    return lines
+
+
+def _reasoning_section(state: TopologyState) -> list[str]:
+    """The reasoning queue, with both routings and how they differ."""
+    if not state.topology_reasoning_candidates:
+        return ["No reasoning candidates were routed."]
+    lines = [
+        "_A deterministic handoff. No model was called to produce this queue, and "
+        "nothing in it has been adjudicated._",
+        "",
+        *_table("Candidate", "Upstream", "Topology", "Movement", "Signals"),
+    ]
+    lines.extend(
+        _row(
+            f"`{row.candidate_id}`",
+            row.upstream_recommended_reasoning_type or "none",
+            row.topology_recommended_reasoning_type,
+            _routing_movement(row),
+            ", ".join(row.structural_signals) or "none",
+        )
+        for row in state.topology_reasoning_candidates
+    )
+    return lines
+
+
+#: Each corpus-scoped section, in the order a reader meets them. A table rather
+#: than a hundred-line function: adding a section is one entry, and each builder
+#: is independently readable and independently testable.
+_CORPUS_SECTIONS: tuple[tuple[str, Callable[[TopologyState], list[str]]], ...] = (
+    ("Corpus Overview", _corpus_overview),
+    ("Cross-Root Exact Duplicates", _duplicate_section),
+    ("Explicit Work Relationships", _work_relation_section),
+    ("Candidate Topics", lambda state: _candidate_table(state, "TOPIC_CANDIDATE")),
+    ("Candidate Bodies of Work", lambda state: _candidate_table(state, "PROJECT_CANDIDATE")),
+    (
+        "Consolidation Candidates",
+        lambda state: _candidate_table(state, "CONSOLIDATION_CANDIDATE"),
+    ),
+    ("Readiness Evidence", _readiness_section),
+    ("Reasoning Queue", _reasoning_section),
+)
+
+
 def _corpus_sections(state: TopologyState) -> list[str]:
     """Render every corpus-scoped section, in the order a reader meets them."""
     lines: list[str] = []
-
-    lines.extend(("", "## Corpus Overview", ""))
-    if state.corpus_records:
-        lines.extend(("| Corpus | Source snapshot | Analysis | Roots |", "|---|---|---|---|"))
-        for corpus in state.corpus_records:
-            lines.append(
-                f"| `{corpus.corpus_id}` | `{corpus.corpus_source_snapshot_id}` | "
-                f"`{corpus.corpus_analysis_id}` | {len(corpus.root_ids)} |"
-            )
-        lines.extend(("", "| Root | Identity | Revision | Repository |", "|---|---|---|---|"))
-        for root in state.root_records:
-            lines.append(
-                f"| `{root.root_id}` | {root.identity_class} | "
-                f"`{root.source_revision}` | "
-                + (f"`{root.repository_id}`" if root.repository_id else "none observed")
-                + " |"
-            )
-    else:
-        lines.append("No corpus intelligence was compiled into this topology.")
-
-    lines.extend(("", "## Cross-Root Exact Duplicates", ""))
-    duplicates = [edge for edge in state.edge_records if edge.edge_type is EdgeType.duplicate_of]
-    if duplicates:
-        lines.append(
-            "_Byte identity only. Every pair below carries the same content hash; "
-            "no similarity score contributes to this table._"
-        )
-        lines.extend(
-            ("", "| Artifact | Duplicate of | Cluster | Content hash |", "|---|---|---|---|")
-        )
-        for edge in duplicates:
-            digest = str(edge.properties.get("content_hash", ""))
-            lines.append(
-                f"| `{edge.source_id}` | `{edge.target_id}` | "
-                f"`{edge.properties.get('duplicate_cluster_id', '')}` | `{digest[:23]}…` |"
-            )
-    else:
-        lines.append("No byte-identical artifacts were observed.")
-
-    lines.extend(("", "## Explicit Work Relationships", ""))
-    work_edges = [edge for edge in state.edge_records if "target_resolution" in edge.properties]
-    if work_edges:
-        lines.extend(("| Source | Relation | Target | Resolution |", "|---|---|---|---|"))
-        for edge in work_edges:
-            lines.append(
-                f"| `{edge.source_id}` | {edge.edge_type.value} | `{edge.target_id}` | "
-                f"{edge.properties.get('target_resolution')} |"
-            )
-    else:
-        lines.append("No explicit work relationships were declared.")
-
-    lines.extend(("", "## Candidate Topics", ""))
-    lines.extend(_candidate_table(state, "TOPIC_CANDIDATE"))
-    lines.extend(("", "## Candidate Bodies of Work", ""))
-    lines.extend(_candidate_table(state, "PROJECT_CANDIDATE"))
-    lines.extend(("", "## Consolidation Candidates", ""))
-    lines.extend(_candidate_table(state, "CONSOLIDATION_CANDIDATE"))
-
-    lines.extend(("", "## Readiness Evidence", ""))
-    if state.readiness_evidence:
-        lines.extend(
-            (
-                READINESS_DISCLAIMER,
-                "",
-                "| Subject | Source | Tests | CI | Docs | Open tasks | Blocked | Gaps |",
-                "|---|---|---|---|---|---|---|---|",
-            )
-        )
-        for readiness in state.readiness_evidence:
-            lines.append(
-                "| "
-                + " | ".join(
-                    (
-                        f"`{readiness.subject_id}`",
-                        str(readiness.source_artifact_count),
-                        str(readiness.test_artifact_count),
-                        str(readiness.ci_definition_count),
-                        str(readiness.documentation_count),
-                        str(readiness.open_task_count),
-                        str(readiness.blocked_count),
-                        str(readiness.coverage_gap_count),
-                    )
-                )
-                + " |"
-            )
-    else:
-        lines.append("No readiness evidence was compiled.")
-
-    lines.extend(("", "## Reasoning Queue", ""))
-    if state.topology_reasoning_candidates:
-        lines.append(
-            "_A deterministic handoff. No model was called to produce this queue, and "
-            "nothing in it has been adjudicated._"
-        )
-        lines.extend(
-            (
-                "",
-                "| Candidate | Upstream | Topology | Movement | Signals |",
-                "|---|---|---|---|---|",
-            )
-        )
-        for row in state.topology_reasoning_candidates:
-            movement = (
-                "escalated" if row.escalated else "de-escalated" if row.deescalated else "unchanged"
-            )
-            lines.append(
-                "| "
-                + " | ".join(
-                    (
-                        f"`{row.candidate_id}`",
-                        row.upstream_recommended_reasoning_type or "none",
-                        row.topology_recommended_reasoning_type,
-                        movement,
-                        ", ".join(row.structural_signals) or "none",
-                    )
-                )
-                + " |"
-            )
-    else:
-        lines.append("No reasoning candidates were routed.")
+    for heading, build in _CORPUS_SECTIONS:
+        lines.extend(("", f"## {heading}", ""))
+        lines.extend(build(state))
     return lines
 
 

@@ -22,7 +22,11 @@ from __future__ import annotations
 
 from l9_constellation_topology.run.evidence import LINE_LOCATOR_KINDS
 
-from .corpus_intelligence import CorpusIntelligencePacket, CorpusIntelligencePayload
+from .corpus_intelligence import (
+    CandidateCluster,
+    CorpusIntelligencePacket,
+    CorpusIntelligencePayload,
+)
 from .repository_model import RepositoryModelPacket
 
 #: Document formats that genuinely have lines. A work signal decoded from
@@ -182,35 +186,45 @@ def _check_pairs(
                 )
 
 
+def _check_candidate(
+    candidate: CandidateCluster,
+    artifacts: frozenset[str],
+    relation_ids: frozenset[str],
+    errors: list[str],
+) -> None:
+    """Check one candidate's members and supporting relations resolve."""
+    for member in candidate.member_artifact_ids:
+        if member not in artifacts:
+            errors.append(
+                f"candidate {candidate.candidate_id} names member {member}, "
+                "which no input packet carries"
+            )
+    for supporting in candidate.supporting_relation_ids:
+        if supporting not in relation_ids:
+            errors.append(
+                f"candidate {candidate.candidate_id} cites supporting relation "
+                f"{supporting}, which this packet does not carry"
+            )
+
+
 def _check_candidates(
     payload: CorpusIntelligencePayload,
     artifacts: frozenset[str],
     errors: list[str],
 ) -> frozenset[str]:
-    relation_ids = {relation.relation_id for relation in payload.semantic_pair_relations} | {
-        relation.relation_id for relation in payload.exact_duplicate_relations
-    }
-    candidate_ids: set[str] = set()
-    for group in (
-        payload.topic_candidates,
-        payload.project_candidates,
-        payload.consolidation_candidates,
-    ):
-        for candidate in group:
-            candidate_ids.add(candidate.candidate_id)
-            for member in candidate.member_artifact_ids:
-                if member not in artifacts:
-                    errors.append(
-                        f"candidate {candidate.candidate_id} names member {member}, "
-                        "which no input packet carries"
-                    )
-            for supporting in candidate.supporting_relation_ids:
-                if supporting not in relation_ids:
-                    errors.append(
-                        f"candidate {candidate.candidate_id} cites supporting relation "
-                        f"{supporting}, which this packet does not carry"
-                    )
-    return frozenset(candidate_ids)
+    """Check every candidate domain, and return the identities they declare."""
+    relation_ids = frozenset(
+        {relation.relation_id for relation in payload.semantic_pair_relations}
+        | {relation.relation_id for relation in payload.exact_duplicate_relations}
+    )
+    candidates = (
+        *payload.topic_candidates,
+        *payload.project_candidates,
+        *payload.consolidation_candidates,
+    )
+    for candidate in candidates:
+        _check_candidate(candidate, artifacts, relation_ids, errors)
+    return frozenset(candidate.candidate_id for candidate in candidates)
 
 
 def _check_readiness(

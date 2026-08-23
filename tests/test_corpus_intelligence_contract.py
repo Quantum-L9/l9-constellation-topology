@@ -50,7 +50,17 @@ from tests.corpus_fixtures import (
 
 
 def _validate(payload: CorpusIntelligencePayload) -> None:
-    validate_corpus_intelligence_packet(corpus_packet(payload), REPOSITORY_PACKETS)
+    """Validate a payload, with the packet built outside the assertion.
+
+    ``CorpusIntelligenceValidationError`` is a ``ValueError``, and so is every
+    payload and packet model validator. Constructing either *inside* a
+    ``pytest.raises`` block would let a test pass because the fixture was
+    rejected rather than because validation found what it was meant to find —
+    which is a test that cannot fail for the reason it was written. So the
+    fixture is built first, and only the call under test sits in the block.
+    """
+    packet = corpus_packet(payload)
+    validate_corpus_intelligence_packet(packet, REPOSITORY_PACKETS)
 
 
 def test_a_well_formed_corpus_packet_validates() -> None:
@@ -105,8 +115,9 @@ def test_a_changed_payload_moves_packet_identity() -> None:
 
 
 def test_a_corpus_packet_referencing_a_missing_repository_model_fails() -> None:
+    packet = corpus_packet()
     with pytest.raises(CorpusIntelligenceValidationError) as caught:
-        validate_corpus_intelligence_packet(corpus_packet(), (REPOSITORY_PACKETS[0],))
+        validate_corpus_intelligence_packet(packet, (REPOSITORY_PACKETS[0],))
     assert any("did not resolve" in error for error in caught.value.errors)
 
 
@@ -119,8 +130,9 @@ def test_a_document_signal_naming_an_unobserved_artifact_fails() -> None:
         {"kind": "line", "start_line": 1, "end_line": 1},
         "markdown",
     ).model_copy(update={"artifact_id": "artifact:never-observed"})
+    payload = corpus_payload(document_work_signals=(stray,))
     with pytest.raises(CorpusIntelligenceValidationError) as caught:
-        _validate(corpus_payload(document_work_signals=(stray,)))
+        _validate(payload)
     assert any("no input packet carries" in error for error in caught.value.errors)
 
 
@@ -132,8 +144,9 @@ def test_a_duplicate_relation_with_a_missing_endpoint_fails() -> None:
         artifact_b_id="artifact:never-observed",
         content_hash=DUPLICATE_DIGEST,
     )
+    payload = corpus_payload(exact_duplicate_relations=(stray,))
     with pytest.raises(CorpusIntelligenceValidationError) as caught:
-        _validate(corpus_payload(exact_duplicate_relations=(stray,)))
+        _validate(payload)
     assert any("no input packet carries" in error for error in caught.value.errors)
 
 
@@ -159,8 +172,9 @@ def test_a_duplicate_cluster_carrying_two_hashes_fails() -> None:
             content_hash="sha256:" + "2" * 64,
         ),
     )
+    payload = corpus_payload(exact_duplicate_relations=relations)
     with pytest.raises(CorpusIntelligenceValidationError) as caught:
-        _validate(corpus_payload(exact_duplicate_relations=relations))
+        _validate(payload)
     assert any("more than one content hash" in error for error in caught.value.errors)
 
 
@@ -183,8 +197,9 @@ def test_a_pair_relation_with_a_missing_endpoint_fails() -> None:
         confidence_class="weak",
         analysis_profile=ANALYSIS_PROFILE,
     )
+    payload = corpus_payload(semantic_pair_relations=(stray,))
     with pytest.raises(CorpusIntelligenceValidationError) as caught:
-        _validate(corpus_payload(semantic_pair_relations=(stray,)))
+        _validate(payload)
     assert any("no input packet carries" in error for error in caught.value.errors)
 
 
@@ -192,8 +207,9 @@ def test_a_candidate_naming_a_missing_member_fails() -> None:
     stray = PROJECT_CANDIDATE.model_copy(
         update={"member_artifact_ids": ("artifact:never-observed",)}
     )
+    payload = corpus_payload(project_candidates=(stray,))
     with pytest.raises(CorpusIntelligenceValidationError) as caught:
-        _validate(corpus_payload(project_candidates=(stray,)))
+        _validate(payload)
     assert any("no input packet carries" in error for error in caught.value.errors)
 
 
@@ -201,8 +217,9 @@ def test_a_candidate_citing_an_absent_supporting_relation_fails() -> None:
     stray = PROJECT_CANDIDATE.model_copy(
         update={"supporting_relation_ids": ("pair:never-emitted",)}
     )
+    payload = corpus_payload(project_candidates=(stray,))
     with pytest.raises(CorpusIntelligenceValidationError) as caught:
-        _validate(corpus_payload(project_candidates=(stray,)))
+        _validate(payload)
     assert any("this packet does not carry" in error for error in caught.value.errors)
 
 
@@ -237,8 +254,9 @@ def test_readiness_for_an_unknown_subject_fails() -> None:
         profile_id="readiness",
         profile_version="1.0.0",
     )
+    payload = corpus_payload(readiness_evidence=(stray,))
     with pytest.raises(CorpusIntelligenceValidationError) as caught:
-        _validate(corpus_payload(readiness_evidence=(stray,)))
+        _validate(payload)
     assert any("neither a candidate" in error for error in caught.value.errors)
 
 
@@ -248,8 +266,9 @@ def test_a_reasoning_candidate_naming_an_absent_candidate_fails() -> None:
         candidate_id="candidate:never-emitted",
         recommended_reasoning_type="CONSOLIDATION_ANALYSIS",
     )
+    payload = corpus_payload(reasoning_candidates=(stray,))
     with pytest.raises(CorpusIntelligenceValidationError) as caught:
-        _validate(corpus_payload(reasoning_candidates=(stray,)))
+        _validate(payload)
     assert any("this packet does not carry" in error for error in caught.value.errors)
 
 
@@ -260,8 +279,9 @@ def test_a_reasoning_candidate_citing_an_undeclared_pack_fails() -> None:
         recommended_reasoning_type="PROJECT_IDENTITY_ADJUDICATION",
         evidence_pack_ref="pack:never-declared",
     )
+    payload = corpus_payload(reasoning_candidates=(stray,), reasoning_evidence_pack_refs=())
     with pytest.raises(CorpusIntelligenceValidationError) as caught:
-        _validate(corpus_payload(reasoning_candidates=(stray,), reasoning_evidence_pack_refs=()))
+        _validate(payload)
     assert any("does not declare" in error for error in caught.value.errors)
 
 

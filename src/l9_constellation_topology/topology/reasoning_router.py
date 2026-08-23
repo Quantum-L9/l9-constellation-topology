@@ -31,6 +31,8 @@ that exact duplicates and similarity-only candidates never reach a reasoner.
 
 from __future__ import annotations
 
+from dataclasses import dataclass
+
 from l9_constellation_topology.domain.assessment import ConflictRecord, UnknownRecord
 from l9_constellation_topology.domain.candidate import (
     AMBIGUITY_CONFLICTING_STATUS,
@@ -135,53 +137,60 @@ def _ambiguous_supersession(members: frozenset[str], edges: tuple[EdgeRecord, ..
     )
 
 
-def route_candidate(
+@dataclass(frozen=True)
+class _Signals:
+    """What topology's own structure says about one candidate.
+
+    Collected before anything is decided, so gathering evidence and acting on it
+    stay separable: a new signal is one branch here, and the decision table below
+    does not grow with it.
+    """
+
+    structural: tuple[str, ...]
+    conflict_refs: tuple[str, ...]
+    unknown_refs: tuple[str, ...]
+    escalate: bool
+    deescalate: bool
+
+
+def _collect_signals(
     cluster: CandidateClusterRecord,
     *,
-    upstream: ReasoningCandidateRequest | None,
     edges: tuple[EdgeRecord, ...],
     conflicts: tuple[ConflictRecord, ...],
     unknowns: tuple[UnknownRecord, ...],
-) -> TopologyReasoningCandidate:
-    """Return the topology reasoning decision for one candidate."""
+) -> _Signals:
+    """Return every signal recorded structure raises about this candidate."""
     members = frozenset(cluster.member_entity_ids)
     structural: list[str] = []
-    escalate = False
-    deescalate = False
 
-    subject_conflicts = tuple(
+    conflict_refs = tuple(
         sorted(conflict.conflict_id for conflict in conflicts if conflict.subject_id in members)
     )
-    if subject_conflicts or AMBIGUITY_CONFLICTING_STATUS in cluster.ambiguity_flags:
-        structural.append(SIGNAL_CONFIRMED_CLAIM_CONFLICT)
-        escalate = True
-
-    subject_unknowns = tuple(
+    unknown_refs = tuple(
         sorted(unknown.unknown_id for unknown in unknowns if unknown.subject_id in members)
     )
+
+    if conflict_refs or AMBIGUITY_CONFLICTING_STATUS in cluster.ambiguity_flags:
+        structural.append(SIGNAL_CONFIRMED_CLAIM_CONFLICT)
     if any(
         unknown.reason == AMBIGUOUS_TARGET_REASON and unknown.subject_id in members
         for unknown in unknowns
     ):
         structural.append(SIGNAL_UNRESOLVED_EXACT_REFERENCE)
-        escalate = True
-
     if _ambiguous_supersession(members, edges):
         structural.append(SIGNAL_AMBIGUOUS_SUPERSESSION)
-        escalate = True
-
     if (
         cluster.candidate_type == "PROJECT_CANDIDATE"
         and AMBIGUITY_STRUCTURALLY_DISCONNECTED in cluster.ambiguity_flags
     ):
         structural.append(SIGNAL_STRUCTURALLY_DISCONNECTED)
-        escalate = True
-
     if cluster.cross_root and cluster.structural_evidence.internal_supersession_count:
         structural.append(SIGNAL_SPANS_ROOTS_AND_VERSIONS)
-        escalate = True
 
-    # De-escalation is checked after escalation and beats nothing: a group that
+    escalate = bool(structural)
+    deescalate = False
+    # Checked only when nothing escalated, and so it beats nothing: a group that
     # is wholly byte-identical *and* carries a confirmed conflict still goes to a
     # reasoner, because the conflict is a real question the hashes did not answer.
     if not escalate:
@@ -192,42 +201,67 @@ def route_candidate(
             structural.append(SIGNAL_EXPLAINED_BY_EXACT_RELATION)
             deescalate = True
 
-    default = _DEFAULT_BY_TYPE.get(cluster.candidate_type, "NONE")
-    upstream_type: ReasoningType | None = (
-        upstream.recommended_reasoning_type if upstream is not None else None
+    return _Signals(
+        structural=tuple(sorted(set(structural))),
+        conflict_refs=conflict_refs,
+        unknown_refs=unknown_refs,
+        escalate=escalate,
+        deescalate=deescalate,
     )
-    decided: ReasoningType
-    if deescalate:
-        decided = "NONE"
-        reason = (
+
+
+def _escalated_type(
+    signals: _Signals, upstream_type: ReasoningType | None, default: ReasoningType
+) -> ReasoningType:
+    """Return what an escalated candidate should be adjudicated for."""
+    if SIGNAL_CONFIRMED_CLAIM_CONFLICT in signals.structural:
+        return "CONFLICT_RESOLUTION_ANALYSIS"
+    if upstream_type is not None and upstream_type != "NONE":
+        return upstream_type
+    if default != "NONE":
+        return default
+    # A topic candidate's default is ``NONE``, so an escalated one still needs a
+    # question. "Are these one body of work" is the weakest adjudication that
+    # fits every escalation signal here.
+    return "SAME_BODY_OF_WORK_ADJUDICATION"
+
+
+def _decide(
+    signals: _Signals, upstream_type: ReasoningType | None, default: ReasoningType
+) -> tuple[ReasoningType, str]:
+    """Return the routing decision and the reason recorded beside it."""
+    if signals.deescalate:
+        return "NONE", (
             "topology de-escalated: the grouping is already explained by an exact "
             "relation this compile resolved, so there is nothing left to adjudicate"
         )
-    elif escalate:
-        if SIGNAL_CONFIRMED_CLAIM_CONFLICT in structural:
-            decided = "CONFLICT_RESOLUTION_ANALYSIS"
-        elif upstream_type is not None and upstream_type != "NONE":
-            decided = upstream_type
-        elif default != "NONE":
-            decided = default
-        else:
-            # A topic candidate that escalated on structure still needs a
-            # question to answer. "Are these one body of work" is the weakest
-            # adjudication that fits every escalation signal here.
-            decided = "SAME_BODY_OF_WORK_ADJUDICATION"
-        reason = (
+    if signals.escalate:
+        return _escalated_type(signals, upstream_type, default), (
             "topology escalated on structural evidence the corpus pass did not hold: "
-            + ", ".join(sorted(set(structural)))
+            + ", ".join(signals.structural)
         )
-    elif upstream_type is not None:
-        decided = upstream_type
-        reason = "topology found no structural evidence to change the producer's routing"
-    else:
-        decided = default
-        reason = (
-            "no upstream recommendation; routed by candidate type with no structural "
-            "signal either way"
+    if upstream_type is not None:
+        return upstream_type, (
+            "topology found no structural evidence to change the producer's routing"
         )
+    return default, (
+        "no upstream recommendation; routed by candidate type with no structural signal either way"
+    )
+
+
+def route_candidate(
+    cluster: CandidateClusterRecord,
+    *,
+    upstream: ReasoningCandidateRequest | None,
+    edges: tuple[EdgeRecord, ...],
+    conflicts: tuple[ConflictRecord, ...],
+    unknowns: tuple[UnknownRecord, ...],
+) -> TopologyReasoningCandidate:
+    """Return the topology reasoning decision for one candidate."""
+    signals = _collect_signals(cluster, edges=edges, conflicts=conflicts, unknowns=unknowns)
+    upstream_type = upstream.recommended_reasoning_type if upstream is not None else None
+    default = _DEFAULT_BY_TYPE.get(cluster.candidate_type, "NONE")
+    decided, reason = _decide(signals, upstream_type, default)
 
     return TopologyReasoningCandidate(
         reasoning_candidate_id=stable_id(
@@ -239,12 +273,14 @@ def route_candidate(
         topology_recommended_reasoning_type=decided,
         reason=reason,
         trigger_signals=tuple(sorted(set(cluster.ambiguity_flags))),
-        structural_signals=tuple(sorted(set(structural))),
-        conflict_refs=subject_conflicts,
-        unknown_refs=subject_unknowns,
+        structural_signals=signals.structural,
+        conflict_refs=signals.conflict_refs,
+        unknown_refs=signals.unknown_refs,
         readiness_ref=cluster.readiness_evidence_ref,
         evidence_refs=cluster.evidence_refs,
-        bounded_neighborhood_refs=_bounded_neighborhood(members, edges),
+        bounded_neighborhood_refs=_bounded_neighborhood(
+            frozenset(cluster.member_entity_ids), edges
+        ),
     )
 
 

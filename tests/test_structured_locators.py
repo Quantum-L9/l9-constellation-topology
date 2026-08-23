@@ -146,11 +146,12 @@ def test_a_binary_document_signal_claiming_a_line_locator_is_refused() -> None:
         LOCATORS["line"],
         "docx",
     )
+    # Built outside the block: the packet's own validators raise ``ValueError``
+    # too, so constructing it under the assertion would let this pass because the
+    # fixture was rejected rather than because the locator was.
+    packet = corpus_packet(corpus_payload(document_work_signals=(fake,)))
     with pytest.raises(CorpusIntelligenceValidationError) as caught:
-        validate_corpus_intelligence_packet(
-            corpus_packet(corpus_payload(document_work_signals=(fake,))),
-            REPOSITORY_PACKETS,
-        )
+        validate_corpus_intelligence_packet(packet, REPOSITORY_PACKETS)
     assert any("has no lines" in error for error in caught.value.errors)
 
 

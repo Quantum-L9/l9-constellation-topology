@@ -166,6 +166,34 @@ def build_corpus_intelligence_bundle_artifacts(
     return tuple(sorted(artifacts, key=lambda artifact: artifact.destination_path))
 
 
+def _read_payload(root: Path, packet: CorpusIntelligencePacket) -> CorpusIntelligencePayload:
+    """Read every payload domain, verifying each against its declared hash.
+
+    Every domain is mandatory to carry. Unlike the Topology Packet — where a
+    1.0.0 bundle legitimately declares no ref for a domain 1.1.0 added — a
+    missing corpus ref means the bundle is incomplete rather than older, so it is
+    refused rather than read as an empty domain.
+    """
+    from .loader import PacketLoadError
+
+    parts: dict[str, Any] = {}
+    for field in CORPUS_PAYLOAD_FIELDS:
+        reference = packet.payload_refs.get(field)
+        if reference is None:
+            raise PacketLoadError(f"corpus intelligence packet is missing payload ref for {field}")
+        try:
+            content = (root / reference).read_bytes()
+        except OSError as exc:
+            raise PacketLoadError(f"cannot read corpus payload {reference}: {exc}") from exc
+        expected = packet.payload_hashes.get(field)
+        if expected is None:
+            raise PacketLoadError(f"corpus intelligence packet is missing payload hash for {field}")
+        if artifact_hash(content) != expected:
+            raise PacketLoadError(f"corpus payload hash mismatch for {field}")
+        parts[field] = json.loads(content)
+    return CorpusIntelligencePayload.model_validate(parts)
+
+
 @dataclass(frozen=True)
 class CorpusIntelligenceBundle:
     """A loaded, hash-verified corpus intelligence bundle."""
@@ -209,23 +237,7 @@ def load_corpus_intelligence_bundle(path: Path) -> CorpusIntelligenceBundle:
     if manifest.semantic_hash != packet.semantic_hash:
         raise PacketLoadError("manifest semantic_hash does not match packet.json")
 
-    parts: dict[str, Any] = {}
-    for field in CORPUS_PAYLOAD_FIELDS:
-        reference = packet.payload_refs.get(field)
-        if reference is None:
-            raise PacketLoadError(f"corpus intelligence packet is missing payload ref for {field}")
-        member = root / reference
-        try:
-            content = member.read_bytes()
-        except OSError as exc:
-            raise PacketLoadError(f"cannot read corpus payload {reference}: {exc}") from exc
-        expected = packet.payload_hashes.get(field)
-        if expected is None:
-            raise PacketLoadError(f"corpus intelligence packet is missing payload hash for {field}")
-        if artifact_hash(content) != expected:
-            raise PacketLoadError(f"corpus payload hash mismatch for {field}")
-        parts[field] = json.loads(content)
-    payload = CorpusIntelligencePayload.model_validate(parts)
+    payload = _read_payload(root, packet)
 
     materialized = packet.model_copy(update={"payload": payload})
     calculated = calculate_corpus_semantic_hash(materialized)

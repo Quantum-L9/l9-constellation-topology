@@ -168,6 +168,47 @@ def _edge(
     )
 
 
+def _external_target(
+    claim: SemanticClaimRecord, target_id: str, matches: tuple[str, ...], resolution: str
+) -> GraphRecord:
+    """Return the node standing in for a target this compile did not resolve."""
+    return GraphRecord(
+        record_type="node",
+        label="WorkReference",
+        entity_id=target_id,
+        properties={
+            "reference": claim.object,
+            "observed_in_corpus": False,
+            "resolution": resolution,
+            # Named so a reader can see what the ambiguity was between, without
+            # this being taken as a resolution.
+            "ambiguous_matches": list(matches),
+            "projected_from_claim_id": claim.claim_id,
+        },
+        evidence_refs=claim.evidence_refs,
+        confidence=claim.confidence,
+    )
+
+
+def _ambiguous_unknown(claim: SemanticClaimRecord, matches: tuple[str, ...]) -> UnknownRecord:
+    """Return the unknown raised for a target that matched several artifacts."""
+    return UnknownRecord(
+        unknown_id=stable_id(
+            "unknown",
+            {
+                "subject_id": claim.subject_id,
+                "field": claim.predicate,
+                "values": tuple(sorted(matches)),
+                "target": claim.object,
+            },
+        ),
+        subject_id=claim.subject_id,
+        field=claim.predicate,
+        reason=AMBIGUOUS_TARGET_REASON,
+        evidence_refs=claim.evidence_refs,
+    )
+
+
 def project_work_relations(
     claims: tuple[SemanticClaimRecord, ...],
     artifacts: tuple[ArtifactRecord, ...],
@@ -177,7 +218,10 @@ def project_work_relations(
     edges: dict[str, EdgeRecord] = {}
     nodes: dict[str, GraphRecord] = {}
     unknowns: dict[str, UnknownRecord] = {}
-    entities_by_claim: dict[str, tuple[str, ...]] = {}
+    # Accumulated as sets and sorted once at the end. Sorting into a tuple on
+    # every iteration only to re-set it on the next was doing the same work
+    # twice and reading as though order mattered mid-loop, which it does not.
+    produced_by_claim: dict[str, set[str]] = {}
 
     for claim in sorted(claims, key=lambda item: item.claim_id):
         projection = _WORK_EDGE_PROJECTIONS.get(claim.predicate)
@@ -187,50 +231,14 @@ def project_work_relations(
         resolved, matches = index.resolve(claim.object)
 
         if resolved is not None:
-            target_id = resolved
-            resolution = "exact-artifact"
+            target_id, resolution = resolved, "exact-artifact"
         else:
             target_id = _external_target_id(claim.object)
             resolution = "ambiguous" if matches else "unresolved"
-            nodes.setdefault(
-                target_id,
-                GraphRecord(
-                    record_type="node",
-                    label="WorkReference",
-                    entity_id=target_id,
-                    properties={
-                        "reference": claim.object,
-                        "observed_in_corpus": False,
-                        "resolution": resolution,
-                        # Named so a reader can see what the ambiguity was
-                        # between, without this being taken as a resolution.
-                        "ambiguous_matches": list(matches),
-                        "projected_from_claim_id": claim.claim_id,
-                    },
-                    evidence_refs=claim.evidence_refs,
-                    confidence=claim.confidence,
-                ),
-            )
+            nodes.setdefault(target_id, _external_target(claim, target_id, matches, resolution))
             if matches:
-                unknown_id = stable_id(
-                    "unknown",
-                    {
-                        "subject_id": claim.subject_id,
-                        "field": claim.predicate,
-                        "values": tuple(sorted(matches)),
-                        "target": claim.object,
-                    },
-                )
-                unknowns.setdefault(
-                    unknown_id,
-                    UnknownRecord(
-                        unknown_id=unknown_id,
-                        subject_id=claim.subject_id,
-                        field=claim.predicate,
-                        reason=AMBIGUOUS_TARGET_REASON,
-                        evidence_refs=claim.evidence_refs,
-                    ),
-                )
+                unknown = _ambiguous_unknown(claim, matches)
+                unknowns.setdefault(unknown.unknown_id, unknown)
 
         properties: dict[str, object] = {
             "projected_from_claim_id": claim.claim_id,
@@ -242,13 +250,19 @@ def project_work_relations(
         source, target = (target_id, claim.subject_id) if reverse else (claim.subject_id, target_id)
         edge = _edge(source, target, edge_type, claim, properties)
         edges[edge.edge_id] = edge
-        produced = tuple(sorted({edge.edge_id} | ({target_id} if resolved is None else set())))
-        existing = entities_by_claim.get(claim.claim_id, ())
-        entities_by_claim[claim.claim_id] = tuple(sorted(set(existing) | set(produced)))
+        produced = produced_by_claim.setdefault(claim.claim_id, set())
+        produced.add(edge.edge_id)
+        if resolved is None:
+            # The external endpoint is an entity this claim produced too, and
+            # naming it is what lets a reader trace an unresolved target back.
+            produced.add(target_id)
 
     return WorkProjection(
         edges=tuple(sorted(edges.values(), key=lambda item: item.edge_id)),
         nodes=tuple(sorted(nodes.values(), key=lambda item: item.entity_id)),
         unknowns=tuple(sorted(unknowns.values(), key=lambda item: item.unknown_id)),
-        entities_by_claim=entities_by_claim,
+        entities_by_claim={
+            claim_id: tuple(sorted(produced))
+            for claim_id, produced in sorted(produced_by_claim.items())
+        },
     )

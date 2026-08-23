@@ -271,16 +271,69 @@ def _read_generation(root: Path) -> _Generation:
     return generation
 
 
-def _load_root_bundles(
-    generation: _Generation,
-) -> tuple[tuple[CorpusRootRef, ...], tuple[RepositoryModelBundle, ...]]:
-    """Bind each observed root to the exact Repository Model bundle it produced.
+def _root_ref(
+    entry: dict[str, Any], generation: _Generation
+) -> tuple[CorpusRootRef, RepositoryModelBundle]:
+    """Bind one observed root to the exact bundle it produced.
 
     The bundle is *loaded*, not trusted: the snapshot's recorded packet id and
     semantic hash are checked against what the bundle actually carries, so a
     generation whose snapshot has drifted from its own bundles fails here rather
     than producing a packet that binds a hash nothing holds.
     """
+    root_id = entry.get("root_id")
+    reference = entry.get("bundle_ref")
+    if not isinstance(reference, str) or not reference:
+        raise MetaGenerationError(f"observed root {root_id!r} names no bundle_ref")
+    bundle_path = (generation.root / reference).resolve()
+    try:
+        bundle_path.relative_to(generation.root)
+    except ValueError as exc:
+        raise MetaGenerationError(f"bundle_ref escapes the generation root: {reference}") from exc
+    try:
+        bundle = load_repository_model_bundle(bundle_path)
+    except PacketLoadError as exc:
+        raise MetaGenerationError(f"root {root_id!r} bundle did not load: {exc}") from exc
+
+    packet = bundle.packet
+    declared_id = entry.get("rmp_packet_id")
+    if declared_id and declared_id != packet.packet_id:
+        raise MetaGenerationError(
+            f"root {root_id!r} snapshot names packet {declared_id}, "
+            f"but its bundle carries {packet.packet_id}"
+        )
+    declared_hash = entry.get("rmp_semantic_hash")
+    if declared_hash and declared_hash != packet.semantic_hash:
+        raise MetaGenerationError(
+            f"root {root_id!r} snapshot names semantic hash {declared_hash}, "
+            f"but its bundle carries {packet.semantic_hash}"
+        )
+    return (
+        CorpusRootRef(
+            root_id=str(root_id),
+            identity_class=("declared" if entry.get("source_kind") == "declared" else "inferred"),
+            source_revision=str(entry.get("source_revision") or ""),
+            repository_model_packet=PacketRef(
+                packet_id=packet.packet_id,
+                packet_type=packet.packet_type,
+                packet_version=packet.packet_version,
+                uri=f"packet://{packet.packet_id}",
+                semantic_hash=packet.semantic_hash,
+                artifact_hash=packet.artifact_hash,
+                validation_status=packet.validation.status,
+                subject_id=packet.subject.repository_id,
+                source_revision=packet.source_snapshot.revision,
+            ),
+            repository_id=packet.subject.repository_id,
+        ),
+        bundle,
+    )
+
+
+def _load_root_bundles(
+    generation: _Generation,
+) -> tuple[tuple[CorpusRootRef, ...], tuple[RepositoryModelBundle, ...]]:
+    """Bind every observed root to the exact bundle it produced."""
     snapshot = generation.require(SNAPSHOT_FILE)
     roots = snapshot.get("roots")
     if not isinstance(roots, list) or not roots:
@@ -289,62 +342,13 @@ def _load_root_bundles(
     refs: list[CorpusRootRef] = []
     bundles: list[RepositoryModelBundle] = []
     for entry in roots:
+        # A root that failed or was missing produced no packet. Recording it as a
+        # corpus root would bind a reference with nothing behind it.
         if entry.get("observation_status") != "observed":
-            # A root that failed or was missing produced no packet. Recording it
-            # as a corpus root would bind a reference with nothing behind it.
             continue
-        reference = entry.get("bundle_ref")
-        if not isinstance(reference, str) or not reference:
-            raise MetaGenerationError(f"observed root {entry.get('root_id')!r} names no bundle_ref")
-        bundle_path = (generation.root / reference).resolve()
-        try:
-            bundle_path.relative_to(generation.root)
-        except ValueError as exc:
-            raise MetaGenerationError(
-                f"bundle_ref escapes the generation root: {reference}"
-            ) from exc
-        try:
-            bundle = load_repository_model_bundle(bundle_path)
-        except PacketLoadError as exc:
-            raise MetaGenerationError(
-                f"root {entry.get('root_id')!r} bundle did not load: {exc}"
-            ) from exc
-
-        declared_id = entry.get("rmp_packet_id")
-        declared_hash = entry.get("rmp_semantic_hash")
-        if declared_id and declared_id != bundle.packet.packet_id:
-            raise MetaGenerationError(
-                f"root {entry.get('root_id')!r} snapshot names packet {declared_id}, "
-                f"but its bundle carries {bundle.packet.packet_id}"
-            )
-        if declared_hash and declared_hash != bundle.packet.semantic_hash:
-            raise MetaGenerationError(
-                f"root {entry.get('root_id')!r} snapshot names semantic hash "
-                f"{declared_hash}, but its bundle carries {bundle.packet.semantic_hash}"
-            )
+        reference, bundle = _root_ref(entry, generation)
+        refs.append(reference)
         bundles.append(bundle)
-        packet = bundle.packet
-        refs.append(
-            CorpusRootRef(
-                root_id=str(entry["root_id"]),
-                identity_class=(
-                    "declared" if entry.get("source_kind") == "declared" else "inferred"
-                ),
-                source_revision=str(entry.get("source_revision") or ""),
-                repository_model_packet=PacketRef(
-                    packet_id=packet.packet_id,
-                    packet_type=packet.packet_type,
-                    packet_version=packet.packet_version,
-                    uri=f"packet://{packet.packet_id}",
-                    semantic_hash=packet.semantic_hash,
-                    artifact_hash=packet.artifact_hash,
-                    validation_status=packet.validation.status,
-                    subject_id=packet.subject.repository_id,
-                    source_revision=packet.source_snapshot.revision,
-                ),
-                repository_id=packet.subject.repository_id,
-            )
-        )
     if not refs:
         raise MetaGenerationError("no root in this generation observed successfully")
     return tuple(refs), tuple(bundles)
@@ -687,6 +691,27 @@ def _reasoning(
     return requests, tuple(sorted(set(pack_by_candidate.values())))
 
 
+def _drop_orphan_reasoning(
+    reasoning: tuple[ReasoningCandidateRequest, ...],
+    known_candidates: frozenset[str],
+) -> tuple[tuple[ReasoningCandidateRequest, ...], tuple[str, ...]]:
+    """Drop reasoning rows naming a candidate this generation did not write.
+
+    A cross-file inconsistency in the generation. Dropped with a diagnostic
+    rather than carried: the packet's own integrity check would refuse it anyway,
+    and failing there would report a generation defect as a topology one.
+    """
+    kept = tuple(request for request in reasoning if request.candidate_id in known_candidates)
+    dropped = tuple(
+        sorted(
+            request.reasoning_candidate_id
+            for request in reasoning
+            if request.candidate_id not in known_candidates
+        )
+    )
+    return kept, dropped
+
+
 def adapt_meta_generation(path: Path) -> MetaAdaptationReport:
     """Read a Meta corpus generation and return the packet it maps to.
 
@@ -706,19 +731,10 @@ def adapt_meta_generation(path: Path) -> MetaAdaptationReport:
         generation, CONSOLIDATION_CANDIDATES_FILE, "CONSOLIDATION_CANDIDATE"
     )
     reasoning, pack_refs = _reasoning(generation)
-    known_candidates = {candidate.candidate_id for candidate in (*topic, *project, *consolidation)}
-    # A reasoning row naming a candidate this generation did not write is a
-    # cross-file inconsistency. Dropped with a diagnostic rather than carried:
-    # the packet's own integrity check would refuse it anyway, and failing there
-    # would report it as a topology error rather than a generation one.
-    dropped_reasoning = tuple(
-        sorted(
-            request.reasoning_candidate_id
-            for request in reasoning
-            if request.candidate_id not in known_candidates
-        )
+    reasoning, dropped_reasoning = _drop_orphan_reasoning(
+        reasoning,
+        frozenset(candidate.candidate_id for candidate in (*topic, *project, *consolidation)),
     )
-    reasoning = tuple(request for request in reasoning if request.candidate_id in known_candidates)
 
     payload = CorpusIntelligencePayload(
         document_work_signals=signals,
