@@ -28,7 +28,10 @@ from l9_constellation_topology.domain.topology import TopologyState
 from l9_constellation_topology.packets.corpus_intelligence import ExactDuplicateRelation
 from l9_constellation_topology.topology.candidates import CANDIDATE_MARKER
 from l9_constellation_topology.topology.impact import assess_impact
-from l9_constellation_topology.topology.work_projection import WORK_REFERENCE_PREFIX
+from l9_constellation_topology.topology.work_projection import (
+    WORK_REFERENCE_PREFIX,
+    WORK_RELATION_PREDICATES,
+)
 from tests.corpus_fixtures import (
     ARTIFACTS,
     FIXED_TIME,
@@ -716,3 +719,40 @@ def test_a_corrupt_corpus_packet_fails_the_compile_closed(tmp_path: Path) -> Non
     )
     with pytest.raises(CorpusIntelligenceValidationError):
         compile_topology(ROOT, repositories, corpus_bundle_paths=(corpus,), created_at=FIXED_TIME)
+
+
+def test_a_work_claim_that_produced_an_edge_says_so(state: TopologyState) -> None:
+    """`projected` must reflect *every* projector, not just the claim table.
+
+    Two projectors run over the claim set: the predicate projection table and the
+    work-relation projection. Stamping claims from only the first left every
+    `work.depends_on` claim reporting `projected=False` while its `DEPENDS_ON`
+    edge sat in the graph — which is precisely the link this field exists to make
+    findable.
+    """
+    edge_ids = {edge.edge_id for edge in state.edge_records}
+    node_ids = {record.entity_id for record in state.graph_records}
+    projected = [
+        claim for claim in state.semantic_claims if claim.predicate in WORK_RELATION_PREDICATES
+    ]
+    assert projected, "the fixture corpus declares explicit work relations"
+    for claim in projected:
+        assert claim.projected, f"{claim.predicate} produced an edge but says otherwise"
+        assert claim.projected_entity_ids
+        for entity_id in claim.projected_entity_ids:
+            assert entity_id in edge_ids or entity_id in node_ids
+
+
+def test_projection_stamping_merges_rather_than_replaces() -> None:
+    """Merging two projectors' maps keeps everything each one produced."""
+    from l9_constellation_topology.topology.claim_projection import (
+        merge_projected_entities,
+    )
+
+    merged = merge_projected_entities(
+        {"claim:a": ("edge:1",), "claim:b": ("node:1",)},
+        {"claim:a": ("edge:2",), "claim:c": ("edge:3",)},
+    )
+    assert merged["claim:a"] == ("edge:1", "edge:2")
+    assert merged["claim:b"] == ("node:1",)
+    assert merged["claim:c"] == ("edge:3",)

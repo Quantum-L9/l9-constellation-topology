@@ -84,6 +84,7 @@ from l9_constellation_topology.topology.candidates import (
 from l9_constellation_topology.topology.capability_builder import build_capabilities
 from l9_constellation_topology.topology.claim_projection import (
     apply_projection,
+    merge_projected_entities,
     project_claims,
 )
 from l9_constellation_topology.topology.corpus_model import (
@@ -326,7 +327,14 @@ def compile_topology(
     )
     projection = project_claims(claims)
     work = project_work_relations(claims, normalized.artifacts)
-    claims = apply_projection(claims, projection)
+    # Both projectors' outputs are merged before stamping. Applying only the
+    # claim projection would leave every `work.depends_on` claim reporting
+    # `projected=False` while its DEPENDS_ON edge sat in the graph — the one
+    # thing that field exists to make findable.
+    claims = apply_projection(
+        claims,
+        merge_projected_entities(projection.entities_by_claim, work.entities_by_claim),
+    )
 
     capabilities = build_capabilities(
         repositories,

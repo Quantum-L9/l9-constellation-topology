@@ -712,6 +712,39 @@ def _drop_orphan_reasoning(
     return kept, dropped
 
 
+def _build_payload(
+    generation: _Generation, bundles: tuple[RepositoryModelBundle, ...]
+) -> tuple[CorpusIntelligencePayload, tuple[UnadaptableSignal, ...], tuple[str, ...]]:
+    """Assemble every payload domain, plus what could not be carried.
+
+    The declines are returned alongside the payload rather than logged: an
+    adapter that reported only its successes would make the gap invisible.
+    """
+    signals, unadaptable = _work_signals(generation, bundles)
+    topic = _candidates(generation, TOPIC_CANDIDATES_FILE, "TOPIC_CANDIDATE")
+    project = _candidates(generation, PROJECT_CANDIDATES_FILE, "PROJECT_CANDIDATE")
+    consolidation = _candidates(
+        generation, CONSOLIDATION_CANDIDATES_FILE, "CONSOLIDATION_CANDIDATE"
+    )
+    reasoning, pack_refs = _reasoning(generation)
+    reasoning, dropped = _drop_orphan_reasoning(
+        reasoning,
+        frozenset(candidate.candidate_id for candidate in (*topic, *project, *consolidation)),
+    )
+    payload = CorpusIntelligencePayload(
+        document_work_signals=signals,
+        exact_duplicate_relations=_duplicate_relations(generation),
+        semantic_pair_relations=_pair_relations(generation),
+        topic_candidates=topic,
+        project_candidates=project,
+        consolidation_candidates=consolidation,
+        readiness_evidence=_readiness(generation),
+        reasoning_candidates=reasoning,
+        reasoning_evidence_pack_refs=pack_refs,
+    )
+    return payload, unadaptable, dropped
+
+
 def adapt_meta_generation(path: Path) -> MetaAdaptationReport:
     """Read a Meta corpus generation and return the packet it maps to.
 
@@ -724,29 +757,7 @@ def adapt_meta_generation(path: Path) -> MetaAdaptationReport:
     snapshot = generation.require(SNAPSHOT_FILE)
     analysis = snapshot.get("analysis") or {}
 
-    signals, unadaptable = _work_signals(generation, bundles)
-    topic = _candidates(generation, TOPIC_CANDIDATES_FILE, "TOPIC_CANDIDATE")
-    project = _candidates(generation, PROJECT_CANDIDATES_FILE, "PROJECT_CANDIDATE")
-    consolidation = _candidates(
-        generation, CONSOLIDATION_CANDIDATES_FILE, "CONSOLIDATION_CANDIDATE"
-    )
-    reasoning, pack_refs = _reasoning(generation)
-    reasoning, dropped_reasoning = _drop_orphan_reasoning(
-        reasoning,
-        frozenset(candidate.candidate_id for candidate in (*topic, *project, *consolidation)),
-    )
-
-    payload = CorpusIntelligencePayload(
-        document_work_signals=signals,
-        exact_duplicate_relations=_duplicate_relations(generation),
-        semantic_pair_relations=_pair_relations(generation),
-        topic_candidates=topic,
-        project_candidates=project,
-        consolidation_candidates=consolidation,
-        readiness_evidence=_readiness(generation),
-        reasoning_candidates=reasoning,
-        reasoning_evidence_pack_refs=pack_refs,
-    )
+    payload, unadaptable, dropped_reasoning = _build_payload(generation, bundles)
     packet = CorpusIntelligencePacket(
         packet_id="packet:pending",
         producer=Producer(name=ADAPTER_NAME, version=ADAPTER_VERSION),
@@ -792,7 +803,7 @@ def adapt_meta_generation(path: Path) -> MetaAdaptationReport:
         packet=finalize_corpus_intelligence_packet(packet),
         generation_root=root,
         root_bundles=bundles,
-        adapted_signal_count=len(signals),
+        adapted_signal_count=len(payload.document_work_signals),
         unadaptable_signals=unadaptable,
         missing_files=tuple(sorted(generation.missing)),
         diagnostics=tuple(diagnostics),

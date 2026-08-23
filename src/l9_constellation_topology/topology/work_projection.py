@@ -209,6 +209,30 @@ def _ambiguous_unknown(claim: SemanticClaimRecord, matches: tuple[str, ...]) -> 
     )
 
 
+def _relation_edge(
+    claim: SemanticClaimRecord,
+    target_id: str,
+    edge_type: EdgeType,
+    reverse: bool,
+    resolution: str,
+) -> EdgeRecord:
+    """Return the edge one work claim projects, in the taxonomy's direction.
+
+    ``reverse`` emits from object to subject, because the taxonomy defines the
+    relation that way: "A superseded_by B" is the edge "B SUPERSEDES A", and
+    keeping the subject on the left would state the opposite fact.
+    """
+    properties: dict[str, object] = {
+        "projected_from_claim_id": claim.claim_id,
+        "assertion_predicate": claim.predicate,
+        "assertion_object": claim.object,
+        "target_resolution": resolution,
+        "declared_by": claim.subject_id,
+    }
+    source, target = (target_id, claim.subject_id) if reverse else (claim.subject_id, target_id)
+    return _edge(source, target, edge_type, claim, properties)
+
+
 def project_work_relations(
     claims: tuple[SemanticClaimRecord, ...],
     artifacts: tuple[ArtifactRecord, ...],
@@ -240,15 +264,7 @@ def project_work_relations(
                 unknown = _ambiguous_unknown(claim, matches)
                 unknowns.setdefault(unknown.unknown_id, unknown)
 
-        properties: dict[str, object] = {
-            "projected_from_claim_id": claim.claim_id,
-            "assertion_predicate": claim.predicate,
-            "assertion_object": claim.object,
-            "target_resolution": resolution,
-            "declared_by": claim.subject_id,
-        }
-        source, target = (target_id, claim.subject_id) if reverse else (claim.subject_id, target_id)
-        edge = _edge(source, target, edge_type, claim, properties)
+        edge = _relation_edge(claim, target_id, edge_type, reverse, resolution)
         edges[edge.edge_id] = edge
         produced = produced_by_claim.setdefault(claim.claim_id, set())
         produced.add(edge.edge_id)

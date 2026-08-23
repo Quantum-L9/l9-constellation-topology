@@ -355,8 +355,7 @@ def render_markdown(report: TopologyReport) -> str:
     lines.append(f"**Generated:** {report.generated_at}")
     lines.append(f"**Repos scanned:** {len(report.repo_inventory)}")
     lines.extend(("\n---\n", "## Repo Inventory\n"))
-    lines.append("| Repo ID | Name | Role | Languages | Confidence |")
-    lines.append("|---|---|---|---|---|")
+    lines.extend(_table("Repo ID", "Name", "Role", "Languages", "Confidence"))
     for card in report.repo_inventory:
         langs = ", ".join(card.languages) or "UNKNOWN"
         lines.append(
@@ -364,8 +363,7 @@ def render_markdown(report: TopologyReport) -> str:
         )
     lines.extend(("\n---\n", "## Dependency Graph\n"))
     if report.dependency_graph:
-        lines.append("| Source | Target | Type | Direction | Confidence |")
-        lines.append("|---|---|---|---|---|")
+        lines.extend(_table("Source", "Target", "Type", "Direction", "Confidence"))
         for edge in report.dependency_graph:
             lines.append(
                 f"| {edge.source} | {edge.target} | {edge.edge_type.value} | "
@@ -375,8 +373,7 @@ def render_markdown(report: TopologyReport) -> str:
         lines.append("_No cross-repo dependency edges detected._")
     lines.extend(("\n---\n", "## Risk Register\n"))
     if report.risk_register:
-        lines.append("| Risk ID | Repo | Severity | Category | Description |")
-        lines.append("|---|---|---|---|---|")
+        lines.extend(_table("Risk ID", "Repo", "Severity", "Category", "Description"))
         for risk in report.risk_register:
             lines.append(
                 f"| {risk.risk_id} | {risk.repo_id} | {risk.severity} | "
@@ -386,7 +383,7 @@ def render_markdown(report: TopologyReport) -> str:
         lines.append("_No risks detected._")
     lines.extend(("\n---\n", "## Maturity Scorecard\n"))
     if report.maturity_scorecard:
-        lines.extend(("| Repo ID | Score | Band |", "|---|---|---|"))
+        lines.extend(_table("Repo ID", "Score", "Band"))
         for score in report.maturity_scorecard:
             lines.append(f"| {score.repo_id} | {score.score} | {score.band} |")
     else:
