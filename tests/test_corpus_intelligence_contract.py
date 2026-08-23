@@ -10,11 +10,15 @@ make impossible.
 
 from __future__ import annotations
 
+import json
+
 import pytest
 
+from l9_constellation_topology.packets.common import PacketFileEntry
 from l9_constellation_topology.packets.corpus_bundle import (
     build_corpus_intelligence_bundle_artifacts,
     calculate_corpus_semantic_hash,
+    finalize_corpus_intelligence_packet,
     load_corpus_intelligence_bundle,
 )
 from l9_constellation_topology.packets.corpus_intelligence import (
@@ -31,6 +35,7 @@ from l9_constellation_topology.packets.corpus_validator import (
     validate_corpus_intelligence_packet,
 )
 from l9_constellation_topology.packets.loader import PacketLoadError
+from l9_constellation_topology.run.evidence import artifact_hash, semantic_hash
 from tests.corpus_fixtures import (
     ANALYSIS_PROFILE,
     ARTIFACTS,
@@ -265,3 +270,74 @@ def test_a_packet_with_no_materialized_payload_is_refused() -> None:
     with pytest.raises(CorpusIntelligenceValidationError) as caught:
         validate_corpus_intelligence_packet(packet, REPOSITORY_PACKETS)
     assert any("no materialized payload" in error for error in caught.value.errors)
+
+
+# ── bundle rendering and loading refusals ───────────────────────────────────
+
+
+def test_a_bundle_cannot_be_rendered_from_an_unfinalized_packet() -> None:
+    """Payload hashes are derived, so a caller cannot declare ones that disagree.
+
+    ``finalize_corpus_intelligence_packet`` computes them from the payload it is
+    handed. Rendering a packet whose declared hashes do not match its contents
+    would publish a bundle that fails its own verification on read-back.
+    """
+    packet = corpus_packet()
+    drifted = packet.model_copy(update={"payload": corpus_payload(topic_candidates=())})
+    with pytest.raises(ValueError, match="do not match the carried payload"):
+        build_corpus_intelligence_bundle_artifacts(drifted)
+
+
+def test_a_packet_without_a_payload_cannot_be_finalized_or_rendered() -> None:
+    empty = corpus_packet().model_copy(update={"payload": None})
+    with pytest.raises(ValueError, match="without a payload"):
+        finalize_corpus_intelligence_packet(empty)
+    with pytest.raises(ValueError, match="without a payload"):
+        build_corpus_intelligence_bundle_artifacts(empty)
+
+
+def test_loading_a_file_rather_than_a_bundle_directory_is_refused(tmp_path) -> None:
+    root = write_corpus_bundle(corpus_packet(), tmp_path / "corpus")
+    with pytest.raises(PacketLoadError, match="must be a packet bundle directory"):
+        load_corpus_intelligence_bundle(root / "packet.json")
+
+
+def test_a_manifest_naming_a_different_packet_is_refused(tmp_path) -> None:
+    """The manifest and the packet must agree about which packet this is."""
+    root = write_corpus_bundle(corpus_packet(), tmp_path / "corpus")
+    manifest_path = root / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["packet_id"] = "packet:someone-else"
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+    with pytest.raises(PacketLoadError):
+        load_corpus_intelligence_bundle(root)
+
+
+def test_a_packet_declaring_no_ref_for_a_domain_is_refused(tmp_path) -> None:
+    """An absent payload ref is a defect, not an empty domain.
+
+    Unlike the Topology Packet — where a 1.0.0 bundle legitimately declares no
+    ref for a domain 1.1.0 added — every corpus domain is mandatory to carry, so
+    a missing ref means the bundle is incomplete rather than older.
+    """
+    packet = corpus_packet()
+    root = write_corpus_bundle(packet, tmp_path / "corpus")
+    packet_path = root / "packet.json"
+    document = json.loads(packet_path.read_text(encoding="utf-8"))
+    del document["payload_refs"]["topic_candidates"]
+    packet_path.write_text(json.dumps(document), encoding="utf-8")
+    # The manifest now disagrees with the edited bytes, which is caught first;
+    # rewrite it so the missing-ref path is what actually fails.
+    manifest_path = root / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    content = packet_path.read_bytes()
+    for entry in manifest["files"]:
+        if entry["path"] == "packet.json":
+            entry["content_hash"] = artifact_hash(content)
+            entry["size_bytes"] = len(content)
+    manifest["artifact_hash"] = semantic_hash(
+        tuple(PacketFileEntry.model_validate(entry) for entry in manifest["files"])
+    )
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+    with pytest.raises(PacketLoadError, match="missing payload ref"):
+        load_corpus_intelligence_bundle(root)
