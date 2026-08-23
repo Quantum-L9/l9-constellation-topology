@@ -603,6 +603,53 @@ def _candidates(
     return tuple(sorted(clusters, key=lambda item: item.candidate_id))
 
 
+#: How the producer's grouped metrics map onto the canonical readiness fields.
+#:
+#: A table rather than twenty hand-written lookups: the producer groups its
+#: counts by the question each answers, the canonical record is flat, and the
+#: whole of that translation is worth being able to read in one place. Written as
+#: ``(metric group, producer key) -> canonical field``.
+_READINESS_FIELD_MAP: tuple[tuple[str, str, str], ...] = (
+    ("implementation", "source_artifact_count", "source_artifact_count"),
+    ("implementation", "manifest_count", "build_manifest_count"),
+    ("validation", "structural_test_artifact_count", "test_artifact_count"),
+    ("validation", "ci_definition_count", "ci_definition_count"),
+    ("delivery", "deployment_definition_count", "deployment_definition_count"),
+    ("knowledge", "specification_count", "specification_count"),
+    ("knowledge", "documentation_count", "documentation_count"),
+    ("knowledge", "plan_count", "plan_count"),
+    ("knowledge", "roadmap_count", "roadmap_count"),
+    ("work_state", "wip_count", "wip_count"),
+    ("work_state", "draft_count", "draft_count"),
+    ("work_state", "blocked_count", "blocked_count"),
+    ("work_state", "open_task_count", "open_task_count"),
+    ("work_state", "completed_task_count", "completed_task_count"),
+    ("work_state", "milestone_count", "milestone_count"),
+    ("reuse_and_duplication", "exact_duplicate_artifact_count", "exact_duplicate_count"),
+    ("reuse_and_duplication", "near_duplicate_candidate_count", "near_duplicate_count"),
+    (
+        "reuse_and_duplication",
+        "consolidation_candidate_count",
+        "consolidation_candidate_count",
+    ),
+    ("uncertainty", "coverage_gap_count", "coverage_gap_count"),
+)
+
+
+def _readiness_counts(metrics: dict[str, Any]) -> dict[str, int]:
+    """Return the canonical counts, defaulting anything absent to zero.
+
+    A missing group or key means the producer recorded nothing of that kind,
+    which is zero rather than unknown — every one of these is a count of things
+    observed, and observing none is a real answer.
+    """
+    counts: dict[str, int] = {}
+    for group, source_key, canonical_field in _READINESS_FIELD_MAP:
+        value = (metrics.get(group) or {}).get(source_key)
+        counts[canonical_field] = max(0, value) if isinstance(value, int) else 0
+    return counts
+
+
 def _readiness(generation: _Generation) -> tuple[ReadinessEvidence, ...]:
     """Adapt each body of work's metrics into one readiness record.
 
@@ -614,51 +661,21 @@ def _readiness(generation: _Generation) -> tuple[ReadinessEvidence, ...]:
     """
     document = generation.get(READINESS_FILE) or {}
     profile = document.get("profile") or {}
-    records: list[ReadinessEvidence] = []
-    for body in document.get("bodies_of_work", ()):
-        metrics = body.get("metrics") or {}
-        implementation = metrics.get("implementation") or {}
-        validation = metrics.get("validation") or {}
-        delivery = metrics.get("delivery") or {}
-        knowledge = metrics.get("knowledge") or {}
-        work_state = metrics.get("work_state") or {}
-        reuse = metrics.get("reuse_and_duplication") or {}
-        uncertainty = metrics.get("uncertainty") or {}
-
-        def count(source: dict[str, Any], key: str) -> int:
-            value = source.get(key)
-            return max(0, value) if isinstance(value, int) else 0
-
-        records.append(
-            ReadinessEvidence(
-                readiness_id=str(body["body_id"]),
+    records = [
+        ReadinessEvidence.model_validate(
+            {
+                "readiness_id": str(body["body_id"]),
                 # The body is derived from a candidate, so the readiness subject
                 # is that candidate: it is what the counts are about, and what a
                 # topology candidate record can attach them to.
-                subject_id=str(body.get("origin_ref") or body["body_id"]),
-                profile_id=str(profile.get("profile_id") or "readiness"),
-                profile_version=str(profile.get("profile_version") or "unknown"),
-                source_artifact_count=count(implementation, "source_artifact_count"),
-                test_artifact_count=count(validation, "structural_test_artifact_count"),
-                build_manifest_count=count(implementation, "manifest_count"),
-                ci_definition_count=count(validation, "ci_definition_count"),
-                deployment_definition_count=count(delivery, "deployment_definition_count"),
-                specification_count=count(knowledge, "specification_count"),
-                documentation_count=count(knowledge, "documentation_count"),
-                plan_count=count(knowledge, "plan_count"),
-                roadmap_count=count(knowledge, "roadmap_count"),
-                wip_count=count(work_state, "wip_count"),
-                draft_count=count(work_state, "draft_count"),
-                blocked_count=count(work_state, "blocked_count"),
-                open_task_count=count(work_state, "open_task_count"),
-                completed_task_count=count(work_state, "completed_task_count"),
-                milestone_count=count(work_state, "milestone_count"),
-                exact_duplicate_count=count(reuse, "exact_duplicate_artifact_count"),
-                near_duplicate_count=count(reuse, "near_duplicate_candidate_count"),
-                consolidation_candidate_count=count(reuse, "consolidation_candidate_count"),
-                coverage_gap_count=count(uncertainty, "coverage_gap_count"),
-            )
+                "subject_id": str(body.get("origin_ref") or body["body_id"]),
+                "profile_id": str(profile.get("profile_id") or "readiness"),
+                "profile_version": str(profile.get("profile_version") or "unknown"),
+                **_readiness_counts(body.get("metrics") or {}),
+            }
         )
+        for body in document.get("bodies_of_work", ())
+    ]
     return tuple(sorted(records, key=lambda item: item.readiness_id))
 
 
