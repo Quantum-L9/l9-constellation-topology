@@ -308,7 +308,7 @@
       "path": "MAINTAINERS.md"
     },
     {
-      "git_object_id": "551a12e9574d2050b3f57267f083239257583376",
+      "git_object_id": "5747fe70c019edd27d3af8d7a7331990bc8f909c",
       "mode": "100644",
       "object_type": "blob",
       "path": "MANIFEST.md"
@@ -2666,7 +2666,7 @@
       "path": "tests/test_corpus_hash_locality.py"
     },
     {
-      "git_object_id": "d438f8260b130483039e53bf43b130fa6978325e",
+      "git_object_id": "0c7566beba64dc7f0a8ff4ab1917d98491f97c7f",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_corpus_intelligence_contract.py"
@@ -2802,6 +2802,12 @@
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_publication_planning.py"
+    },
+    {
+      "git_object_id": "177530ca1a407a2ebea8c8cbc33e2291705ff749",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/test_reasoning_router.py"
     },
     {
       "git_object_id": "5cda29f8d6d354b4ade98744355d16ccc981e82c",
@@ -2942,8 +2948,8 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:c2d170ccbdf91ed387509d39fea195d1fefa8133ab7397ed44e743b1f549291b",
-  "entry_count": 490,
+  "entries_sha256": "sha256:e8ab675d6be0715e78a7332e08a0a2706c119ec27bb60a6cedf735ce25a777f3",
+  "entry_count": 491,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
   ],
