@@ -236,7 +236,7 @@ class EvidenceSourceRef(FrozenModel):
         """
         if self.locator is None:
             return self
-        if self.locator.kind not in LINE_LOCATOR_KINDS:
+        if not isinstance(self.locator, LineLocator):
             if self.line_number is not None:
                 raise ValueError(
                     "evidence located by a structured "

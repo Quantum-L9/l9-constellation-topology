@@ -17,6 +17,10 @@ from l9_constellation_topology.domain import (
 )
 from l9_constellation_topology.packets.assertion_evidence import ASSERTION_EVIDENCE_STAGE
 from l9_constellation_topology.packets.common import Producer, ValidationStatus
+from l9_constellation_topology.packets.corpus_bundle import CorpusIntelligenceBundle
+from l9_constellation_topology.packets.document_signal_evidence import (
+    DOCUMENT_SIGNAL_EVIDENCE_STAGE,
+)
 from l9_constellation_topology.packets.loader import RepositoryModelBundle
 from l9_constellation_topology.packets.payloads import topology_payload_hashes
 from l9_constellation_topology.packets.topology_packet import (
@@ -29,6 +33,10 @@ from l9_constellation_topology.packets.validation_receipt import (
     finalize_validation_receipt,
 )
 from l9_constellation_topology.run.evidence import utc_now
+
+#: Evidence stages carrying a reconcilable producer statement. Conservation is
+#: checked over both, because both reconcile into the same claim domain.
+_STATEMENT_EVIDENCE_STAGES = frozenset({ASSERTION_EVIDENCE_STAGE, DOCUMENT_SIGNAL_EVIDENCE_STAGE})
 
 
 def _check(
@@ -167,6 +175,7 @@ def validate_topology(
     state: TopologyState,
     input_bundles: tuple[RepositoryModelBundle, ...],
     *,
+    corpus_bundles: tuple[CorpusIntelligenceBundle, ...] = (),
     schema_root: Path,
     created_at: datetime | None = None,
 ) -> ValidationReceipt:
@@ -513,6 +522,11 @@ def validate_topology(
     # no trace is the failure this whole domain exists to prevent, and a count
     # alone would not catch it: it must be locatable afterwards, by identity, in
     # both the evidence pool and the claim set.
+    # Both producers count. A document work signal is a statement exactly as a
+    # repository-model assertion is, and it reconciles through the same engine —
+    # so conservation must be checked over the union. Counting only the
+    # repository packets would report every claim compiled from a corpus packet
+    # as citing an assertion nobody made.
     input_assertion_ids: set[str] = set()
     for bundle in input_bundles:
         if bundle.packet.payload is None or not bundle.packet.payload.assertions:
@@ -520,9 +534,15 @@ def validate_topology(
         input_assertion_ids.update(
             assertion.assertion_id for assertion in bundle.packet.payload.assertions
         )
+    for corpus in corpus_bundles:
+        if corpus.packet.payload is None:
+            continue
+        input_assertion_ids.update(
+            signal.signal_id for signal in corpus.packet.payload.document_work_signals
+        )
     evidenced_assertion_ids: set[str] = set()
     for record in state.evidence:
-        if record.stage != ASSERTION_EVIDENCE_STAGE or not isinstance(record.value, dict):
+        if record.stage not in _STATEMENT_EVIDENCE_STAGES or not isinstance(record.value, dict):
             continue
         assertion_id = record.value.get("assertion_id")
         if isinstance(assertion_id, str):

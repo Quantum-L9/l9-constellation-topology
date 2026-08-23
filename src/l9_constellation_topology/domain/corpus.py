@@ -23,7 +23,14 @@ from typing import Literal
 from pydantic import Field
 
 from .base import FrozenModel
-from .confidence import ConfidenceAssessment
+from .confidence import (
+    Authority,
+    Completeness,
+    ConfidenceAssessment,
+    ConfidenceLevel,
+    DerivationMethod,
+    EvidenceStrength,
+)
 
 #: How a root's identity was established.
 #:
@@ -73,3 +80,39 @@ class CorpusRecord(FrozenModel):
     coverage_ref: str | None = None
     evidence_refs: tuple[str, ...] = ()
     confidence: ConfidenceAssessment
+
+
+def root_confidence(identity_class: str) -> ConfidenceAssessment:
+    """Return a root's confidence, bounded by how its identity was established.
+
+    A declared root carries ``source`` authority: an operator stated it. An
+    inferred one carries ``derived``, because a marker was found and interpreted.
+    The gap matters when an inferred root turns out to be two: that is a
+    different kind of error from a declared root having been named wrongly, and
+    it is only distinguishable afterwards if the difference was recorded.
+    """
+    declared = identity_class == "declared"
+    return ConfidenceAssessment(
+        level=ConfidenceLevel.high if declared else ConfidenceLevel.medium,
+        evidence_strength=EvidenceStrength.direct,
+        derivation_method=(
+            DerivationMethod.declared if declared else DerivationMethod.deterministic
+        ),
+        authority=Authority.source if declared else Authority.derived,
+        completeness=Completeness.sufficient,
+    )
+
+
+def corpus_confidence() -> ConfidenceAssessment:
+    """Return a corpus record's confidence.
+
+    ``derived``: a corpus is an operator's grouping of roots plus a producer's
+    analysis identity. Nothing declared the corpus itself.
+    """
+    return ConfidenceAssessment(
+        level=ConfidenceLevel.medium,
+        evidence_strength=EvidenceStrength.direct,
+        derivation_method=DerivationMethod.deterministic,
+        authority=Authority.derived,
+        completeness=Completeness.sufficient,
+    )

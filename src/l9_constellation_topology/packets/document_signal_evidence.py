@@ -29,9 +29,9 @@ from l9_constellation_topology.domain.confidence import (
 )
 from l9_constellation_topology.reconciliation.inputs import SemanticInput
 from l9_constellation_topology.run.evidence import (
-    LINE_LOCATOR_KINDS,
     EvidenceRecord,
     EvidenceSourceRef,
+    LineLocator,
     make_evidence_record,
 )
 
@@ -99,11 +99,7 @@ def signal_source_ref(
     ref refuses a line number beside a structured locator, so a caller cannot
     quietly reintroduce the flattening this module exists to avoid.
     """
-    line_number = (
-        signal.locator.start_line  # type: ignore[union-attr]
-        if signal.locator.kind in LINE_LOCATOR_KINDS
-        else None
-    )
+    line_number = signal.locator.start_line if isinstance(signal.locator, LineLocator) else None
     return EvidenceSourceRef(
         source_path=signal.source_path,
         line_number=line_number,

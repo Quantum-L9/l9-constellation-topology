@@ -34,7 +34,14 @@ from pydantic import Field
 from l9_constellation_topology.run.evidence import semantic_hash
 
 from .base import FrozenModel
-from .confidence import ConfidenceAssessment
+from .confidence import (
+    Authority,
+    Completeness,
+    ConfidenceAssessment,
+    ConfidenceLevel,
+    DerivationMethod,
+    EvidenceStrength,
+)
 
 EDGE_TAXONOMY_ID = "l9-topology-edge-taxonomy"
 
@@ -84,6 +91,38 @@ NON_TRAVERSABLE_EDGE_TYPES: frozenset[EdgeType] = frozenset(
 
 #: Edge types canonical impact traversal admits by default.
 TRAVERSABLE_EDGE_TYPES: frozenset[EdgeType] = frozenset(EdgeType) - NON_TRAVERSABLE_EDGE_TYPES
+
+
+#: Method recorded on every ``DUPLICATE_OF`` edge and its evidence, so the graph
+#: states what decided the relation rather than leaving it to be assumed.
+EXACT_DUPLICATE_METHOD = "content-hash-equality/v1"
+
+
+def canonical_pair(left: str, right: str) -> tuple[str, str]:
+    """Return two endpoints of a symmetric relation in a fixed order.
+
+    Byte equality is symmetric, so ``(a, b)`` and ``(b, a)`` are one relation and
+    must hash to one identity. Ordering by identity is what makes that true
+    regardless of which side the producer happened to write first.
+    """
+    return (left, right) if left <= right else (right, left)
+
+
+def duplicate_confidence() -> ConfidenceAssessment:
+    """Return the confidence of a byte-identity relation.
+
+    ``validated_machine`` rather than ``source``: no repository *declared* these
+    files identical, a comparison established it. It is nonetheless the strongest
+    derivation this compiler has — equality of two hashes is decided, not
+    inferred — so the level is high and the method is deterministic.
+    """
+    return ConfidenceAssessment(
+        level=ConfidenceLevel.high,
+        evidence_strength=EvidenceStrength.direct,
+        derivation_method=DerivationMethod.deterministic,
+        authority=Authority.validated_machine,
+        completeness=Completeness.complete,
+    )
 
 
 def edge_taxonomy_view() -> dict[str, object]:

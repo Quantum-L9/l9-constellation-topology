@@ -123,8 +123,19 @@ def test_scan_verifies_the_intermediate_bundle_as_a_repository_model(
     assert verify_packet_bundle(destination) == "l9.repository-model"
 
 
-def test_both_canonical_packet_types_have_a_bound_verifier() -> None:
-    assert set(BUNDLE_VERIFIERS) == {"l9.topology", "l9.repository-model"}
+def test_every_canonical_packet_type_has_a_bound_verifier() -> None:
+    """Every packet type this repository can write must be verifiable on read-back.
+
+    Asserted as an exact set rather than a subset: a new packet type that reaches
+    an OutputSink without a verifier would be staged, published, and never loaded
+    back under its own contract, which is precisely the gap
+    ``verify_packet_bundle`` exists to close.
+    """
+    assert set(BUNDLE_VERIFIERS) == {
+        "l9.topology",
+        "l9.repository-model",
+        "l9.corpus-intelligence",
+    }
 
 
 def test_unknown_packet_type_fails_closed(trivial_repository: Path, tmp_path: Path) -> None:
