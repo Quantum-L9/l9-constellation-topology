@@ -158,7 +158,7 @@
       "path": ".l9/pipeline.yaml"
     },
     {
-      "git_object_id": "6703dfd2d03ebf3fe40e7d728eb3343807487619",
+      "git_object_id": "7e72a604d9a2cd8c3f8b2ab6c1ba9ba10c5ce00b",
       "mode": "100644",
       "object_type": "blob",
       "path": ".l9/publication-policy.yaml"
@@ -188,7 +188,7 @@
       "path": ".python-version"
     },
     {
-      "git_object_id": "b044360dcf88adc6db92d4fa0f9871f37c8ec7be",
+      "git_object_id": "b6608d8b92cf52bcaadda4822fb89541945b5593",
       "mode": "100644",
       "object_type": "blob",
       "path": "ADR_INDEX.md"
@@ -206,13 +206,13 @@
       "path": "ALIGNMENT_AUDIT.md"
     },
     {
-      "git_object_id": "658ea731d5bb52ee97e4127b4ded2207c9c84397",
+      "git_object_id": "fba688f8a50aa3e5e6fe7f241f33e01b24602d0b",
       "mode": "100644",
       "object_type": "blob",
       "path": "ARCHITECTURE.md"
     },
     {
-      "git_object_id": "40bff5b611e7072dc3373e023f91cc90f1b3c174",
+      "git_object_id": "b5629eaa9ffac6d967b645fd47e099a474face33",
       "mode": "100644",
       "object_type": "blob",
       "path": "BUILD_SPECIFICATION.md"
@@ -308,7 +308,7 @@
       "path": "MAINTAINERS.md"
     },
     {
-      "git_object_id": "e42c196105cc9cdf29010434ca437938a0b66a1d",
+      "git_object_id": "551a12e9574d2050b3f57267f083239257583376",
       "mode": "100644",
       "object_type": "blob",
       "path": "MANIFEST.md"
@@ -332,7 +332,7 @@
       "path": "QUALIFICATION.json"
     },
     {
-      "git_object_id": "dfb7862fc9fdc87fa189820c38d1f0f3b2bb1d4b",
+      "git_object_id": "30e2eea9396412ac526615f062ea2ec120de5fa2",
       "mode": "100644",
       "object_type": "blob",
       "path": "README.md"
@@ -350,13 +350,13 @@
       "path": "RELEASING.md"
     },
     {
-      "git_object_id": "f7b729d98590533f8357908b8c689b53b20b21f4",
+      "git_object_id": "7f1f931ac1a0dc9b29efae5dad1d946b8f5c62c2",
       "mode": "100644",
       "object_type": "blob",
       "path": "ROADMAP.md"
     },
     {
-      "git_object_id": "59c01a022e76414cfefe2f61192cac2503175095",
+      "git_object_id": "a232b9d85602053f0b7308fdead996b5c8870470",
       "mode": "100644",
       "object_type": "blob",
       "path": "RUNBOOK.md"
@@ -368,7 +368,7 @@
       "path": "SECURITY.md"
     },
     {
-      "git_object_id": "d0d9b0af1807662450081b62f8beab09e9c10cb6",
+      "git_object_id": "05d3002c9444742c5eefc6feff003e43ccbcf67b",
       "mode": "100644",
       "object_type": "blob",
       "path": "SPECIFICATION.md"
@@ -392,13 +392,13 @@
       "path": "THREAT_MODEL.md"
     },
     {
-      "git_object_id": "e030ecc74599169617c80452d9e6ef3b3678b311",
+      "git_object_id": "597b37c49ec23307221894efc69fa8fa6f7c2219",
       "mode": "100644",
       "object_type": "blob",
       "path": "TRACEABILITY_MAP.yaml"
     },
     {
-      "git_object_id": "5a94e30c1a4b1dc9315fd6fbc7674d476c654755",
+      "git_object_id": "98b717c389510fcf930ef0479d1fdc56dbc831e5",
       "mode": "100644",
       "object_type": "blob",
       "path": "UNKNOWN_REGISTER.md"
@@ -680,7 +680,13 @@
       "path": "docs/adr/0025-separate-fact-identity-from-durable-write-identity.md"
     },
     {
-      "git_object_id": "ea4326a51bf7c8f1259e0362121323a4569708cb",
+      "git_object_id": "bd9595280be894156677df0e6d32825e9cc2c2e0",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "docs/adr/0026-accept-corpus-intelligence-as-an-auxiliary-packet.md"
+    },
+    {
+      "git_object_id": "c698cc31c18e9b785b44257a6bb41980d30ad73a",
       "mode": "100644",
       "object_type": "blob",
       "path": "docs/adr/README.md"
@@ -744,6 +750,18 @@
       "mode": "100644",
       "object_type": "blob",
       "path": "docs/archive/v4/machine-summary.json"
+    },
+    {
+      "git_object_id": "ac19280ccf7c9c04756485614434b595c7aaa6cd",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "docs/candidate-topology.md"
+    },
+    {
+      "git_object_id": "a4aa908ffccb62e0e01713501fbd1674eeedef03",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "docs/corpus-intelligence-boundary.md"
     },
     {
       "git_object_id": "2c7a1a53cb74695b368466f0c157028f58df6850",
@@ -1592,7 +1610,7 @@
       "path": "src/l9_constellation_topology/packets/corpus_bundle.py"
     },
     {
-      "git_object_id": "aae8ac9619cdd5671130a4b36c75333433063292",
+      "git_object_id": "ca2397b1f37140e67d7492e058cd17db693fbf97",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/packets/corpus_evidence.py"
@@ -1700,7 +1718,7 @@
       "path": "src/l9_constellation_topology/publication/contracts.py"
     },
     {
-      "git_object_id": "a868ba4d1440bccc73208d5fec46e1f6b33d1399",
+      "git_object_id": "f7ff9c7efdd4b21f4a52f0102503c1fb37eb179a",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/publication/eligibility.py"
@@ -1718,7 +1736,7 @@
       "path": "src/l9_constellation_topology/publication/lowering.py"
     },
     {
-      "git_object_id": "a88d1893aeee4cadf4c4948b339a08584b5c4f2a",
+      "git_object_id": "7d0e990c67d4aa9879d598deb78aa917974dfead",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/publication/plan.py"
@@ -1784,7 +1802,7 @@
       "path": "src/l9_constellation_topology/renderers/json_export.py"
     },
     {
-      "git_object_id": "7bc52b310cf9913a17c58f084a2eea8eaebf17ef",
+      "git_object_id": "c5fd9cbe49e28b1cb3bb6352faa60f737cfe98fb",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/renderers/markdown_report.py"
@@ -2000,7 +2018,7 @@
       "path": "src/l9_constellation_topology/stages/reconcile_assertions.py"
     },
     {
-      "git_object_id": "1d4cd8ab88c0c705e01f859fc50c5cbf2bdb4499",
+      "git_object_id": "b8e975c90be8846049b87e7537dee7418dc8cd6b",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/stages/reconcile_evidence.py"
@@ -2208,6 +2226,12 @@
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/__init__.py"
+    },
+    {
+      "git_object_id": "2fa457155cc0e04e72b54fe8a396f0de80d5a6bd",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/corpus_fixtures.py"
     },
     {
       "git_object_id": "736cc95ddf42253b5bf9597d9fc33589c46fbd3e",
@@ -2636,6 +2660,30 @@
       "path": "tests/test_conflict_cardinality.py"
     },
     {
+      "git_object_id": "83174f30dd4cb01ebda82a32d672090bb199f0eb",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/test_corpus_hash_locality.py"
+    },
+    {
+      "git_object_id": "d438f8260b130483039e53bf43b130fa6978325e",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/test_corpus_intelligence_contract.py"
+    },
+    {
+      "git_object_id": "b63b308dbf02e297d097897750cf6b0e020813ad",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/test_corpus_publication_containment.py"
+    },
+    {
+      "git_object_id": "f931aa6c44c18479b067804b489ee7fa5ee66585",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/test_corpus_topology_compilation.py"
+    },
+    {
       "git_object_id": "4056cf3da9b00bada1376e4433e70271aa91a744",
       "mode": "100644",
       "object_type": "blob",
@@ -2706,6 +2754,12 @@
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_maturity.py"
+    },
+    {
+      "git_object_id": "aab3c99903ba815e951e5bf583979f2f7394e57f",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/test_meta_generation_adapter.py"
     },
     {
       "git_object_id": "b49bcaaf2b3be471095bd9da62b81df8f817b4ed",
@@ -2780,7 +2834,7 @@
       "path": "tests/test_repository_aggregation_v5.py"
     },
     {
-      "git_object_id": "1837a2cf70da707d5a475e7c381a4815c6fbee09",
+      "git_object_id": "c36fee465ab7654ecb1490d74421f0271e741922",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_repository_governance.py"
@@ -2814,6 +2868,12 @@
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_semantic_claim_activation.py"
+    },
+    {
+      "git_object_id": "06ba8a019bac5393c204d0b2f21f30482d00b2dc",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/test_structured_locators.py"
     },
     {
       "git_object_id": "54a5b3516386b972b64e2b8574b55be5e679737e",
@@ -2882,8 +2942,8 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:a74b0d403c1952c61470c37075388f58a0193d923fa82047a29bc881ed267081",
-  "entry_count": 480,
+  "entries_sha256": "sha256:c2d170ccbdf91ed387509d39fea195d1fefa8133ab7397ed44e743b1f549291b",
+  "entry_count": 490,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
   ],
