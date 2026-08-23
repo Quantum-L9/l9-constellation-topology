@@ -485,6 +485,15 @@ class CorpusIntelligencePacket(FrozenModel):
         return self
 
 
+#: The declared type and the model's own default must name one string. A
+#: ``Literal`` annotation cannot be built from a variable, so the two are pinned
+#: to each other here rather than left to agree by inspection.
+if (
+    CorpusIntelligencePacket.model_fields["packet_type"].default != CORPUS_INTELLIGENCE_PACKET_TYPE
+):  # pragma: no cover - guarded at import; a build error, not a runtime path
+    raise ValueError("CORPUS_INTELLIGENCE_PACKET_TYPE and the packet's declared type disagree")
+
+
 def corpus_payload_path(field: str) -> str:
     if field not in CORPUS_PAYLOAD_FIELDS:
         raise ValueError(f"unsupported corpus payload field: {field}")

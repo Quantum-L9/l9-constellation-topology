@@ -42,6 +42,9 @@ from l9_constellation_topology.packets.bundle_verification import BundleVerifica
 from l9_constellation_topology.packets.corpus_bundle import (
     build_corpus_intelligence_bundle_artifacts,
 )
+from l9_constellation_topology.packets.corpus_intelligence import (
+    CORPUS_INTELLIGENCE_PACKET_TYPE,
+)
 from l9_constellation_topology.packets.corpus_validator import (
     CorpusIntelligenceValidationError,
 )
@@ -210,7 +213,7 @@ def cmd_adapt_meta_corpus(args: argparse.Namespace) -> int:
         }
     )
     return _commit_exit_code(
-        receipt, stage="adapt-meta-corpus", packet_type="l9.corpus-intelligence"
+        receipt, stage="adapt-meta-corpus", packet_type=CORPUS_INTELLIGENCE_PACKET_TYPE
     )
 
 
