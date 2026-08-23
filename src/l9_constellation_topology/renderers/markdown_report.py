@@ -225,7 +225,7 @@ def _duplicate_section(state: TopologyState) -> list[str]:
         return ["No byte-identical artifacts were observed."]
     lines = [
         "_Byte identity only. Every pair below carries the same content hash; "
-        "no similarity score contributes to this table._",
+        + "no similarity score contributes to this table._",
         "",
         *_table("Artifact", "Duplicate of", "Cluster", "Content hash"),
     ]
@@ -290,7 +290,7 @@ def _reasoning_section(state: TopologyState) -> list[str]:
         return ["No reasoning candidates were routed."]
     lines = [
         "_A deterministic handoff. No model was called to produce this queue, and "
-        "nothing in it has been adjudicated._",
+        + "nothing in it has been adjudicated._",
         "",
         *_table("Candidate", "Upstream", "Topology", "Movement", "Signals"),
     ]

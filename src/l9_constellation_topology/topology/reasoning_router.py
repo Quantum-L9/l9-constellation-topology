@@ -233,7 +233,7 @@ def _decide(
     if signals.deescalate:
         return "NONE", (
             "topology de-escalated: the grouping is already explained by an exact "
-            "relation this compile resolved, so there is nothing left to adjudicate"
+            + "relation this compile resolved, so there is nothing left to adjudicate"
         )
     if signals.escalate:
         return _escalated_type(signals, upstream_type, default), (
