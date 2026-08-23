@@ -93,14 +93,19 @@ EXCLUDED_PARTS = {
     "dist",
 }
 #: Repository-relative prefixes holding agent runtime state rather than
-#: delivered files: L4 local-autonomy phase and release receipts, and the PR
-#: remediation handoff. They are written into the worktree by the governance
-#: release flow, are git-ignored, and are never part of the delivery inventory,
-#: so a readiness scan must not report them as manifest omissions.
+#: delivered files: L4 local-autonomy phase and release receipts, the PR
+#: remediation handoff, and the agent adapter wiring the governance sessionStart
+#: bootstrap writes into the worktree. They are written by the governance flow,
+#: are git-ignored, and are never part of the delivery inventory, so a readiness
+#: scan must not report them as manifest omissions.
 EXCLUDED_RELATIVE_PREFIXES = (
+    ".claude/",
     ".l9/autonomy/",
     ".l9/pr/",
 )
+#: Repository-relative files in the same category as the prefixes above. A whole
+#: directory is not the right unit for the MCP server map, which is one file.
+EXCLUDED_RELATIVE_FILES = frozenset({".mcp.json"})
 ALLOWED_THIN_NAMES = {"__init__.py", "py.typed", ".gitkeep"}
 
 
@@ -108,6 +113,8 @@ def _is_excluded(path: Path) -> bool:
     if any(part in EXCLUDED_PARTS or part.endswith(".egg-info") for part in path.parts):
         return True
     relative = path.relative_to(ROOT).as_posix()
+    if relative in EXCLUDED_RELATIVE_FILES:
+        return True
     return relative.startswith(EXCLUDED_RELATIVE_PREFIXES)
 
 
