@@ -1364,7 +1364,7 @@
       "path": "src/l9_constellation_topology/compatibility/v4_models.py"
     },
     {
-      "git_object_id": "473147f49d5d98cb27b4bdaa71a2c0c388218cb6",
+      "git_object_id": "4c7694fd6fc138d38b4f28512569f951f6aeef47",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/compiler.py"
@@ -1562,7 +1562,7 @@
       "path": "src/l9_constellation_topology/packets/adapters/__init__.py"
     },
     {
-      "git_object_id": "563efd2657a2acf22103f7f2382ce29cc994fe52",
+      "git_object_id": "c53de86855b8e418dd6d223014884f42fb759aae",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/packets/adapters/meta_generation.py"
@@ -1802,7 +1802,7 @@
       "path": "src/l9_constellation_topology/renderers/json_export.py"
     },
     {
-      "git_object_id": "a75acec9695113f789b6b77f38e0b74bc2e6ad8f",
+      "git_object_id": "2d1e3ab9aeda9b020d96096883e814ed6ddeaf9a",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/renderers/markdown_report.py"
@@ -2054,7 +2054,7 @@
       "path": "src/l9_constellation_topology/topology/capability_builder.py"
     },
     {
-      "git_object_id": "9befeda8e4e13d617f3135afdef43371848b5e99",
+      "git_object_id": "c4673185514c93250c2badf19cfb6a3154b1d1b0",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/topology/claim_projection.py"
@@ -2120,7 +2120,7 @@
       "path": "src/l9_constellation_topology/topology/risk.py"
     },
     {
-      "git_object_id": "4a3e204d9762ff111661be7de4f17630d0d5c20a",
+      "git_object_id": "ec9ec7327bb49a7eca48e9d4e2e85e4c95932ce6",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/topology/work_projection.py"
@@ -2678,7 +2678,7 @@
       "path": "tests/test_corpus_publication_containment.py"
     },
     {
-      "git_object_id": "f931aa6c44c18479b067804b489ee7fa5ee66585",
+      "git_object_id": "c84f3fe1914187bd98be3db2f27c19bb51bd1fa2",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_corpus_topology_compilation.py"
@@ -2948,7 +2948,7 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:09e15daf5745205b13a3ac5736459697374c9de08d389c91b200378f649d088a",
+  "entries_sha256": "sha256:55395495eab51c5ef549c2d0bfc3fc86ccec40cdc66e957701305dd0f1fdbd1b",
   "entry_count": 491,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
