@@ -5,7 +5,7 @@ values mutually exclusive. Set-valued fields aggregate downstream, and fields
 whose cardinality is undeclared are surfaced as unknowns rather than being
 turned into conflicts that were never observed.
 
-Assertion-derived evidence is deduplicated here but deliberately not classified
+Statement-derived evidence is deduplicated here but deliberately not classified
 here. Its ``field`` is an assertion *predicate*, whose arity is declared by the
 predicate registry rather than by the field-cardinality contract this stage
 reads. Judging it here would apply the wrong policy and reach the wrong answer
@@ -15,6 +15,13 @@ as an undeclared-cardinality unknown, and two competing values of
 they are. ``reconcile_assertions`` owns that judgement, with the right registry;
 two stages adjudicating one fact under two policies is how a fact ends up both
 aggregated and contradicted.
+
+That applies identically to document work signals. Their ``field`` is a
+predicate too — ``work.status``, ``work.kind`` — and they reconcile through the
+same registry, so they are excluded on the same grounds. Excluding only
+assertions would have judged a `.docx` and a `.pptx` disagreeing about
+``work.status`` here *and* in ``reconcile_assertions``, producing an
+undeclared-cardinality unknown beside the conflict that is the real finding.
 """
 
 from __future__ import annotations
@@ -24,7 +31,14 @@ from collections import defaultdict
 from l9_constellation_topology.cardinality import Cardinality, cardinality_of
 from l9_constellation_topology.domain import ConflictRecord, UnknownRecord
 from l9_constellation_topology.packets.assertion_evidence import ASSERTION_EVIDENCE_STAGE
+from l9_constellation_topology.packets.document_signal_evidence import (
+    DOCUMENT_SIGNAL_EVIDENCE_STAGE,
+)
 from l9_constellation_topology.run import EvidenceRecord, canonical_json, stable_id
+
+#: Evidence stages whose ``field`` is a predicate rather than a record field.
+#: Adjudicated by the predicate registry in ``reconcile_assertions``, never here.
+PREDICATE_FIELD_STAGES = frozenset({ASSERTION_EVIDENCE_STAGE, DOCUMENT_SIGNAL_EVIDENCE_STAGE})
 
 
 def run(
@@ -33,7 +47,7 @@ def run(
     by_id = {record.evidence_id: record for record in evidence}
     by_subject_field: dict[tuple[str, str | None], list[EvidenceRecord]] = defaultdict(list)
     for record in by_id.values():
-        if record.stage == ASSERTION_EVIDENCE_STAGE:
+        if record.stage in PREDICATE_FIELD_STAGES:
             continue
         by_subject_field[(record.subject_id, record.field)].append(record)
 

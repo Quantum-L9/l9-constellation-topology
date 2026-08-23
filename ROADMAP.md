@@ -49,6 +49,23 @@ adoption across the foundational chain.
 
 - Repository Model Packet fixture generation is deterministic: `created_at` is pinned and `source_revision` is derived from the sample tree's own content rather than the live repository HEAD. `make fixtures-check` is gate-eligible and runs inside `make validate` through `generated-check`, alongside the golden Topology Packet bundle and the hash-locality evaluation.
 
+## R8: Corpus intelligence — delivered
+
+- `l9.corpus-intelligence` 1.0.0 is accepted as an optional auxiliary input beside
+  Repository Model Packets, with fail-closed referential integrity against exactly
+  the packets it names (ADR-0026).
+- Topology Packet 1.1.0 carries corpus, root, candidate, readiness, and reasoning
+  domains. A 1.0.0 bundle still loads and a compile with no corpus input is
+  unchanged.
+- Evidence locators are generalized: PDF page/block, DOCX block, PPTX slide/shape,
+  spreadsheet sheet/cell, notebook cell, CSV row, and HTML node, with a line number
+  refused beside any of them.
+- `adapt-meta-corpus` is compatibility ingress for current producer generations.
+  It is intended to be retired once `l9-meta-injector` emits the canonical packet
+  directly, which is also what would let it carry per-signal structured locators
+  for binary documents — the one class of work signal the adapter currently
+  declines rather than locates by invention.
+
 ## Explicitly deferred
 
 - Full L9 Gate dependency for the foundational phase.

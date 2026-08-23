@@ -31,6 +31,33 @@ uv run l9-topology compile-packet \
 
 The command exits non-zero if packet loading, parent receipt verification, topology validation, output planning, or commit fails.
 
+## Compile with corpus intelligence
+
+```bash
+uv run l9-topology adapt-meta-corpus \
+  --meta-generation /path/to/meta/generation \
+  --out outputs/corpus-intelligence
+
+uv run l9-topology compile-packet \
+  --repo-root . \
+  --input-bundle outputs/corpus-intelligence/../roots/plans \
+  --input-bundle outputs/corpus-intelligence/../roots/engine \
+  --corpus-bundle outputs/corpus-intelligence \
+  --out outputs/corpus-topology
+```
+
+`adapt-meta-corpus` reports `unadaptable_signal_count` and `unadaptable_by_format`.
+A non-zero count is expected wherever the generation carries work signals from
+Word, PDF, PowerPoint, or spreadsheet documents: it records those only as line
+spans into joined block text, which is not a coordinate in the source file, so
+they are declined rather than located by invention. It is not a failure of the
+adaptation, and the packet it emits is complete for everything the generation can
+express.
+
+A corpus packet must analyse a subset of the compile's repository packets. Naming
+one the compile was not given fails closed, because every count drawn over it
+would be computed against a denominator the consumer cannot see.
+
 ## Dry run
 
 ```bash

@@ -144,6 +144,33 @@ The loader verifies bundle membership, byte hashes, packet schema, source revisi
 parent receipt, and repository identity. Unsupported versions fail closed unless a
 versioned adapter is present.
 
+## 6a. Corpus Intelligence Packet input
+
+Optional, and auxiliary rather than canonical (ADR-0026). An `l9.corpus-intelligence`
+packet is an analysis *over* a named set of Repository Model Packets; it introduces
+no observation of its own and cannot widen the compile's subject set.
+
+Each packet supplies:
+
+- packet identity, producer, profile, schema and semantic hashes;
+- the Repository Model Packets it analyses, each bound by packet id and semantic hash;
+- a corpus descriptor: corpus id, source-snapshot identity, analysis identity, root
+  references, and coverage denominators;
+- payload domains, separated by epistemic class — document work signals, exact
+  duplicate relations, semantic pair relations, topic / project / consolidation
+  candidates, readiness evidence, reasoning candidates, and evidence-pack references.
+
+Referential integrity is fail-closed. Every artifact identity, work-signal subject,
+duplicate endpoint, pair endpoint, candidate member, supporting relation, readiness
+subject, and reasoning reference must resolve against the packets the corpus names,
+and a work signal decoded from a format without lines may not carry a line locator.
+A packet that fails any of these is refused rather than partially compiled: compiling
+the resolvable subset would produce a topology that looks complete and silently omits
+whatever the producer got wrong.
+
+A corpus packet may cover a subset of the compile's repository packets. It may not
+name one the compile was not given.
+
 ## 7. Canonical internal model
 
 The run-scoped compiler model includes:
@@ -307,9 +334,15 @@ The Topology Packet is the sole canonical machine output. It contains or referen
 
 - producer and profile identity;
 - parent packet references and lineage;
-- repository, artifact, capability, edge, flow, and graph records;
+- repository, artifact, capability, semantic claim, edge, flow, and graph records;
 - impact indexes;
 - risk and maturity projections;
+- corpus and root records, when corpus intelligence was compiled;
+- candidate relations and candidate clusters, held strictly outside the canonical
+  edge domain so no canonical consumer can traverse them;
+- readiness evidence, carried as counts and never as a score;
+- topology reasoning candidates, recording both the producer's recommendation and
+  topology's own deterministic decision;
 - evidence, conflicts, unknowns, and diagnostics;
 - semantic and artifact hashes;
 - a reference to the separate Validation Receipt.

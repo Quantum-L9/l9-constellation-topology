@@ -245,3 +245,46 @@ changes:
       - docs/adr/0021-internalize-publication-planning-and-memory-lowering.md
       - tests/test_repository_governance.py
     status: implemented
+  - id: ACT-009
+    source: src/l9_constellation_topology/packets/corpus_intelligence.py, src/l9_constellation_topology/packets/corpus_validator.py, src/l9_constellation_topology/domain/candidate.py, src/l9_constellation_topology/domain/readiness.py, docs/adr/0026-accept-corpus-intelligence-as-an-auxiliary-packet.md
+    gap: topology could compile per-root repository observation only, so the corpus analysis l9-meta-injector now produces — cross-root byte identity, candidate bodies of work, readiness measurement, reasoning routing — had no way in; widening l9.repository-model to carry it would have made source observation and derived candidate analysis indistinguishable at the one boundary where that distinction can still be made
+    fix: accept l9.corpus-intelligence 1.0.0 as a separate optional auxiliary packet with fail-closed referential integrity against exactly the repository packets it names; carry the epistemic classes in the type system so candidates live outside edge_records and cannot reach impact, flow, maturity, risk, or publication by being forgotten
+    validation:
+      - tests/test_corpus_intelligence_contract.py
+      - tests/test_corpus_topology_compilation.py
+      - tests/test_corpus_publication_containment.py
+    status: implemented
+  - id: ACT-010
+    source: src/l9_constellation_topology/run/evidence.py, src/l9_constellation_topology/packets/document_signal_evidence.py
+    gap: EvidenceSourceRef carried only source_path and line_number, so a work signal decoded from a Word document, slide deck, workbook, or PDF could be recorded only by flattening its true coordinate into a line number that names nothing an operator can open
+    fix: add a discriminated SourceLocator union over the coordinate systems real formats have, and refuse a line number beside a structured locator in both EvidenceSourceRef and the corpus packet validator; existing repository-model assertions keep line_number alone and serialize byte-identically, so no published effect key moves
+    validation:
+      - tests/test_structured_locators.py
+      - tests/test_corpus_topology_compilation.py::test_no_evidence_in_the_compile_carries_a_fake_line_number
+    status: implemented
+  - id: ACT-011
+    source: src/l9_constellation_topology/stages/reconcile_assertions.py, src/l9_constellation_topology/reconciliation/inputs.py, src/l9_constellation_topology/stages/reconcile_evidence.py
+    gap: a second reconciliation path for structured documents would have filed a .docx declaring Complete and a .md declaring WIP as two internally consistent facts in two collections, so the contradiction would have been reported by neither
+    fix: lower both producers to SemanticInput and reconcile through one engine under one predicate registry; exclude document-signal evidence from field-cardinality judgement for the same reason assertion evidence already was, since its field is a predicate rather than a record field
+    validation:
+      - tests/test_corpus_topology_compilation.py::test_a_docx_and_a_pptx_disagreeing_is_one_conflict_not_two_facts
+      - tests/test_assertion_reconciliation.py
+    status: implemented
+  - id: ACT-012
+    source: src/l9_constellation_topology/domain/edge.py, src/l9_constellation_topology/topology/impact.py
+    gap: assess_impact defaulted its admissible edge types to set(EdgeType), so adding DUPLICATE_OF would have pulled byte identity into dependency traversal — making every copy of a shared licence file a dependency hop and connecting otherwise unrelated repositories through it
+    fix: version the edge taxonomy to 2.0.0, declare NON_TRAVERSABLE_EDGE_TYPES, default impact to the traversable set while still honouring an explicit request, and bind the taxonomy hash into TopologyPacket.policy_hashes
+    validation:
+      - tests/test_corpus_topology_compilation.py::test_duplicate_edges_do_not_contribute_to_dependency_impact
+      - tests/test_corpus_topology_compilation.py::test_duplicate_edges_are_reachable_when_explicitly_requested
+      - tests/test_corpus_hash_locality.py::test_the_edge_taxonomy_is_bound_into_topology_identity
+    status: implemented
+  - id: ACT-013
+    source: src/l9_constellation_topology/packets/loader.py
+    gap: load_topology_bundle wrote semantic_claims into every topology bundle and never read them back, so a bundle round-trip silently dropped every reconciled claim
+    fix: read the semantic_claims payload domain alongside the others
+    validation:
+      - tests/test_corpus_topology_compilation.py
+      - tests/test_topology_compiler_v5.py::test_golden_topology_bundle_matches_fixed_compiler_output
+    status: implemented
+

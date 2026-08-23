@@ -23,7 +23,9 @@ This repository implements the live GitHub design whose governing principle is:
 
 ## Required role
 
-The compiler consumes one or more validated Repository Model Packets, optionally performs policy-authorized read-only observations for missing topology evidence, builds canonical repository and constellation topology, validates the result, and emits one immutable Topology Packet plus a separate Validation Receipt.
+The compiler consumes one or more validated Repository Model Packets and, optionally, one or more Corpus Intelligence Packets analysing exactly those roots; optionally performs policy-authorized read-only observations for missing topology evidence; builds canonical repository and constellation topology plus explicitly-classed candidate topology; validates the result; and emits one immutable Topology Packet plus a separate Validation Receipt.
+
+Corpus intelligence is auxiliary and optional. A compile given none behaves exactly as it did before the domain existed. Per [ADR-0026](docs/adr/0026-accept-corpus-intelligence-as-an-auxiliary-packet.md), it is a second input rather than a widening of the Repository Model Packet, because source observation and derived candidate analysis are different kinds of statement and the boundary is the only point at which that distinction can be made.
 
 ## Authority boundaries
 
@@ -34,6 +36,11 @@ The compiler consumes one or more validated Repository Model Packets, optionally
 - Stable graph identities and edge construction
 - Impact, maturity, and risk projections
 - Evidence reconciliation, conflict preservation, and explicit unknowns
+- Corpus and root scope above repositories
+- Exact byte-identity (`DUPLICATE_OF`) and explicit work-relation compilation
+- Candidate relation and cluster preservation, with deterministic structural enrichment
+- Readiness measurement carried as counts, never as a score
+- Deterministic reasoning routing, performing no reasoning
 - Topology Packet construction and validation
 - Pure report projections
 - Worker-side stage execution and callback contracts

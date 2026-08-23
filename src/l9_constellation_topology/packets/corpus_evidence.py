@@ -60,8 +60,16 @@ def duplicate_evidence_records(
     for relation in packet.payload.exact_duplicate_relations:
         first, second = canonical_pair(relation.artifact_a_id, relation.artifact_b_id)
         record = make_evidence_record(
-            subject_id=first,
-            field="content_hash",
+            # The cluster, not either artifact. Filing this under an artifact's
+            # `content_hash` would put it in the same reconciliation group as
+            # that artifact's own observed hash, and a single-valued field
+            # holding both the hash and this record's structured value reads as
+            # a contradiction — one manufactured entirely by the choice of
+            # subject. What this evidence is about is the cluster.
+            subject_id=relation.duplicate_cluster_id,
+            # Set-valued: several relations drawn from one cluster are several
+            # true statements about its membership, never competing answers.
+            field="artifact_ids",
             stage=DUPLICATE_EVIDENCE_STAGE,
             # A comparison the producer performed and recorded, not something a
             # repository declared about itself.

@@ -27,8 +27,12 @@ from .contracts import (
     SkippedCandidate,
 )
 from .eligibility import (
+    SKIP_CANDIDATE_DOMAIN,
     SKIP_EDGE_TYPE,
     SKIP_ENTITY_KIND,
+    SKIP_READINESS_DOMAIN,
+    SKIP_REASONING_DOMAIN,
+    SKIP_UNRESOLVED_WORK_TARGET,
     SKIP_UNSTATEABLE_CLAIM,
     EligibilityContext,
     decide,
@@ -261,18 +265,69 @@ def build_publication_plan(
     )
 
     for edge in state.edge_records:
-        if str(edge.edge_type) in eligible_edge_types:
-            lowered.append(
-                lower_relationship(
-                    edge, policy=policy, packet=packet, index=index, published_at=timestamp
-                )
-            )
-        else:
+        if str(edge.edge_type) not in eligible_edge_types:
             skipped.append(
                 SkippedCandidate(
                     source_kind="relationship", source_id=edge.edge_id, reason=SKIP_EDGE_TYPE
                 )
             )
+            continue
+        # An explicit work relation publishes only when its target resolved to
+        # exactly one observed artifact. An ambiguous or unresolved target still
+        # produced a canonical edge — the declaration happened — but publishing
+        # it would state a *resolved* relation downstream, and a consumer reading
+        # only the assertion cannot tell that the endpoint was never observed.
+        resolution = edge.properties.get("target_resolution")
+        if resolution is not None and resolution != "exact-artifact":
+            skipped.append(
+                SkippedCandidate(
+                    source_kind="relationship",
+                    source_id=edge.edge_id,
+                    reason=SKIP_UNRESOLVED_WORK_TARGET,
+                )
+            )
+            continue
+        lowered.append(
+            lower_relationship(
+                edge, policy=policy, packet=packet, index=index, published_at=timestamp
+            )
+        )
+
+    # The non-canonical domains, recorded as held rather than left absent. None
+    # of them has a lowering function and none can acquire one by accident: they
+    # are enumerated here only so the plan states the containment it performs.
+    skipped.extend(
+        SkippedCandidate(
+            source_kind="relationship",
+            source_id=record.relation_id,
+            reason=SKIP_CANDIDATE_DOMAIN,
+        )
+        for record in state.candidate_relations
+    )
+    skipped.extend(
+        SkippedCandidate(
+            source_kind="entity",
+            source_id=record.candidate_id,
+            reason=SKIP_CANDIDATE_DOMAIN,
+        )
+        for record in state.candidate_clusters
+    )
+    skipped.extend(
+        SkippedCandidate(
+            source_kind="entity",
+            source_id=record.readiness_id,
+            reason=SKIP_READINESS_DOMAIN,
+        )
+        for record in state.readiness_evidence
+    )
+    skipped.extend(
+        SkippedCandidate(
+            source_kind="entity",
+            source_id=record.reasoning_candidate_id,
+            reason=SKIP_REASONING_DOMAIN,
+        )
+        for record in state.topology_reasoning_candidates
+    )
 
     candidates = tuple(
         sorted(

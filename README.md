@@ -83,7 +83,49 @@ uv run l9-topology render-report \
 
 `neo4j-candidate` is a neutral candidate export. This repository contains no Neo4j or Graphiti write client.
 
+## Corpus intelligence
+
+Beside per-root Repository Model Packets, the compiler accepts an optional
+`l9.corpus-intelligence` bundle: an analysis over exactly those roots, carrying
+document work signals, exact duplicate relations, candidate relations and
+clusters, readiness measurements, and reasoning requests.
+
+```bash
+uv run l9-topology compile-packet \
+  --repo-root . \
+  --input-bundle roots/plans \
+  --input-bundle roots/engine \
+  --corpus-bundle corpus-intelligence \
+  --out outputs/corpus-topology
+```
+
+The domains are separated by epistemic class and the separation is structural:
+`DUPLICATE_OF` means byte identity and nothing weaker; candidate relations and
+clusters live outside `edge_records`, so impact, flow, maturity, risk, and
+publication cannot see them; readiness is counts and never a score. Evidence
+cites the coordinate its format actually has — a slide and shape for a `.pptx`,
+a sheet and cell for a workbook — and a line number is refused for any format
+without lines.
+
+Omitting `--corpus-bundle` compiles repository observation alone, exactly as
+before. See [`docs/corpus-intelligence-boundary.md`](docs/corpus-intelligence-boundary.md)
+and [`docs/candidate-topology.md`](docs/candidate-topology.md).
+
 ## Compatibility ingress
+
+`l9-meta-injector` does not emit `l9.corpus-intelligence` yet. Its current corpus
+generation adapts into one:
+
+```bash
+uv run l9-topology adapt-meta-corpus \
+  --meta-generation /path/to/meta/generation \
+  --out outputs/corpus-intelligence
+```
+
+The generation is read and never written, and no source tree is rescanned. Work
+signals the generation cannot locate truthfully — those from formats without
+lines, which it records only as line spans into joined block text — are declined
+and reported by count and reason rather than given an invented coordinate.
 
 Legacy scanner logic remains available only as a read-only observation provider:
 

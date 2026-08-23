@@ -4,7 +4,7 @@ This directory contains accepted architectural decisions for
 `l9-constellation-topology`.
 
 - Initial ADR set: 20
-- Accepted ADRs: 26
+- Accepted ADRs: 27
 - Status at packaging: Accepted
 - Index: [`ADR_INDEX.md`](../../ADR_INDEX.md)
 - Governing process: [`GOVERNANCE.md`](../../GOVERNANCE.md)
