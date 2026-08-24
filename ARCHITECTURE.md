@@ -7,17 +7,31 @@ foundational L9 repository-intelligence pipeline. It transforms validated
 Repository Model Packets into one validated immutable Topology Packet.
 
 ```text
-source repositories
+source repositories, folders, and archives
         ↓
 l9-meta-injector
-        ↓ Repository Model Packet(s)
+        ├─ per-root Repository Model Packet(s)   canonical source observation
+        └─ Corpus Intelligence Packet            auxiliary corpus analysis
+                            ↓
 l9-constellation-topology
         ├─ compiler    → Topology Packet + Validation Receipt
+        │                  ├─ canonical topology   claims, edges, flows, impact
+        │                  └─ candidate topology   relations, clusters, readiness,
+        │                                          reasoning handoff
         └─ publication → publication plan + memory.ingest intents
                             ↓ (planned, never dispatched here)
                      l9-graphiti-memory
                             ↓ durable admission and execution
 ```
+
+Per [ADR-0026](docs/adr/0026-accept-corpus-intelligence-as-an-auxiliary-packet.md),
+corpus intelligence is a **second, optional** input rather than a widening of the
+Repository Model Packet. The two carry different kinds of statement — one is what
+a root said about itself, the other is what an analysis concluded over several —
+and the boundary is the only point at which that distinction can be made. Once a
+candidate has entered a canonical domain, nothing downstream can tell it was ever
+a candidate. See [`docs/corpus-intelligence-boundary.md`](docs/corpus-intelligence-boundary.md)
+and [`docs/candidate-topology.md`](docs/candidate-topology.md).
 
 Per [ADR-0021](docs/adr/0021-internalize-publication-planning-and-memory-lowering.md),
 publication planning is an internal boundary of this repository. Planning decides
@@ -27,7 +41,9 @@ write. Durable admission remains owned by `l9-graphiti-memory`.
 ## Architectural laws
 
 1. `TransportPacket` is the only control-plane envelope.
-2. Repository Model Packets are the canonical semantic inputs.
+2. Repository Model Packets are the canonical source-observation inputs. Corpus
+   Intelligence Packets are auxiliary analysis *over* a named set of them, and
+   introduce no observation of their own.
 3. The Topology Packet is the sole canonical machine output.
 4. Reports are optional projections and never stage contracts.
 5. Evidence, conflicts, and unknowns remain explicit.
@@ -40,6 +56,11 @@ write. Durable admission remains owned by `l9-graphiti-memory`.
     producing one performs no durable effect.
 11. Publication artifacts are derived from a validated Topology Packet and never
     become an alternate source of topology truth.
+12. Candidate analysis is preserved as candidate topology and never promoted into
+    canonical edges, impact, maturity, risk, or durable memory. The separation is
+    enforced by where a record can be placed, not by a flag on it.
+13. Evidence cites the coordinate its format actually has. A line number is never
+    invented for a format without lines.
 
 ## Compiler pipeline
 

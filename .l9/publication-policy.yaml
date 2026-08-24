@@ -28,6 +28,15 @@ eligible_edge_types:
   - ROUTES_TO
   - PUBLISHES_TO
   - MEMBER_OF
+  # Exact byte identity. Decidable, and re-checkable downstream from the hash the
+  # edge carries, so it is a canonical fact rather than an analysis result.
+  - DUPLICATE_OF
+  # Explicitly declared work relations. Eligible only when their target resolved
+  # to exactly one observed artifact; publication skips the rest with
+  # `relation.work_target_not_exactly_resolved` rather than publishing an
+  # assertion whose endpoint this compile never observed.
+  - BLOCKED_BY
+  - REFERENCES
 
 # Downstream memory classes. Both values are existing l9-graphiti-memory
 # MemoryClass members; this repository never invents a downstream enum.

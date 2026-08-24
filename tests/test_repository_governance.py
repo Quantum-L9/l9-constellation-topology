@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 
 import yaml
@@ -33,11 +34,20 @@ def test_initial_root_authority_files_exist() -> None:
 def test_adrs_are_complete_indexed_and_sequentially_numbered() -> None:
     adr_dir = ROOT / "docs" / "adr"
     adr_paths = sorted(path for path in adr_dir.glob("[0-9][0-9][0-9][0-9]-*.md"))
-    assert len(adr_paths) == 25
+    index = (ROOT / "ADR_INDEX.md").read_text(encoding="utf-8")
+
+    # Checked against the index rather than against a literal count. A hardcoded
+    # number has to be edited every time a decision is recorded, and says nothing
+    # once the sequence and index checks below hold — while a stale one fails a
+    # correct change, which trains people to edit the number without reading why.
+    indexed = {int(match) for match in re.findall(r"\| ADR-(\d{4}) \|", index)}
+    assert indexed, "ADR_INDEX.md lists no decisions"
+    assert {int(path.name[:4]) for path in adr_paths} == indexed, (
+        "every ADR file must be indexed, and every indexed ADR must exist"
+    )
     numbers = [int(path.name[:4]) for path in adr_paths]
     assert numbers == list(range(1, len(adr_paths) + 1)), "ADR numbers must not skip or repeat"
 
-    index = (ROOT / "ADR_INDEX.md").read_text(encoding="utf-8")
     required_sections = (
         "## Context",
         "## Decision",

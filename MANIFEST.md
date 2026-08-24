@@ -6,11 +6,15 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 
 ## Inventory
 
-**Tracked delivery files:** 432
+**Tracked delivery files:** 492
 
 - `.editorconfig` — editor encoding, indentation, and whitespace policy
 - `.env.example` — documented worker and control-plane environment variables
 - `.gitattributes` — Git text normalization and binary-file policy
+- `.github/ISSUE_TEMPLATE/architecture_change.yml` — structured GitHub issue intake contract
+- `.github/ISSUE_TEMPLATE/bug_report.yml` — structured GitHub issue intake contract
+- `.github/ISSUE_TEMPLATE/config.yml` — structured GitHub issue intake contract
+- `.github/PULL_REQUEST_TEMPLATE.md` — pull-request evidence and architecture checklist
 - `.github/governance/execution-profiles.yaml` — governed analysis execution-profile definitions
 - `.github/governance/promotion-policy.yaml` — governed analysis finding-promotion policy
 - `.github/governance/provider-requiredness.yaml` — governed analysis provider-requiredness policy
@@ -19,10 +23,6 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `.github/governance/semgrep-identity-map.yaml` — governed analysis semgrep rule identity resolution map
 - `.github/governance/semgrep-policy.yaml` — governed analysis semgrep provider policy
 - `.github/governance/waivers.yaml` — governed analysis finding-waiver ledger
-- `.github/ISSUE_TEMPLATE/architecture_change.yml` — structured GitHub issue intake contract
-- `.github/ISSUE_TEMPLATE/bug_report.yml` — structured GitHub issue intake contract
-- `.github/ISSUE_TEMPLATE/config.yml` — structured GitHub issue intake contract
-- `.github/PULL_REQUEST_TEMPLATE.md` — pull-request evidence and architecture checklist
 - `.github/workflows/l9-analysis.yml` — immutable-pinned GitHub Actions workflow
 - `.github/workflows/l9-ingress.yml` — immutable-pinned GitHub Actions workflow
 - `.github/workflows/l9-manual-replay.yml` — immutable-pinned GitHub Actions workflow
@@ -54,13 +54,14 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `EFFECT_IDENTITY_MIGRATION_PREFLIGHT.json` — governance, policy, or release documentation
 - `FINAL_TREE.md` — deterministic final repository tree
 - `FIX_MAP.md` — confirmed finding to fix and validation mapping
-- `GOVERNANCE.md` — authority, approval, ADR, branch, and release governance
 - `GIT_TREE_MANIFEST.json` — Git-native mode, object-type, and blob-identity manifest
+- `GOVERNANCE.md` — authority, approval, ADR, branch, and release governance
 - `HASH_LOCALITY_EVALUATION.json` — recorded topology, candidate, and downstream-effect identity locality matrix
 - `INITIAL_COMMIT.md` — clean initial-commit and push handoff
 - `LICENSE` — proprietary repository license terms
 - `MAINTAINERS.md` — maintainer roles and ownership responsibilities
 - `MANIFEST.md` — complete delivery inventory and responsibility map
+- `CURRENT_VALIDATION_REPORT.md` — complete delivery inventory and responsibility map
 - `Makefile` — canonical local validation and build command surface
 - `NOTICE.md` — third-party and generated-artifact notice
 - `QUALIFICATION.json` — governance, policy, or release documentation
@@ -122,6 +123,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `docs/adr/0023-declare-field-cardinality-before-detecting-conflicts.md` — accepted architecture decision record
 - `docs/adr/0024-compile-repository-model-assertions-into-semantic-claims.md` — accepted architecture decision record
 - `docs/adr/0025-separate-fact-identity-from-durable-write-identity.md` — accepted architecture decision record
+- `docs/adr/0026-accept-corpus-intelligence-as-an-auxiliary-packet.md` — architecture decision record
 - `docs/adr/README.md` — ADR directory governance and navigation
 - `docs/architecture.md` — architecture, contract, deployment, recovery, or model documentation
 - `docs/archive/v4/01_SPEC_ATTACK.md` — superseded v4 historical artifact retained for migration evidence
@@ -133,6 +135,8 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `docs/archive/v4/README.md` — superseded v4 historical artifact retained for migration evidence
 - `docs/archive/v4/architecture.md` — superseded v4 historical artifact retained for migration evidence
 - `docs/archive/v4/machine-summary.json` — superseded v4 historical artifact retained for migration evidence
+- `docs/candidate-topology.md` — candidate domain semantics: enrichment, lower-never-raise, readiness, reasoning handoff
+- `docs/corpus-intelligence-boundary.md` — corpus intelligence boundary: epistemic classes, locators, exact relations, ingress
 - `docs/deployment.md` — architecture, contract, deployment, recovery, or model documentation
 - `docs/design/l9-constellation-topology-spec.md` — architecture, contract, deployment, recovery, or model documentation
 - `docs/evidence-model.md` — architecture, contract, deployment, recovery, or model documentation
@@ -206,9 +210,9 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `schemas/maturity-assessment.schema.json` — canonical or compatibility domain JSON Schema
 - `schemas/repo_card.schema.json` — canonical or compatibility domain JSON Schema
 - `schemas/repository-record.schema.json` — canonical or compatibility domain JSON Schema
-- `schemas/semantic-claim-record.schema.json` — canonical or compatibility domain JSON Schema
 - `schemas/risk-record.schema.json` — canonical or compatibility domain JSON Schema
 - `schemas/risk_register.schema.json` — canonical or compatibility domain JSON Schema
+- `schemas/semantic-claim-record.schema.json` — canonical or compatibility domain JSON Schema
 - `schemas/topology-publication-plan.schema.json` — canonical or compatibility domain JSON Schema
 - `schemas/topology_report.schema.json` — canonical or compatibility domain JSON Schema
 - `scripts/architecture_boundary_check.py` — operator, build, generation, or validation command
@@ -216,9 +220,9 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `scripts/compile_topology_packet.py` — operator, build, generation, or validation command
 - `scripts/evaluate_hash_locality.py` — operator, build, generation, or validation command
 - `scripts/generate_fixture_packets.py` — operator, build, generation, or validation command
-- `scripts/git_tree_manifest.py` — deterministic Git tree manifest generator and validator
 - `scripts/generate_schemas.py` — operator, build, generation, or validation command
 - `scripts/generated_artifact_sync.py` — shared read-only generated-artifact drift detection and explicit update support
+- `scripts/git_tree_manifest.py` — deterministic Git tree manifest generator and validator
 - `scripts/qualify_repository_model_assertions.py` — repository automation or validation script
 - `scripts/render_topology_reports.py` — operator, build, generation, or validation command
 - `scripts/validate_contracts.py` — operator, build, generation, or validation command
@@ -228,23 +232,27 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `scripts/validate_workflows.py` — operator, build, generation, or validation command
 - `scripts/verify_determinism.py` — operator, build, generation, or validation command
 - `src/l9_constellation_topology/__init__.py` — production Python package implementation
+- `src/l9_constellation_topology/cardinality.py` — versioned field cardinality contract governing which divergent values are conflicts
 - `src/l9_constellation_topology/cli.py` — production Python package implementation
 - `src/l9_constellation_topology/compatibility/__init__.py` — production Python package implementation
 - `src/l9_constellation_topology/compatibility/repo_card_adapter.py` — production Python package implementation
 - `src/l9_constellation_topology/compatibility/v4_models.py` — production Python package implementation
-- `src/l9_constellation_topology/cardinality.py` — versioned field cardinality contract governing which divergent values are conflicts
 - `src/l9_constellation_topology/compiler.py` — production Python package implementation
 - `src/l9_constellation_topology/config.py` — production Python package implementation
 - `src/l9_constellation_topology/domain/__init__.py` — production Python package implementation
 - `src/l9_constellation_topology/domain/artifact.py` — production Python package implementation
 - `src/l9_constellation_topology/domain/assessment.py` — production Python package implementation
 - `src/l9_constellation_topology/domain/base.py` — production Python package implementation
+- `src/l9_constellation_topology/domain/candidate.py` — production Python package implementation
 - `src/l9_constellation_topology/domain/capability.py` — production Python package implementation
 - `src/l9_constellation_topology/domain/claim.py` — production Python package implementation
 - `src/l9_constellation_topology/domain/confidence.py` — production Python package implementation
+- `src/l9_constellation_topology/domain/corpus.py` — production Python package implementation
 - `src/l9_constellation_topology/domain/diagnostic.py` — typed diagnostic conservation domain model
 - `src/l9_constellation_topology/domain/edge.py` — production Python package implementation
 - `src/l9_constellation_topology/domain/flow.py` — production Python package implementation
+- `src/l9_constellation_topology/domain/readiness.py` — production Python package implementation
+- `src/l9_constellation_topology/domain/reasoning.py` — production Python package implementation
 - `src/l9_constellation_topology/domain/repository.py` — production Python package implementation
 - `src/l9_constellation_topology/domain/topology.py` — production Python package implementation
 - `src/l9_constellation_topology/evidence.py` — production Python package implementation
@@ -262,12 +270,20 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `src/l9_constellation_topology/models.py` — production Python package implementation
 - `src/l9_constellation_topology/packets/__init__.py` — production Python package implementation
 - `src/l9_constellation_topology/packets/adapters/__init__.py` — production Python package implementation
+- `src/l9_constellation_topology/packets/adapters/errors.py` — production Python package implementation
+- `src/l9_constellation_topology/packets/adapters/meta_generation.py` — production Python package implementation
+- `src/l9_constellation_topology/packets/adapters/meta_work_signals.py` — production Python package implementation
 - `src/l9_constellation_topology/packets/adapters/repository_model_v1.py` — production Python package implementation
 - `src/l9_constellation_topology/packets/assertion_evidence.py` — production Python package implementation
 - `src/l9_constellation_topology/packets/bundle.py` — production Python package implementation
 - `src/l9_constellation_topology/packets/bundle_verification.py` — production Python package implementation
 - `src/l9_constellation_topology/packets/common.py` — production Python package implementation
 - `src/l9_constellation_topology/packets/control.py` — production Python package implementation
+- `src/l9_constellation_topology/packets/corpus_bundle.py` — production Python package implementation
+- `src/l9_constellation_topology/packets/corpus_evidence.py` — production Python package implementation
+- `src/l9_constellation_topology/packets/corpus_intelligence.py` — production Python package implementation
+- `src/l9_constellation_topology/packets/corpus_validator.py` — production Python package implementation
+- `src/l9_constellation_topology/packets/document_signal_evidence.py` — production Python package implementation
 - `src/l9_constellation_topology/packets/loader.py` — production Python package implementation
 - `src/l9_constellation_topology/packets/payloads.py` — production Python package implementation
 - `src/l9_constellation_topology/packets/refs.py` — production Python package implementation
@@ -290,6 +306,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `src/l9_constellation_topology/py.typed` — production Python package implementation
 - `src/l9_constellation_topology/reconciliation/__init__.py` — production Python package implementation
 - `src/l9_constellation_topology/reconciliation/cardinality.py` — production Python package implementation
+- `src/l9_constellation_topology/reconciliation/inputs.py` — production Python package implementation
 - `src/l9_constellation_topology/reconciliation/predicates.py` — production Python package implementation
 - `src/l9_constellation_topology/renderers/__init__.py` — production Python package implementation
 - `src/l9_constellation_topology/renderers/common.py` — production Python package implementation
@@ -335,14 +352,20 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `src/l9_constellation_topology/stages/resolve_config.py` — production Python package implementation
 - `src/l9_constellation_topology/stages/validate_topology.py` — production Python package implementation
 - `src/l9_constellation_topology/topology/__init__.py` — production Python package implementation
+- `src/l9_constellation_topology/topology/candidates.py` — production Python package implementation
 - `src/l9_constellation_topology/topology/capability_builder.py` — production Python package implementation
 - `src/l9_constellation_topology/topology/claim_projection.py` — production Python package implementation
 - `src/l9_constellation_topology/topology/classifier.py` — production Python package implementation
+- `src/l9_constellation_topology/topology/corpus_model.py` — production Python package implementation
+- `src/l9_constellation_topology/topology/duplicates.py` — production Python package implementation
 - `src/l9_constellation_topology/topology/flow_builder.py` — production Python package implementation
 - `src/l9_constellation_topology/topology/graph_builder.py` — production Python package implementation
 - `src/l9_constellation_topology/topology/impact.py` — production Python package implementation
 - `src/l9_constellation_topology/topology/maturity.py` — production Python package implementation
+- `src/l9_constellation_topology/topology/readiness.py` — production Python package implementation
+- `src/l9_constellation_topology/topology/reasoning_router.py` — production Python package implementation
 - `src/l9_constellation_topology/topology/risk.py` — production Python package implementation
+- `src/l9_constellation_topology/topology/work_projection.py` — production Python package implementation
 - `src/l9_constellation_topology/validation/__init__.py` — production Python package implementation
 - `src/l9_constellation_topology/validation/invariant_validator.py` — production Python package implementation
 - `src/l9_constellation_topology/validation/schema_validator.py` — production Python package implementation
@@ -360,6 +383,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `src/l9_constellation_topology/worker/stage_runner.py` — production Python package implementation
 - `src/l9_constellation_topology/worker/transport_factory.py` — production Python package implementation
 - `tests/__init__.py` — unit, contract, integration, regression, or governance test
+- `tests/corpus_fixtures.py` — automated regression and contract test suite
 - `tests/fixtures/downstream_contracts/l9-graphiti-memory-contract.json` — captured downstream contract descriptor fixture
 - `tests/fixtures/legacy_v4_outputs/07_VALIDATION_REPORT.md` — deterministic packet, source, or regression fixture
 - `tests/fixtures/legacy_v4_outputs/architecture_diagrams.mmd` — deterministic packet, source, or regression fixture
@@ -405,8 +429,11 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `tests/fixtures/topology_packets/foundational-two-repo/manifest.json` — deterministic packet, source, or regression fixture
 - `tests/fixtures/topology_packets/foundational-two-repo/packet.json` — deterministic packet, source, or regression fixture
 - `tests/fixtures/topology_packets/foundational-two-repo/payload/artifact-records.json` — deterministic packet, source, or regression fixture
+- `tests/fixtures/topology_packets/foundational-two-repo/payload/candidate-clusters.json` — golden Topology Packet bundle fixture
+- `tests/fixtures/topology_packets/foundational-two-repo/payload/candidate-relations.json` — golden Topology Packet bundle fixture
 - `tests/fixtures/topology_packets/foundational-two-repo/payload/capability-records.json` — deterministic packet, source, or regression fixture
 - `tests/fixtures/topology_packets/foundational-two-repo/payload/conflicts.json` — deterministic packet, source, or regression fixture
+- `tests/fixtures/topology_packets/foundational-two-repo/payload/corpus-records.json` — golden Topology Packet bundle fixture
 - `tests/fixtures/topology_packets/foundational-two-repo/payload/diagnostics.json` — deterministic conserved-diagnostic payload fixture
 - `tests/fixtures/topology_packets/foundational-two-repo/payload/edge-records.json` — deterministic packet, source, or regression fixture
 - `tests/fixtures/topology_packets/foundational-two-repo/payload/evidence.json` — deterministic packet, source, or regression fixture
@@ -414,9 +441,12 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `tests/fixtures/topology_packets/foundational-two-repo/payload/graph-records.json` — deterministic packet, source, or regression fixture
 - `tests/fixtures/topology_packets/foundational-two-repo/payload/impact-indexes.json` — deterministic packet, source, or regression fixture
 - `tests/fixtures/topology_packets/foundational-two-repo/payload/maturity.json` — deterministic packet, source, or regression fixture
+- `tests/fixtures/topology_packets/foundational-two-repo/payload/readiness-evidence.json` — golden Topology Packet bundle fixture
 - `tests/fixtures/topology_packets/foundational-two-repo/payload/repository-records.json` — deterministic packet, source, or regression fixture
-- `tests/fixtures/topology_packets/foundational-two-repo/payload/semantic-claims.json` — generated packet fixture payload
 - `tests/fixtures/topology_packets/foundational-two-repo/payload/risks.json` — deterministic packet, source, or regression fixture
+- `tests/fixtures/topology_packets/foundational-two-repo/payload/root-records.json` — golden Topology Packet bundle fixture
+- `tests/fixtures/topology_packets/foundational-two-repo/payload/semantic-claims.json` — generated packet fixture payload
+- `tests/fixtures/topology_packets/foundational-two-repo/payload/topology-reasoning-candidates.json` — golden Topology Packet bundle fixture
 - `tests/fixtures/topology_packets/foundational-two-repo/payload/unknowns.json` — deterministic packet, source, or regression fixture
 - `tests/fixtures/topology_packets/foundational-two-repo/receipts/validation-receipt.json` — deterministic packet, source, or regression fixture
 - `tests/test_architecture_boundary_v5.py` — unit, contract, integration, regression, or governance test
@@ -425,25 +455,32 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `tests/test_cli_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_confirmed_findings_remediation.py` — adversarial regression tests for every confirmed audit finding
 - `tests/test_conflict_cardinality.py` — unit, contract, integration, regression, or governance test
+- `tests/test_corpus_hash_locality.py` — automated regression and contract test suite
+- `tests/test_corpus_intelligence_contract.py` — automated regression and contract test suite
+- `tests/test_corpus_publication_containment.py` — automated regression and contract test suite
+- `tests/test_corpus_topology_compilation.py` — automated regression and contract test suite
 - `tests/test_dependency_scanner.py` — unit, contract, integration, regression, or governance test
 - `tests/test_direct_observation_adapter_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_effect_identity_migration_preflight.py` — automated test module
 - `tests/test_evidence_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_execution_authority_v5.py` — adversarial coverage for the execution-lease trust boundary
-- `tests/test_hash_locality.py` — unit, contract, integration, regression, or governance test
-- `tests/test_publication_effect_identity.py` — unit, contract, integration, regression, or governance test
 - `tests/test_field_cardinality.py` — unit, contract, integration, regression, or governance test
 - `tests/test_generated_artifact_sync.py` — generated-artifact check/update and fail-closed regression tests
 - `tests/test_git_integrity.py` — Git path, mode, object-type, and blob-identity regression tests
 - `tests/test_graph_builder.py` — unit, contract, integration, regression, or governance test
+- `tests/test_hash_locality.py` — unit, contract, integration, regression, or governance test
 - `tests/test_impact.py` — unit, contract, integration, regression, or governance test
 - `tests/test_maturity.py` — unit, contract, integration, regression, or governance test
+- `tests/test_meta_generation_adapter.py` — automated regression and contract test suite
+- `tests/test_meta_work_signal_payload.py` — automated regression and contract test suite
 - `tests/test_output_sink_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_packet_ingress_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_packet_models_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_packet_store_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_publication_downstream_conformance.py` — unit, contract, integration, regression, or governance test
+- `tests/test_publication_effect_identity.py` — unit, contract, integration, regression, or governance test
 - `tests/test_publication_planning.py` — unit, contract, integration, regression, or governance test
+- `tests/test_reasoning_router.py` — automated regression and contract test suite
 - `tests/test_release_readiness.py` — unit, contract, integration, regression, or governance test
 - `tests/test_renderers.py` — unit, contract, integration, regression, or governance test
 - `tests/test_repo_scanner.py` — unit, contract, integration, regression, or governance test
@@ -455,10 +492,11 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `tests/test_runtime_boundaries_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_scan_compatibility_path.py` — unit, contract, integration, regression, or governance test
 - `tests/test_semantic_claim_activation.py` — automated test module
+- `tests/test_structured_locators.py` — automated regression and contract test suite
 - `tests/test_topology_compiler_v5.py` — unit, contract, integration, regression, or governance test
-- `tests/test_unknown_derivation.py` — unit, contract, integration, regression, or governance test
 - `tests/test_topology_graph_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_transport_signature_v5.py` — unit, contract, integration, regression, or governance test
+- `tests/test_unknown_derivation.py` — unit, contract, integration, regression, or governance test
 - `tests/test_validation.py` — unit, contract, integration, regression, or governance test
 - `tests/test_worker_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_workflow_contracts_v5.py` — unit, contract, integration, regression, or governance test

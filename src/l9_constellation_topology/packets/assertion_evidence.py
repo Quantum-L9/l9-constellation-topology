@@ -25,6 +25,7 @@ from l9_constellation_topology.domain.confidence import (
     DerivationMethod,
     EvidenceStrength,
 )
+from l9_constellation_topology.reconciliation.inputs import SemanticInput
 from l9_constellation_topology.run.evidence import (
     EvidenceRecord,
     EvidenceSourceRef,
@@ -65,28 +66,44 @@ _LEVEL_BY_NAME: dict[str, ConfidenceLevel] = {
 }
 
 
+def named_authority(value: str) -> Authority:
+    """Map a producer authority name, never upgrading an unrecognized one."""
+    return _AUTHORITY_BY_NAME.get(value, Authority.unknown)
+
+
+def named_level(value: str) -> ConfidenceLevel:
+    """Map a producer confidence name, never upgrading an unrecognized one."""
+    return _LEVEL_BY_NAME.get(value, ConfidenceLevel.low)
+
+
+def named_derivation(evidence_class: str) -> DerivationMethod:
+    """Return how a producer arrived at a statement.
+
+    ``declared`` means the source said it in prose or in a manifest; ``observed``
+    means an extractor read it out of structure. Both are deterministic reads of
+    a hashed span, and neither is a heuristic guess. The same mapping serves
+    document work signals, which carry the same two-valued vocabulary.
+    """
+    return (
+        DerivationMethod.declared
+        if evidence_class == "declared"
+        else DerivationMethod.deterministic
+    )
+
+
 def assertion_authority(assertion: RepositoryModelAssertion) -> Authority:
     """Return the topology authority of an assertion, never upgrading it."""
-    return _AUTHORITY_BY_NAME.get(assertion.authority, Authority.unknown)
+    return named_authority(assertion.authority)
 
 
 def assertion_level(assertion: RepositoryModelAssertion) -> ConfidenceLevel:
     """Return the topology confidence level of an assertion, never upgrading it."""
-    return _LEVEL_BY_NAME.get(assertion.confidence, ConfidenceLevel.low)
+    return named_level(assertion.confidence)
 
 
 def assertion_derivation(assertion: RepositoryModelAssertion) -> DerivationMethod:
-    """Return how the producer arrived at an assertion.
-
-    ``declared`` means the repository said it in prose or in a manifest;
-    ``observed`` means an extractor read it out of code. Both are deterministic
-    reads of a hashed span, and neither is a heuristic guess.
-    """
-    return (
-        DerivationMethod.declared
-        if assertion.evidence_class == "declared"
-        else DerivationMethod.deterministic
-    )
+    """Return how the producer arrived at an assertion."""
+    return named_derivation(assertion.evidence_class)
 
 
 def assertion_confidence(assertion: RepositoryModelAssertion) -> ConfidenceAssessment:
@@ -168,3 +185,23 @@ def assertion_evidence_records(
         assertion_evidence_record(assertion, packet=packet)
         for assertion in packet.payload.assertions
     )
+
+
+def assertion_semantic_input(assertion: RepositoryModelAssertion) -> SemanticInput:
+    """Reduce an assertion to the shape reconciliation reads."""
+    return SemanticInput(
+        input_id=assertion.assertion_id,
+        subject_id=assertion.subject_id,
+        predicate=assertion.predicate,
+        object=assertion.object,
+        authority=assertion.authority,
+        confidence=assertion.confidence,
+        evidence_class=assertion.evidence_class,
+        origin="repository-model",
+    )
+
+
+def assertion_semantic_inputs(
+    assertions: tuple[RepositoryModelAssertion, ...],
+) -> tuple[SemanticInput, ...]:
+    return tuple(assertion_semantic_input(assertion) for assertion in assertions)

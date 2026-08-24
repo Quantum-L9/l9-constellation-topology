@@ -23,3 +23,9 @@ outputs/*
 # phase and release receipts, PR remediation handoff. Never part of delivery.
 .l9/autonomy/
 .l9/pr/
+
+# Agent adapter wiring written into the worktree by the governance sessionStart
+# bootstrap: Claude Code settings, hooks, and the managed-skill index, plus the
+# MCP server map. Session-local, machine-specific, and never part of delivery.
+.claude/
+.mcp.json

@@ -1,4 +1,12 @@
-"""Reconcile repository-model assertions into canonical semantic claims.
+"""Reconcile producer statements into canonical semantic claims.
+
+Two producers reach this stage: repository-model assertions read out of source
+files, and document work signals read out of Word documents, slide decks,
+workbooks, notebooks, and PDFs. Both arrive as ``SemanticInput`` and neither is
+distinguishable here, which is the point — a ``.docx`` plan declaring
+``work.status = Complete`` and a ``.md`` plan declaring ``work.status = WIP`` are
+one subject with two competing answers, and only a single engine reports that as
+the conflict it is.
 
 Grouping is by ``(subject_id, predicate)`` — the question being asked — and the
 predicate registry decides what several answers to one question mean.
@@ -14,8 +22,8 @@ predicate registry decides what several answers to one question mean.
   evidence, plus a diagnostic and an unknown scoped to that predicate. Nothing is
   aggregated, nothing is called a contradiction, and nothing is dropped.
 
-The stage adds no facts. Every claim it emits is an assertion some producer made,
-and every claim cites the evidence records built for those assertions.
+The stage adds no facts. Every claim it emits is a statement some producer made,
+and every claim cites the evidence records built for those statements.
 """
 
 from __future__ import annotations
@@ -41,17 +49,20 @@ from l9_constellation_topology.domain.confidence import (
 from l9_constellation_topology.domain.diagnostic import DiagnosticRecord
 from l9_constellation_topology.packets.assertion_evidence import (
     ASSERTION_EVIDENCE_STAGE,
-    assertion_authority,
-    assertion_derivation,
-    assertion_level,
+    named_authority,
+    named_derivation,
+    named_level,
 )
-from l9_constellation_topology.packets.repository_model import RepositoryModelAssertion
+from l9_constellation_topology.packets.document_signal_evidence import (
+    DOCUMENT_SIGNAL_EVIDENCE_STAGE,
+)
 from l9_constellation_topology.reconciliation import (
     UNSUPPORTED_PREDICATE_CODE,
     UNSUPPORTED_PREDICATE_REASON,
     predicate_cardinality,
     predicate_support,
 )
+from l9_constellation_topology.reconciliation.inputs import SemanticInput
 from l9_constellation_topology.run.evidence import EvidenceRecord, stable_id
 
 STAGE_NAME = "reconcile_assertions"
@@ -74,12 +85,17 @@ _AUTHORITY_ORDER: tuple[Authority, ...] = (
 )
 
 
-class AssertionEvidenceIndex:
-    """Resolve the evidence record built for each producer assertion.
+#: Evidence stages that carry a reconcilable producer statement. Both write the
+#: statement's identity under ``assertion_id``, so one index serves both.
+_STATEMENT_EVIDENCE_STAGES = frozenset({ASSERTION_EVIDENCE_STAGE, DOCUMENT_SIGNAL_EVIDENCE_STAGE})
 
-    Assertion evidence is created at the packet boundary, where the parent packet
-    is available; by the time reconciliation runs, only the flattened assertions
-    and the evidence pool remain. The link back is the assertion identity the
+
+class AssertionEvidenceIndex:
+    """Resolve the evidence record built for each producer statement.
+
+    Statement evidence is created at the packet boundary, where the parent packet
+    is available; by the time reconciliation runs, only the flattened statements
+    and the evidence pool remain. The link back is the statement identity the
     evidence carries in its value, so the index is rebuilt from the pool rather
     than threaded through every intermediate stage.
     """
@@ -87,7 +103,7 @@ class AssertionEvidenceIndex:
     def __init__(self, evidence: tuple[EvidenceRecord, ...]) -> None:
         index: dict[tuple[str, str], str] = {}
         for record in evidence:
-            if record.stage != ASSERTION_EVIDENCE_STAGE:
+            if record.stage not in _STATEMENT_EVIDENCE_STAGES:
                 continue
             value: Any = record.value
             if not isinstance(value, dict):
@@ -97,14 +113,14 @@ class AssertionEvidenceIndex:
                 index[(record.subject_id, assertion_id)] = record.evidence_id
         self._by_assertion = index
 
-    def resolve(self, assertion: RepositoryModelAssertion) -> str | None:
-        return self._by_assertion.get((assertion.subject_id, assertion.assertion_id))
+    def resolve(self, statement: SemanticInput) -> str | None:
+        return self._by_assertion.get((statement.subject_id, statement.input_id))
 
-    def resolve_all(self, assertions: tuple[RepositoryModelAssertion, ...]) -> tuple[str, ...]:
+    def resolve_all(self, statements: tuple[SemanticInput, ...]) -> tuple[str, ...]:
         resolved = {
             evidence_id
-            for assertion in assertions
-            if (evidence_id := self.resolve(assertion)) is not None
+            for statement in statements
+            if (evidence_id := self.resolve(statement)) is not None
         }
         return tuple(sorted(resolved))
 
@@ -119,24 +135,24 @@ def _claim_id(subject_id: str, predicate: str, obj: str) -> str:
     return stable_id("claim", {"subject_id": subject_id, "predicate": predicate, "object": obj})
 
 
-def _weakest_level(assertions: tuple[RepositoryModelAssertion, ...]) -> ConfidenceLevel:
+def _weakest_level(statements: tuple[SemanticInput, ...]) -> ConfidenceLevel:
     return min(
-        (assertion_level(assertion) for assertion in assertions),
+        (named_level(statement.confidence) for statement in statements),
         key=_LEVEL_ORDER.index,
         default=ConfidenceLevel.low,
     )
 
 
-def _weakest_authority(assertions: tuple[RepositoryModelAssertion, ...]) -> Authority:
+def _weakest_authority(statements: tuple[SemanticInput, ...]) -> Authority:
     return min(
-        (assertion_authority(assertion) for assertion in assertions),
+        (named_authority(statement.authority) for statement in statements),
         key=_AUTHORITY_ORDER.index,
         default=Authority.unknown,
     )
 
 
-def _derivation(assertions: tuple[RepositoryModelAssertion, ...]) -> DerivationMethod:
-    methods = {assertion_derivation(assertion) for assertion in assertions}
+def _derivation(statements: tuple[SemanticInput, ...]) -> DerivationMethod:
+    methods = {named_derivation(statement.evidence_class) for statement in statements}
     if len(methods) == 1:
         return next(iter(methods))
     # Declared prose and observed code agreeing on one claim is corroboration
@@ -145,19 +161,19 @@ def _derivation(assertions: tuple[RepositoryModelAssertion, ...]) -> DerivationM
 
 
 def _claim_confidence(
-    assertions: tuple[RepositoryModelAssertion, ...],
+    statements: tuple[SemanticInput, ...],
     *,
     evidence_count: int,
     conflict_status: ConflictStatus,
 ) -> ConfidenceAssessment:
     corroborated = evidence_count > 1
     return ConfidenceAssessment(
-        level=_weakest_level(assertions),
+        level=_weakest_level(statements),
         evidence_strength=(
             EvidenceStrength.corroborated if corroborated else EvidenceStrength.direct
         ),
-        derivation_method=_derivation(assertions),
-        authority=_weakest_authority(assertions),
+        derivation_method=_derivation(statements),
+        authority=_weakest_authority(statements),
         completeness=(
             Completeness.partial
             if conflict_status is not ConflictStatus.none
@@ -216,7 +232,7 @@ def _packet_id_for(
 
 
 def run(
-    assertions: tuple[RepositoryModelAssertion, ...],
+    statements: tuple[SemanticInput, ...],
     evidence: tuple[EvidenceRecord, ...],
 ) -> tuple[
     tuple[SemanticClaimRecord, ...],
@@ -228,9 +244,12 @@ def run(
     index = AssertionEvidenceIndex(evidence)
     evidence_by_id = {record.evidence_id: record for record in evidence}
 
-    grouped: dict[tuple[str, str], list[RepositoryModelAssertion]] = defaultdict(list)
-    for assertion in assertions:
-        grouped[(assertion.subject_id, assertion.predicate)].append(assertion)
+    # Grouped by the question asked, never by which producer asked it. A source
+    # assertion and a document work signal about one subject and predicate land
+    # in one group, which is what makes a cross-format contradiction visible.
+    grouped: dict[tuple[str, str], list[SemanticInput]] = defaultdict(list)
+    for statement in statements:
+        grouped[(statement.subject_id, statement.predicate)].append(statement)
 
     claims: list[SemanticClaimRecord] = []
     conflicts: list[ConflictRecord] = []
@@ -244,9 +263,9 @@ def run(
 
         # Objects, grouped so that repeated agreement aggregates evidence rather
         # than being collapsed into a single unsupported assertion.
-        by_object: dict[str, list[RepositoryModelAssertion]] = defaultdict(list)
-        for assertion in group:
-            by_object[assertion.object].append(assertion)
+        by_object: dict[str, list[SemanticInput]] = defaultdict(list)
+        for statement in group:
+            by_object[statement.object].append(statement)
         objects = tuple(sorted(by_object))
 
         group_evidence = index.resolve_all(group)
@@ -323,7 +342,7 @@ def run(
                     predicate=predicate,
                     object=obj,
                     source_assertion_ids=tuple(
-                        sorted({assertion.assertion_id for assertion in supporting})
+                        sorted({statement.input_id for statement in supporting})
                     ),
                     evidence_refs=evidence_refs,
                     confidence=_claim_confidence(

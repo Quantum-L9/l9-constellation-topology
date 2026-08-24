@@ -34,7 +34,20 @@ from l9_constellation_topology.packets import (
     load_repository_model_bundle,
     load_topology_bundle,
 )
+from l9_constellation_topology.packets.adapters.meta_generation import (
+    MetaGenerationError,
+    adapt_meta_generation,
+)
 from l9_constellation_topology.packets.bundle_verification import BundleVerificationError
+from l9_constellation_topology.packets.corpus_bundle import (
+    build_corpus_intelligence_bundle_artifacts,
+)
+from l9_constellation_topology.packets.corpus_intelligence import (
+    CORPUS_INTELLIGENCE_PACKET_TYPE,
+)
+from l9_constellation_topology.packets.corpus_validator import (
+    CorpusIntelligenceValidationError,
+)
 from l9_constellation_topology.packets.repository_bundle import (
     build_repository_model_bundle_artifacts,
 )
@@ -123,6 +136,7 @@ def cmd_compile_packet(args: argparse.Namespace) -> int:
     result = compile_topology(
         Path(args.repo_root),
         tuple(Path(path) for path in args.input_bundle),
+        corpus_bundle_paths=tuple(Path(path) for path in args.corpus_bundle or ()),
     )
     sink = PacketBundleOutputSink(
         Path(args.out),
@@ -137,10 +151,88 @@ def cmd_compile_packet(args: argparse.Namespace) -> int:
             "semantic_hash": result.materialized.packet.semantic_hash,
             "validation_status": result.validation_receipt.status,
             "write_plan_id": receipt.plan_id,
+            "corpus_intelligence_packets": [
+                ref.packet_id
+                for ref in result.materialized.packet.inputs.corpus_intelligence_packets
+            ],
             "outputs": [item.model_dump(mode="json") for item in receipt.results],
         }
     )
     return _commit_exit_code(receipt, stage="compile-packet", packet_type="l9.topology")
+
+
+def cmd_adapt_meta_corpus(args: argparse.Namespace) -> int:
+    """Adapt a current Meta corpus generation into a Corpus Intelligence bundle.
+
+    Compatibility ingress. The generation is read and never written; the bundle
+    is committed to a separate destination through ``OutputSink``.
+    """
+    report = adapt_meta_generation(Path(args.meta_generation))
+    sink = PacketBundleOutputSink(
+        Path(args.out),
+        mode="dry-run" if args.dry_run else "write",
+        allow_overwrite=args.allow_overwrite,
+    )
+    for artifact in build_corpus_intelligence_bundle_artifacts(report.packet):
+        sink.enqueue(WriteIntent(artifact=artifact))
+    receipt = sink.commit()
+    payload = report.packet.payload
+    _print_json(
+        {
+            "status": receipt.status,
+            "packet_id": report.packet.packet_id,
+            "semantic_hash": report.packet.semantic_hash,
+            "generation_root": str(report.generation_root),
+            "roots": [root.root_id for root in report.packet.corpus.root_refs],
+            # Which contract the generation was read under. A legacy adaptation
+            # that looked like a current one would let a caller report the
+            # current producer as qualified on evidence that never covered it.
+            "adaptation_mode": report.adaptation_mode,
+            "producer_revision": report.producer_revision,
+            # The conservation chain, stated rather than implied. Equal counts
+            # here are the whole claim that nothing was dropped between the
+            # producer's manifest and this packet.
+            "manifest_record_count": report.manifest_record_count,
+            "parsed_signal_count": report.parsed_signal_count,
+            "adapted_signal_count": report.adapted_signal_count,
+            # How many the *sampled report* lists, for comparison only. It is
+            # never a source of signals; it is here so a reader can see that the
+            # report and the payload are different sizes.
+            "sampled_report_listed_count": report.sampled_report_listed_count,
+            "adapted_by_format": dict(report.adapted_by_format),
+            "adapted_by_predicate": dict(report.adapted_by_predicate),
+            "root_identity_class_counts": dict(report.root_identity_class_counts),
+            "counts": {
+                "document_work_signals": len(payload.document_work_signals) if payload else 0,
+                "exact_duplicate_relations": (
+                    len(payload.exact_duplicate_relations) if payload else 0
+                ),
+                "semantic_pair_relations": (len(payload.semantic_pair_relations) if payload else 0),
+                "topic_candidates": len(payload.topic_candidates) if payload else 0,
+                "project_candidates": len(payload.project_candidates) if payload else 0,
+                "consolidation_candidates": (
+                    len(payload.consolidation_candidates) if payload else 0
+                ),
+                "readiness_evidence": len(payload.readiness_evidence) if payload else 0,
+                "reasoning_candidates": len(payload.reasoning_candidates) if payload else 0,
+            },
+            # Reported rather than hidden: these are the signals this generation
+            # cannot locate truthfully, and a silent count of successes would
+            # make the gap invisible.
+            "unadaptable_signal_count": len(report.unadaptable_signals),
+            "unadaptable_by_format": report.unadaptable_by_format,
+            "missing_generation_files": list(report.missing_files),
+            "diagnostics": list(report.diagnostics),
+            "note": (
+                "compatibility ingress only; the Meta generation was read and not "
+                "modified, and no source tree was rescanned"
+            ),
+            "outputs": [item.model_dump(mode="json") for item in receipt.results],
+        }
+    )
+    return _commit_exit_code(
+        receipt, stage="adapt-meta-corpus", packet_type=CORPUS_INTELLIGENCE_PACKET_TYPE
+    )
 
 
 def cmd_validate_packet(args: argparse.Namespace) -> int:
@@ -441,6 +533,14 @@ def build_parser() -> argparse.ArgumentParser:
     )
     compile_parser.add_argument("--repo-root", default=".")
     compile_parser.add_argument("--input-bundle", action="append", required=True)
+    compile_parser.add_argument(
+        "--corpus-bundle",
+        action="append",
+        help=(
+            "Corpus Intelligence Packet bundle to compile alongside the repository "
+            "models. Repeatable; omitting it compiles repository observation alone."
+        ),
+    )
     compile_parser.add_argument("--out", required=True)
     compile_parser.add_argument("--dry-run", action="store_true")
     compile_parser.add_argument("--allow-overwrite", action="store_true")
@@ -525,6 +625,16 @@ def build_parser() -> argparse.ArgumentParser:
     publication_parser.add_argument("--allow-overwrite", action="store_true")
     publication_parser.set_defaults(handler=cmd_plan_publication)
 
+    adapt_parser = commands.add_parser(
+        "adapt-meta-corpus",
+        help="Compatibility: adapt a Meta corpus generation into a Corpus Intelligence bundle",
+    )
+    adapt_parser.add_argument("--meta-generation", required=True)
+    adapt_parser.add_argument("--out", required=True)
+    adapt_parser.add_argument("--dry-run", action="store_true")
+    adapt_parser.add_argument("--allow-overwrite", action="store_true")
+    adapt_parser.set_defaults(handler=cmd_adapt_meta_corpus)
+
     neo4j_parser = commands.add_parser("export-neo4j", help="Render a Neo4j candidate projection")
     neo4j_parser.add_argument("--input-bundle", required=True)
     neo4j_parser.add_argument("--out", required=True)
@@ -546,6 +656,13 @@ def run(argv: Sequence[str] | None = None) -> int:
     except BundleVerificationError as exc:
         for line in _format_verification_error(exc):
             print(line, file=sys.stderr)
+        return 2
+    except (CorpusIntelligenceValidationError, MetaGenerationError) as exc:
+        # Both carry an operator-actionable list of what did not resolve. Printed
+        # line by line rather than as one blob so the failing references are
+        # readable in a terminal.
+        for line in str(exc).splitlines():
+            print(f"ERROR: {line}", file=sys.stderr)
         return 2
     except (PacketLoadError, ValueError, OSError, RuntimeError, json.JSONDecodeError) as exc:
         for line in str(exc).splitlines() or [repr(exc)]:

@@ -168,16 +168,27 @@ def load_topology_bundle(bundle_root: Path) -> tuple[MaterializedTopology, Valid
         except json.JSONDecodeError as exc:
             raise PacketLoadError(f"invalid topology payload JSON for {key}") from exc
 
+    # Every domain is read by name. A 1.0.0 bundle declares no ref for the
+    # domains 1.1.0 added, and `load_records` answers an absent ref with an empty
+    # list, so an older packet loads as itself rather than failing on files it
+    # never had a reason to write.
     state = TopologyState(
         repository_records=tuple(load_records("repository_records")),
         artifact_records=tuple(load_records("artifact_records")),
         capability_records=tuple(load_records("capability_records")),
+        semantic_claims=tuple(load_records("semantic_claims")),
         edge_records=tuple(load_records("edge_records")),
         flow_records=tuple(load_records("flow_records")),
         graph_records=tuple(load_records("graph_records")),
         risks=tuple(load_records("risks")),
         maturity=tuple(load_records("maturity")),
         impact_indexes=tuple(load_records("impact_indexes")),
+        corpus_records=tuple(load_records("corpus_records")),
+        root_records=tuple(load_records("root_records")),
+        candidate_relations=tuple(load_records("candidate_relations")),
+        candidate_clusters=tuple(load_records("candidate_clusters")),
+        readiness_evidence=tuple(load_records("readiness_evidence")),
+        topology_reasoning_candidates=tuple(load_records("topology_reasoning_candidates")),
         evidence=tuple(load_records("evidence")),
         diagnostics=tuple(load_records("diagnostics")),
         unknowns=tuple(load_records("unknowns")),

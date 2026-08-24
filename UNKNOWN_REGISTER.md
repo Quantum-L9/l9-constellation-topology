@@ -19,6 +19,23 @@
 - Publication planning lives here per ADR-0021, but live graph promotion, Gate dispatch, and durable admission remain owned by `l9-graphiti-memory` and are intentionally absent.
 - Final public release eligibility remains owner-controlled. The repository includes an explicit proprietary source license and package metadata preventing accidental public publication.
 
+## Corpus intelligence Unknowns
+
+- `l9-meta-injector` does not yet emit `l9.corpus-intelligence`. The canonical
+  packet contract is implemented and tested here; production use currently goes
+  through the `adapt-meta-corpus` compatibility ingress.
+- The current producer generation records work signals only as line spans into the
+  text it interpreted. For Word, PDF, PowerPoint, and spreadsheet documents that
+  text is the decoded blocks joined by newlines, so the recorded line is not a
+  coordinate in the source document. Those signals are declined by the adapter and
+  reported by count and reason. No structured locator is derived for them: the
+  line-to-block mapping holds only if no decoded block text contains a newline,
+  which the generation gives no way to check.
+- Whether a corpus root that observed no repository should carry a synthetic
+  repository identity is deliberately unresolved. `RootRecord.repository_id` is
+  optional, and the root-to-repository containment edge is emitted only when a
+  repository was actually observed.
+
 No unsupported value was invented to close these Unknowns.
 
 ## Remediation release gates

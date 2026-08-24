@@ -26,6 +26,27 @@ REASON_ADMITTED = "policy.admitted"
 
 SKIP_ENTITY_KIND = "policy.entity_kind_not_selected"
 SKIP_EDGE_TYPE = "policy.edge_type_not_selected"
+#: A candidate domain is held from publication by default, and the hold is
+#: recorded rather than left implicit.
+#:
+#: Candidates are already structurally unable to reach a lowering function: they
+#: live in their own ``TopologyState`` fields and publication reads
+#: ``edge_records``. Recording the skip anyway is what makes the containment
+#: *auditable* — a plan that simply omitted them would look identical to a plan
+#: compiled from a corpus that produced none, and "we held six project
+#: candidates" and "there were no project candidates" are different facts.
+SKIP_CANDIDATE_DOMAIN = "policy.candidate_domain_not_published"
+#: Readiness is a measurement over derived analysis. Published as durable memory
+#: it would read as a verdict about a body of work, which is exactly what its own
+#: domain refuses to compute.
+SKIP_READINESS_DOMAIN = "policy.readiness_evidence_not_published"
+#: A reasoning candidate is a request for future adjudication, not a conclusion.
+SKIP_REASONING_DOMAIN = "policy.reasoning_candidate_not_published"
+#: An explicit work relation whose target did not resolve to exactly one observed
+#: artifact. The declaration is real and stays in canonical topology; what cannot
+#: be published is a durable assertion pointing at an endpoint this compile never
+#: observed, which downstream would read as a resolved relation.
+SKIP_UNRESOLVED_WORK_TARGET = "relation.work_target_not_exactly_resolved"
 #: A claim whose subject, predicate, or object is empty cannot be stated as a
 #: triple downstream. Recording it as skipped keeps it visible; letting the
 #: lowering error escape would fail the whole plan over one malformed claim.

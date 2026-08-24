@@ -7,9 +7,9 @@ import json
 import re
 from datetime import UTC, datetime
 from pathlib import Path, PurePosixPath
-from typing import Any, Literal
+from typing import Annotated, Any, Literal
 
-from pydantic import Field, field_validator
+from pydantic import Field, field_validator, model_validator
 
 from l9_constellation_topology.domain.base import FrozenModel
 from l9_constellation_topology.domain.confidence import ConfidenceAssessment
@@ -120,6 +120,111 @@ def stable_id(prefix: str, value: Any) -> str:
     return f"{prefix}:{semantic_hash(value).removeprefix(_SHA_PREFIX)}"
 
 
+class LineLocator(FrozenModel):
+    """A 1-based inclusive line span, for a format that has lines."""
+
+    kind: Literal["line"] = "line"
+    start_line: int = Field(ge=1)
+    end_line: int = Field(ge=1)
+
+
+class PdfLocator(FrozenModel):
+    """A block on a page. A PDF page is not a line and has no line numbers."""
+
+    kind: Literal["pdf"] = "pdf"
+    page_number: int = Field(ge=1)
+    block_index: int = Field(ge=0)
+
+
+class DocxLocator(FrozenModel):
+    """A block within a Word document body, by ordinal and block kind."""
+
+    kind: Literal["docx"] = "docx"
+    block_index: int = Field(ge=0)
+    block_kind: str
+    #: The OPC part the block was read from, e.g. ``word/document.xml``. A Word
+    #: file is several XML parts and block 3 of the body is not block 3 of a
+    #: footnote, so the ordinal alone does not identify the block.
+    part: str = ""
+
+
+class PptxLocator(FrozenModel):
+    """A shape on a slide."""
+
+    kind: Literal["pptx"] = "pptx"
+    slide_number: int = Field(ge=1)
+    shape_index: int = Field(ge=0)
+    #: The OPC part the shape was read from. Same reason as ``DocxLocator``:
+    #: a notes slide and its slide carry independent shape ordinals.
+    part: str = ""
+
+
+class SpreadsheetLocator(FrozenModel):
+    """A cell or range on a named sheet, in the workbook's own A1 vocabulary."""
+
+    kind: Literal["spreadsheet"] = "spreadsheet"
+    sheet: str
+    cell_or_range: str
+
+
+class NotebookLocator(FrozenModel):
+    """A notebook cell by ordinal and declared cell type."""
+
+    kind: Literal["notebook"] = "notebook"
+    cell_index: int = Field(ge=0)
+    cell_type: str
+    #: A cell does have lines, so a span *within* the cell is a real coordinate
+    #: rather than an invented one. Absent when the producer cited the cell
+    #: whole.
+    start_line: int | None = Field(default=None, ge=1)
+    end_line: int | None = Field(default=None, ge=1)
+
+
+class CsvLocator(FrozenModel):
+    """A row of a delimited file."""
+
+    kind: Literal["csv"] = "csv"
+    row: int = Field(ge=1)
+    #: The named column, when the claim was read from one cell rather than the
+    #: whole row.
+    column: str | None = None
+
+
+class HtmlLocator(FrozenModel):
+    """A node, by an index stable under the producer's own traversal order."""
+
+    kind: Literal["html"] = "html"
+    stable_node_index: int = Field(ge=0)
+    #: The element path the index was counted along. The index is stable only
+    #: relative to a traversal; the path is what a reader can actually follow.
+    node_path: str = ""
+
+
+#: Where a piece of evidence sits, in the coordinate system its format has.
+#:
+#: A Markdown file has lines. A slide deck has slides and shapes; a workbook has
+#: sheets and cells; a PDF has pages and blocks within them. None of those is a
+#: line number, and flattening one into a line number does not lose precision so
+#: much as invent it: ``line 7`` of a ``.docx`` names nothing an operator can
+#: open. The union keeps each format's true coordinates, so evidence that cannot
+#: honestly cite a line simply does not.
+SourceLocator = Annotated[
+    LineLocator
+    | PdfLocator
+    | DocxLocator
+    | PptxLocator
+    | SpreadsheetLocator
+    | NotebookLocator
+    | CsvLocator
+    | HtmlLocator,
+    Field(discriminator="kind"),
+]
+
+#: Locator kinds that name a line span. Everything else is a structured
+#: coordinate, and a signal decoded from such a format may never carry a line.
+LINE_LOCATOR_KINDS: frozenset[str] = frozenset({"line"})
+
+
 class EvidenceSourceRef(FrozenModel):
     uri: str | None = None
     source_path: str | None = None
@@ -127,11 +232,42 @@ class EvidenceSourceRef(FrozenModel):
     content_hash: str | None = None
     packet_id: str | None = None
     source_revision: str | None = None
+    #: The structured coordinate this evidence was read at, when the producer
+    #: reported one. ``None`` for evidence that carries only ``line_number``,
+    #: which is every repository-model assertion emitted before locators existed.
+    locator: SourceLocator | None = None
 
     @field_validator("source_path")
     @classmethod
     def source_path_is_portable(cls, value: str | None) -> str | None:
         return normalize_source_path(value) if value is not None else None
+
+    @model_validator(mode="after")
+    def line_number_agrees_with_locator(self) -> EvidenceSourceRef:
+        """Refuse a line number that contradicts the structured coordinate.
+
+        A line locator may also project to ``line_number`` — that is how a 1.1.0
+        repository-model assertion keeps working unchanged. What is refused is a
+        line number beside a *structured* locator: it would let a consumer that
+        reads only ``line_number`` believe a Word document has lines, which is
+        the exact confusion the locator union exists to prevent.
+        """
+        if self.locator is None:
+            return self
+        if not isinstance(self.locator, LineLocator):
+            if self.line_number is not None:
+                raise ValueError(
+                    "evidence located by a structured "
+                    f"{self.locator.kind!r} coordinate cannot also carry a line number; "
+                    "the format has no lines to number"
+                )
+            return self
+        if self.line_number is not None and self.line_number != self.locator.start_line:
+            raise ValueError(
+                "line_number must equal the line locator's start_line: "
+                f"{self.line_number} != {self.locator.start_line}"
+            )
+        return self
 
 
 EvidenceClass = Literal[

@@ -13,6 +13,7 @@ from l9_constellation_topology.compatibility.v4_models import (
     GraphRecord as LegacyGraphRecord,
 )
 from l9_constellation_topology.domain import ConfidenceLevel, EdgeRecord, EdgeType, ImpactIndex
+from l9_constellation_topology.domain.edge import TRAVERSABLE_EDGE_TYPES
 
 _CONFIDENCE_ORDER = {
     ConfidenceLevel.low: 0,
@@ -34,7 +35,15 @@ def assess_impact(
         raise ValueError(f"invalid impact direction: {direction}")
     if maximum_depth < 0:
         raise ValueError("maximum_depth cannot be negative")
-    allowed_types = edge_types or set(EdgeType)
+    # The default is the *traversable* taxonomy, not every edge type. Byte
+    # identity and a textual reference are real relations that are not
+    # dependencies, and defaulting to `set(EdgeType)` would have silently pulled
+    # both into canonical impact the moment they were added to the enum.
+    #
+    # An explicit `edge_types` is still honoured verbatim: a caller that asks to
+    # traverse duplicates is answering a different question deliberately, and
+    # this is the one place that distinction can be made.
+    allowed_types = edge_types if edge_types is not None else set(TRAVERSABLE_EDGE_TYPES)
     outgoing: dict[str, list[tuple[str, str]]] = defaultdict(list)
     incoming: dict[str, list[tuple[str, str]]] = defaultdict(list)
     unresolved: list[str] = []

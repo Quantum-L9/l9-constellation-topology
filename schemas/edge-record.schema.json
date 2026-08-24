@@ -108,7 +108,10 @@
         "SUPERSEDES",
         "ROUTES_TO",
         "PUBLISHES_TO",
-        "MEMBER_OF"
+        "MEMBER_OF",
+        "DUPLICATE_OF",
+        "BLOCKED_BY",
+        "REFERENCES"
       ],
       "title": "EdgeType",
       "type": "string"

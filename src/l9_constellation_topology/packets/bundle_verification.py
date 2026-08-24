@@ -14,6 +14,8 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+from .corpus_bundle import load_corpus_intelligence_bundle
+from .corpus_intelligence import CORPUS_INTELLIGENCE_PACKET_TYPE
 from .loader import (
     PacketLoadError,
     load_repository_model_bundle,
@@ -25,6 +27,7 @@ from .loader import (
 BUNDLE_VERIFIERS: dict[str, Any] = {
     "l9.topology": load_topology_bundle,
     "l9.repository-model": load_repository_model_bundle,
+    CORPUS_INTELLIGENCE_PACKET_TYPE: load_corpus_intelligence_bundle,
 }
 
 

@@ -294,15 +294,40 @@ def project_claims(claims: tuple[SemanticClaimRecord, ...]) -> ClaimProjection:
     )
 
 
+def merge_projected_entities(
+    *maps: dict[str, tuple[str, ...]],
+) -> dict[str, tuple[str, ...]]:
+    """Combine what several projections produced, per claim.
+
+    A claim can project through more than one table: ``work.supersedes`` reaches
+    the work projector, and a future predicate could reach both. Taking only one
+    map would leave such a claim reporting a subset of what it actually produced.
+    """
+    merged: dict[str, set[str]] = {}
+    for entities_by_claim in maps:
+        for claim_id, produced in entities_by_claim.items():
+            merged.setdefault(claim_id, set()).update(produced)
+    return {claim_id: tuple(sorted(produced)) for claim_id, produced in sorted(merged.items())}
+
+
 def apply_projection(
-    claims: tuple[SemanticClaimRecord, ...], projection: ClaimProjection
+    claims: tuple[SemanticClaimRecord, ...],
+    projection: ClaimProjection | dict[str, tuple[str, ...]],
 ) -> tuple[SemanticClaimRecord, ...]:
-    """Stamp each claim with the topology entities it produced, if any."""
+    """Stamp each claim with the topology entities it produced, if any.
+
+    Accepts either a ``ClaimProjection`` or an already-merged map, because a
+    claim's projected entities can come from more than one projector and only the
+    caller knows which ran.
+    """
+    entities_by_claim = (
+        projection.entities_by_claim if isinstance(projection, ClaimProjection) else projection
+    )
     return tuple(
         claim.model_copy(
             update={
-                "projected": claim.claim_id in projection.entities_by_claim,
-                "projected_entity_ids": projection.entities_by_claim.get(claim.claim_id, ()),
+                "projected": claim.claim_id in entities_by_claim,
+                "projected_entity_ids": entities_by_claim.get(claim.claim_id, ()),
             }
         )
         for claim in claims
