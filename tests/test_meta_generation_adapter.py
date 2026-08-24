@@ -24,6 +24,8 @@ from l9_constellation_topology.domain.edge import EdgeType
 from l9_constellation_topology.packets.adapters.meta_generation import (
     UNADAPTABLE_NO_STRUCTURED_LOCATOR,
     MetaGenerationError,
+    _document_formats,
+    _Generation,
     adapt_meta_generation,
     resolve_generation_root,
 )
@@ -44,7 +46,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 #: Which decoder the generation records for each fixture artifact. The split is
 #: the point: markdown carries real lines, docx and pptx do not.
-DECODERS = {
+#: Decoded format per artifact, as the producer's document index records it.
+FORMATS = {
     "artifact:plan-md": "markdown",
     "artifact:wip-docx": "docx",
     "artifact:roadmap-pptx": "pptx",
@@ -52,6 +55,18 @@ DECODERS = {
     "artifact:tracker-xlsx": "xlsx",
     "artifact:proto-ipynb": "ipynb",
 }
+
+
+def decoder_id_for(artifact_id: str) -> str:
+    """The producer names decoders, not formats, in ``decoder_id``.
+
+    Written out here because a fixture that puts ``"docx"`` in ``decoder_id``
+    lets a consumer compare the two fields interchangeably and pass. The
+    producer writes ``l9.docx-decoder`` there and ``docx`` in ``format``, and a
+    reader that confuses them fails on every binary document in a real
+    generation while every test still goes green.
+    """
+    return f"l9.{FORMATS.get(artifact_id, 'text')}-decoder"
 
 
 def _tree_digest(root: Path) -> str:
@@ -102,7 +117,8 @@ def build_generation(root: Path, *, with_current: bool = True) -> Path:
                     "root_relative_path": record.source_path,
                     "content_hash": record.content_hash,
                     "normalized_document_id": f"nd:{record.artifact_id}",
-                    "decoder_id": DECODERS.get(record.artifact_id, "text"),
+                    "format": FORMATS.get(record.artifact_id, "text"),
+                    "decoder_id": decoder_id_for(record.artifact_id),
                     "decoder_version": "1.0.0",
                     "decoded": True,
                     "undecoded_reason": None,
@@ -580,3 +596,42 @@ def test_a_binary_document_work_signal_is_declined_and_reported(
     assert all(
         record.document_format != "docx" for record in report.packet.payload.document_work_signals
     )
+
+
+def test_the_decoded_format_is_read_from_format_not_from_the_decoder_id(
+    generation: Path,
+) -> None:
+    """A decoder name is not a file type.
+
+    The producer records ``decoder_id: l9.docx-decoder`` and ``format: docx``.
+    Reading the first as the second compares a tool against a file type, which
+    matches for nothing: in a real generation every binary-document signal was
+    refused with "declares format 'docx' and the document index records
+    'l9.docx-decoder'", while the whole suite stayed green because the fixture
+    had put a format string in the decoder field.
+
+    Asserted on the parsed index rather than through the adapter, because the
+    point is which field is authoritative, not what any one signal did with it.
+    """
+    root = resolve_generation_root(generation)
+    index = json.loads((root / "document-index.json").read_text(encoding="utf-8"))
+    formats = _document_formats(
+        _Generation(root=root, documents={"document-index.json": index})
+    )
+    assert formats["artifact:wip-docx"] == "docx"
+    assert all(not value.startswith("l9.") for value in formats.values())
+
+
+def test_a_generation_recording_only_a_decoder_id_still_resolves_a_format(
+    tmp_path: Path,
+) -> None:
+    """Older generations wrote one string in both places; they still read."""
+    index = {
+        "documents": [
+            {"artifact_id": "artifact:legacy", "decoder_id": "markdown"},
+        ]
+    }
+    formats = _document_formats(
+        _Generation(root=tmp_path, documents={"document-index.json": index})
+    )
+    assert formats == {"artifact:legacy": "markdown"}

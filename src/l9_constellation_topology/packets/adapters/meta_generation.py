@@ -494,15 +494,36 @@ def _coverage(generation: _Generation) -> CorpusCoverage:
 
 
 def _document_formats(generation: _Generation) -> dict[str, str]:
-    """Return ``artifact_id`` -> decoded format, from the document index."""
+    """Return ``artifact_id`` -> decoded format, from the document index.
+
+    ``format`` is the field that holds a format. ``decoder_id`` names the
+    decoder that produced it — ``l9.docx-decoder`` rather than ``docx`` — and
+    reading one as the other compares a tool against a file type. Older
+    generations that carry only the decoder id fall back to it, since for those
+    the two were written as the same string.
+    """
     index = generation.get(DOCUMENT_INDEX_FILE) or {}
     formats: dict[str, str] = {}
     for entry in index.get("documents", ()):
         artifact_id = entry.get("artifact_id")
-        decoder = entry.get("decoder_id")
-        if isinstance(artifact_id, str) and isinstance(decoder, str):
-            formats[artifact_id] = decoder
+        if not isinstance(artifact_id, str):
+            continue
+        declared = entry.get("format")
+        if not isinstance(declared, str) or not declared:
+            declared = entry.get("decoder_id")
+        if isinstance(declared, str) and declared:
+            formats[artifact_id] = declared
     return formats
+
+
+def _normalized_document_ids(generation: _Generation) -> frozenset[str]:
+    """Every decoding the document index recorded."""
+    index = generation.get(DOCUMENT_INDEX_FILE) or {}
+    return frozenset(
+        entry["normalized_document_id"]
+        for entry in index.get("documents", ())
+        if isinstance(entry.get("normalized_document_id"), str)
+    )
 
 
 def _artifact_paths(generation: _Generation) -> dict[str, str]:
@@ -593,11 +614,20 @@ def _record_format(record: dict[str, Any], formats: dict[str, str], context: str
 
 
 def _adapt_record(
-    record: dict[str, Any], index: dict[str, tuple[str, str]], formats: dict[str, str]
+    record: dict[str, Any],
+    index: dict[str, tuple[str, str]],
+    formats: dict[str, str],
+    decodings: frozenset[str],
 ) -> DocumentWorkSignal:
     """Translate one verified payload record into a work signal."""
     signal_id = str(record.get("signal_id"))
     context = f"work signal {signal_id}"
+    normalized_document_id = _optional_text(record, "normalized_document_id")
+    if normalized_document_id is not None and normalized_document_id not in decodings:
+        raise MetaGenerationError(
+            f"{context}: cites decoding {normalized_document_id!r}, which the document "
+            "index does not record"
+        )
     rmp_artifact_id, content_hash, source_path = _resolve_record_artifact(record, index, context)
     document_format = _record_format(record, formats, context)
     block_kind = record.get("block_kind")
@@ -629,7 +659,7 @@ def _adapt_record(
         authority=_required_text(record, "authority", context),
         confidence=_required_text(record, "confidence", context),
         corpus_artifact_id=str(record.get("artifact_id") or ""),
-        normalized_document_id=_optional_text(record, "normalized_document_id"),
+        normalized_document_id=normalized_document_id,
         block_id=str(record.get("block_id") or ""),
         block_kind=block_kind_text,
         extractor_profile_version=str(record.get("extractor_profile_version") or ""),
@@ -649,7 +679,8 @@ def _current_work_signals(
     """
     index = _artifact_index(bundles)
     formats = _document_formats(generation)
-    signals = [_adapt_record(record, index, formats) for record in payload.records]
+    decodings = _normalized_document_ids(generation)
+    signals = [_adapt_record(record, index, formats, decodings) for record in payload.records]
     return tuple(sorted(signals, key=lambda item: item.signal_id))
 
 
