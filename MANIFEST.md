@@ -269,7 +269,9 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `src/l9_constellation_topology/models.py` — production Python package implementation
 - `src/l9_constellation_topology/packets/__init__.py` — production Python package implementation
 - `src/l9_constellation_topology/packets/adapters/__init__.py` — production Python package implementation
+- `src/l9_constellation_topology/packets/adapters/errors.py` — production Python package implementation
 - `src/l9_constellation_topology/packets/adapters/meta_generation.py` — production Python package implementation
+- `src/l9_constellation_topology/packets/adapters/meta_work_signals.py` — production Python package implementation
 - `src/l9_constellation_topology/packets/adapters/repository_model_v1.py` — production Python package implementation
 - `src/l9_constellation_topology/packets/assertion_evidence.py` — production Python package implementation
 - `src/l9_constellation_topology/packets/bundle.py` — production Python package implementation

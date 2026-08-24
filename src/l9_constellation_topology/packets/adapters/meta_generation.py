@@ -45,7 +45,7 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from l9_constellation_topology.packets.common import (
     PacketValidationRef,
@@ -78,6 +78,15 @@ from l9_constellation_topology.packets.loader import (
 )
 from l9_constellation_topology.packets.refs import PacketRef
 from l9_constellation_topology.packets.repository_model import RepositoryModelAssertion
+
+from .errors import MetaGenerationError
+from .meta_work_signals import (
+    DOCUMENT_WORK_SIGNALS_FILE,
+    DOCUMENT_WORK_SIGNALS_MANIFEST_FILE,
+    WorkSignalPayload,
+    load_work_signal_payload,
+    translate_locator,
+)
 
 #: The pointer a published generation writes, naming which generation to read.
 CURRENT_FILE = "CURRENT.json"
@@ -130,11 +139,28 @@ UNADAPTABLE_NO_STRUCTURED_LOCATOR = (
 #: Adapter identity, recorded as the producer of the emitted packet so a consumer
 #: can tell an adapted packet from one the producer emitted directly.
 ADAPTER_NAME = "l9-constellation-topology/meta-generation-adapter"
-ADAPTER_VERSION = "1.0.0"
+ADAPTER_VERSION = "1.1.0"
 
+#: The generation carries the complete, manifested work-signal payload.
+MODE_CURRENT_COMPLETE = "current_complete"
 
-class MetaGenerationError(ValueError):
-    """Raised when a Meta generation cannot be read or is not self-consistent."""
+#: The generation predates that payload. Work signals are reconstructed from
+#: line-bearing repository-model assertions, and binary-document signals are
+#: reported as unadaptable rather than given an invented coordinate.
+MODE_LEGACY_LINE_ASSERTIONS = "legacy_line_assertions"
+
+#: Re-exported so callers keep importing the error from the adapter they call.
+__all__ = [
+    "ADAPTER_VERSION",
+    "MODE_CURRENT_COMPLETE",
+    "MODE_LEGACY_LINE_ASSERTIONS",
+    "MetaAdaptationReport",
+    "MetaGenerationError",
+    "UnadaptableSignal",
+    "adapt_meta_generation",
+    "detect_adaptation_mode",
+    "resolve_generation_root",
+]
 
 
 @dataclass(frozen=True)
@@ -165,6 +191,27 @@ class MetaAdaptationReport:
     unadaptable_signals: tuple[UnadaptableSignal, ...] = ()
     missing_files: tuple[str, ...] = ()
     diagnostics: tuple[str, ...] = ()
+    #: Which contract this generation was read under.
+    adaptation_mode: str = MODE_LEGACY_LINE_ASSERTIONS
+    #: What the producer's manifest declared, and what parsing actually yielded.
+    #: Equal in a sound current-mode adaptation; both zero in legacy mode, where
+    #: there is no manifest to declare anything.
+    manifest_record_count: int = 0
+    parsed_signal_count: int = 0
+    #: Identity of the producer revision behind the payload, as the generation
+    #: states it. Recorded rather than derived so a report can be traced back to
+    #: the exact analysis that produced it.
+    producer_revision: str = ""
+    #: How many signals the *sampled* report lists, when it is present. Carried
+    #: only so the two documents can be compared; never a source of signals.
+    sampled_report_listed_count: int | None = None
+    adapted_by_format: tuple[tuple[str, int], ...] = ()
+    adapted_by_predicate: tuple[tuple[str, int], ...] = ()
+    root_identity_class_counts: tuple[tuple[str, int], ...] = ()
+
+    @property
+    def unadaptable_signal_count(self) -> int:
+        return len(self.unadaptable_signals)
 
     @property
     def unadaptable_by_format(self) -> dict[str, int]:
@@ -226,6 +273,22 @@ def resolve_generation_root(path: Path) -> Path:
     return resolved
 
 
+def detect_adaptation_mode(root: Path) -> str:
+    """Decide which contract this generation is read under.
+
+    Presence of *either* half of the complete payload commits the generation to
+    current mode. A generation carrying a manifest with no payload, or a payload
+    with no manifest, is refused rather than quietly demoted to legacy: falling
+    back would read an unverifiable subset of the signals and report success,
+    which is the exact failure the manifest exists to prevent.
+    """
+    has_payload = (root / DOCUMENT_WORK_SIGNALS_FILE).is_file()
+    has_manifest = (root / DOCUMENT_WORK_SIGNALS_MANIFEST_FILE).is_file()
+    if has_payload or has_manifest:
+        return MODE_CURRENT_COMPLETE
+    return MODE_LEGACY_LINE_ASSERTIONS
+
+
 def _read_generation(root: Path) -> _Generation:
     generation = _Generation(root=root)
     for name in (
@@ -271,8 +334,43 @@ def _read_generation(root: Path) -> _Generation:
     return generation
 
 
+def _root_identity_class(
+    entry: dict[str, Any], root_id: Any, *, mode: str
+) -> Literal["declared", "inferred"]:
+    """Return what the producer said the root's identity is.
+
+    ``root_identity_class`` is the producer's own answer to "was this root's
+    identity declared, or did we infer it?". ``source_kind`` answers a different
+    question — what sort of thing the root is — and reading one as the other was
+    wrong in a way no downstream consumer could detect: an inferred root would
+    have been published carrying a declared root's authority.
+
+    A current-mode generation that omits the field fails closed. Defaulting it
+    would reintroduce exactly the guess this function exists to remove.
+    """
+    declared = entry.get("root_identity_class")
+    if declared == "declared":
+        return "declared"
+    if declared == "inferred":
+        return "inferred"
+    if declared is not None:
+        raise MetaGenerationError(
+            f"root {root_id!r} declares root_identity_class {declared!r}, which is "
+            "neither 'declared' nor 'inferred'"
+        )
+    if mode == MODE_CURRENT_COMPLETE:
+        raise MetaGenerationError(
+            f"root {root_id!r} carries no root_identity_class; a generation emitting "
+            "the complete work-signal payload is expected to state it, and inferring "
+            "it here would be a guess wearing the producer's authority"
+        )
+    # A generation predating the field cannot be asked. The lower of the two
+    # classes is the honest reading: 'inferred' claims less.
+    return "inferred"
+
+
 def _root_ref(
-    entry: dict[str, Any], generation: _Generation
+    entry: dict[str, Any], generation: _Generation, *, mode: str
 ) -> tuple[CorpusRootRef, RepositoryModelBundle]:
     """Bind one observed root to the exact bundle it produced.
 
@@ -311,7 +409,7 @@ def _root_ref(
     return (
         CorpusRootRef(
             root_id=str(root_id),
-            identity_class=("declared" if entry.get("source_kind") == "declared" else "inferred"),
+            identity_class=_root_identity_class(entry, root_id, mode=mode),
             source_revision=str(entry.get("source_revision") or ""),
             repository_model_packet=PacketRef(
                 packet_id=packet.packet_id,
@@ -331,7 +429,7 @@ def _root_ref(
 
 
 def _load_root_bundles(
-    generation: _Generation,
+    generation: _Generation, *, mode: str
 ) -> tuple[tuple[CorpusRootRef, ...], tuple[RepositoryModelBundle, ...]]:
     """Bind every observed root to the exact bundle it produced."""
     snapshot = generation.require(SNAPSHOT_FILE)
@@ -346,7 +444,7 @@ def _load_root_bundles(
         # corpus root would bind a reference with nothing behind it.
         if entry.get("observation_status") != "observed":
             continue
-        reference, bundle = _root_ref(entry, generation)
+        reference, bundle = _root_ref(entry, generation, mode=mode)
         refs.append(reference)
         bundles.append(bundle)
     if not refs:
@@ -416,6 +514,155 @@ def _artifact_paths(generation: _Generation) -> dict[str, str]:
         if isinstance(artifact_id, str) and isinstance(path, str):
             paths[artifact_id] = path
     return paths
+
+
+def _artifact_index(
+    bundles: tuple[RepositoryModelBundle, ...],
+) -> dict[str, tuple[str, str]]:
+    """Return ``artifact_id`` -> (content hash, portable path) over every input.
+
+    An id appearing in two packets is dropped rather than resolved to one of
+    them: an ambiguous identity is not evidence, and picking a side here would
+    bind a claim to whichever bundle happened to load first.
+    """
+    index: dict[str, tuple[str, str]] = {}
+    duplicated: set[str] = set()
+    for bundle in bundles:
+        payload = bundle.packet.payload
+        if payload is None:
+            continue
+        for record in payload.artifacts:
+            if record.artifact_id in index:
+                duplicated.add(record.artifact_id)
+                continue
+            index[record.artifact_id] = (record.content_hash, record.source_path)
+    for artifact_id in duplicated:
+        index.pop(artifact_id, None)
+    return index
+
+
+def _current_work_signals(
+    payload: WorkSignalPayload,
+    bundles: tuple[RepositoryModelBundle, ...],
+    generation: _Generation,
+) -> tuple[DocumentWorkSignal, ...]:
+    """Adapt every record in the complete payload, or refuse the generation.
+
+    Every record is adapted. There is no path here that skips one: a payload
+    whose count was verified against its manifest and then silently reduced
+    would conserve its total against a number that no longer described it.
+
+    Identity comes from ``rmp_artifact_id`` rather than ``artifact_id``. The
+    producer emits both because it works in two identity domains — the corpus
+    addresses an artifact within the corpus, a Repository Model Packet addresses
+    it within its root's bundle — and this compiler resolves in the second. The
+    corpus id is kept beside it rather than discarded, so a reader working in
+    either domain can still find the artifact.
+    """
+    index = _artifact_index(bundles)
+    formats = _document_formats(generation)
+    signals: list[DocumentWorkSignal] = []
+    for record in payload.records:
+        signal_id = str(record.get("signal_id"))
+        context = f"work signal {signal_id}"
+
+        rmp_artifact_id = record.get("rmp_artifact_id")
+        if not isinstance(rmp_artifact_id, str) or not rmp_artifact_id:
+            raise MetaGenerationError(f"{context}: carries no rmp_artifact_id")
+        resolved = index.get(rmp_artifact_id)
+        if resolved is None:
+            raise MetaGenerationError(
+                f"{context}: names artifact {rmp_artifact_id!r}, which no input "
+                "Repository Model Packet carries unambiguously"
+            )
+        content_hash, portable_path = resolved
+
+        declared_hash = record.get("raw_content_hash")
+        if declared_hash is not None and declared_hash != content_hash:
+            raise MetaGenerationError(
+                f"{context}: cites content hash {declared_hash!r} and the artifact "
+                f"carries {content_hash!r}; the claim is bound to bytes the corpus "
+                "did not observe"
+            )
+
+        source_path = record.get("source_path")
+        if not isinstance(source_path, str) or not source_path:
+            raise MetaGenerationError(f"{context}: carries no source_path")
+        if source_path != portable_path:
+            raise MetaGenerationError(
+                f"{context}: cites path {source_path!r} and the artifact is at {portable_path!r}"
+            )
+
+        document_format = record.get("format")
+        if not isinstance(document_format, str) or not document_format:
+            raise MetaGenerationError(f"{context}: carries no format")
+        indexed_format = formats.get(str(record.get("artifact_id") or ""))
+        if indexed_format is not None and indexed_format != document_format:
+            raise MetaGenerationError(
+                f"{context}: declares format {document_format!r} and the document "
+                f"index records {indexed_format!r}"
+            )
+
+        block_kind = record.get("block_kind")
+        locator = translate_locator(
+            record.get("structured_locator"),
+            document_format=document_format,
+            block_kind=str(block_kind) if isinstance(block_kind, str) else "",
+            context=context,
+        )
+
+        signals.append(
+            DocumentWorkSignal(
+                signal_id=signal_id,
+                artifact_id=rmp_artifact_id,
+                # The producer's signal is artifact-scoped. Naming the artifact
+                # as the subject is a schema translation, not an inference about
+                # what the claim is about.
+                subject_id=rmp_artifact_id,
+                predicate=_required_text(record, "predicate", context),
+                object=str(record.get("object") or ""),
+                source_path=source_path,
+                locator=locator,  # type: ignore[arg-type]
+                source_content_hash=content_hash,
+                document_format=document_format,
+                evidence_excerpt=str(record.get("bounded_excerpt") or ""),
+                extractor_id=_required_text(record, "extractor_id", context),
+                decoder_id=_required_text(record, "decoder_id", context),
+                decoder_version=_required_text(record, "decoder_version", context),
+                evidence_class=_evidence_class(record, context),
+                authority=_required_text(record, "authority", context),
+                confidence=_required_text(record, "confidence", context),
+                corpus_artifact_id=str(record.get("artifact_id") or ""),
+                normalized_document_id=_optional_text(record, "normalized_document_id"),
+                block_id=str(record.get("block_id") or ""),
+                block_kind=str(block_kind) if isinstance(block_kind, str) else "",
+                extractor_profile_version=str(record.get("extractor_profile_version") or ""),
+            )
+        )
+    return tuple(sorted(signals, key=lambda item: item.signal_id))
+
+
+def _required_text(record: dict[str, Any], key: str, context: str) -> str:
+    value = record.get(key)
+    if not isinstance(value, str) or not value:
+        raise MetaGenerationError(f"{context}: {key} is missing or empty")
+    return value
+
+
+def _optional_text(record: dict[str, Any], key: str) -> str | None:
+    value = record.get(key)
+    return value if isinstance(value, str) and value else None
+
+
+def _evidence_class(record: dict[str, Any], context: str) -> Literal["declared", "observed"]:
+    value = record.get("evidence_class")
+    if value == "declared":
+        return "declared"
+    if value == "observed":
+        return "observed"
+    raise MetaGenerationError(
+        f"{context}: evidence_class is {value!r}, not 'declared' or 'observed'"
+    )
 
 
 def _work_signals(
@@ -730,14 +977,26 @@ def _drop_orphan_reasoning(
 
 
 def _build_payload(
-    generation: _Generation, bundles: tuple[RepositoryModelBundle, ...]
+    generation: _Generation,
+    bundles: tuple[RepositoryModelBundle, ...],
+    *,
+    mode: str,
+    work_signals: WorkSignalPayload | None,
 ) -> tuple[CorpusIntelligencePayload, tuple[UnadaptableSignal, ...], tuple[str, ...]]:
     """Assemble every payload domain, plus what could not be carried.
 
     The declines are returned alongside the payload rather than logged: an
-    adapter that reported only its successes would make the gap invisible.
+    adapter that reported only its successes would make the gap invisible. In
+    current mode there are none — every record in a verified payload is adapted
+    or the whole adaptation fails.
     """
-    signals, unadaptable = _work_signals(generation, bundles)
+    if mode == MODE_CURRENT_COMPLETE:
+        if work_signals is None:  # pragma: no cover - guarded by the caller
+            raise MetaGenerationError("current mode requires a verified work-signal payload")
+        signals = _current_work_signals(work_signals, bundles, generation)
+        unadaptable: tuple[UnadaptableSignal, ...] = ()
+    else:
+        signals, unadaptable = _work_signals(generation, bundles)
     topic = _candidates(generation, TOPIC_CANDIDATES_FILE, "TOPIC_CANDIDATE")
     project = _candidates(generation, PROJECT_CANDIDATES_FILE, "PROJECT_CANDIDATE")
     consolidation = _candidates(
@@ -762,6 +1021,45 @@ def _build_payload(
     return payload, unadaptable, dropped
 
 
+def _tally_signals(
+    signals: tuple[DocumentWorkSignal, ...], attribute: str
+) -> tuple[tuple[str, int], ...]:
+    counts: dict[str, int] = {}
+    for signal in signals:
+        key = str(getattr(signal, attribute))
+        counts[key] = counts.get(key, 0) + 1
+    return tuple(sorted(counts.items()))
+
+
+def _tally_identity_classes(roots: tuple[CorpusRootRef, ...]) -> tuple[tuple[str, int], ...]:
+    counts: dict[str, int] = {}
+    for root in roots:
+        counts[root.identity_class] = counts.get(root.identity_class, 0) + 1
+    return tuple(sorted(counts.items()))
+
+
+def _sampled_report_listed_count(generation: _Generation) -> int | None:
+    """How many evidence records the *report* lists, for comparison only.
+
+    Never a source of signals. It is read so the adapter can say out loud that
+    the report is a sample of the payload rather than a second copy of it.
+    """
+    document = generation.get(DOCUMENT_SIGNALS_FILE)
+    if not isinstance(document, dict):
+        return None
+    evidence = document.get("evidence")
+    if not isinstance(evidence, dict):
+        return None
+    formats = evidence.get("by_format")
+    if not isinstance(formats, list):
+        return None
+    total = 0
+    for entry in formats:
+        if isinstance(entry, dict) and isinstance(entry.get("listed_signal_count"), int):
+            total += int(entry["listed_signal_count"])
+    return total
+
+
 def adapt_meta_generation(path: Path) -> MetaAdaptationReport:
     """Read a Meta corpus generation and return the packet it maps to.
 
@@ -770,11 +1068,15 @@ def adapt_meta_generation(path: Path) -> MetaAdaptationReport:
     """
     root = resolve_generation_root(path)
     generation = _read_generation(root)
-    root_refs, bundles = _load_root_bundles(generation)
+    mode = detect_adaptation_mode(root)
+    work_signal_payload = load_work_signal_payload(root) if mode == MODE_CURRENT_COMPLETE else None
+    root_refs, bundles = _load_root_bundles(generation, mode=mode)
     snapshot = generation.require(SNAPSHOT_FILE)
     analysis = snapshot.get("analysis") or {}
 
-    payload, unadaptable, dropped_reasoning = _build_payload(generation, bundles)
+    payload, unadaptable, dropped_reasoning = _build_payload(
+        generation, bundles, mode=mode, work_signals=work_signal_payload
+    )
     packet = CorpusIntelligencePacket(
         packet_id="packet:pending",
         producer=Producer(name=ADAPTER_NAME, version=ADAPTER_VERSION),
@@ -816,12 +1118,38 @@ def adapt_meta_generation(path: Path) -> MetaAdaptationReport:
             f"{len(unadaptable)} work signal(s) were not adapted because this generation "
             "records them only as line spans into joined block text"
         )
+    if mode == MODE_LEGACY_LINE_ASSERTIONS:
+        diagnostics.append(
+            "read in legacy mode: this generation predates the complete work-signal "
+            "payload, so binary-document signals are reported rather than adapted. "
+            "It does not qualify the current producer contract."
+        )
+
+    signals = payload.document_work_signals
+    manifest = work_signal_payload.manifest if work_signal_payload is not None else {}
+    sampled = _sampled_report_listed_count(generation)
+    if mode == MODE_CURRENT_COMPLETE and sampled is not None and sampled > len(signals):
+        raise MetaGenerationError(
+            f"the sampled report lists {sampled} signal(s) and the complete payload "
+            f"carries {len(signals)}; the report cannot exceed the payload it samples"
+        )
+
     return MetaAdaptationReport(
         packet=finalize_corpus_intelligence_packet(packet),
         generation_root=root,
         root_bundles=bundles,
-        adapted_signal_count=len(payload.document_work_signals),
+        adapted_signal_count=len(signals),
         unadaptable_signals=unadaptable,
+        adaptation_mode=mode,
+        manifest_record_count=int(manifest.get("record_count") or 0),
+        parsed_signal_count=(
+            work_signal_payload.record_count if work_signal_payload is not None else 0
+        ),
+        producer_revision=str(analysis.get("corpus_analysis_id") or ""),
+        sampled_report_listed_count=sampled,
+        adapted_by_format=_tally_signals(signals, "document_format"),
+        adapted_by_predicate=_tally_signals(signals, "predicate"),
+        root_identity_class_counts=_tally_identity_classes(root_refs),
         missing_files=tuple(sorted(generation.missing)),
         diagnostics=tuple(diagnostics),
     )
