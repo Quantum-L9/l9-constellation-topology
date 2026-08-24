@@ -308,7 +308,7 @@
       "path": "MAINTAINERS.md"
     },
     {
-      "git_object_id": "5747fe70c019edd27d3af8d7a7331990bc8f909c",
+      "git_object_id": "633221b6a72031a435d77f0d5421928783f6f303",
       "mode": "100644",
       "object_type": "blob",
       "path": "MANIFEST.md"
@@ -1562,10 +1562,22 @@
       "path": "src/l9_constellation_topology/packets/adapters/__init__.py"
     },
     {
-      "git_object_id": "2347c18f6b64866bfcf59fe509851ec583a117f7",
+      "git_object_id": "f13d62e9013484caf69c10105534e95795b86dc2",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "src/l9_constellation_topology/packets/adapters/errors.py"
+    },
+    {
+      "git_object_id": "d2c483aa78da477fb6a3d75b40a43871429cf76f",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/packets/adapters/meta_generation.py"
+    },
+    {
+      "git_object_id": "282750f419cf91155bc161e71b1818fb1f7aa391",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "src/l9_constellation_topology/packets/adapters/meta_work_signals.py"
     },
     {
       "git_object_id": "c8988e1a0e7a2dd9514b3a5a2eb9689b35c51d3f",
@@ -2948,8 +2960,8 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:cb47d17ffddf291dc5062e00c09fbd38be69f2bbe8685ea54c574a4a0f0cc70b",
-  "entry_count": 491,
+  "entries_sha256": "sha256:40226883474084acd5fde00b2c9accb9a902e7889c4923728df71662cb352e3d",
+  "entry_count": 493,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
   ],
