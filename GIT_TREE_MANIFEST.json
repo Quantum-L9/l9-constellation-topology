@@ -1568,7 +1568,7 @@
       "path": "src/l9_constellation_topology/packets/adapters/errors.py"
     },
     {
-      "git_object_id": "2db91d7460a9724be89507e2eced39d828c7151a",
+      "git_object_id": "a66f7f157e026643c8818fab46e94c72d9e22083",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/packets/adapters/meta_generation.py"
@@ -1634,7 +1634,7 @@
       "path": "src/l9_constellation_topology/packets/corpus_intelligence.py"
     },
     {
-      "git_object_id": "2bd93f9e70ac43f29a1b3fa38dd7eed8e44c44a9",
+      "git_object_id": "f25eedde8261ef98073715e614109ec3cc35948c",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/packets/corpus_validator.py"
@@ -2960,7 +2960,7 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:70c940b9e245da9cd44ea2e86d38dd32ec42ec1c977a983a53afbe0ccfa5f018",
+  "entries_sha256": "sha256:10fcfbe26b9102f232699493b3124f86a6264220a84119f246de538458021bdd",
   "entry_count": 493,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
