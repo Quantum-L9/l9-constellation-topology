@@ -1089,10 +1089,10 @@ def _sampled_report_listed_count(generation: _Generation) -> int | None:
     document = generation.get(DOCUMENT_SIGNALS_FILE)
     if not isinstance(document, dict):
         return None
-    evidence = document.get("evidence")
-    if not isinstance(evidence, dict):
+    block_signals = document.get("block_signals")
+    if not isinstance(block_signals, dict):
         return None
-    formats = evidence.get("by_format")
+    formats = block_signals.get("by_format")
     if not isinstance(formats, list):
         return None
     total = 0

@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import shutil
 from pathlib import Path
 
 import pytest
@@ -32,6 +33,7 @@ from l9_constellation_topology.packets.adapters.meta_generation import (
 from l9_constellation_topology.packets.corpus_validator import (
     validate_corpus_intelligence_packet,
 )
+from l9_constellation_topology.run.evidence import canonical_json, sha256_text
 from tests.corpus_fixtures import (
     ARTIFACTS,
     FIXED_TIME,
@@ -181,6 +183,46 @@ def build_generation(root: Path, *, with_current: bool = True) -> Path:
             "semantics": {"interpreted_artifact_count": 6},
         },
     )
+    # The sampled report, written the way the producer writes it: complete
+    # counts beside a listing the producer caps. Present in the fixture because
+    # its absence let a consumer read the wrong key and see None forever, which
+    # is indistinguishable from a report that agrees with the payload.
+    _write(
+        generation / "document-signals.json",
+        {
+            "schema": "l9.document-signals/v1",
+            "corpus_source_snapshot_id": "snap:abc",
+            "corpus_analysis_id": "analysis:xyz",
+            "block_signals": {
+                "profile_id": "l9.interpretation",
+                "profile_version": "1.0.0",
+                "profile_hash": "sha256:" + "4" * 64,
+                "extractor_id": "l9.extractor",
+                "document_count": 2,
+                "signal_count": 191,
+                "by_format": [
+                    {
+                        "format": "docx",
+                        "documents_with_signals": 1,
+                        "signal_count": 191,
+                        "listed_signal_count": 50,
+                        "omitted_signal_count": 141,
+                        "predicates": [],
+                        "records": [],
+                    },
+                    {
+                        "format": "markdown",
+                        "documents_with_signals": 1,
+                        "signal_count": 3,
+                        "listed_signal_count": 3,
+                        "omitted_signal_count": 0,
+                        "predicates": [],
+                        "records": [],
+                    },
+                ],
+            },
+        },
+    )
     _write(
         generation / "document-index.json",
         {
@@ -321,6 +363,20 @@ def build_generation(root: Path, *, with_current: bool = True) -> Path:
             },
         )
     return root
+
+
+@pytest.fixture
+def mutable_generation(generation: Path, tmp_path: Path) -> Path:
+    """A private copy, for tests that edit the generation to make it wrong.
+
+    The shared generation is module-scoped, so a test that stamps a field on it
+    changes what every later test reads. Isolating the mutations keeps each
+    refusal a statement about the input it was given rather than about the order
+    the suite happened to run in.
+    """
+    target = tmp_path / "generation"
+    shutil.copytree(generation, target)
+    return target
 
 
 @pytest.fixture(scope="module")
@@ -633,3 +689,163 @@ def test_a_generation_recording_only_a_decoder_id_still_resolves_a_format(
         _Generation(root=tmp_path, documents={"document-index.json": index})
     )
     assert formats == {"artifact:legacy": "markdown"}
+
+
+def test_the_sampled_report_is_counted_but_never_read_as_the_payload(
+    generation: Path,
+) -> None:
+    """The report's listing is capped; the payload is not.
+
+    53 listed against 194 complete is the whole reason `document-signals.json`
+    cannot be the machine contract. A consumer adapting its `records` arrays
+    would ingest the listed count and then report perfect conservation against
+    it — every number self-consistent, 141 signals gone, and nothing in the
+    output saying so.
+
+    The count is read so the two documents can be compared. It is asserted here
+    because reading it from the wrong key returns None, and a cross-check that
+    never fires looks exactly like one that always passes.
+    """
+    report = adapt_meta_generation(generation)
+    assert report.sampled_report_listed_count == 53
+    complete = 191 + 3
+    assert report.sampled_report_listed_count < complete
+
+
+def test_a_report_claiming_more_signals_than_the_payload_is_refused(
+    mutable_generation: Path,
+) -> None:
+    """A sample cannot exceed what it samples.
+
+    If it does, one of the two documents is wrong about how much the corpus
+    found, and which one is not knowable from either document alone — so the
+    generation is refused rather than adapted under whichever number is smaller.
+    """
+    root = resolve_generation_root(mutable_generation)
+    _write_payload_with_one_signal(root)
+    _declare_root_identity(root)
+    document = json.loads((root / "document-signals.json").read_text(encoding="utf-8"))
+    document["block_signals"]["by_format"][0]["listed_signal_count"] = 999
+    (root / "document-signals.json").write_text(json.dumps(document, indent=2), encoding="utf-8")
+    with pytest.raises(MetaGenerationError, match="cannot exceed the payload"):
+        adapt_meta_generation(mutable_generation)
+
+
+def _write_payload_with_one_signal(root: Path) -> None:
+    """Turn a legacy-shaped generation into a current-mode one.
+
+    Built here rather than copied from a real generation so the manifest is
+    computed from the payload rather than pasted beside it: a fixture whose
+    hashes were transcribed would keep passing if the reader stopped checking
+    them.
+    """
+    record = ARTIFACTS["plan_md"]
+    signal = {
+        "signal_id": "sig:one",
+        "artifact_id": "vsrc:one",
+        "rmp_artifact_id": record.artifact_id,
+        "source_path": record.source_path,
+        "format": "markdown",
+        "raw_content_hash": record.content_hash,
+        "normalized_document_id": f"nd:{record.artifact_id}",
+        "decoder_id": "l9.text-decoder",
+        "decoder_version": "1.0.0",
+        "block_id": "block:1",
+        "block_kind": "paragraph",
+        "structured_locator": {"kind": "line_span", "line_start": 1, "line_end": 2},
+        "predicate": "work.status",
+        "object": "wip",
+        "bounded_excerpt": "Status: WIP",
+        "evidence_class": "declared",
+        "authority": "source",
+        "confidence": "high",
+        "extractor_id": "l9.extractor",
+        "extractor_profile_version": "1.0.0",
+    }
+    payload = canonical_json(signal) + "\n"
+    manifest = {
+        "schema": "l9.document-work-signals-manifest/v1",
+        "corpus_source_snapshot_id": "snap:abc",
+        "corpus_analysis_id": "analysis:xyz",
+        "profile_id": "l9.interpretation",
+        "profile_version": "1.0.0",
+        "profile_hash": "sha256:" + "4" * 64,
+        "payload_file": "document-work-signals.jsonl",
+        "record_count": 1,
+        "document_count": 1,
+        "by_format": [{"format": "markdown", "document_count": 1, "signal_count": 1}],
+        "by_predicate": [{"predicate": "work.status", "signal_count": 1}],
+        "payload_byte_length": len(payload.encode("utf-8")),
+        "payload_artifact_hash": sha256_text(payload),
+        "payload_semantic_hash": sha256_text(
+            canonical_json({"schema": "l9.document-work-signals/v1", "records": [signal]})
+        ),
+    }
+    (root / "document-work-signals.jsonl").write_text(payload, encoding="utf-8")
+    _write(root / "document-work-signals.manifest.json", manifest)
+
+    # Keep the report consistent with the payload it samples. A generation whose
+    # two documents disagree is refused, which is correct but is a different
+    # refusal than the one a caller of this helper is usually testing.
+    document = json.loads((root / "document-signals.json").read_text(encoding="utf-8"))
+    document["block_signals"]["signal_count"] = 1
+    document["block_signals"]["by_format"] = [
+        {
+            "format": "markdown",
+            "documents_with_signals": 1,
+            "signal_count": 1,
+            "listed_signal_count": 1,
+            "omitted_signal_count": 0,
+            "predicates": [],
+            "records": [],
+        }
+    ]
+    _write(root / "document-signals.json", document)
+
+
+def _declare_root_identity(root: Path, identity_class: str = "declared") -> None:
+    """Stamp what a current-mode generation is required to state."""
+    snapshot = json.loads((root / "corpus-snapshot.json").read_text(encoding="utf-8"))
+    for entry in snapshot["roots"]:
+        entry["root_identity_class"] = identity_class
+    _write(root / "corpus-snapshot.json", snapshot)
+
+
+def test_a_current_generation_without_root_identity_class_is_refused(
+    mutable_generation: Path,
+) -> None:
+    """The producer states it; this compiler does not get to decide it.
+
+    `source_kind` says what sort of thing a root is. `root_identity_class` says
+    whether its identity was declared or inferred. Deriving the second from the
+    first published inferred roots carrying a declared root's authority, and
+    nothing downstream could tell.
+    """
+    root = resolve_generation_root(mutable_generation)
+    _write_payload_with_one_signal(root)
+    with pytest.raises(MetaGenerationError, match="carries no root_identity_class"):
+        adapt_meta_generation(mutable_generation)
+
+
+def test_root_identity_class_is_read_rather_than_derived_from_source_kind(
+    mutable_generation: Path,
+) -> None:
+    """A root the producer calls declared stays declared, whatever its kind."""
+    root = resolve_generation_root(mutable_generation)
+    _write_payload_with_one_signal(root)
+    _declare_root_identity(root, "declared")
+    report = adapt_meta_generation(mutable_generation)
+    assert dict(report.root_identity_class_counts) == {"declared": 2}
+    assert all(ref.identity_class == "declared" for ref in report.packet.corpus.root_refs)
+
+    _declare_root_identity(root, "inferred")
+    report = adapt_meta_generation(mutable_generation)
+    assert dict(report.root_identity_class_counts) == {"inferred": 2}
+
+
+def test_an_invalid_root_identity_class_is_refused(mutable_generation: Path) -> None:
+    root = resolve_generation_root(mutable_generation)
+    _write_payload_with_one_signal(root)
+    _declare_root_identity(root, "probably-declared")
+    with pytest.raises(MetaGenerationError, match="neither 'declared' nor 'inferred'"):
+        adapt_meta_generation(mutable_generation)
