@@ -615,9 +615,7 @@ def test_the_decoded_format_is_read_from_format_not_from_the_decoder_id(
     """
     root = resolve_generation_root(generation)
     index = json.loads((root / "document-index.json").read_text(encoding="utf-8"))
-    formats = _document_formats(
-        _Generation(root=root, documents={"document-index.json": index})
-    )
+    formats = _document_formats(_Generation(root=root, documents={"document-index.json": index}))
     assert formats["artifact:wip-docx"] == "docx"
     assert all(not value.startswith("l9.") for value in formats.values())
 
