@@ -61,6 +61,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `LICENSE` — proprietary repository license terms
 - `MAINTAINERS.md` — maintainer roles and ownership responsibilities
 - `MANIFEST.md` — complete delivery inventory and responsibility map
+- `CURRENT_VALIDATION_REPORT.md` — complete delivery inventory and responsibility map
 - `Makefile` — canonical local validation and build command surface
 - `NOTICE.md` — third-party and generated-artifact notice
 - `QUALIFICATION.json` — governance, policy, or release documentation

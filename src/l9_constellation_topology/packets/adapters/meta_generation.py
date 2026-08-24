@@ -1,4 +1,4 @@
-"""Adapt a current l9-meta-injector corpus generation into a Corpus Intelligence Packet.
+"""Adapt an l9-meta-injector corpus generation into a Corpus Intelligence Packet.
 
 Compatibility ingress, and nothing more. The canonical input to this compiler is
 an ``l9.corpus-intelligence`` bundle; the producer does not emit one yet, and its
@@ -19,25 +19,37 @@ disks would make this a second observer, and two observers of one corpus that
 disagree is the failure the packet boundary exists to prevent.
 
 **Nothing is invented.** Where the generation does not carry something the
-canonical packet wants, the adapter says so and drops the record rather than
-filling it in.
+canonical packet wants, the adapter refuses rather than filling it in.
 
-The last rule has one consequence worth stating plainly, because it is the
-adapter's main limitation rather than a detail. The current generation records
-work signals only as repository-model assertions, which carry a line span. For
-Markdown, text, CSV, HTML, and notebooks that span is a real coordinate and
-becomes a line locator. For Word, PDF, PowerPoint, and spreadsheets it is not: the
-producer joins a document's decoded blocks with newlines and interprets the
-result, so "line 7" indexes a derived string and names nothing in the source
-document. Those signals are therefore **not adapted**, and are reported by count
-and reason in ``MetaAdaptationReport.unadaptable_signals``.
+Two modes
+---------
 
-The tempting fix — map line *n* to block *n-1* — is available and wrong. It holds
-only if no decoded block text contains a newline, which the generation gives no
-way to check, and a locator that is right most of the time is worse than an
-absent one: it cannot be distinguished from a correct one afterwards. Closing the
-gap properly means the producer emitting per-signal structured locators, which is
-the same change that would let it emit ``l9.corpus-intelligence`` directly.
+**Current.** The generation carries ``document-work-signals.jsonl`` and its
+manifest. Every record is read and adapted; none is declined. The manifest is
+verified by recomputation — byte length, artifact hash over the exact bytes,
+semantic hash over the records, and every declared count — because a payload
+that arrives without a verified count is a payload whose losses are invisible.
+See :mod:`.meta_work_signals`.
+
+**Legacy.** The generation predates that payload. Work signals are reconstructed
+from line-bearing repository-model assertions, and binary-document signals are
+reported in ``MetaAdaptationReport.unadaptable_signals`` rather than given an
+invented coordinate: those assertions carry a line span into the producer's
+*joined* block text, so "line 7" of a ``.docx`` indexes a derived string and
+names nothing in the source document. Mapping line *n* to block *n-1* is
+available and wrong — it holds only if no decoded block contains a newline,
+which the generation gives no way to check, and a locator right most of the time
+cannot be told from a correct one afterwards.
+
+Presence of *either* half of the payload selects current mode, so a manifest
+without a payload — or a payload without a manifest — fails closed rather than
+quietly demoting to legacy and reporting success over a subset nothing verified.
+Legacy mode labels itself and does not qualify the current producer contract.
+
+Neither mode reads ``document-signals.json`` as a source of signals. That
+document is a report whose per-format listing is capped; its count is read only
+so the two documents can be compared, and a report claiming more signals than
+the payload holds is refused.
 """
 
 from __future__ import annotations

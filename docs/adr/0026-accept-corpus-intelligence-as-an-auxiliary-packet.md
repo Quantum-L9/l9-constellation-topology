@@ -114,12 +114,23 @@ produce a topology that looks complete and silently omits whatever the producer
 got wrong.
 
 **A compatibility adapter, explicitly temporary.** The producer does not emit
-`l9.corpus-intelligence` yet. `adapt-meta-corpus` reads a current corpus
-generation and produces the canonical packet, so the compiler's API is the packet
-and the raw file layout never becomes it. Its limitation is reported rather than
-papered over: the current generation records work signals only as line spans, and
-for formats without lines those signals are declined rather than given an
-invented coordinate. See
+`l9.corpus-intelligence` as a packet yet, though it now emits the whole of what
+one would carry. `adapt-meta-corpus` reads a corpus generation and produces the
+canonical packet, so the compiler's API is the packet and the raw file layout
+never becomes it.
+
+The adapter reads the producer's complete `document-work-signals.jsonl` payload
+and verifies its manifest by recomputation. It does **not** read
+`document-signals.json`, whose per-format listing is capped: on a real
+214-signal generation that report lists 73, so adapting it would ingest 73 and
+then report perfect conservation against 73 — self-consistent, and missing 141
+signals nothing would name. The report's count is read only so the two documents
+can be compared.
+
+An explicit legacy mode remains for generations predating that payload. It
+reconstructs work signals from line-bearing assertions, declines
+binary-document signals rather than inventing coordinates for them, labels
+itself, and does not qualify the current producer contract. See
 [`docs/corpus-intelligence-boundary.md`](../corpus-intelligence-boundary.md).
 
 ## Alternatives considered
@@ -178,8 +189,13 @@ by default and the hold is recorded, so "we held six project candidates" and
   published.
 - `tests/test_meta_generation_adapter.py` proves the generation's bytes are
   unchanged across an adaptation, that a snapshot drifted from its own bundles is
-  refused, and that a binary-document work signal is declined and reported rather
-  than given an invented locator.
+  refused, that a current-mode generation omitting `root_identity_class` is
+  refused rather than defaulted, and that in legacy mode a binary-document work
+  signal is declined and reported rather than given an invented locator.
+- `tests/test_meta_work_signal_payload.py` pins every refusal the complete
+  payload boundary makes — a payload without its manifest and a manifest without
+  its payload both fail closed, each integrity field is recomputed rather than
+  read back, and every locator kind translates or is refused by name.
 
 ## Related artifacts
 
@@ -189,6 +205,7 @@ by default and the hold is recorded, so "we held six project candidates" and
 - `src/l9_constellation_topology/packets/corpus_evidence.py`
 - `src/l9_constellation_topology/packets/document_signal_evidence.py`
 - `src/l9_constellation_topology/packets/adapters/meta_generation.py`
+- `src/l9_constellation_topology/packets/adapters/meta_work_signals.py`
 - `src/l9_constellation_topology/domain/candidate.py`
 - `src/l9_constellation_topology/domain/corpus.py`
 - `src/l9_constellation_topology/domain/readiness.py`

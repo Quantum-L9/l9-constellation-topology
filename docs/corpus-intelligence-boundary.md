@@ -67,12 +67,25 @@ systems that actually exist:
 |---|---|---|
 | `line` | `start_line`, `end_line` | text, markdown |
 | `pdf` | `page_number`, `block_index` | PDF |
-| `docx` | `block_index`, `block_kind` | Word |
-| `pptx` | `slide_number`, `shape_index` | PowerPoint |
+| `docx` | `block_index`, `block_kind`, `part` | Word |
+| `pptx` | `slide_number`, `shape_index`, `part` | PowerPoint |
 | `spreadsheet` | `sheet`, `cell_or_range` | Excel |
-| `notebook` | `cell_index`, `cell_type` | Jupyter |
-| `csv` | `row` | delimited text |
-| `html` | `stable_node_index` | HTML |
+| `notebook` | `cell_index`, `cell_type`, optional in-cell span | Jupyter |
+| `csv` | `row`, optional `column` | delimited text |
+| `html` | `stable_node_index`, `node_path` | HTML |
+
+`part` is on the OOXML kinds because block 3 of a document body is not block 3
+of a footnote, and a notes slide carries its own shape ordinals: the ordinal
+alone does not identify the block. `node_path` is on `html` because the node
+index is stable only relative to a traversal, so the path is the half a reader
+can actually follow. A notebook cell does have lines, so a span *within* one is
+a real coordinate rather than an invented one.
+
+The producer names these kinds `line_span`, `pdf_page_block`, `docx_block`,
+`pptx_shape`, `spreadsheet_cell`, `notebook_cell`, `csv_row` and `html_node`.
+The adapter renames them and nothing else: no coordinate is converted into
+another, because the whole point of a structured locator is that a page is not
+a line.
 
 A line number beside a structured locator is refused. `line 7` of a `.docx`
 names nothing an operator can open, and a consumer reading only `line_number`
@@ -131,7 +144,9 @@ input, and no inference from candidate membership.
 
 ## Compatibility ingress
 
-`l9-meta-injector` does not emit `l9.corpus-intelligence` yet. Until it does:
+`l9-meta-injector` does not emit `l9.corpus-intelligence` as a packet yet, but
+it does emit the whole of what such a packet would carry. Until the packet
+itself arrives:
 
 ```bash
 l9-topology adapt-meta-corpus --meta-generation <generation-dir> --out corpus-bundle
@@ -143,25 +158,92 @@ l9-topology compile-packet \
 The adapter reads the generation and never writes to it, emits through
 `OutputSink` to a separate destination, and rescans no source tree.
 
-### Its limitation, stated
+### Two documents, one of them a contract
 
-The current generation records work signals only as repository-model assertions
-carrying a line span. For Markdown, text, CSV, HTML, and notebooks that span is a
-real coordinate and becomes a line locator. For Word, PDF, PowerPoint, and
-spreadsheets it is not: the producer joins a document's decoded blocks with
-newlines before interpreting, so the recorded line indexes a derived string.
+The producer writes two documents about the same claims, and only one is a
+machine contract.
 
-Those signals are **declined**, and the count and reason come back in
-`MetaAdaptationReport.unadaptable_signals` and on the CLI's JSON output.
+`document-signals.json` is a **report**. Its per-format `records` array is
+capped — 50 — and it says so: `signal_count` is what the corpus found,
+`listed_signal_count` is what the array holds, `omitted_signal_count` is the
+difference. On a real 214-signal generation the report lists 73. A consumer
+adapting it would ingest 73 and then report perfect conservation against 73:
+every number self-consistent, 141 signals gone, and nothing in the output saying
+so. The adapter reads its count for comparison and never as a source of signals,
+and refuses a generation whose report claims more than its payload holds.
 
-Mapping line *n* to block *n-1* is available and wrong. It holds only if no
-decoded block text contains a newline, which the generation gives no way to
-check, and a locator right most of the time cannot be distinguished from a
-correct one afterwards.
+`document-work-signals.jsonl` is the **payload**: one line per signal, never
+sampled, never truncated. `document-work-signals.manifest.json` beside it is
+what makes the payload checkable on arrival.
 
-Closing the gap means the producer emitting per-signal structured locators —
-which is the same change that would let it emit `l9.corpus-intelligence`
-directly, at which point this adapter can be retired.
+### The manifest is verified, not read back
+
+Every integrity field is recomputed here under the producer's own definitions —
+the byte length, the SHA-256 over the exact emitted bytes, and the semantic hash
+over the records themselves. A manifest that merely *contains* a hash proves
+nothing; one whose hash this reader reproduces proves the payload arrived as it
+left. Declared `document_count`, `by_format` and `by_predicate` breakdowns are
+checked too, and a payload carrying a format the manifest does not declare is
+refused — silence about a format is not the same as declaring zero of it.
+
+A duplicate `signal_id` is refused rather than collapsed. Two records under one
+identity are either one record written twice or two claims sharing an identity,
+and the payload gives no way to tell which.
+
+### Two identity domains
+
+The producer addresses an artifact two ways: `artifact_id` inside the corpus,
+`rmp_artifact_id` inside its root's Repository Model Packet. This compiler
+resolves in the second, so that is what becomes `DocumentWorkSignal.artifact_id`;
+the corpus id is kept beside it as `corpus_artifact_id` rather than discarded,
+because a claim nameable in only one domain is a claim one of its two readers
+cannot check.
+
+The duplicate, pair, candidate and reasoning documents name only the corpus id.
+The snapshot states each artifact's `virtual_source_id` beside the root and
+root-relative path it was observed at, and a root's bundle addresses the same
+file by that path, so the translation is exact. An id whose path the bundle does
+not carry is left untranslated and the packet boundary refuses it, rather than
+the adapter inventing a binding.
+
+### Root identity is read, never derived
+
+`root_identity_class` says whether a root's identity was declared or inferred.
+`source_kind` says what sort of thing the root is. They answer different
+questions, and reading the first from the second published inferred roots
+carrying a declared root's authority — wrong in a way nothing downstream could
+detect. A current-mode generation that omits the field is refused rather than
+defaulted.
+
+### Signal conservation
+
+The count is carried through every hop and checked at each one:
+
+```
+manifest -> parsed -> adapted -> packet -> bundle roundtrip -> semantic inputs -> claim lineages
+```
+
+Every record in a verified payload is adapted. There is no path that skips one:
+a payload whose count was verified and then silently reduced would conserve its
+total against a number that no longer described it.
+
+### Current and legacy modes
+
+Presence of either half of the payload commits a generation to **current** mode.
+A manifest without a payload, or a payload without a manifest, fails closed
+rather than quietly demoting to legacy and reporting success over a subset
+nothing verified.
+
+**Legacy** mode remains for generations predating the payload. It reconstructs
+work signals from line-bearing repository-model assertions, reports
+binary-document signals as unadaptable rather than giving them an invented
+coordinate, labels itself in `adaptation_mode`, and — stated plainly — does not
+qualify the current producer contract. It never reads the sampled report as a
+source of signals either.
+
+Both modes report `adaptation_mode`, `producer_revision`, the conservation
+chain, the per-format and per-predicate tallies, and the root-identity-class
+counts, on `MetaAdaptationReport` and on the CLI's JSON output.
 
 ## Publication
 
