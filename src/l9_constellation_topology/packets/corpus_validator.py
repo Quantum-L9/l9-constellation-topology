@@ -213,9 +213,17 @@ def _check_candidates(
     errors: list[str],
 ) -> frozenset[str]:
     """Check every candidate domain, and return the identities they declare."""
+    # A candidate cites what the producer grouped it by, and for byte identity
+    # that is the *cluster* rather than any one edge in it: "these five files
+    # are the same bytes" is one fact with one identity, and the four relations
+    # carrying it are an encoding of that fact. The cluster is an identity this
+    # packet carries — every duplicate relation states it — so accepting it is
+    # not widening the check. Rewriting the citation to name one relation
+    # instead would make the packet say something the producer did not.
     relation_ids = frozenset(
         {relation.relation_id for relation in payload.semantic_pair_relations}
         | {relation.relation_id for relation in payload.exact_duplicate_relations}
+        | {relation.duplicate_cluster_id for relation in payload.exact_duplicate_relations}
     )
     candidates = (
         *payload.topic_candidates,

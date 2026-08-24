@@ -537,6 +537,55 @@ def _artifact_paths(generation: _Generation) -> dict[str, str]:
     return paths
 
 
+def _corpus_to_rmp_ids(
+    generation: _Generation,
+    root_refs: tuple[CorpusRootRef, ...],
+    bundles: tuple[RepositoryModelBundle, ...],
+) -> dict[str, str]:
+    """Map the corpus's artifact identities onto the packet domain's.
+
+    The producer works in two identity domains. Its work-signal payload carries
+    both ids per record, but the duplicate, pair and candidate documents name
+    only the corpus one — so every identity in those domains has to be
+    translated before it can resolve against a Repository Model Packet.
+
+    The snapshot is what makes that possible: it states each artifact's
+    ``virtual_source_id`` beside the root and root-relative path it was observed
+    at, and a root's bundle addresses the same file by that path. An id whose
+    path the bundle does not carry is left untranslated, so the packet boundary
+    refuses it rather than this function inventing a binding.
+    """
+    by_root: dict[str, dict[str, str]] = {}
+    for reference, bundle in zip(root_refs, bundles, strict=True):
+        payload = bundle.packet.payload
+        if payload is None:
+            continue
+        by_root[reference.root_id] = {
+            record.source_path: record.artifact_id for record in payload.artifacts
+        }
+
+    snapshot = generation.require(SNAPSHOT_FILE)
+    translated: dict[str, str] = {}
+    for entry in snapshot.get("artifacts", ()):
+        corpus_id = entry.get("virtual_source_id")
+        root_id = entry.get("root_id")
+        relative = entry.get("root_relative_path")
+        if not (isinstance(corpus_id, str) and isinstance(root_id, str)):
+            continue
+        if not isinstance(relative, str):
+            continue
+        resolved = by_root.get(root_id, {}).get(relative)
+        if resolved is not None:
+            translated[corpus_id] = resolved
+    return translated
+
+
+def _translate(identity: Any, mapping: dict[str, str]) -> str:
+    """Return the packet-domain identity, or the original when unmapped."""
+    text = str(identity)
+    return mapping.get(text, text)
+
+
 def _artifact_index(
     bundles: tuple[RepositoryModelBundle, ...],
 ) -> dict[str, tuple[str, str]]:
@@ -785,7 +834,9 @@ def _line_signal(
     )
 
 
-def _duplicate_relations(generation: _Generation) -> tuple[ExactDuplicateRelation, ...]:
+def _duplicate_relations(
+    generation: _Generation, identities: dict[str, str]
+) -> tuple[ExactDuplicateRelation, ...]:
     candidates = generation.get(CANDIDATES_FILE) or {}
     relations: list[ExactDuplicateRelation] = []
     for entry in candidates.get("relations", ()):
@@ -795,8 +846,8 @@ def _duplicate_relations(generation: _Generation) -> tuple[ExactDuplicateRelatio
             ExactDuplicateRelation(
                 relation_id=str(entry["relation_id"]),
                 duplicate_cluster_id=str(entry["duplicate_cluster_id"]),
-                artifact_a_id=str(entry["source_artifact_id"]),
-                artifact_b_id=str(entry["target_artifact_id"]),
+                artifact_a_id=_translate(entry["source_artifact_id"], identities),
+                artifact_b_id=_translate(entry["target_artifact_id"], identities),
                 content_hash=str(entry["content_hash"]),
             )
         )
@@ -812,7 +863,9 @@ def _analysis_profile(document: Any, fallback: str) -> CorpusAnalysisProfileRef:
     )
 
 
-def _pair_relations(generation: _Generation) -> tuple[SemanticPairRelation, ...]:
+def _pair_relations(
+    generation: _Generation, identities: dict[str, str]
+) -> tuple[SemanticPairRelation, ...]:
     document = generation.get(SEMANTIC_RELATIONS_FILE) or {}
     profile = _analysis_profile(document, "semantic-fusion")
     classifications = {entry.get("pair_id"): entry for entry in document.get("classifications", ())}
@@ -824,8 +877,8 @@ def _pair_relations(generation: _Generation) -> tuple[SemanticPairRelation, ...]
         relations.append(
             SemanticPairRelation(
                 relation_id=str(pair_id),
-                source_artifact_id=str(pair["artifact_a_id"]),
-                target_artifact_id=str(pair["artifact_b_id"]),
+                source_artifact_id=_translate(pair["artifact_a_id"], identities),
+                target_artifact_id=_translate(pair["artifact_b_id"], identities),
                 methods=tuple(
                     sorted({str(signal["method"]) for signal in signals if "method" in signal})
                 ),
@@ -852,7 +905,10 @@ def _pair_relations(generation: _Generation) -> tuple[SemanticPairRelation, ...]
 
 
 def _candidates(
-    generation: _Generation, filename: str, candidate_type: str
+    generation: _Generation,
+    filename: str,
+    candidate_type: str,
+    identities: dict[str, str],
 ) -> tuple[CandidateCluster, ...]:
     document = generation.get(filename) or {}
     profile = _analysis_profile(document, candidate_type.lower())
@@ -871,7 +927,14 @@ def _candidates(
             CandidateCluster(
                 candidate_id=str(entry["candidate_id"]),
                 candidate_type=candidate_type,  # type: ignore[arg-type]
-                member_artifact_ids=tuple(sorted(set(entry.get("member_artifact_ids", ())))),
+                member_artifact_ids=tuple(
+                    sorted(
+                        {
+                            _translate(member, identities)
+                            for member in entry.get("member_artifact_ids", ())
+                        }
+                    )
+                ),
                 supporting_relation_ids=supporting,
                 evidence_refs=tuple(sorted(set(entry.get("evidence_refs", ())))),
                 confidence_class=entry.get("confidence_class", "weak"),
@@ -969,7 +1032,7 @@ def _readiness(generation: _Generation) -> tuple[ReadinessEvidence, ...]:
 
 
 def _reasoning(
-    generation: _Generation,
+    generation: _Generation, identities: dict[str, str]
 ) -> tuple[tuple[ReasoningCandidateRequest, ...], tuple[str, ...]]:
     rows = generation.get(REASONING_CANDIDATES_FILE) or []
     packs = generation.get(REASONING_PACKS_FILE) or []
@@ -986,7 +1049,14 @@ def _reasoning(
                     candidate_id=str(row["candidate_id"]),
                     recommended_reasoning_type=row.get("reasoning_type", "NONE"),
                     reason=str(row.get("reason") or ""),
-                    member_artifact_ids=tuple(sorted(set(row.get("member_artifact_ids", ())))),
+                    member_artifact_ids=tuple(
+                        sorted(
+                            {
+                                _translate(member, identities)
+                                for member in row.get("member_artifact_ids", ())
+                            }
+                        )
+                    ),
                     evidence_pack_ref=pack_by_candidate.get(str(row["reasoning_candidate_id"])),
                 )
                 for row in rows
@@ -1024,6 +1094,7 @@ def _build_payload(
     *,
     mode: str,
     work_signals: WorkSignalPayload | None,
+    identities: dict[str, str],
 ) -> tuple[CorpusIntelligencePayload, tuple[UnadaptableSignal, ...], tuple[str, ...]]:
     """Assemble every payload domain, plus what could not be carried.
 
@@ -1039,20 +1110,20 @@ def _build_payload(
         unadaptable: tuple[UnadaptableSignal, ...] = ()
     else:
         signals, unadaptable = _work_signals(generation, bundles)
-    topic = _candidates(generation, TOPIC_CANDIDATES_FILE, "TOPIC_CANDIDATE")
-    project = _candidates(generation, PROJECT_CANDIDATES_FILE, "PROJECT_CANDIDATE")
+    topic = _candidates(generation, TOPIC_CANDIDATES_FILE, "TOPIC_CANDIDATE", identities)
+    project = _candidates(generation, PROJECT_CANDIDATES_FILE, "PROJECT_CANDIDATE", identities)
     consolidation = _candidates(
-        generation, CONSOLIDATION_CANDIDATES_FILE, "CONSOLIDATION_CANDIDATE"
+        generation, CONSOLIDATION_CANDIDATES_FILE, "CONSOLIDATION_CANDIDATE", identities
     )
-    reasoning, pack_refs = _reasoning(generation)
+    reasoning, pack_refs = _reasoning(generation, identities)
     reasoning, dropped = _drop_orphan_reasoning(
         reasoning,
         frozenset(candidate.candidate_id for candidate in (*topic, *project, *consolidation)),
     )
     payload = CorpusIntelligencePayload(
         document_work_signals=signals,
-        exact_duplicate_relations=_duplicate_relations(generation),
-        semantic_pair_relations=_pair_relations(generation),
+        exact_duplicate_relations=_duplicate_relations(generation, identities),
+        semantic_pair_relations=_pair_relations(generation, identities),
         topic_candidates=topic,
         project_candidates=project,
         consolidation_candidates=consolidation,
@@ -1143,7 +1214,11 @@ def adapt_meta_generation(path: Path) -> MetaAdaptationReport:
     analysis = snapshot.get("analysis") or {}
 
     payload, unadaptable, dropped_reasoning = _build_payload(
-        generation, bundles, mode=mode, work_signals=work_signal_payload
+        generation,
+        bundles,
+        mode=mode,
+        work_signals=work_signal_payload,
+        identities=_corpus_to_rmp_ids(generation, root_refs, bundles),
     )
     packet = CorpusIntelligencePacket(
         packet_id="packet:pending",
