@@ -248,6 +248,12 @@
       "path": "CONVERGENCE_REPORT.yaml"
     },
     {
+      "git_object_id": "c1f6ec4e7876ca251013b3d9bb9fbe948319d06b",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "CURRENT_VALIDATION_REPORT.md"
+    },
+    {
       "git_object_id": "98bf9ee51276e5dd4a0ad2df9c3cd6541a072a08",
       "mode": "100644",
       "object_type": "blob",
@@ -308,7 +314,7 @@
       "path": "MAINTAINERS.md"
     },
     {
-      "git_object_id": "919e94d2f9a5f8851d393173a78e1acdb30d981b",
+      "git_object_id": "4b1e9c8ed8fec21867e4acf6dc59c86f5aaae566",
       "mode": "100644",
       "object_type": "blob",
       "path": "MANIFEST.md"
@@ -680,7 +686,7 @@
       "path": "docs/adr/0025-separate-fact-identity-from-durable-write-identity.md"
     },
     {
-      "git_object_id": "bd9595280be894156677df0e6d32825e9cc2c2e0",
+      "git_object_id": "66e3ae1f62ed9265793ddab804f21386cc22cfc3",
       "mode": "100644",
       "object_type": "blob",
       "path": "docs/adr/0026-accept-corpus-intelligence-as-an-auxiliary-packet.md"
@@ -758,7 +764,7 @@
       "path": "docs/candidate-topology.md"
     },
     {
-      "git_object_id": "a4aa908ffccb62e0e01713501fbd1674eeedef03",
+      "git_object_id": "f29c0194db695e0235058572765df5422fb89dbc",
       "mode": "100644",
       "object_type": "blob",
       "path": "docs/corpus-intelligence-boundary.md"
@@ -1568,7 +1574,7 @@
       "path": "src/l9_constellation_topology/packets/adapters/errors.py"
     },
     {
-      "git_object_id": "a66f7f157e026643c8818fab46e94c72d9e22083",
+      "git_object_id": "15564af29a540cceb7d61f97dd181581a0cbbcb3",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/packets/adapters/meta_generation.py"
@@ -2966,8 +2972,8 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:07ce08eb89828a33c7c45ae59ed4b3192be92fbc00bb007d303e9bdd9620f16e",
-  "entry_count": 494,
+  "entries_sha256": "sha256:8142ebafb0e75ff5312873ab86ac4736782b2a562deb3e1c5a8dbc428ed0d655",
+  "entry_count": 495,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
   ],
