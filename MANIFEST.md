@@ -471,6 +471,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `tests/test_impact.py` — unit, contract, integration, regression, or governance test
 - `tests/test_maturity.py` — unit, contract, integration, regression, or governance test
 - `tests/test_meta_generation_adapter.py` — automated regression and contract test suite
+- `tests/test_meta_work_signal_payload.py` — automated regression and contract test suite
 - `tests/test_output_sink_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_packet_ingress_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_packet_models_v5.py` — unit, contract, integration, regression, or governance test

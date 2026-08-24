@@ -184,6 +184,24 @@ def cmd_adapt_meta_corpus(args: argparse.Namespace) -> int:
             "semantic_hash": report.packet.semantic_hash,
             "generation_root": str(report.generation_root),
             "roots": [root.root_id for root in report.packet.corpus.root_refs],
+            # Which contract the generation was read under. A legacy adaptation
+            # that looked like a current one would let a caller report the
+            # current producer as qualified on evidence that never covered it.
+            "adaptation_mode": report.adaptation_mode,
+            "producer_revision": report.producer_revision,
+            # The conservation chain, stated rather than implied. Equal counts
+            # here are the whole claim that nothing was dropped between the
+            # producer's manifest and this packet.
+            "manifest_record_count": report.manifest_record_count,
+            "parsed_signal_count": report.parsed_signal_count,
+            "adapted_signal_count": report.adapted_signal_count,
+            # How many the *sampled report* lists, for comparison only. It is
+            # never a source of signals; it is here so a reader can see that the
+            # report and the payload are different sizes.
+            "sampled_report_listed_count": report.sampled_report_listed_count,
+            "adapted_by_format": dict(report.adapted_by_format),
+            "adapted_by_predicate": dict(report.adapted_by_predicate),
+            "root_identity_class_counts": dict(report.root_identity_class_counts),
             "counts": {
                 "document_work_signals": len(payload.document_work_signals) if payload else 0,
                 "exact_duplicate_relations": (
