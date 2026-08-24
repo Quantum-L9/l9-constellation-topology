@@ -23,6 +23,7 @@ record this module refuses rather than places.
 from __future__ import annotations
 
 import json
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -103,6 +104,99 @@ def _require_text(container: dict[str, Any], key: str, *, context: str) -> str:
     return value
 
 
+def _line_locator(raw: dict[str, Any], context: str, _block_kind: str) -> dict[str, Any]:
+    return {
+        "kind": "line",
+        "start_line": _require_int(raw, "line_start", minimum=1, context=context),
+        "end_line": _require_int(raw, "line_end", minimum=1, context=context),
+    }
+
+
+def _notebook_locator(raw: dict[str, Any], context: str, _block_kind: str) -> dict[str, Any]:
+    located: dict[str, Any] = {
+        "kind": "notebook",
+        "cell_index": _require_int(raw, "cell_index", minimum=0, context=context),
+        "cell_type": _require_text(raw, "cell_type", context=context),
+    }
+    # A cell does have lines, so a span within one is a real coordinate. It is
+    # optional because the producer cites some cells whole.
+    if raw.get("line_start") is not None:
+        located["start_line"] = _require_int(raw, "line_start", minimum=1, context=context)
+    if raw.get("line_end") is not None:
+        located["end_line"] = _require_int(raw, "line_end", minimum=1, context=context)
+    return located
+
+
+def _pdf_locator(raw: dict[str, Any], context: str, _block_kind: str) -> dict[str, Any]:
+    return {
+        "kind": "pdf",
+        "page_number": _require_int(raw, "page_number", minimum=1, context=context),
+        "block_index": _require_int(raw, "block_index", minimum=0, context=context),
+    }
+
+
+def _docx_locator(raw: dict[str, Any], context: str, block_kind: str) -> dict[str, Any]:
+    return {
+        "kind": "docx",
+        "block_index": _require_int(raw, "block_index", minimum=0, context=context),
+        # The producer carries the block's kind on the record rather than in the
+        # locator; both describe the same block.
+        "block_kind": block_kind,
+        "part": _require_text(raw, "part", context=context),
+    }
+
+
+def _pptx_locator(raw: dict[str, Any], context: str, _block_kind: str) -> dict[str, Any]:
+    return {
+        "kind": "pptx",
+        "slide_number": _require_int(raw, "slide_number", minimum=1, context=context),
+        "shape_index": _require_int(raw, "shape_index", minimum=0, context=context),
+        "part": _require_text(raw, "part", context=context),
+    }
+
+
+def _spreadsheet_locator(raw: dict[str, Any], context: str, _block_kind: str) -> dict[str, Any]:
+    return {
+        "kind": "spreadsheet",
+        "sheet": _require_text(raw, "sheet", context=context),
+        "cell_or_range": _require_text(raw, "cell_or_range", context=context),
+    }
+
+
+def _csv_locator(raw: dict[str, Any], context: str, _block_kind: str) -> dict[str, Any]:
+    located: dict[str, Any] = {
+        "kind": "csv",
+        "row": _require_int(raw, "row_number", minimum=1, context=context),
+    }
+    column = raw.get("column")
+    if isinstance(column, str) and column:
+        located["column"] = column
+    return located
+
+
+def _html_locator(raw: dict[str, Any], context: str, _block_kind: str) -> dict[str, Any]:
+    return {
+        "kind": "html",
+        "stable_node_index": _require_int(raw, "node_index", minimum=0, context=context),
+        "node_path": _require_text(raw, "node_path", context=context),
+    }
+
+
+#: One builder per coordinate system. A table rather than a chain of branches so
+#: that adding a coordinate system is adding an entry, and so that no format's
+#: required fields can be checked by a branch belonging to another.
+_LOCATOR_BUILDERS: dict[str, Callable[[dict[str, Any], str, str], dict[str, Any]]] = {
+    "line": _line_locator,
+    "notebook": _notebook_locator,
+    "pdf": _pdf_locator,
+    "docx": _docx_locator,
+    "pptx": _pptx_locator,
+    "spreadsheet": _spreadsheet_locator,
+    "csv": _csv_locator,
+    "html": _html_locator,
+}
+
+
 def translate_locator(
     raw: Any, *, document_format: str, block_kind: str, context: str
 ) -> dict[str, Any]:
@@ -118,74 +212,12 @@ def translate_locator(
     if not isinstance(producer_kind, str) or producer_kind not in LOCATOR_KIND_BY_PRODUCER_KIND:
         raise MetaGenerationError(f"{context}: unknown locator kind {producer_kind!r}")
     kind = LOCATOR_KIND_BY_PRODUCER_KIND[producer_kind]
-
     if kind == "line" and document_format not in LINE_BEARING_FORMATS:
         raise MetaGenerationError(
             f"{context}: a {document_format} document carries a line locator; "
             "that format has no lines, so the coordinate names nothing openable"
         )
-
-    if kind == "line":
-        return {
-            "kind": "line",
-            "start_line": _require_int(raw, "line_start", minimum=1, context=context),
-            "end_line": _require_int(raw, "line_end", minimum=1, context=context),
-        }
-    if kind == "notebook":
-        located: dict[str, Any] = {
-            "kind": "notebook",
-            "cell_index": _require_int(raw, "cell_index", minimum=0, context=context),
-            "cell_type": _require_text(raw, "cell_type", context=context),
-        }
-        # A cell does have lines, so a span within one is a real coordinate. It
-        # is optional because the producer cites some cells whole.
-        if raw.get("line_start") is not None:
-            located["start_line"] = _require_int(raw, "line_start", minimum=1, context=context)
-        if raw.get("line_end") is not None:
-            located["end_line"] = _require_int(raw, "line_end", minimum=1, context=context)
-        return located
-    if kind == "pdf":
-        return {
-            "kind": "pdf",
-            "page_number": _require_int(raw, "page_number", minimum=1, context=context),
-            "block_index": _require_int(raw, "block_index", minimum=0, context=context),
-        }
-    if kind == "docx":
-        return {
-            "kind": "docx",
-            "block_index": _require_int(raw, "block_index", minimum=0, context=context),
-            # The producer carries the block's kind on the record rather than in
-            # the locator; both describe the same block.
-            "block_kind": block_kind,
-            "part": _require_text(raw, "part", context=context),
-        }
-    if kind == "pptx":
-        return {
-            "kind": "pptx",
-            "slide_number": _require_int(raw, "slide_number", minimum=1, context=context),
-            "shape_index": _require_int(raw, "shape_index", minimum=0, context=context),
-            "part": _require_text(raw, "part", context=context),
-        }
-    if kind == "spreadsheet":
-        return {
-            "kind": "spreadsheet",
-            "sheet": _require_text(raw, "sheet", context=context),
-            "cell_or_range": _require_text(raw, "cell_or_range", context=context),
-        }
-    if kind == "csv":
-        row: dict[str, Any] = {
-            "kind": "csv",
-            "row": _require_int(raw, "row_number", minimum=1, context=context),
-        }
-        column = raw.get("column")
-        if isinstance(column, str) and column:
-            row["column"] = column
-        return row
-    return {
-        "kind": "html",
-        "stable_node_index": _require_int(raw, "node_index", minimum=0, context=context),
-        "node_path": _require_text(raw, "node_path", context=context),
-    }
+    return _LOCATOR_BUILDERS[kind](raw, context, block_kind)
 
 
 def _read_manifest(root: Path) -> dict[str, Any]:
@@ -259,6 +291,53 @@ def _tally(records: tuple[dict[str, Any], ...], key: str) -> dict[str, int]:
     return counts
 
 
+def _check_declared_document_count(
+    manifest: dict[str, Any], records: tuple[dict[str, Any], ...]
+) -> None:
+    declared = manifest.get("document_count")
+    if not isinstance(declared, int) or isinstance(declared, bool):
+        return
+    observed = len({record.get("artifact_id") for record in records})
+    if observed != declared:
+        raise MetaGenerationError(
+            f"manifest declares {declared} document(s) and the payload carries signals "
+            f"from {observed}"
+        )
+
+
+def _check_declared_tally(
+    manifest: dict[str, Any],
+    records: tuple[dict[str, Any], ...],
+    *,
+    field_name: str,
+    record_key: str,
+) -> None:
+    """Check one declared breakdown against what the payload actually holds."""
+    declared = manifest.get(field_name)
+    if not isinstance(declared, list):
+        return
+    observed = _tally(records, record_key)
+    for entry in declared:
+        if not isinstance(entry, dict):
+            raise MetaGenerationError(f"manifest {field_name} carries a non-object entry")
+        name = entry.get(record_key)
+        expected = entry.get("signal_count")
+        if not isinstance(name, str) or not isinstance(expected, int):
+            raise MetaGenerationError(f"manifest {field_name} entry is not well formed")
+        actual = observed.pop(name, 0)
+        if actual != expected:
+            raise MetaGenerationError(
+                f"manifest {field_name} declares {expected} signal(s) for {name!r} and "
+                f"the payload carries {actual}"
+            )
+    if observed:
+        extra = ", ".join(sorted(observed))
+        raise MetaGenerationError(
+            f"the payload carries {record_key}(s) the manifest {field_name} does not "
+            f"declare: {extra}"
+        )
+
+
 def _check_declared_counts(manifest: dict[str, Any], records: tuple[dict[str, Any], ...]) -> None:
     """Check every count the manifest chose to declare.
 
@@ -267,42 +346,9 @@ def _check_declared_counts(manifest: dict[str, Any], records: tuple[dict[str, An
     manifest with a cosmetic error: whichever of the two is wrong, the payload's
     completeness is no longer something the manifest can vouch for.
     """
-    declared_documents = manifest.get("document_count")
-    if isinstance(declared_documents, int) and not isinstance(declared_documents, bool):
-        observed = len({record.get("artifact_id") for record in records})
-        if observed != declared_documents:
-            raise MetaGenerationError(
-                f"manifest declares {declared_documents} document(s) and the payload "
-                f"carries signals from {observed}"
-            )
-
-    for field_name, record_key, count_key in (
-        ("by_format", "format", "signal_count"),
-        ("by_predicate", "predicate", "signal_count"),
-    ):
-        declared = manifest.get(field_name)
-        if not isinstance(declared, list):
-            continue
-        observed_counts = _tally(records, record_key)
-        for entry in declared:
-            if not isinstance(entry, dict):
-                raise MetaGenerationError(f"manifest {field_name} carries a non-object entry")
-            name = entry.get(record_key)
-            expected = entry.get(count_key)
-            if not isinstance(name, str) or not isinstance(expected, int):
-                raise MetaGenerationError(f"manifest {field_name} entry is not well formed")
-            actual = observed_counts.pop(name, 0)
-            if actual != expected:
-                raise MetaGenerationError(
-                    f"manifest {field_name} declares {expected} signal(s) for {name!r} "
-                    f"and the payload carries {actual}"
-                )
-        if observed_counts:
-            extra = ", ".join(sorted(observed_counts))
-            raise MetaGenerationError(
-                f"the payload carries {record_key}(s) the manifest {field_name} does not "
-                f"declare: {extra}"
-            )
+    _check_declared_document_count(manifest, records)
+    _check_declared_tally(manifest, records, field_name="by_format", record_key="format")
+    _check_declared_tally(manifest, records, field_name="by_predicate", record_key="predicate")
 
 
 def load_work_signal_payload(root: Path) -> WorkSignalPayload:

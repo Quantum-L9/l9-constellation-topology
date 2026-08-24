@@ -541,6 +541,101 @@ def _artifact_index(
     return index
 
 
+def _resolve_record_artifact(
+    record: dict[str, Any], index: dict[str, tuple[str, str]], context: str
+) -> tuple[str, str, str]:
+    """Bind one record to the artifact it claims, or refuse it.
+
+    Identity comes from ``rmp_artifact_id`` rather than ``artifact_id``. The
+    producer emits both because it works in two identity domains — the corpus
+    addresses an artifact within the corpus, a Repository Model Packet addresses
+    it within its root's bundle — and this compiler resolves in the second.
+    """
+    rmp_artifact_id = record.get("rmp_artifact_id")
+    if not isinstance(rmp_artifact_id, str) or not rmp_artifact_id:
+        raise MetaGenerationError(f"{context}: carries no rmp_artifact_id")
+    resolved = index.get(rmp_artifact_id)
+    if resolved is None:
+        raise MetaGenerationError(
+            f"{context}: names artifact {rmp_artifact_id!r}, which no input Repository "
+            "Model Packet carries unambiguously"
+        )
+    content_hash, portable_path = resolved
+
+    declared_hash = record.get("raw_content_hash")
+    if declared_hash is not None and declared_hash != content_hash:
+        raise MetaGenerationError(
+            f"{context}: cites content hash {declared_hash!r} and the artifact carries "
+            f"{content_hash!r}; the claim is bound to bytes the corpus did not observe"
+        )
+
+    source_path = record.get("source_path")
+    if not isinstance(source_path, str) or not source_path:
+        raise MetaGenerationError(f"{context}: carries no source_path")
+    if source_path != portable_path:
+        raise MetaGenerationError(
+            f"{context}: cites path {source_path!r} and the artifact is at {portable_path!r}"
+        )
+    return rmp_artifact_id, content_hash, source_path
+
+
+def _record_format(record: dict[str, Any], formats: dict[str, str], context: str) -> str:
+    document_format = record.get("format")
+    if not isinstance(document_format, str) or not document_format:
+        raise MetaGenerationError(f"{context}: carries no format")
+    indexed = formats.get(str(record.get("artifact_id") or ""))
+    if indexed is not None and indexed != document_format:
+        raise MetaGenerationError(
+            f"{context}: declares format {document_format!r} and the document index "
+            f"records {indexed!r}"
+        )
+    return document_format
+
+
+def _adapt_record(
+    record: dict[str, Any], index: dict[str, tuple[str, str]], formats: dict[str, str]
+) -> DocumentWorkSignal:
+    """Translate one verified payload record into a work signal."""
+    signal_id = str(record.get("signal_id"))
+    context = f"work signal {signal_id}"
+    rmp_artifact_id, content_hash, source_path = _resolve_record_artifact(record, index, context)
+    document_format = _record_format(record, formats, context)
+    block_kind = record.get("block_kind")
+    block_kind_text = block_kind if isinstance(block_kind, str) else ""
+    locator = translate_locator(
+        record.get("structured_locator"),
+        document_format=document_format,
+        block_kind=block_kind_text,
+        context=context,
+    )
+    return DocumentWorkSignal(
+        signal_id=signal_id,
+        artifact_id=rmp_artifact_id,
+        # The producer's signal is artifact-scoped. Naming the artifact as the
+        # subject is a schema translation, not an inference about what the claim
+        # is about.
+        subject_id=rmp_artifact_id,
+        predicate=_required_text(record, "predicate", context),
+        object=str(record.get("object") or ""),
+        source_path=source_path,
+        locator=locator,  # type: ignore[arg-type]
+        source_content_hash=content_hash,
+        document_format=document_format,
+        evidence_excerpt=str(record.get("bounded_excerpt") or ""),
+        extractor_id=_required_text(record, "extractor_id", context),
+        decoder_id=_required_text(record, "decoder_id", context),
+        decoder_version=_required_text(record, "decoder_version", context),
+        evidence_class=_evidence_class(record, context),
+        authority=_required_text(record, "authority", context),
+        confidence=_required_text(record, "confidence", context),
+        corpus_artifact_id=str(record.get("artifact_id") or ""),
+        normalized_document_id=_optional_text(record, "normalized_document_id"),
+        block_id=str(record.get("block_id") or ""),
+        block_kind=block_kind_text,
+        extractor_profile_version=str(record.get("extractor_profile_version") or ""),
+    )
+
+
 def _current_work_signals(
     payload: WorkSignalPayload,
     bundles: tuple[RepositoryModelBundle, ...],
@@ -551,94 +646,10 @@ def _current_work_signals(
     Every record is adapted. There is no path here that skips one: a payload
     whose count was verified against its manifest and then silently reduced
     would conserve its total against a number that no longer described it.
-
-    Identity comes from ``rmp_artifact_id`` rather than ``artifact_id``. The
-    producer emits both because it works in two identity domains — the corpus
-    addresses an artifact within the corpus, a Repository Model Packet addresses
-    it within its root's bundle — and this compiler resolves in the second. The
-    corpus id is kept beside it rather than discarded, so a reader working in
-    either domain can still find the artifact.
     """
     index = _artifact_index(bundles)
     formats = _document_formats(generation)
-    signals: list[DocumentWorkSignal] = []
-    for record in payload.records:
-        signal_id = str(record.get("signal_id"))
-        context = f"work signal {signal_id}"
-
-        rmp_artifact_id = record.get("rmp_artifact_id")
-        if not isinstance(rmp_artifact_id, str) or not rmp_artifact_id:
-            raise MetaGenerationError(f"{context}: carries no rmp_artifact_id")
-        resolved = index.get(rmp_artifact_id)
-        if resolved is None:
-            raise MetaGenerationError(
-                f"{context}: names artifact {rmp_artifact_id!r}, which no input "
-                "Repository Model Packet carries unambiguously"
-            )
-        content_hash, portable_path = resolved
-
-        declared_hash = record.get("raw_content_hash")
-        if declared_hash is not None and declared_hash != content_hash:
-            raise MetaGenerationError(
-                f"{context}: cites content hash {declared_hash!r} and the artifact "
-                f"carries {content_hash!r}; the claim is bound to bytes the corpus "
-                "did not observe"
-            )
-
-        source_path = record.get("source_path")
-        if not isinstance(source_path, str) or not source_path:
-            raise MetaGenerationError(f"{context}: carries no source_path")
-        if source_path != portable_path:
-            raise MetaGenerationError(
-                f"{context}: cites path {source_path!r} and the artifact is at {portable_path!r}"
-            )
-
-        document_format = record.get("format")
-        if not isinstance(document_format, str) or not document_format:
-            raise MetaGenerationError(f"{context}: carries no format")
-        indexed_format = formats.get(str(record.get("artifact_id") or ""))
-        if indexed_format is not None and indexed_format != document_format:
-            raise MetaGenerationError(
-                f"{context}: declares format {document_format!r} and the document "
-                f"index records {indexed_format!r}"
-            )
-
-        block_kind = record.get("block_kind")
-        locator = translate_locator(
-            record.get("structured_locator"),
-            document_format=document_format,
-            block_kind=str(block_kind) if isinstance(block_kind, str) else "",
-            context=context,
-        )
-
-        signals.append(
-            DocumentWorkSignal(
-                signal_id=signal_id,
-                artifact_id=rmp_artifact_id,
-                # The producer's signal is artifact-scoped. Naming the artifact
-                # as the subject is a schema translation, not an inference about
-                # what the claim is about.
-                subject_id=rmp_artifact_id,
-                predicate=_required_text(record, "predicate", context),
-                object=str(record.get("object") or ""),
-                source_path=source_path,
-                locator=locator,  # type: ignore[arg-type]
-                source_content_hash=content_hash,
-                document_format=document_format,
-                evidence_excerpt=str(record.get("bounded_excerpt") or ""),
-                extractor_id=_required_text(record, "extractor_id", context),
-                decoder_id=_required_text(record, "decoder_id", context),
-                decoder_version=_required_text(record, "decoder_version", context),
-                evidence_class=_evidence_class(record, context),
-                authority=_required_text(record, "authority", context),
-                confidence=_required_text(record, "confidence", context),
-                corpus_artifact_id=str(record.get("artifact_id") or ""),
-                normalized_document_id=_optional_text(record, "normalized_document_id"),
-                block_id=str(record.get("block_id") or ""),
-                block_kind=str(block_kind) if isinstance(block_kind, str) else "",
-                extractor_profile_version=str(record.get("extractor_profile_version") or ""),
-            )
-        )
+    signals = [_adapt_record(record, index, formats) for record in payload.records]
     return tuple(sorted(signals, key=lambda item: item.signal_id))
 
 
@@ -1060,6 +1071,32 @@ def _sampled_report_listed_count(generation: _Generation) -> int | None:
     return total
 
 
+def _diagnostics(
+    mode: str,
+    unadaptable: tuple[UnadaptableSignal, ...],
+    dropped_reasoning: tuple[str, ...],
+) -> tuple[str, ...]:
+    """What the caller should know that the counts alone do not say."""
+    notes: list[str] = []
+    if dropped_reasoning:
+        notes.append(
+            "dropped reasoning candidates naming a candidate this generation did not "
+            f"write: {', '.join(dropped_reasoning)}"
+        )
+    if unadaptable:
+        notes.append(
+            f"{len(unadaptable)} work signal(s) were not adapted because this generation "
+            "records them only as line spans into joined block text"
+        )
+    if mode == MODE_LEGACY_LINE_ASSERTIONS:
+        notes.append(
+            "read in legacy mode: this generation predates the complete work-signal "
+            "payload, so binary-document signals are reported rather than adapted. "
+            "It does not qualify the current producer contract."
+        )
+    return tuple(notes)
+
+
 def adapt_meta_generation(path: Path) -> MetaAdaptationReport:
     """Read a Meta corpus generation and return the packet it maps to.
 
@@ -1107,24 +1144,7 @@ def adapt_meta_generation(path: Path) -> MetaAdaptationReport:
         semantic_hash="sha256:pending",
         payload=payload,
     )
-    diagnostics: list[str] = []
-    if dropped_reasoning:
-        diagnostics.append(
-            "dropped reasoning candidates naming a candidate this generation did not "
-            f"write: {', '.join(dropped_reasoning)}"
-        )
-    if unadaptable:
-        diagnostics.append(
-            f"{len(unadaptable)} work signal(s) were not adapted because this generation "
-            "records them only as line spans into joined block text"
-        )
-    if mode == MODE_LEGACY_LINE_ASSERTIONS:
-        diagnostics.append(
-            "read in legacy mode: this generation predates the complete work-signal "
-            "payload, so binary-document signals are reported rather than adapted. "
-            "It does not qualify the current producer contract."
-        )
-
+    diagnostics = _diagnostics(mode, unadaptable, dropped_reasoning)
     signals = payload.document_work_signals
     manifest = work_signal_payload.manifest if work_signal_payload is not None else {}
     sampled = _sampled_report_listed_count(generation)
