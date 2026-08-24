@@ -75,6 +75,18 @@
       "additionalProperties": false,
       "description": "A row of a delimited file.",
       "properties": {
+        "column": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Column"
+        },
         "kind": {
           "const": "csv",
           "default": "csv",
@@ -122,6 +134,11 @@
           "const": "docx",
           "default": "docx",
           "title": "Kind",
+          "type": "string"
+        },
+        "part": {
+          "default": "",
+          "title": "Part",
           "type": "string"
         }
       },
@@ -282,6 +299,11 @@
           "title": "Kind",
           "type": "string"
         },
+        "node_path": {
+          "default": "",
+          "title": "Node Path",
+          "type": "string"
+        },
         "stable_node_index": {
           "minimum": 0,
           "title": "Stable Node Index",
@@ -335,11 +357,37 @@
           "title": "Cell Type",
           "type": "string"
         },
+        "end_line": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "End Line"
+        },
         "kind": {
           "const": "notebook",
           "default": "notebook",
           "title": "Kind",
           "type": "string"
+        },
+        "start_line": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Start Line"
         }
       },
       "required": [
@@ -385,6 +433,11 @@
           "const": "pptx",
           "default": "pptx",
           "title": "Kind",
+          "type": "string"
+        },
+        "part": {
+          "default": "",
+          "title": "Part",
           "type": "string"
         },
         "shape_index": {

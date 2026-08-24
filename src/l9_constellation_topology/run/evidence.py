@@ -142,6 +142,10 @@ class DocxLocator(FrozenModel):
     kind: Literal["docx"] = "docx"
     block_index: int = Field(ge=0)
     block_kind: str
+    #: The OPC part the block was read from, e.g. ``word/document.xml``. A Word
+    #: file is several XML parts and block 3 of the body is not block 3 of a
+    #: footnote, so the ordinal alone does not identify the block.
+    part: str = ""
 
 
 class PptxLocator(FrozenModel):
@@ -150,6 +154,9 @@ class PptxLocator(FrozenModel):
     kind: Literal["pptx"] = "pptx"
     slide_number: int = Field(ge=1)
     shape_index: int = Field(ge=0)
+    #: The OPC part the shape was read from. Same reason as ``DocxLocator``:
+    #: a notes slide and its slide carry independent shape ordinals.
+    part: str = ""
 
 
 class SpreadsheetLocator(FrozenModel):
@@ -166,6 +173,11 @@ class NotebookLocator(FrozenModel):
     kind: Literal["notebook"] = "notebook"
     cell_index: int = Field(ge=0)
     cell_type: str
+    #: A cell does have lines, so a span *within* the cell is a real coordinate
+    #: rather than an invented one. Absent when the producer cited the cell
+    #: whole.
+    start_line: int | None = Field(default=None, ge=1)
+    end_line: int | None = Field(default=None, ge=1)
 
 
 class CsvLocator(FrozenModel):
@@ -173,6 +185,9 @@ class CsvLocator(FrozenModel):
 
     kind: Literal["csv"] = "csv"
     row: int = Field(ge=1)
+    #: The named column, when the claim was read from one cell rather than the
+    #: whole row.
+    column: str | None = None
 
 
 class HtmlLocator(FrozenModel):
@@ -180,6 +195,9 @@ class HtmlLocator(FrozenModel):
 
     kind: Literal["html"] = "html"
     stable_node_index: int = Field(ge=0)
+    #: The element path the index was counted along. The index is stable only
+    #: relative to a traversal; the path is what a reader can actually follow.
+    node_path: str = ""
 
 
 #: Where a piece of evidence sits, in the coordinate system its format has.

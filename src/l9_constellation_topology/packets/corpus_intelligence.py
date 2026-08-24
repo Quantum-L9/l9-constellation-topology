@@ -225,6 +225,24 @@ class DocumentWorkSignal(FrozenModel):
     evidence_class: Literal["declared", "observed"]
     authority: str = Field(min_length=1)
     confidence: str = Field(min_length=1)
+    #: The same artifact as the *corpus* identifies it, when the producer works
+    #: in two identity domains. ``artifact_id`` above addresses the artifact
+    #: inside its root's Repository Model Packet, which is the domain this
+    #: compiler resolves in; this one addresses it inside the corpus snapshot.
+    #: Both are kept because a claim that can only be named in one of them is a
+    #: claim one of the two readers cannot check.
+    corpus_artifact_id: str = ""
+    #: The decoding of the source bytes the block was read from. A document can
+    #: be decoded more than once; this says which decoding is being cited.
+    normalized_document_id: str | None = None
+    #: The block within that decoding, and what the producer called it. The
+    #: locator says where the block sits; these say which block it was.
+    block_id: str = ""
+    block_kind: str = ""
+    #: Version of the interpretation profile the extractor ran under. Two
+    #: profiles can read the same block and state different things, so the
+    #: profile is part of the claim's provenance rather than of its subject.
+    extractor_profile_version: str = ""
 
 
 class ExactDuplicateRelation(FrozenModel):
