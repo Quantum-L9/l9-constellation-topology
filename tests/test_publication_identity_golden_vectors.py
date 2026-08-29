@@ -64,7 +64,12 @@ def _identity(vector: dict[str, Any]) -> dict[str, Any]:
 def test_vector_file_pins_the_versions_this_build_implements() -> None:
     document = _document()
     assert document["effect_identity_algorithm_version"] == IDEMPOTENCY_ALGORITHM_VERSION
-    assert document["lowering_contract_version"] == LOWERING_CONTRACT_VERSION
+    assert document["current_lowering_contract_version"] == LOWERING_CONTRACT_VERSION
+    # Superseded contracts stay covered. A plan generated under an older
+    # lowering contract carries that contract's keys and stays honest about
+    # itself forever, so the consumer must keep verifying it correctly.
+    assert LOWERING_CONTRACT_VERSION in document["covered_lowering_contract_versions"]
+    assert "lowering/v1" in document["covered_lowering_contract_versions"]
     assert document["generated_from"]["producer_repository"] == (
         "Quantum-L9/l9-constellation-topology"
     )
@@ -77,10 +82,9 @@ def test_candidate_id_is_unchanged(vector: dict[str, Any]) -> None:
 
 @pytest.mark.parametrize("vector", _vectors(), ids=lambda item: item["label"])
 def test_idempotency_key_is_unchanged(vector: dict[str, Any]) -> None:
-    document = _document()
     recomputed = idempotency_key(
         _identity(vector),
-        lowering_contract_version=document["lowering_contract_version"],
+        lowering_contract_version=vector["lowering_contract_version"],
         local_evidence=tuple(
             evidence_semantics(
                 evidence_kind=item["evidence_kind"],

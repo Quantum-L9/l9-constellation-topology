@@ -479,6 +479,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `tests/test_packet_ingress_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_packet_models_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_packet_store_v5.py` — unit, contract, integration, regression, or governance test
+- `tests/test_publication_edge_fidelity.py` — proves edge direction and properties survive lowering as structured data rather than prose
 - `tests/test_publication_downstream_conformance.py` — unit, contract, integration, regression, or governance test
 - `tests/test_publication_effect_identity.py` — unit, contract, integration, regression, or governance test
 - `tests/test_publication_planning.py` — unit, contract, integration, regression, or governance test

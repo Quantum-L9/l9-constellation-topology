@@ -26,7 +26,17 @@ MEMORY_INGEST_OPERATION = "memory.ingest"
 #: Version of the rules that turn a canonical topology fact into a memory
 #: intent. It participates in memory-effect identity because the same fact
 #: lowered by different rules is a different effect.
-LOWERING_CONTRACT_VERSION = "lowering/v1"
+#:
+#: v2 carries an edge's direction and properties as structured metadata. Under
+#: v1 they survived only inside the human-readable ``content`` string, so a
+#: consumer had to parse prose to learn that a ``DUPLICATE_OF`` relation was
+#: symmetric or which cluster it belonged to. A fact re-published under v2
+#: therefore requests a genuinely different durable write than the same fact
+#: under v1 -- it states more -- and the key moves accordingly. That is the
+#: field doing its job, not a regression: keying the richer write as a retry of
+#: the poorer one is what would make the downstream answer DUPLICATE and drop
+#: the added structure.
+LOWERING_CONTRACT_VERSION = "lowering/v2"
 
 MemoryClassName = Literal[
     "identity",
