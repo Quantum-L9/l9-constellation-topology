@@ -32,6 +32,7 @@ changed decision requires a new ADR that explicitly supersedes the old record.
 | ADR-0024 | [Compile repository-model assertions into canonical semantic claims](docs/adr/0024-compile-repository-model-assertions-into-semantic-claims.md) | Accepted |
 | ADR-0025 | [Separate fact identity from durable write identity](docs/adr/0025-separate-fact-identity-from-durable-write-identity.md) | Accepted |
 | ADR-0026 | [Accept corpus intelligence as an auxiliary packet beside repository models](docs/adr/0026-accept-corpus-intelligence-as-an-auxiliary-packet.md) | Accepted |
+| ADR-0027 | [Separate observation time from publication time, and do not retract on absence](docs/adr/0027-separate-observation-time-from-publication-time.md) | Accepted |
 
 ## Decision order
 

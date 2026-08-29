@@ -333,6 +333,22 @@ def _provenance(
     )
 
 
+def _earliest_observation(kept: tuple[EvidenceRecord, ...]) -> datetime | None:
+    """Return when the earliest supporting evidence was observed.
+
+    ``valid_from`` is publication time — when this compiler stated the fact.
+    That is not when the fact was seen, and conflating the two makes a claim
+    read as if it came into being the moment it was published. The downstream
+    contract has a field for the difference, and topology evidence carries the
+    observation timestamp, so the two coordinates stay distinct.
+
+    ``None`` when nothing supports the fact: a derived candidate with no
+    resolved evidence has no observation time, and publication time is not a
+    substitute for one.
+    """
+    return min((record.created_at for record in kept), default=None)
+
+
 def _source_locators(
     *,
     policy: PublicationPolicy,
@@ -490,6 +506,7 @@ def _build(
         evidence=lowered_evidence,
         confidence=confidence,
         valid_from=published_at,
+        source_observed_at=_earliest_observation(kept_evidence),
         tags=("l9-topology", f"topology-{candidate_kind}"),
         metadata=_metadata(
             packet=packet,

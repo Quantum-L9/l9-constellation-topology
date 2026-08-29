@@ -124,6 +124,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `docs/adr/0024-compile-repository-model-assertions-into-semantic-claims.md` — accepted architecture decision record
 - `docs/adr/0025-separate-fact-identity-from-durable-write-identity.md` — accepted architecture decision record
 - `docs/adr/0026-accept-corpus-intelligence-as-an-auxiliary-packet.md` — architecture decision record
+- `docs/adr/0027-separate-observation-time-from-publication-time.md` — accepted architecture decision record
 - `docs/adr/README.md` — ADR directory governance and navigation
 - `docs/architecture.md` — architecture, contract, deployment, recovery, or model documentation
 - `docs/archive/v4/01_SPEC_ATTACK.md` — superseded v4 historical artifact retained for migration evidence
@@ -484,6 +485,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `tests/test_publication_effect_identity.py` — unit, contract, integration, regression, or governance test
 - `tests/test_publication_planning.py` — unit, contract, integration, regression, or governance test
 - `tests/test_reasoning_router.py` — automated regression and contract test suite
+- `tests/test_publication_temporal.py` — proves observation time and publication time stay distinct coordinates
 - `tests/test_release_readiness.py` — unit, contract, integration, regression, or governance test
 - `tests/test_renderers.py` — unit, contract, integration, regression, or governance test
 - `tests/test_repo_scanner.py` — unit, contract, integration, regression, or governance test
