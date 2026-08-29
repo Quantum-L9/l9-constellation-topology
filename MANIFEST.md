@@ -426,6 +426,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `tests/fixtures/semantic_assertion_repository/engine/main.py` — deterministic packet, source, or regression fixture
 - `tests/fixtures/semantic_assertion_repository/pyproject.toml` — deterministic packet, source, or regression fixture
 - `tests/fixtures/semantic_assertion_repository/spec.yaml` — deterministic packet, source, or regression fixture
+- `tests/fixtures/publication_identity/golden-vectors.json` — publication identity vectors generated from this producer and asserted by both this repository and l9-graphiti-memory
 - `tests/fixtures/topology_packets/foundational-two-repo/manifest.json` — deterministic packet, source, or regression fixture
 - `tests/fixtures/topology_packets/foundational-two-repo/packet.json` — deterministic packet, source, or regression fixture
 - `tests/fixtures/topology_packets/foundational-two-repo/payload/artifact-records.json` — deterministic packet, source, or regression fixture
@@ -492,6 +493,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `tests/test_runtime_boundaries_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_scan_compatibility_path.py` — unit, contract, integration, regression, or governance test
 - `tests/test_semantic_claim_activation.py` — automated test module
+- `tests/test_publication_identity_golden_vectors.py` — pins the publication identity algorithm against the cross-repository golden vectors
 - `tests/test_structured_locators.py` — automated regression and contract test suite
 - `tests/test_topology_compiler_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_topology_graph_v5.py` — unit, contract, integration, regression, or governance test
