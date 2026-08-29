@@ -3,8 +3,12 @@
 Two layers guard the seam:
 
 * An offline structural check against a contract descriptor captured from the
-  bound downstream revision. It runs everywhere, including CI, and fails when
-  this repository's mirror drifts from the recorded downstream shape.
+  bound downstream revision by ``scripts/capture_downstream_contract.py``. It
+  runs everywhere, including CI, and fails when this repository's mirror drifts
+  from the recorded downstream shape. The descriptor is derived from the
+  downstream models rather than hand-authored, because a hand-authored
+  descriptor is a second thing that can drift: a mirror and a descriptor can
+  agree with each other while both disagree with the real contract.
 * A live check against the real downstream types. It runs only when
   ``L9_GRAPHITI_MEMORY_SRC`` points at a read-only checkout of
   ``Quantum-L9/l9-graphiti-memory``, and it validates intents without
@@ -18,7 +22,8 @@ import os
 import sys
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, get_args
+from uuid import UUID
 
 import pytest
 
@@ -41,6 +46,14 @@ from l9_constellation_topology.publication.contracts import (
     ConfidenceMethodName,
     EvidenceKindName,
     MemoryClassName,
+    MemoryCsvSourceLocator,
+    MemoryDocxSourceLocator,
+    MemoryHtmlSourceLocator,
+    MemoryLineSourceLocator,
+    MemoryNotebookSourceLocator,
+    MemoryPdfSourceLocator,
+    MemoryPptxSourceLocator,
+    MemorySpreadsheetSourceLocator,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -65,6 +78,32 @@ MIRRORS = {
     "MemoryAssertion": MemoryAssertion,
     "SourceRange": MemorySourceRange,
 }
+
+#: Mirrors of the downstream ``SourceLocator`` union, variant by variant. Until
+#: these existed the mirror carried no locator at all and lowering degraded
+#: structured coordinates into prose, so a downstream field added here was
+#: invisible until the first binary-format claim was published and the whole
+#: plan was refused for an extra field.
+LOCATOR_MIRRORS = {
+    "line": MemoryLineSourceLocator,
+    "pdf": MemoryPdfSourceLocator,
+    "docx": MemoryDocxSourceLocator,
+    "pptx": MemoryPptxSourceLocator,
+    "spreadsheet": MemorySpreadsheetSourceLocator,
+    "notebook": MemoryNotebookSourceLocator,
+    "csv": MemoryCsvSourceLocator,
+    "html": MemoryHtmlSourceLocator,
+}
+
+
+def _constraints(field: Any) -> dict[str, Any]:
+    found: dict[str, Any] = {}
+    for meta in field.metadata:
+        for attr in ("ge", "gt", "le", "lt", "min_length", "max_length"):
+            value = getattr(meta, attr, None)
+            if value is not None:
+                found[attr] = value
+    return found
 
 
 def _literal_values(annotation: Any) -> set[str]:
@@ -207,3 +246,73 @@ def test_intents_validate_against_the_real_downstream_boundary(
             assert isinstance(validated, IngestMemoryIntent)
     finally:
         sys.path.remove(str(source))
+
+
+def test_locator_mirror_covers_every_downstream_variant(contract: dict[str, Any]) -> None:
+    """A variant this repository cannot express is a coordinate it cannot carry."""
+    assert set(LOCATOR_MIRRORS) == set(contract["source_locator_variants"])
+
+
+def test_locator_mirror_fields_match_the_downstream_contract(contract: dict[str, Any]) -> None:
+    for kind, mirror in LOCATOR_MIRRORS.items():
+        expected = set(contract["source_locator_variants"][kind]["fields"])
+        actual = set(mirror.model_fields)
+        assert actual == expected, f"{kind} locator mirror drifted: {actual ^ expected}"
+
+
+def test_locator_mirror_constraints_are_never_looser_than_downstream(
+    contract: dict[str, Any],
+) -> None:
+    """A looser mirror emits values the downstream boundary refuses.
+
+    This is the check that would have caught five topology-only locator fields
+    and a ``csv.row`` bound that named a different row on each side — drift that
+    was invisible while the mirror carried no locator at all, and would have
+    failed an entire publication plan the first time one was emitted.
+    """
+    for kind, mirror in LOCATOR_MIRRORS.items():
+        downstream = contract["source_locator_variants"][kind]["fields"]
+        for field, spec in downstream.items():
+            expected = spec.get("constraints", {})
+            actual = _constraints(mirror.model_fields[field])
+            for attr, value in expected.items():
+                assert actual.get(attr) == value, (
+                    f"{kind}.{field} constraint {attr} is {actual.get(attr)!r}, "
+                    f"downstream requires {value!r}"
+                )
+
+
+def test_mirror_field_constraints_are_never_looser_than_downstream(
+    contract: dict[str, Any],
+) -> None:
+    for name, mirror in MIRRORS.items():
+        downstream = contract["models"][name]["fields"]
+        for field, spec in downstream.items():
+            expected = spec.get("constraints", {})
+            actual = _constraints(mirror.model_fields[field])
+            for attr, value in expected.items():
+                assert actual.get(attr) == value, (
+                    f"{name}.{field} constraint {attr} is {actual.get(attr)!r}, "
+                    f"downstream requires {value!r}"
+                )
+
+
+def test_mirror_field_types_match_the_downstream_contract(contract: dict[str, Any]) -> None:
+    """Same field name is not the same field.
+
+    ``supersedes`` and ``references`` were mirrored as tuples of topology
+    strings while the downstream contract holds tuples of memory record UUIDs.
+    Both are empty today, so the drift was invisible; the first use would have
+    emitted a topology entity id where a record id was required.
+    """
+    for name, mirror in MIRRORS.items():
+        downstream = contract["models"][name]["fields"]
+        for field, spec in downstream.items():
+            mirrored = mirror.model_fields[field].annotation
+            if spec["type"] == "array":
+                args = [item for item in get_args(mirrored) if item is not type(None)]
+                assert args, f"{name}.{field} must stay a sequence"
+            if field in {"supersedes", "references"}:
+                assert UUID in get_args(mirrored), (
+                    f"{name}.{field} must carry downstream record UUIDs, not topology ids"
+                )

@@ -11,6 +11,8 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
 
+from pydantic import TypeAdapter
+
 from l9_constellation_topology.domain.assessment import ConflictRecord, UnknownRecord
 from l9_constellation_topology.domain.capability import CapabilityRecord
 from l9_constellation_topology.domain.claim import SemanticClaimRecord
@@ -35,6 +37,7 @@ from .contracts import (
     MemoryEvidenceRef,
     MemoryIngestIntent,
     MemoryProvenance,
+    MemorySourceLocator,
     MemoryWriteRequest,
 )
 from .identity import (
@@ -47,6 +50,9 @@ from .identity import (
     idempotency_key,
 )
 from .policy import PublicationPolicy
+
+#: Validates a mirrored locator payload against the discriminated union.
+_LOCATOR_ADAPTER: TypeAdapter[MemorySourceLocator] = TypeAdapter(MemorySourceLocator)
 
 ENTITY_EXTRACTION_METHOD = "topology-entity-aggregation"
 RELATIONSHIP_EXTRACTION_METHOD = "topology-relationship-compilation"
@@ -183,6 +189,22 @@ def _evidence_kind(policy: PublicationPolicy, record: EvidenceRecord) -> Evidenc
     return policy.evidence_kind_by_class[evidence_class]
 
 
+def _lower_locator(record: EvidenceRecord) -> MemorySourceLocator | None:
+    """Carry the structured coordinate this evidence was read at, if any.
+
+    Translated field-for-field rather than passed through: the two unions are
+    separate contracts that happen to agree, and a mirror that forwarded the
+    producer's object would silently export whatever this repository added to it
+    next. ``None`` stays ``None`` — evidence that carries only a line number has
+    no structured coordinate to state, and inventing one is the failure the
+    locator union exists to prevent.
+    """
+    locator = record.source_ref.locator
+    if locator is None:
+        return None
+    return _LOCATOR_ADAPTER.validate_python(locator.model_dump(mode="json"))
+
+
 def _evidence_description(record: EvidenceRecord) -> str:
     subject = record.field or record.subject_id
     location = record.source_ref.source_path or record.source_ref.uri or record.source_ref.packet_id
@@ -236,6 +258,7 @@ def _lower_evidence(
             description=_evidence_description(record),
             source_id=record.evidence_id[:500],
             source_digest=bare_digest(record.source_ref.content_hash),
+            source_locator=_lower_locator(record),
             observed_at=published_at,
         )
         for record in kept

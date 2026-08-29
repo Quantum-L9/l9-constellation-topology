@@ -217,6 +217,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `schemas/topology_report.schema.json` — canonical or compatibility domain JSON Schema
 - `scripts/architecture_boundary_check.py` — operator, build, generation, or validation command
 - `scripts/build_control_packet.py` — operator, build, generation, or validation command
+- `scripts/capture_downstream_contract.py` — derives the bound l9-graphiti-memory contract descriptor from the downstream models
 - `scripts/compile_topology_packet.py` — operator, build, generation, or validation command
 - `scripts/evaluate_hash_locality.py` — operator, build, generation, or validation command
 - `scripts/generate_fixture_packets.py` — operator, build, generation, or validation command
