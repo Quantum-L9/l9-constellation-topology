@@ -432,9 +432,11 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `tests/fixtures/repository_model_packets/l9-assertion-sample/manifest.json` — deterministic packet, source, or regression fixture
 - `tests/fixtures/repository_model_packets/l9-assertion-sample/packet.json` — deterministic packet, source, or regression fixture
 - `tests/fixtures/repository_model_packets/l9-assertion-sample/receipts/validation-receipt.json` — deterministic packet, source, or regression fixture
+- `tests/fixtures/repository_model_packets/l9-gate-sdk/PROVENANCE.md` — provenance label recording that this fixture is legacy-scanner output, not current producer output
 - `tests/fixtures/repository_model_packets/l9-gate-sdk/manifest.json` — deterministic packet, source, or regression fixture
 - `tests/fixtures/repository_model_packets/l9-gate-sdk/packet.json` — deterministic packet, source, or regression fixture
 - `tests/fixtures/repository_model_packets/l9-gate-sdk/receipts/validation-receipt.json` — deterministic packet, source, or regression fixture
+- `tests/fixtures/repository_model_packets/l9-mcp-server/PROVENANCE.md` — provenance label recording that this fixture is legacy-scanner output, not current producer output
 - `tests/fixtures/repository_model_packets/l9-mcp-server/manifest.json` — deterministic packet, source, or regression fixture
 - `tests/fixtures/repository_model_packets/l9-mcp-server/packet.json` — deterministic packet, source, or regression fixture
 - `tests/fixtures/repository_model_packets/l9-mcp-server/receipts/validation-receipt.json` — deterministic packet, source, or regression fixture
@@ -497,6 +499,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `tests/test_evidence_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_execution_authority_v5.py` — adversarial coverage for the execution-lease trust boundary
 - `tests/test_field_cardinality.py` — unit, contract, integration, regression, or governance test
+- `tests/test_fixture_provenance.py` — automated regression and contract test suite
 - `tests/test_generated_artifact_sync.py` — generated-artifact check/update and fail-closed regression tests
 - `tests/test_git_integrity.py` — Git path, mode, object-type, and blob-identity regression tests
 - `tests/test_graph_builder.py` — unit, contract, integration, regression, or governance test
@@ -510,9 +513,11 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `tests/test_packet_models_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_packet_store_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_producer_emitted_corpus_packet.py` — automated regression and contract test suite
+- `tests/test_publication_edge_coverage.py` — automated regression and contract test suite
 - `tests/test_publication_edge_fidelity.py` — proves edge direction and properties survive lowering as structured data rather than prose
 - `tests/test_publication_downstream_conformance.py` — unit, contract, integration, regression, or governance test
 - `tests/test_publication_effect_identity.py` — unit, contract, integration, regression, or governance test
+- `tests/test_publication_plan_identity.py` — automated regression and contract test suite
 - `tests/test_publication_planning.py` — unit, contract, integration, regression, or governance test
 - `tests/test_reasoning_router.py` — automated regression and contract test suite
 - `tests/test_publication_temporal.py` — proves observation time and publication time stay distinct coordinates

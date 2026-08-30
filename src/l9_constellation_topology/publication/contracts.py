@@ -343,6 +343,26 @@ class PublicationPlan(FrozenModel):
 
     plan_type: Literal["l9.topology-publication-plan"] = "l9.topology-publication-plan"
     plan_version: str = PUBLICATION_PLAN_VERSION
+    #: Contract identity of this plan: ``publication-plan:<semantic digest>``.
+    #:
+    #: Derived from the plan's semantic view — plan version, producer, the source
+    #: packet reference and its semantic hash, the policy hash, and every
+    #: candidate and skip — never from a clock, a run counter, or a path. So two
+    #: plans sharing a ``plan_id`` are the same plan in meaning, and a plan whose
+    #: id has moved differs in something a consumer is entitled to care about.
+    #:
+    #: **It is not a run identifier.** Re-planning an unchanged topology under an
+    #: unchanged policy reproduces the same id, which is the property that lets a
+    #: consumer recognise a re-published plan as one it has already seen rather
+    #: than as new work. A consumer that treated it as a run id would do the work
+    #: twice; one that treated a *changed* id as cosmetic would skip work it has
+    #: never done.
+    #:
+    #: Distinct from the two identities inside it (ADR-0025): ``candidate_id``
+    #: names a logical fact, ``idempotency_key`` names one exact durable
+    #: admission, and this names the whole plan those appear in. Publication
+    #: time is deliberately outside it — the same plan published twice at
+    #: different times is the same plan.
     plan_id: str
     producer: Producer
     source_topology_packet: PacketRef
