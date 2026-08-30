@@ -1,11 +1,30 @@
 """Adapt an l9-meta-injector corpus generation into a Corpus Intelligence Packet.
 
-Compatibility ingress, and nothing more. The canonical input to this compiler is
-an ``l9.corpus-intelligence`` bundle; the producer does not emit one yet, and its
-corpus generation is nonetheless a real, validated output that topology needs to
-be testable against. This module reads that generation and produces the canonical
-packet, so the compiler's API stays the packet and the raw file layout never
-becomes it.
+.. deprecated::
+   **Legacy compatibility ingress. Do not extend, and do not route new work
+   through it.** The producer now emits an ``l9.corpus-intelligence`` bundle
+   beside every generation it publishes, and :mod:`..corpus_ingress` prefers
+   that bundle whenever one is present. This module runs only for generations
+   published before the producer emitted one.
+
+   *Removal trigger:* delete this module, its tests, and the
+   ``adapt-meta-corpus`` command once no generation still in use predates the
+   producer revision that began emitting the bundle
+   (``l9-meta-injector`` 79bd7a3, recorded in
+   ``tests/fixtures/corpus_intelligence/producer-emitted/PROVENANCE.md``).
+   Nothing here needs to survive that: every claim it reconstructs from the file
+   layout, the producer now states directly.
+
+   Two things it gets wrong that the producer does not, and that are not worth
+   fixing here because the fix is upstream: it reads three
+   ``fusion_profile_*`` fields that no generation has ever carried, so every
+   candidate it adapts records ``profile_version: "unknown"``; and it names a
+   readiness subject by project *key* rather than by candidate id, which no
+   packet can resolve.
+
+Compatibility ingress, and nothing more. This module reads a generation and
+produces the canonical packet, so the compiler's API stays the packet and the
+raw file layout never becomes it.
 
 Three rules follow from "compatibility ingress":
 

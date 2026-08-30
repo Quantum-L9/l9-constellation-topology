@@ -42,6 +42,10 @@ from l9_constellation_topology.packets.bundle_verification import BundleVerifica
 from l9_constellation_topology.packets.corpus_bundle import (
     build_corpus_intelligence_bundle_artifacts,
 )
+from l9_constellation_topology.packets.corpus_ingress import (
+    CorpusIngressError,
+    load_corpus_intelligence,
+)
 from l9_constellation_topology.packets.corpus_intelligence import (
     CORPUS_INTELLIGENCE_PACKET_TYPE,
 )
@@ -167,6 +171,24 @@ def cmd_adapt_meta_corpus(args: argparse.Namespace) -> int:
     Compatibility ingress. The generation is read and never written; the bundle
     is committed to a separate destination through ``OutputSink``.
     """
+    # Refuses rather than adapts when the generation already publishes the
+    # canonical packet: adapting one would produce a second packet describing
+    # the same run, differing in ways nobody would think to look for.
+    ingress = load_corpus_intelligence(Path(args.meta_generation))
+    if ingress.is_canonical:
+        _print_json(
+            {
+                "status": "already-canonical",
+                "packet_id": ingress.packet.packet_id,
+                "semantic_hash": ingress.packet.semantic_hash,
+                "generation_root": str(ingress.generation_root),
+                "detail": (
+                    "this generation publishes an l9.corpus-intelligence bundle; pass it to "
+                    "--corpus-bundle rather than adapting the generation"
+                ),
+            }
+        )
+        return 0
     report = adapt_meta_generation(Path(args.meta_generation))
     sink = PacketBundleOutputSink(
         Path(args.out),
@@ -657,7 +679,7 @@ def run(argv: Sequence[str] | None = None) -> int:
         for line in _format_verification_error(exc):
             print(line, file=sys.stderr)
         return 2
-    except (CorpusIntelligenceValidationError, MetaGenerationError) as exc:
+    except (CorpusIntelligenceValidationError, CorpusIngressError, MetaGenerationError) as exc:
         # Both carry an operator-actionable list of what did not resolve. Printed
         # line by line rather than as one blob so the failing references are
         # readable in a terminal.

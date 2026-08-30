@@ -283,6 +283,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `src/l9_constellation_topology/packets/control.py` — production Python package implementation
 - `src/l9_constellation_topology/packets/corpus_bundle.py` — production Python package implementation
 - `src/l9_constellation_topology/packets/corpus_evidence.py` — production Python package implementation
+- `src/l9_constellation_topology/packets/corpus_ingress.py` — production Python package implementation
 - `src/l9_constellation_topology/packets/corpus_intelligence.py` — production Python package implementation
 - `src/l9_constellation_topology/packets/corpus_validator.py` — production Python package implementation
 - `src/l9_constellation_topology/packets/document_signal_evidence.py` — production Python package implementation
@@ -386,6 +387,33 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `src/l9_constellation_topology/worker/transport_factory.py` — production Python package implementation
 - `tests/__init__.py` — unit, contract, integration, regression, or governance test
 - `tests/corpus_fixtures.py` — automated regression and contract test suite
+- `tests/fixtures/corpus_intelligence/producer-emitted/PROVENANCE.md` — provenance of the producer-emitted corpus intelligence fixture
+- `tests/fixtures/corpus_intelligence/producer-emitted/corpus-intelligence/manifest.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/corpus-intelligence/packet.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/corpus-intelligence/payload/consolidation-candidates.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/corpus-intelligence/payload/document-work-signals.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/corpus-intelligence/payload/exact-duplicate-relations.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/corpus-intelligence/payload/project-candidates.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/corpus-intelligence/payload/readiness-evidence.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/corpus-intelligence/payload/reasoning-candidates.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/corpus-intelligence/payload/reasoning-evidence-pack-refs.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/corpus-intelligence/payload/semantic-pair-relations.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/corpus-intelligence/payload/topic-candidates.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/roots/ArchiveZips/manifest.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/roots/ArchiveZips/packet.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/roots/ArchiveZips/receipts/validation-receipt.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/roots/Backup/manifest.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/roots/Backup/packet.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/roots/Backup/receipts/validation-receipt.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/roots/Documents/manifest.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/roots/Documents/packet.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/roots/Documents/receipts/validation-receipt.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/roots/OldSSD/manifest.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/roots/OldSSD/packet.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/roots/OldSSD/receipts/validation-receipt.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/roots/corpus/manifest.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/roots/corpus/packet.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/roots/corpus/receipts/validation-receipt.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
 - `tests/fixtures/downstream_contracts/l9-graphiti-memory-contract.json` — captured downstream contract descriptor fixture
 - `tests/fixtures/legacy_v4_outputs/07_VALIDATION_REPORT.md` — deterministic packet, source, or regression fixture
 - `tests/fixtures/legacy_v4_outputs/architecture_diagrams.mmd` — deterministic packet, source, or regression fixture
@@ -459,6 +487,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `tests/test_confirmed_findings_remediation.py` — adversarial regression tests for every confirmed audit finding
 - `tests/test_conflict_cardinality.py` — unit, contract, integration, regression, or governance test
 - `tests/test_corpus_hash_locality.py` — automated regression and contract test suite
+- `tests/test_corpus_ingress.py` — automated regression and contract test suite
 - `tests/test_corpus_intelligence_contract.py` — automated regression and contract test suite
 - `tests/test_corpus_publication_containment.py` — automated regression and contract test suite
 - `tests/test_corpus_topology_compilation.py` — automated regression and contract test suite
@@ -480,6 +509,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `tests/test_packet_ingress_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_packet_models_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_packet_store_v5.py` — unit, contract, integration, regression, or governance test
+- `tests/test_producer_emitted_corpus_packet.py` — automated regression and contract test suite
 - `tests/test_publication_edge_fidelity.py` — proves edge direction and properties survive lowering as structured data rather than prose
 - `tests/test_publication_downstream_conformance.py` — unit, contract, integration, regression, or governance test
 - `tests/test_publication_effect_identity.py` — unit, contract, integration, regression, or governance test
