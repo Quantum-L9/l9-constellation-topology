@@ -214,7 +214,9 @@ def _capability_gap(
     incoming_edges = incoming.get(capability.capability_id, ())
     outgoing_edges = outgoing.get(capability.capability_id, ())
     implementation_edges = _of_type(incoming_edges, EdgeType.implements)
-    validation_edges = _of_type(incoming_edges, EdgeType.validated_by)
+    incoming_validation = _of_type(incoming_edges, EdgeType.validated_by)
+    outgoing_validation = _of_type(outgoing_edges, EdgeType.validated_by)
+    validation_edges = incoming_validation + outgoing_validation
     exposure_edges = _of_type(incoming_edges, EdgeType.exposes, EdgeType.routes_to)
     routed_edges = _of_type(outgoing_edges, EdgeType.routes_to)
     consumer_edges = _of_type(incoming_edges, EdgeType.consumes)
@@ -226,7 +228,11 @@ def _capability_gap(
         )
     )
     validators = tuple(
-        sorted(set(capability.validated_by) | {edge.source_id for edge in validation_edges})
+        sorted(
+            set(capability.validated_by)
+            | {edge.source_id for edge in incoming_validation}
+            | {edge.target_id for edge in outgoing_validation}
+        )
     )
     exposers = tuple(
         sorted(

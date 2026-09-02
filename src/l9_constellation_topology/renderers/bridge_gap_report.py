@@ -75,9 +75,11 @@ def render_bridge_gap_markdown(projection: BridgeGapProjection) -> str:
             )
             + " |"
         )
+    if projection.gaps:
+        lines.extend(("", "## Gap details", ""))
+    for gap in projection.gaps:
         lines.extend(
             (
-                "",
                 f"### `{gap.bridge_gap_id}`",
                 "",
                 f"- **Subject:** `{gap.subject_id}` ({gap.subject_kind})",
@@ -87,6 +89,7 @@ def render_bridge_gap_markdown(projection: BridgeGapProjection) -> str:
                 + (", ".join(f"`{item}`" for item in gap.producer_ids) or "none observed"),
                 "- **Consumers:** "
                 + (", ".join(f"`{item}`" for item in gap.consumer_ids) or "none observed"),
+                "",
             )
         )
     return "\n".join(lines) + "\n"
