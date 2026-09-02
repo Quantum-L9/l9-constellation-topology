@@ -15,6 +15,10 @@ from l9_constellation_topology.packets import (
 from l9_constellation_topology.packets.report_manifest import finalize_report_manifest
 from l9_constellation_topology.run import canonical_bytes, semantic_hash, utc_now
 
+from .bridge_gap_report import (
+    render_bridge_gap_json_artifact,
+    render_bridge_gap_markdown_artifact,
+)
 from .common import make_rendered_artifact
 from .csv_export import render_maturity_csv_artifact, render_repository_inventory_yaml_artifact
 from .json_export import (
@@ -27,7 +31,7 @@ from .mermaid_export import render_mermaid_artifact
 from .risk_report import render_risk_markdown_artifact
 
 RENDERER_ID = "l9-topology-renderer"
-RENDERER_VERSION = "2.0.0"
+RENDERER_VERSION = "2.1.0"
 SUPPORTED_FORMATS = (
     "markdown",
     "mermaid",
@@ -37,6 +41,8 @@ SUPPORTED_FORMATS = (
     "graph-jsonl",
     "neo4j-candidate",
     "risk-markdown",
+    "bridge-gaps-json",
+    "bridge-gaps-markdown",
 )
 DEFAULT_FORMATS = (
     "markdown",
@@ -46,6 +52,8 @@ DEFAULT_FORMATS = (
     "json",
     "neo4j-candidate",
     "risk-markdown",
+    "bridge-gaps-json",
+    "bridge-gaps-markdown",
 )
 
 
@@ -86,6 +94,8 @@ def render_reports(
         "graph-jsonl": render_graph_records_jsonl_artifact,
         "neo4j-candidate": render_neo4j_candidate_artifact,
         "risk-markdown": render_risk_markdown_artifact,
+        "bridge-gaps-json": render_bridge_gap_json_artifact,
+        "bridge-gaps-markdown": render_bridge_gap_markdown_artifact,
     }
     artifacts = tuple(factories[name](materialized) for name in requested)
     cache_key = projection_cache_key(materialized.packet.semantic_hash, report_profile_hash)

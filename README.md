@@ -78,10 +78,12 @@ uv run l9-topology render-report \
   --format markdown \
   --format mermaid \
   --format maturity-csv \
-  --format neo4j-candidate
+  --format neo4j-candidate \
+  --format bridge-gaps-json \
+  --format bridge-gaps-markdown
 ```
 
-`neo4j-candidate` is a neutral candidate export. This repository contains no Neo4j or Graphiti write client.
+`neo4j-candidate` is a neutral candidate export. This repository contains no Neo4j or Graphiti write client. `bridge-gaps.json` and `BRIDGE_GAPS.md` are deterministic decision-support projections: they identify missing lifecycle edges proven by topology while keeping activation intent explicit and never activating or dispatching anything. See [`docs/bridge-gap-projection.md`](docs/bridge-gap-projection.md).
 
 ## Corpus intelligence
 
