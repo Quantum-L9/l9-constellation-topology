@@ -11,6 +11,8 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
 
+from pydantic import TypeAdapter
+
 from l9_constellation_topology.domain.assessment import ConflictRecord, UnknownRecord
 from l9_constellation_topology.domain.capability import CapabilityRecord
 from l9_constellation_topology.domain.claim import SemanticClaimRecord
@@ -19,7 +21,7 @@ from l9_constellation_topology.domain.edge import EdgeRecord
 from l9_constellation_topology.domain.repository import RepositoryRecord
 from l9_constellation_topology.domain.topology import TopologyState
 from l9_constellation_topology.packets.topology_packet import TopologyPacket
-from l9_constellation_topology.run.evidence import EvidenceRecord
+from l9_constellation_topology.run.evidence import EvidenceRecord, canonical_data
 
 from .contracts import (
     DERIVATION_EVIDENCE_KINDS,
@@ -35,6 +37,7 @@ from .contracts import (
     MemoryEvidenceRef,
     MemoryIngestIntent,
     MemoryProvenance,
+    MemorySourceLocator,
     MemoryWriteRequest,
 )
 from .identity import (
@@ -47,6 +50,9 @@ from .identity import (
     idempotency_key,
 )
 from .policy import PublicationPolicy
+
+#: Validates a mirrored locator payload against the discriminated union.
+_LOCATOR_ADAPTER: TypeAdapter[MemorySourceLocator] = TypeAdapter(MemorySourceLocator)
 
 ENTITY_EXTRACTION_METHOD = "topology-entity-aggregation"
 RELATIONSHIP_EXTRACTION_METHOD = "topology-relationship-compilation"
@@ -183,6 +189,22 @@ def _evidence_kind(policy: PublicationPolicy, record: EvidenceRecord) -> Evidenc
     return policy.evidence_kind_by_class[evidence_class]
 
 
+def _lower_locator(record: EvidenceRecord) -> MemorySourceLocator | None:
+    """Carry the structured coordinate this evidence was read at, if any.
+
+    Translated field-for-field rather than passed through: the two unions are
+    separate contracts that happen to agree, and a mirror that forwarded the
+    producer's object would silently export whatever this repository added to it
+    next. ``None`` stays ``None`` — evidence that carries only a line number has
+    no structured coordinate to state, and inventing one is the failure the
+    locator union exists to prevent.
+    """
+    locator = record.source_ref.locator
+    if locator is None:
+        return None
+    return _LOCATOR_ADAPTER.validate_python(locator.model_dump(mode="json"))
+
+
 def _evidence_description(record: EvidenceRecord) -> str:
     subject = record.field or record.subject_id
     location = record.source_ref.source_path or record.source_ref.uri or record.source_ref.packet_id
@@ -236,6 +258,7 @@ def _lower_evidence(
             description=_evidence_description(record),
             source_id=record.evidence_id[:500],
             source_digest=bare_digest(record.source_ref.content_hash),
+            source_locator=_lower_locator(record),
             observed_at=published_at,
         )
         for record in kept
@@ -310,6 +333,22 @@ def _provenance(
     )
 
 
+def _earliest_observation(kept: tuple[EvidenceRecord, ...]) -> datetime | None:
+    """Return when the earliest supporting evidence was observed.
+
+    ``valid_from`` is publication time — when this compiler stated the fact.
+    That is not when the fact was seen, and conflating the two makes a claim
+    read as if it came into being the moment it was published. The downstream
+    contract has a field for the difference, and topology evidence carries the
+    observation timestamp, so the two coordinates stay distinct.
+
+    ``None`` when nothing supports the fact: a derived candidate with no
+    resolved evidence has no observation time, and publication time is not a
+    substitute for one.
+    """
+    return min((record.created_at for record in kept), default=None)
+
+
 def _source_locators(
     *,
     policy: PublicationPolicy,
@@ -350,8 +389,9 @@ def _metadata(
     publication_candidate_id: str,
     source_assertion_ids: tuple[str, ...],
     assertion_predicate: str | None,
+    relation: dict[str, Any] | None,
 ) -> dict[str, Any]:
-    return {
+    metadata: dict[str, Any] = {
         "topology_packet_id": packet.packet_id,
         "topology_semantic_hash": packet.semantic_hash,
         "topology_entity_ids": list(entity_ids),
@@ -378,6 +418,12 @@ def _metadata(
         "source_assertion_ids": list(source_assertion_ids),
         "assertion_predicate": assertion_predicate,
     }
+    if relation is not None:
+        # Namespaced under one topology-owned key rather than spread across the
+        # flat metadata, so a downstream reader can tell what this repository
+        # asserted about the edge from what it asserted about the snapshot.
+        metadata["topology_relation"] = relation
+    return metadata
 
 
 def _build(
@@ -395,6 +441,7 @@ def _build(
     extraction_method: str,
     published_at: datetime,
     provenance: AssertionProvenance = NO_ASSERTION_PROVENANCE,
+    relation: dict[str, Any] | None = None,
 ) -> LoweredCandidate:
     # The subject is the first entity the fact was lowered from, in every kind:
     # a repository, a capability, a relationship's source, a claim's subject.
@@ -459,6 +506,7 @@ def _build(
         evidence=lowered_evidence,
         confidence=confidence,
         valid_from=published_at,
+        source_observed_at=_earliest_observation(kept_evidence),
         tags=("l9-topology", f"topology-{candidate_kind}"),
         metadata=_metadata(
             packet=packet,
@@ -472,6 +520,7 @@ def _build(
             publication_candidate_id=candidate_id(identity),
             source_assertion_ids=provenance.source_assertion_ids,
             assertion_predicate=provenance.predicate,
+            relation=relation,
         ),
         idempotency_key=idempotency_key(
             identity,
@@ -591,6 +640,32 @@ def lower_capability(
     )
 
 
+def relation_metadata(record: EdgeRecord) -> dict[str, Any]:
+    """Return the structured facts about an edge that prose cannot carry.
+
+    ``direction`` and ``properties`` used to survive only inside the human
+    ``content`` string, or not at all. That was worst for the one edge type
+    whose whole meaning is in its properties: a ``DUPLICATE_OF`` edge carries
+    the cluster it belongs to, the content hash both endpoints share, the method
+    that decided the relation, the cluster size, and an explicit statement that
+    the star's centre is arbitrary. Published without them it read as a
+    directional relation between two files, with no cluster, nothing to
+    re-check, and no sign that picking that centre meant nothing.
+
+    The endpoints are repeated here even though the assertion carries them: an
+    assertion is a triple, and a reader resolving a symmetric relation needs to
+    know the triple's order was imposed rather than observed.
+    """
+    return {
+        "edge_id": record.edge_id,
+        "edge_type": str(record.edge_type),
+        "source_id": record.source_id,
+        "target_id": record.target_id,
+        "direction": str(record.direction),
+        "properties": canonical_data(record.properties),
+    }
+
+
 def lower_relationship(
     record: EdgeRecord,
     *,
@@ -625,6 +700,7 @@ def lower_relationship(
         source_fields=("source_id", "edge_type", "target_id", "direction"),
         extraction_method=RELATIONSHIP_EXTRACTION_METHOD,
         published_at=published_at,
+        relation=relation_metadata(record),
     )
 
 

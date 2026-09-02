@@ -2,6 +2,15 @@
 
 from .artifact import ArtifactRecord
 from .assessment import ConflictRecord, ImpactIndex, MaturityAssessment, RiskRecord, UnknownRecord
+from .bridge_gap import (
+    BRIDGE_GAP_SCHEMA_VERSION,
+    ActivationIntent,
+    BridgeDisposition,
+    BridgeGapProjection,
+    BridgeGapRecord,
+    BridgeGapType,
+    BridgeLifecycleState,
+)
 from .candidate import (
     CandidateClusterRecord,
     CandidateMethodScore,
@@ -49,6 +58,13 @@ __all__ = [
     "REASONING_TYPES",
     "TRAVERSABLE_EDGE_TYPES",
     "ArtifactRecord",
+    "BRIDGE_GAP_SCHEMA_VERSION",
+    "ActivationIntent",
+    "BridgeDisposition",
+    "BridgeGapProjection",
+    "BridgeGapRecord",
+    "BridgeGapType",
+    "BridgeLifecycleState",
     "Authority",
     "CandidateClusterRecord",
     "CandidateMethodScore",

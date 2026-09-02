@@ -188,7 +188,7 @@
       "path": ".python-version"
     },
     {
-      "git_object_id": "b6608d8b92cf52bcaadda4822fb89541945b5593",
+      "git_object_id": "73de3dd672aca1eed89c4d69c37ac254e56bed28",
       "mode": "100644",
       "object_type": "blob",
       "path": "ADR_INDEX.md"
@@ -314,7 +314,7 @@
       "path": "MAINTAINERS.md"
     },
     {
-      "git_object_id": "4b1e9c8ed8fec21867e4acf6dc59c86f5aaae566",
+      "git_object_id": "424849e2e04eecd9a706d613ee48605f9e7c4ca4",
       "mode": "100644",
       "object_type": "blob",
       "path": "MANIFEST.md"
@@ -338,7 +338,7 @@
       "path": "QUALIFICATION.json"
     },
     {
-      "git_object_id": "30e2eea9396412ac526615f062ea2ec120de5fa2",
+      "git_object_id": "cb8ae7d1fccd22423f64c5d01feaa5e1cf22c7a7",
       "mode": "100644",
       "object_type": "blob",
       "path": "README.md"
@@ -692,7 +692,19 @@
       "path": "docs/adr/0026-accept-corpus-intelligence-as-an-auxiliary-packet.md"
     },
     {
-      "git_object_id": "c698cc31c18e9b785b44257a6bb41980d30ad73a",
+      "git_object_id": "6f654b697f583cf082ee555ae6bce13db5b1e2ee",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "docs/adr/0027-separate-observation-time-from-publication-time.md"
+    },
+    {
+      "git_object_id": "8bc5fee4ecc92457e241f95079a15f4f1d1dc068",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "docs/adr/0028-project-bridge-gaps-as-decision-support.md"
+    },
+    {
+      "git_object_id": "3c2466071d4b3c021b1969946079823ae4bcfae7",
       "mode": "100644",
       "object_type": "blob",
       "path": "docs/adr/README.md"
@@ -758,6 +770,12 @@
       "path": "docs/archive/v4/machine-summary.json"
     },
     {
+      "git_object_id": "cf939fd4b27df02a3591d0a7b1fb2eaeaaf7d20a",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "docs/bridge-gap-projection.md"
+    },
+    {
       "git_object_id": "ac19280ccf7c9c04756485614434b595c7aaa6cd",
       "mode": "100644",
       "object_type": "blob",
@@ -818,7 +836,7 @@
       "path": "docs/recovery.md"
     },
     {
-      "git_object_id": "38fdb180db2c883d500680c339fb8341805de2d8",
+      "git_object_id": "764a2e233b1241fc084732e4f4a34360a6839922",
       "mode": "100644",
       "object_type": "blob",
       "path": "docs/report-lifecycle.md"
@@ -1136,6 +1154,12 @@
       "path": "schemas/artifact-record.schema.json"
     },
     {
+      "git_object_id": "67e56acbd67c9263c567241661dc4392324ababe",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "schemas/bridge-gap-projection.schema.json"
+    },
+    {
       "git_object_id": "afa41caeee831cf06dc74a86ec00ffd3094688ed",
       "mode": "100644",
       "object_type": "blob",
@@ -1226,7 +1250,7 @@
       "path": "schemas/semantic-claim-record.schema.json"
     },
     {
-      "git_object_id": "e6cdd044276e8e26cfafec2e42ce74428dcfbd7f",
+      "git_object_id": "f9ae964941258b581423c557e6cf7556fff7d100",
       "mode": "100644",
       "object_type": "blob",
       "path": "schemas/topology-publication-plan.schema.json"
@@ -1250,6 +1274,12 @@
       "path": "scripts/build_control_packet.py"
     },
     {
+      "git_object_id": "9d6f6690ac3892b5d023bce47fde2d6590fd7070",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "scripts/capture_downstream_contract.py"
+    },
+    {
       "git_object_id": "d7d1f6e72fe771acd28dd17263bb215483c9af78",
       "mode": "100755",
       "object_type": "blob",
@@ -1268,7 +1298,7 @@
       "path": "scripts/generate_fixture_packets.py"
     },
     {
-      "git_object_id": "09c4c5b9b8e5ffaae612595503a4c5a078472689",
+      "git_object_id": "fcc1fecd931a3d6c1a7dd3e1418e48699198fb66",
       "mode": "100644",
       "object_type": "blob",
       "path": "scripts/generate_schemas.py"
@@ -1346,7 +1376,7 @@
       "path": "src/l9_constellation_topology/cardinality.py"
     },
     {
-      "git_object_id": "e4949efbfb3381dc65ae33093dea0284f158a0e8",
+      "git_object_id": "9866e4bb7dce95093f7f5878de0ffc75e6e2f9ca",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/cli.py"
@@ -1382,7 +1412,7 @@
       "path": "src/l9_constellation_topology/config.py"
     },
     {
-      "git_object_id": "9e7ea3df586385fdeb03455b5188d2b09960c143",
+      "git_object_id": "6f65f7f7b49b0c9a67024e6b08e550cede5671d8",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/domain/__init__.py"
@@ -1404,6 +1434,12 @@
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/domain/base.py"
+    },
+    {
+      "git_object_id": "92ff95a44fd19b2a5c0afe1a72842b625cbb1b21",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "src/l9_constellation_topology/domain/bridge_gap.py"
     },
     {
       "git_object_id": "5d8bc891427883b58830e0569d076cf36ba1de64",
@@ -1574,7 +1610,7 @@
       "path": "src/l9_constellation_topology/packets/adapters/errors.py"
     },
     {
-      "git_object_id": "15564af29a540cceb7d61f97dd181581a0cbbcb3",
+      "git_object_id": "df450e4a7e20495208dc4795dbd610a4ae5034aa",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/packets/adapters/meta_generation.py"
@@ -1632,6 +1668,12 @@
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/packets/corpus_evidence.py"
+    },
+    {
+      "git_object_id": "9cac6a3da9ffa86515dd6a67d51bc0fb53429a58",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "src/l9_constellation_topology/packets/corpus_ingress.py"
     },
     {
       "git_object_id": "023ff40942df63b6f153e18cc49eb2843fcf6f7b",
@@ -1730,7 +1772,7 @@
       "path": "src/l9_constellation_topology/publication/bundle.py"
     },
     {
-      "git_object_id": "563624abe73b743ffae62784097f4debcf70080b",
+      "git_object_id": "04d35691040b148629365bea821427510545b6cc",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/publication/contracts.py"
@@ -1748,7 +1790,7 @@
       "path": "src/l9_constellation_topology/publication/identity.py"
     },
     {
-      "git_object_id": "ee4cbb1f4b38c99a32b144c62169da4503a9922f",
+      "git_object_id": "de14b97e745bd2378adb99081e45c757a7c5ca1e",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/publication/lowering.py"
@@ -1796,10 +1838,16 @@
       "path": "src/l9_constellation_topology/reconciliation/predicates.py"
     },
     {
-      "git_object_id": "29b8d615e9413f062b0572109854e4441f8a09ac",
+      "git_object_id": "65a8a742a093acc21a185dca3fe329d6854af605",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/renderers/__init__.py"
+    },
+    {
+      "git_object_id": "757d0dfef16181529a50a2d00c312849f712dca1",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "src/l9_constellation_topology/renderers/bridge_gap_report.py"
     },
     {
       "git_object_id": "2000aa19753789a8cc1b993a1e42ecd533638ef9",
@@ -1832,7 +1880,7 @@
       "path": "src/l9_constellation_topology/renderers/mermaid_export.py"
     },
     {
-      "git_object_id": "ccdb291f459cdc1a28cce17402c0e2ee21e7668c",
+      "git_object_id": "fe83c7289f3f98a1b9dd3a92ce92fcfdba8b1f27",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/renderers/report_renderer.py"
@@ -2060,6 +2108,12 @@
       "path": "src/l9_constellation_topology/topology/__init__.py"
     },
     {
+      "git_object_id": "8d77d6dc2e75503dac90754ed3026c10cbe4fc5e",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "src/l9_constellation_topology/topology/bridge_gaps.py"
+    },
+    {
       "git_object_id": "0689e74f304cb0f51e4f6c0d131d9d57e0e7452c",
       "mode": "100644",
       "object_type": "blob",
@@ -2252,7 +2306,169 @@
       "path": "tests/corpus_fixtures.py"
     },
     {
-      "git_object_id": "736cc95ddf42253b5bf9597d9fc33589c46fbd3e",
+      "git_object_id": "f798b5a98f5240ae312ca7992317eaab6443e4b5",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/fixtures/corpus_intelligence/producer-emitted/PROVENANCE.md"
+    },
+    {
+      "git_object_id": "f200e618064a27921a196594f54f29cc7abfa95d",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/fixtures/corpus_intelligence/producer-emitted/corpus-intelligence/manifest.json"
+    },
+    {
+      "git_object_id": "aeb4b06a35511c916d91da5a7170462cbfd75136",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/fixtures/corpus_intelligence/producer-emitted/corpus-intelligence/packet.json"
+    },
+    {
+      "git_object_id": "1469c58ba99cc4cdbf0a9c2766d0096380f6d0a5",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/fixtures/corpus_intelligence/producer-emitted/corpus-intelligence/payload/consolidation-candidates.json"
+    },
+    {
+      "git_object_id": "67721efefcb9cda0e7d10c8a7b8b712c6ceecaf5",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/fixtures/corpus_intelligence/producer-emitted/corpus-intelligence/payload/document-work-signals.json"
+    },
+    {
+      "git_object_id": "3af9e7749d9fa93dba5b35e3ac7eb44dd2e7747a",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/fixtures/corpus_intelligence/producer-emitted/corpus-intelligence/payload/exact-duplicate-relations.json"
+    },
+    {
+      "git_object_id": "0566ae38116379f364b40d404fca0a506e3c5f58",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/fixtures/corpus_intelligence/producer-emitted/corpus-intelligence/payload/project-candidates.json"
+    },
+    {
+      "git_object_id": "718f6d061be7a6cb2425b9b2af913c96fe33aef5",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/fixtures/corpus_intelligence/producer-emitted/corpus-intelligence/payload/readiness-evidence.json"
+    },
+    {
+      "git_object_id": "1cc125f624a77396f291edae34b38832920bb133",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/fixtures/corpus_intelligence/producer-emitted/corpus-intelligence/payload/reasoning-candidates.json"
+    },
+    {
+      "git_object_id": "e16cfc18ea6c43164b344cbad8122d7b9365218c",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/fixtures/corpus_intelligence/producer-emitted/corpus-intelligence/payload/reasoning-evidence-pack-refs.json"
+    },
+    {
+      "git_object_id": "8df40c024e397a7040806d95dac0e3676b3002b7",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/fixtures/corpus_intelligence/producer-emitted/corpus-intelligence/payload/semantic-pair-relations.json"
+    },
+    {
+      "git_object_id": "052f8d30b3bb4626551066c784bc2fe65e126536",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/fixtures/corpus_intelligence/producer-emitted/corpus-intelligence/payload/topic-candidates.json"
+    },
+    {
+      "git_object_id": "16e0f1d2513e44312cf317c3a37dee8db0cd9761",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/fixtures/corpus_intelligence/producer-emitted/roots/ArchiveZips/manifest.json"
+    },
+    {
+      "git_object_id": "e28849486ae48d08da8606686b888fc1fe10eec8",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/fixtures/corpus_intelligence/producer-emitted/roots/ArchiveZips/packet.json"
+    },
+    {
+      "git_object_id": "db00e991809ab6f27dec963cbb38bbf4b6728f7d",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/fixtures/corpus_intelligence/producer-emitted/roots/ArchiveZips/receipts/validation-receipt.json"
+    },
+    {
+      "git_object_id": "3b8b8ee9a2edbaed310daaf31a22549ea80b5362",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/fixtures/corpus_intelligence/producer-emitted/roots/Backup/manifest.json"
+    },
+    {
+      "git_object_id": "25fada081045198ed2f7db8090847d2f31c2dc07",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/fixtures/corpus_intelligence/producer-emitted/roots/Backup/packet.json"
+    },
+    {
+      "git_object_id": "582af7693e83284760e479748e37a31f1885a27c",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/fixtures/corpus_intelligence/producer-emitted/roots/Backup/receipts/validation-receipt.json"
+    },
+    {
+      "git_object_id": "164a096061fba59fbe2162c1a4307dc6d062c25c",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/fixtures/corpus_intelligence/producer-emitted/roots/Documents/manifest.json"
+    },
+    {
+      "git_object_id": "33a7580c4e70c9eef8dd7f68fa1f12e4c3b2b170",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/fixtures/corpus_intelligence/producer-emitted/roots/Documents/packet.json"
+    },
+    {
+      "git_object_id": "0af66fbb4e8d2285eacbc983ff97f831e7e8e10b",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/fixtures/corpus_intelligence/producer-emitted/roots/Documents/receipts/validation-receipt.json"
+    },
+    {
+      "git_object_id": "36cf35fe6a0a4c97589354d4e69696a98d89c356",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/fixtures/corpus_intelligence/producer-emitted/roots/OldSSD/manifest.json"
+    },
+    {
+      "git_object_id": "11f1ad2289bc5ce670b0019adf5578130daa7b96",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/fixtures/corpus_intelligence/producer-emitted/roots/OldSSD/packet.json"
+    },
+    {
+      "git_object_id": "b26bcc9ed76061110f362e129264e4ee9ca8e15c",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/fixtures/corpus_intelligence/producer-emitted/roots/OldSSD/receipts/validation-receipt.json"
+    },
+    {
+      "git_object_id": "94960696fafa5ae45d202275ba9c35d5e39980ae",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/fixtures/corpus_intelligence/producer-emitted/roots/corpus/manifest.json"
+    },
+    {
+      "git_object_id": "3ced0c193c0160312067ea1cad9fe3b781f717ed",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/fixtures/corpus_intelligence/producer-emitted/roots/corpus/packet.json"
+    },
+    {
+      "git_object_id": "522a55a5a008c99dc987eff32256170c6c6e88d6",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/fixtures/corpus_intelligence/producer-emitted/roots/corpus/receipts/validation-receipt.json"
+    },
+    {
+      "git_object_id": "6ab243bdb5834054525122a041687f5ae588b884",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/downstream_contracts/l9-graphiti-memory-contract.json"
@@ -2342,6 +2558,12 @@
       "path": "tests/fixtures/legacy_v4_outputs/topology_report.md"
     },
     {
+      "git_object_id": "50e989daedebd5fc168070ce7231775e898eb5e6",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/fixtures/publication_identity/golden-vectors.json"
+    },
+    {
       "git_object_id": "9e750bf29029421c88e81d8a7e86d53dcb6ec1a7",
       "mode": "100644",
       "object_type": "blob",
@@ -2360,6 +2582,12 @@
       "path": "tests/fixtures/repository_model_packets/l9-assertion-sample/receipts/validation-receipt.json"
     },
     {
+      "git_object_id": "15237522fed2d5bf4bab8178395f9e533606332d",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/fixtures/repository_model_packets/l9-gate-sdk/PROVENANCE.md"
+    },
+    {
       "git_object_id": "cf2502f5f31fcbd36471ddd74b7515f51de9c67b",
       "mode": "100644",
       "object_type": "blob",
@@ -2376,6 +2604,12 @@
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/repository_model_packets/l9-gate-sdk/receipts/validation-receipt.json"
+    },
+    {
+      "git_object_id": "078c0e0974d383792867ebf7784c67f8b3e56341",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/fixtures/repository_model_packets/l9-mcp-server/PROVENANCE.md"
     },
     {
       "git_object_id": "b6ef3328fd0fab5b825b52ec49403825937e07a0",
@@ -2660,6 +2894,18 @@
       "path": "tests/test_assessments_v5.py"
     },
     {
+      "git_object_id": "bc23694768e7572b6fa9e83fa4af091bc407eab2",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/test_bridge_gap_projection.py"
+    },
+    {
+      "git_object_id": "980c032ad11bc1f73bbc4a934c44f70ab741ad99",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/test_bridge_gap_renderer.py"
+    },
+    {
       "git_object_id": "b0d11717ee1a03a50fd73a369d81324bd7808f83",
       "mode": "100644",
       "object_type": "blob",
@@ -2682,6 +2928,12 @@
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_corpus_hash_locality.py"
+    },
+    {
+      "git_object_id": "6dd35a1867977d503f696d70bf85261d9dc2269f",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/test_corpus_ingress.py"
     },
     {
       "git_object_id": "e4e4d0b54f5e9d0cf6e8357db90209ad6345f72e",
@@ -2736,6 +2988,12 @@
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_field_cardinality.py"
+    },
+    {
+      "git_object_id": "433f6633cfdaf826b1ca014be7f1b730187c7098",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/test_fixture_provenance.py"
     },
     {
       "git_object_id": "b12f780a89e97749b99424f13d3cea41df15de5c",
@@ -2810,10 +3068,28 @@
       "path": "tests/test_packet_store_v5.py"
     },
     {
-      "git_object_id": "98f418c97a86bfb7116d0d9de4ab1384f25d88c1",
+      "git_object_id": "2d90096e1274b9f29a30c832ebf250e4f8774487",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/test_producer_emitted_corpus_packet.py"
+    },
+    {
+      "git_object_id": "37d33de06968765dbee4b545248a720c2efd21ad",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_publication_downstream_conformance.py"
+    },
+    {
+      "git_object_id": "bf2e9abfe67db3fa10fa9643c2977a28fedcbe23",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/test_publication_edge_coverage.py"
+    },
+    {
+      "git_object_id": "736e2e7a19247a9d70e0351e448c24f23cfac81c",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/test_publication_edge_fidelity.py"
     },
     {
       "git_object_id": "a3f26ceda1db8714b7e81aa7c25c43191b4305a3",
@@ -2822,10 +3098,28 @@
       "path": "tests/test_publication_effect_identity.py"
     },
     {
+      "git_object_id": "70bbcb773e5a9078553e65bcca00d5a9eb6389c1",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/test_publication_identity_golden_vectors.py"
+    },
+    {
+      "git_object_id": "1dc43db57c6fed96497d8032acd1d5ecb141625d",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/test_publication_plan_identity.py"
+    },
+    {
       "git_object_id": "11f05682f7ef09471a6ec94f55f5347a34174c7d",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_publication_planning.py"
+    },
+    {
+      "git_object_id": "2cdc3886c79bb86a08a59bb16b4054a0f7f51fe6",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/test_publication_temporal.py"
     },
     {
       "git_object_id": "177530ca1a407a2ebea8c8cbc33e2291705ff749",
@@ -2972,8 +3266,8 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:8142ebafb0e75ff5312873ab86ac4736782b2a562deb3e1c5a8dbc428ed0d655",
-  "entry_count": 495,
+  "entries_sha256": "sha256:11b56db86f6ad180d2f391e2788f092608a21ea27d12ce7a0407290bf6f19898",
+  "entry_count": 544,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
   ],

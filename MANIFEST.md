@@ -6,7 +6,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 
 ## Inventory
 
-**Tracked delivery files:** 492
+**Tracked delivery files:** 545
 
 - `.editorconfig` — editor encoding, indentation, and whitespace policy
 - `.env.example` — documented worker and control-plane environment variables
@@ -49,6 +49,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `CODE_OF_CONDUCT.md` — contributor conduct and enforcement policy
 - `CONTRIBUTING.md` — contribution workflow and validation expectations
 - `CONVERGENCE_REPORT.yaml` — convergence state and stop-condition evidence
+- `CURRENT_VALIDATION_REPORT.md` — complete delivery inventory and responsibility map
 - `DEPENDENCY_POLICY.md` — runtime, development, action, and service dependency policy
 - `DEVELOPMENT.md` — developer environment, layout, and command guide
 - `EFFECT_IDENTITY_MIGRATION_PREFLIGHT.json` — governance, policy, or release documentation
@@ -61,7 +62,6 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `LICENSE` — proprietary repository license terms
 - `MAINTAINERS.md` — maintainer roles and ownership responsibilities
 - `MANIFEST.md` — complete delivery inventory and responsibility map
-- `CURRENT_VALIDATION_REPORT.md` — complete delivery inventory and responsibility map
 - `Makefile` — canonical local validation and build command surface
 - `NOTICE.md` — third-party and generated-artifact notice
 - `QUALIFICATION.json` — governance, policy, or release documentation
@@ -124,6 +124,8 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `docs/adr/0024-compile-repository-model-assertions-into-semantic-claims.md` — accepted architecture decision record
 - `docs/adr/0025-separate-fact-identity-from-durable-write-identity.md` — accepted architecture decision record
 - `docs/adr/0026-accept-corpus-intelligence-as-an-auxiliary-packet.md` — architecture decision record
+- `docs/adr/0027-separate-observation-time-from-publication-time.md` — accepted architecture decision record
+- `docs/adr/0028-project-bridge-gaps-as-decision-support.md` — accepted architecture decision record
 - `docs/adr/README.md` — ADR directory governance and navigation
 - `docs/architecture.md` — architecture, contract, deployment, recovery, or model documentation
 - `docs/archive/v4/01_SPEC_ATTACK.md` — superseded v4 historical artifact retained for migration evidence
@@ -135,6 +137,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `docs/archive/v4/README.md` — superseded v4 historical artifact retained for migration evidence
 - `docs/archive/v4/architecture.md` — superseded v4 historical artifact retained for migration evidence
 - `docs/archive/v4/machine-summary.json` — superseded v4 historical artifact retained for migration evidence
+- `docs/bridge-gap-projection.md` — bridge-gap lifecycle projection, intent, evidence, and authority guidance
 - `docs/candidate-topology.md` — candidate domain semantics: enrichment, lower-never-raise, readiness, reasoning handoff
 - `docs/corpus-intelligence-boundary.md` — corpus intelligence boundary: epistemic classes, locators, exact relations, ingress
 - `docs/deployment.md` — architecture, contract, deployment, recovery, or model documentation
@@ -198,6 +201,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `outputs/.gitkeep` — tracked output-directory marker only
 - `pyproject.toml` — Python package metadata, entrypoints, and quality configuration
 - `schemas/artifact-record.schema.json` — canonical or compatibility domain JSON Schema
+- `schemas/bridge-gap-projection.schema.json` — generated bridge-gap decision-support JSON Schema
 - `schemas/capability-record.schema.json` — canonical or compatibility domain JSON Schema
 - `schemas/diagnostic-record.schema.json` — typed conserved upstream diagnostic JSON Schema
 - `schemas/edge-record.schema.json` — canonical or compatibility domain JSON Schema
@@ -217,6 +221,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `schemas/topology_report.schema.json` — canonical or compatibility domain JSON Schema
 - `scripts/architecture_boundary_check.py` — operator, build, generation, or validation command
 - `scripts/build_control_packet.py` — operator, build, generation, or validation command
+- `scripts/capture_downstream_contract.py` — derives the bound l9-graphiti-memory contract descriptor from the downstream models
 - `scripts/compile_topology_packet.py` — operator, build, generation, or validation command
 - `scripts/evaluate_hash_locality.py` — operator, build, generation, or validation command
 - `scripts/generate_fixture_packets.py` — operator, build, generation, or validation command
@@ -243,6 +248,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `src/l9_constellation_topology/domain/artifact.py` — production Python package implementation
 - `src/l9_constellation_topology/domain/assessment.py` — production Python package implementation
 - `src/l9_constellation_topology/domain/base.py` — production Python package implementation
+- `src/l9_constellation_topology/domain/bridge_gap.py` — typed bridge-gap lifecycle and activation-intent domain models
 - `src/l9_constellation_topology/domain/candidate.py` — production Python package implementation
 - `src/l9_constellation_topology/domain/capability.py` — production Python package implementation
 - `src/l9_constellation_topology/domain/claim.py` — production Python package implementation
@@ -281,6 +287,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `src/l9_constellation_topology/packets/control.py` — production Python package implementation
 - `src/l9_constellation_topology/packets/corpus_bundle.py` — production Python package implementation
 - `src/l9_constellation_topology/packets/corpus_evidence.py` — production Python package implementation
+- `src/l9_constellation_topology/packets/corpus_ingress.py` — production Python package implementation
 - `src/l9_constellation_topology/packets/corpus_intelligence.py` — production Python package implementation
 - `src/l9_constellation_topology/packets/corpus_validator.py` — production Python package implementation
 - `src/l9_constellation_topology/packets/document_signal_evidence.py` — production Python package implementation
@@ -309,6 +316,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `src/l9_constellation_topology/reconciliation/inputs.py` — production Python package implementation
 - `src/l9_constellation_topology/reconciliation/predicates.py` — production Python package implementation
 - `src/l9_constellation_topology/renderers/__init__.py` — production Python package implementation
+- `src/l9_constellation_topology/renderers/bridge_gap_report.py` — bridge-gap JSON and Markdown report projections
 - `src/l9_constellation_topology/renderers/common.py` — production Python package implementation
 - `src/l9_constellation_topology/renderers/csv_export.py` — production Python package implementation
 - `src/l9_constellation_topology/renderers/json_export.py` — production Python package implementation
@@ -352,6 +360,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `src/l9_constellation_topology/stages/resolve_config.py` — production Python package implementation
 - `src/l9_constellation_topology/stages/validate_topology.py` — production Python package implementation
 - `src/l9_constellation_topology/topology/__init__.py` — production Python package implementation
+- `src/l9_constellation_topology/topology/bridge_gaps.py` — pure bridge-gap detection policy and projector
 - `src/l9_constellation_topology/topology/candidates.py` — production Python package implementation
 - `src/l9_constellation_topology/topology/capability_builder.py` — production Python package implementation
 - `src/l9_constellation_topology/topology/claim_projection.py` — production Python package implementation
@@ -384,6 +393,33 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `src/l9_constellation_topology/worker/transport_factory.py` — production Python package implementation
 - `tests/__init__.py` — unit, contract, integration, regression, or governance test
 - `tests/corpus_fixtures.py` — automated regression and contract test suite
+- `tests/fixtures/corpus_intelligence/producer-emitted/PROVENANCE.md` — provenance of the producer-emitted corpus intelligence fixture
+- `tests/fixtures/corpus_intelligence/producer-emitted/corpus-intelligence/manifest.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/corpus-intelligence/packet.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/corpus-intelligence/payload/consolidation-candidates.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/corpus-intelligence/payload/document-work-signals.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/corpus-intelligence/payload/exact-duplicate-relations.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/corpus-intelligence/payload/project-candidates.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/corpus-intelligence/payload/readiness-evidence.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/corpus-intelligence/payload/reasoning-candidates.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/corpus-intelligence/payload/reasoning-evidence-pack-refs.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/corpus-intelligence/payload/semantic-pair-relations.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/corpus-intelligence/payload/topic-candidates.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/roots/ArchiveZips/manifest.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/roots/ArchiveZips/packet.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/roots/ArchiveZips/receipts/validation-receipt.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/roots/Backup/manifest.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/roots/Backup/packet.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/roots/Backup/receipts/validation-receipt.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/roots/Documents/manifest.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/roots/Documents/packet.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/roots/Documents/receipts/validation-receipt.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/roots/OldSSD/manifest.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/roots/OldSSD/packet.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/roots/OldSSD/receipts/validation-receipt.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/roots/corpus/manifest.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/roots/corpus/packet.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
+- `tests/fixtures/corpus_intelligence/producer-emitted/roots/corpus/receipts/validation-receipt.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository
 - `tests/fixtures/downstream_contracts/l9-graphiti-memory-contract.json` — captured downstream contract descriptor fixture
 - `tests/fixtures/legacy_v4_outputs/07_VALIDATION_REPORT.md` — deterministic packet, source, or regression fixture
 - `tests/fixtures/legacy_v4_outputs/architecture_diagrams.mmd` — deterministic packet, source, or regression fixture
@@ -399,12 +435,15 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `tests/fixtures/legacy_v4_outputs/risk_register.md` — deterministic packet, source, or regression fixture
 - `tests/fixtures/legacy_v4_outputs/topology_report.json` — deterministic packet, source, or regression fixture
 - `tests/fixtures/legacy_v4_outputs/topology_report.md` — deterministic packet, source, or regression fixture
+- `tests/fixtures/publication_identity/golden-vectors.json` — publication identity vectors generated from this producer and asserted by both this repository and l9-graphiti-memory
 - `tests/fixtures/repository_model_packets/l9-assertion-sample/manifest.json` — deterministic packet, source, or regression fixture
 - `tests/fixtures/repository_model_packets/l9-assertion-sample/packet.json` — deterministic packet, source, or regression fixture
 - `tests/fixtures/repository_model_packets/l9-assertion-sample/receipts/validation-receipt.json` — deterministic packet, source, or regression fixture
+- `tests/fixtures/repository_model_packets/l9-gate-sdk/PROVENANCE.md` — provenance label recording that this fixture is legacy-scanner output, not current producer output
 - `tests/fixtures/repository_model_packets/l9-gate-sdk/manifest.json` — deterministic packet, source, or regression fixture
 - `tests/fixtures/repository_model_packets/l9-gate-sdk/packet.json` — deterministic packet, source, or regression fixture
 - `tests/fixtures/repository_model_packets/l9-gate-sdk/receipts/validation-receipt.json` — deterministic packet, source, or regression fixture
+- `tests/fixtures/repository_model_packets/l9-mcp-server/PROVENANCE.md` — provenance label recording that this fixture is legacy-scanner output, not current producer output
 - `tests/fixtures/repository_model_packets/l9-mcp-server/manifest.json` — deterministic packet, source, or regression fixture
 - `tests/fixtures/repository_model_packets/l9-mcp-server/packet.json` — deterministic packet, source, or regression fixture
 - `tests/fixtures/repository_model_packets/l9-mcp-server/receipts/validation-receipt.json` — deterministic packet, source, or regression fixture
@@ -452,10 +491,13 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `tests/test_architecture_boundary_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_assertion_reconciliation.py` — automated test module
 - `tests/test_assessments_v5.py` — unit, contract, integration, regression, or governance test
+- `tests/test_bridge_gap_projection.py` — bridge-gap lifecycle, intent, closure, and determinism regression tests
+- `tests/test_bridge_gap_renderer.py` — bridge-gap report and report-manifest integration tests
 - `tests/test_cli_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_confirmed_findings_remediation.py` — adversarial regression tests for every confirmed audit finding
 - `tests/test_conflict_cardinality.py` — unit, contract, integration, regression, or governance test
 - `tests/test_corpus_hash_locality.py` — automated regression and contract test suite
+- `tests/test_corpus_ingress.py` — automated regression and contract test suite
 - `tests/test_corpus_intelligence_contract.py` — automated regression and contract test suite
 - `tests/test_corpus_publication_containment.py` — automated regression and contract test suite
 - `tests/test_corpus_topology_compilation.py` — automated regression and contract test suite
@@ -465,6 +507,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `tests/test_evidence_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_execution_authority_v5.py` — adversarial coverage for the execution-lease trust boundary
 - `tests/test_field_cardinality.py` — unit, contract, integration, regression, or governance test
+- `tests/test_fixture_provenance.py` — automated regression and contract test suite
 - `tests/test_generated_artifact_sync.py` — generated-artifact check/update and fail-closed regression tests
 - `tests/test_git_integrity.py` — Git path, mode, object-type, and blob-identity regression tests
 - `tests/test_graph_builder.py` — unit, contract, integration, regression, or governance test
@@ -477,9 +520,15 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `tests/test_packet_ingress_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_packet_models_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_packet_store_v5.py` — unit, contract, integration, regression, or governance test
+- `tests/test_producer_emitted_corpus_packet.py` — automated regression and contract test suite
 - `tests/test_publication_downstream_conformance.py` — unit, contract, integration, regression, or governance test
+- `tests/test_publication_edge_coverage.py` — automated regression and contract test suite
+- `tests/test_publication_edge_fidelity.py` — proves edge direction and properties survive lowering as structured data rather than prose
 - `tests/test_publication_effect_identity.py` — unit, contract, integration, regression, or governance test
+- `tests/test_publication_identity_golden_vectors.py` — pins the publication identity algorithm against the cross-repository golden vectors
+- `tests/test_publication_plan_identity.py` — automated regression and contract test suite
 - `tests/test_publication_planning.py` — unit, contract, integration, regression, or governance test
+- `tests/test_publication_temporal.py` — proves observation time and publication time stay distinct coordinates
 - `tests/test_reasoning_router.py` — automated regression and contract test suite
 - `tests/test_release_readiness.py` — unit, contract, integration, regression, or governance test
 - `tests/test_renderers.py` — unit, contract, integration, regression, or governance test

@@ -258,6 +258,76 @@
       "title": "MemoryConfidence",
       "type": "object"
     },
+    "MemoryCsvSourceLocator": {
+      "additionalProperties": false,
+      "description": "Mirror of the downstream ``CsvSourceLocator``.\n\n``row`` is one-based on both sides. The downstream contract documented it as\na zero-based index while this repository emitted one-based rows, so the two\nnamed different rows of the same file; the bound is stated here so a reader\nof the mirror does not have to go and check.",
+      "properties": {
+        "column": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Column"
+        },
+        "kind": {
+          "const": "csv",
+          "default": "csv",
+          "title": "Kind",
+          "type": "string"
+        },
+        "row": {
+          "minimum": 1,
+          "title": "Row",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "row"
+      ],
+      "title": "MemoryCsvSourceLocator",
+      "type": "object"
+    },
+    "MemoryDocxSourceLocator": {
+      "additionalProperties": false,
+      "description": "Mirror of the downstream ``DocxSourceLocator``.",
+      "properties": {
+        "block_index": {
+          "minimum": 0,
+          "title": "Block Index",
+          "type": "integer"
+        },
+        "block_kind": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Block Kind",
+          "type": "string"
+        },
+        "kind": {
+          "const": "docx",
+          "default": "docx",
+          "title": "Kind",
+          "type": "string"
+        },
+        "part": {
+          "default": "",
+          "maxLength": 300,
+          "title": "Part",
+          "type": "string"
+        }
+      },
+      "required": [
+        "block_index",
+        "block_kind"
+      ],
+      "title": "MemoryDocxSourceLocator",
+      "type": "object"
+    },
     "MemoryEvidenceRef": {
       "additionalProperties": false,
       "description": "Mirror of the downstream ``EvidenceRef`` contract.",
@@ -312,6 +382,56 @@
           "default": null,
           "title": "Source Id"
         },
+        "source_locator": {
+          "anyOf": [
+            {
+              "discriminator": {
+                "mapping": {
+                  "csv": "#/$defs/MemoryCsvSourceLocator",
+                  "docx": "#/$defs/MemoryDocxSourceLocator",
+                  "html": "#/$defs/MemoryHtmlSourceLocator",
+                  "line": "#/$defs/MemoryLineSourceLocator",
+                  "notebook": "#/$defs/MemoryNotebookSourceLocator",
+                  "pdf": "#/$defs/MemoryPdfSourceLocator",
+                  "pptx": "#/$defs/MemoryPptxSourceLocator",
+                  "spreadsheet": "#/$defs/MemorySpreadsheetSourceLocator"
+                },
+                "propertyName": "kind"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/MemoryLineSourceLocator"
+                },
+                {
+                  "$ref": "#/$defs/MemoryPdfSourceLocator"
+                },
+                {
+                  "$ref": "#/$defs/MemoryDocxSourceLocator"
+                },
+                {
+                  "$ref": "#/$defs/MemoryPptxSourceLocator"
+                },
+                {
+                  "$ref": "#/$defs/MemorySpreadsheetSourceLocator"
+                },
+                {
+                  "$ref": "#/$defs/MemoryNotebookSourceLocator"
+                },
+                {
+                  "$ref": "#/$defs/MemoryCsvSourceLocator"
+                },
+                {
+                  "$ref": "#/$defs/MemoryHtmlSourceLocator"
+                }
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Locator"
+        },
         "source_range": {
           "anyOf": [
             {
@@ -332,6 +452,34 @@
       "title": "MemoryEvidenceRef",
       "type": "object"
     },
+    "MemoryHtmlSourceLocator": {
+      "additionalProperties": false,
+      "description": "Mirror of the downstream ``HtmlSourceLocator``.",
+      "properties": {
+        "kind": {
+          "const": "html",
+          "default": "html",
+          "title": "Kind",
+          "type": "string"
+        },
+        "node_path": {
+          "default": "",
+          "maxLength": 1000,
+          "title": "Node Path",
+          "type": "string"
+        },
+        "stable_node_index": {
+          "minimum": 0,
+          "title": "Stable Node Index",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "stable_node_index"
+      ],
+      "title": "MemoryHtmlSourceLocator",
+      "type": "object"
+    },
     "MemoryIngestIntent": {
       "additionalProperties": false,
       "description": "Mirror of the downstream ``IngestMemoryIntent`` discriminated member.",
@@ -350,6 +498,189 @@
         "request"
       ],
       "title": "MemoryIngestIntent",
+      "type": "object"
+    },
+    "MemoryLineSourceLocator": {
+      "additionalProperties": false,
+      "description": "Mirror of the downstream ``LineSourceLocator``.",
+      "properties": {
+        "end_line": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "End Line"
+        },
+        "end_offset": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "End Offset"
+        },
+        "kind": {
+          "const": "line",
+          "default": "line",
+          "title": "Kind",
+          "type": "string"
+        },
+        "start_line": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Start Line"
+        },
+        "start_offset": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Start Offset"
+        }
+      },
+      "title": "MemoryLineSourceLocator",
+      "type": "object"
+    },
+    "MemoryNotebookSourceLocator": {
+      "additionalProperties": false,
+      "description": "Mirror of the downstream ``NotebookSourceLocator``.",
+      "properties": {
+        "cell_index": {
+          "minimum": 0,
+          "title": "Cell Index",
+          "type": "integer"
+        },
+        "cell_type": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Cell Type",
+          "type": "string"
+        },
+        "end_line": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "End Line"
+        },
+        "kind": {
+          "const": "notebook",
+          "default": "notebook",
+          "title": "Kind",
+          "type": "string"
+        },
+        "start_line": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Start Line"
+        }
+      },
+      "required": [
+        "cell_index",
+        "cell_type"
+      ],
+      "title": "MemoryNotebookSourceLocator",
+      "type": "object"
+    },
+    "MemoryPdfSourceLocator": {
+      "additionalProperties": false,
+      "description": "Mirror of the downstream ``PdfSourceLocator``.",
+      "properties": {
+        "block_index": {
+          "minimum": 0,
+          "title": "Block Index",
+          "type": "integer"
+        },
+        "kind": {
+          "const": "pdf",
+          "default": "pdf",
+          "title": "Kind",
+          "type": "string"
+        },
+        "page_number": {
+          "minimum": 1,
+          "title": "Page Number",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "page_number",
+        "block_index"
+      ],
+      "title": "MemoryPdfSourceLocator",
+      "type": "object"
+    },
+    "MemoryPptxSourceLocator": {
+      "additionalProperties": false,
+      "description": "Mirror of the downstream ``PptxSourceLocator``.",
+      "properties": {
+        "kind": {
+          "const": "pptx",
+          "default": "pptx",
+          "title": "Kind",
+          "type": "string"
+        },
+        "part": {
+          "default": "",
+          "maxLength": 300,
+          "title": "Part",
+          "type": "string"
+        },
+        "shape_index": {
+          "minimum": 0,
+          "title": "Shape Index",
+          "type": "integer"
+        },
+        "slide_number": {
+          "minimum": 1,
+          "title": "Slide Number",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "slide_number",
+        "shape_index"
+      ],
+      "title": "MemoryPptxSourceLocator",
       "type": "object"
     },
     "MemoryProvenance": {
@@ -445,6 +776,56 @@
           ],
           "default": null,
           "title": "Source Id"
+        },
+        "source_locator": {
+          "anyOf": [
+            {
+              "discriminator": {
+                "mapping": {
+                  "csv": "#/$defs/MemoryCsvSourceLocator",
+                  "docx": "#/$defs/MemoryDocxSourceLocator",
+                  "html": "#/$defs/MemoryHtmlSourceLocator",
+                  "line": "#/$defs/MemoryLineSourceLocator",
+                  "notebook": "#/$defs/MemoryNotebookSourceLocator",
+                  "pdf": "#/$defs/MemoryPdfSourceLocator",
+                  "pptx": "#/$defs/MemoryPptxSourceLocator",
+                  "spreadsheet": "#/$defs/MemorySpreadsheetSourceLocator"
+                },
+                "propertyName": "kind"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/MemoryLineSourceLocator"
+                },
+                {
+                  "$ref": "#/$defs/MemoryPdfSourceLocator"
+                },
+                {
+                  "$ref": "#/$defs/MemoryDocxSourceLocator"
+                },
+                {
+                  "$ref": "#/$defs/MemoryPptxSourceLocator"
+                },
+                {
+                  "$ref": "#/$defs/MemorySpreadsheetSourceLocator"
+                },
+                {
+                  "$ref": "#/$defs/MemoryNotebookSourceLocator"
+                },
+                {
+                  "$ref": "#/$defs/MemoryCsvSourceLocator"
+                },
+                {
+                  "$ref": "#/$defs/MemoryHtmlSourceLocator"
+                }
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Locator"
         },
         "source_range": {
           "anyOf": [
@@ -550,6 +931,36 @@
       "title": "MemorySourceRange",
       "type": "object"
     },
+    "MemorySpreadsheetSourceLocator": {
+      "additionalProperties": false,
+      "description": "Mirror of the downstream ``SpreadsheetSourceLocator``.",
+      "properties": {
+        "cell_or_range": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Cell Or Range",
+          "type": "string"
+        },
+        "kind": {
+          "const": "spreadsheet",
+          "default": "spreadsheet",
+          "title": "Kind",
+          "type": "string"
+        },
+        "sheet": {
+          "maxLength": 300,
+          "minLength": 1,
+          "title": "Sheet",
+          "type": "string"
+        }
+      },
+      "required": [
+        "sheet",
+        "cell_or_range"
+      ],
+      "title": "MemorySpreadsheetSourceLocator",
+      "type": "object"
+    },
     "MemoryWriteRequest": {
       "additionalProperties": false,
       "description": "Mirror of the downstream ``MemoryWriteRequest`` contract.\n\n``consent`` is typed as ``None`` because topology never grants consent on\nanother subject's behalf, and ``dry_run`` stays at the downstream default\nbecause this repository plans effects rather than executing them.",
@@ -639,6 +1050,7 @@
         "references": {
           "default": [],
           "items": {
+            "format": "uuid",
             "type": "string"
           },
           "title": "References",
@@ -660,6 +1072,7 @@
         "supersedes": {
           "default": [],
           "items": {
+            "format": "uuid",
             "type": "string"
           },
           "title": "Supersedes",

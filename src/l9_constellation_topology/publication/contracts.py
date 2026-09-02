@@ -10,7 +10,8 @@ dispatches an intent.
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any, Literal
+from typing import Annotated, Any, Literal
+from uuid import UUID
 
 from pydantic import Field
 
@@ -25,7 +26,17 @@ MEMORY_INGEST_OPERATION = "memory.ingest"
 #: Version of the rules that turn a canonical topology fact into a memory
 #: intent. It participates in memory-effect identity because the same fact
 #: lowered by different rules is a different effect.
-LOWERING_CONTRACT_VERSION = "lowering/v1"
+#:
+#: v2 carries an edge's direction and properties as structured metadata. Under
+#: v1 they survived only inside the human-readable ``content`` string, so a
+#: consumer had to parse prose to learn that a ``DUPLICATE_OF`` relation was
+#: symmetric or which cluster it belonged to. A fact re-published under v2
+#: therefore requests a genuinely different durable write than the same fact
+#: under v1 -- it states more -- and the key moves accordingly. That is the
+#: field doing its job, not a regression: keying the richer write as a retry of
+#: the poorer one is what would make the downstream answer DUPLICATE and drop
+#: the added structure.
+LOWERING_CONTRACT_VERSION = "lowering/v2"
 
 MemoryClassName = Literal[
     "identity",
@@ -78,6 +89,101 @@ class MemorySourceRange(FrozenModel):
     end_offset: int | None = Field(default=None, ge=0)
 
 
+class MemoryLineSourceLocator(FrozenModel):
+    """Mirror of the downstream ``LineSourceLocator``."""
+
+    kind: Literal["line"] = "line"
+    start_line: int | None = Field(default=None, ge=1)
+    end_line: int | None = Field(default=None, ge=1)
+    start_offset: int | None = Field(default=None, ge=0)
+    end_offset: int | None = Field(default=None, ge=0)
+
+
+class MemoryPdfSourceLocator(FrozenModel):
+    """Mirror of the downstream ``PdfSourceLocator``."""
+
+    kind: Literal["pdf"] = "pdf"
+    page_number: int = Field(ge=1)
+    block_index: int = Field(ge=0)
+
+
+class MemoryDocxSourceLocator(FrozenModel):
+    """Mirror of the downstream ``DocxSourceLocator``."""
+
+    kind: Literal["docx"] = "docx"
+    block_index: int = Field(ge=0)
+    block_kind: str = Field(min_length=1, max_length=100)
+    part: str = Field(default="", max_length=300)
+
+
+class MemoryPptxSourceLocator(FrozenModel):
+    """Mirror of the downstream ``PptxSourceLocator``."""
+
+    kind: Literal["pptx"] = "pptx"
+    slide_number: int = Field(ge=1)
+    shape_index: int = Field(ge=0)
+    part: str = Field(default="", max_length=300)
+
+
+class MemorySpreadsheetSourceLocator(FrozenModel):
+    """Mirror of the downstream ``SpreadsheetSourceLocator``."""
+
+    kind: Literal["spreadsheet"] = "spreadsheet"
+    sheet: str = Field(min_length=1, max_length=300)
+    cell_or_range: str = Field(min_length=1, max_length=100)
+
+
+class MemoryNotebookSourceLocator(FrozenModel):
+    """Mirror of the downstream ``NotebookSourceLocator``."""
+
+    kind: Literal["notebook"] = "notebook"
+    cell_index: int = Field(ge=0)
+    cell_type: str = Field(min_length=1, max_length=100)
+    start_line: int | None = Field(default=None, ge=1)
+    end_line: int | None = Field(default=None, ge=1)
+
+
+class MemoryCsvSourceLocator(FrozenModel):
+    """Mirror of the downstream ``CsvSourceLocator``.
+
+    ``row`` is one-based on both sides. The downstream contract documented it as
+    a zero-based index while this repository emitted one-based rows, so the two
+    named different rows of the same file; the bound is stated here so a reader
+    of the mirror does not have to go and check.
+    """
+
+    kind: Literal["csv"] = "csv"
+    row: int = Field(ge=1)
+    column: str | None = Field(default=None, max_length=300)
+
+
+class MemoryHtmlSourceLocator(FrozenModel):
+    """Mirror of the downstream ``HtmlSourceLocator``."""
+
+    kind: Literal["html"] = "html"
+    stable_node_index: int = Field(ge=0)
+    node_path: str = Field(default="", max_length=1_000)
+
+
+#: Mirror of the downstream ``SourceLocator`` discriminated union.
+#:
+#: Lowering used to drop structured coordinates into prose because the
+#: downstream contract "had nowhere to carry them". It does — this union — and
+#: degrading a coordinate the consumer can hold as data cost every published
+#: fact the ability to say where in a document it was read.
+MemorySourceLocator = Annotated[
+    MemoryLineSourceLocator
+    | MemoryPdfSourceLocator
+    | MemoryDocxSourceLocator
+    | MemoryPptxSourceLocator
+    | MemorySpreadsheetSourceLocator
+    | MemoryNotebookSourceLocator
+    | MemoryCsvSourceLocator
+    | MemoryHtmlSourceLocator,
+    Field(discriminator="kind"),
+]
+
+
 class MemoryProvenance(FrozenModel):
     """Mirror of the downstream ``Provenance`` contract."""
 
@@ -85,6 +191,10 @@ class MemoryProvenance(FrozenModel):
     source_id: str | None = Field(default=None, max_length=500)
     source_digest: str | None = Field(default=None, pattern=_SHA256_HEX)
     source_range: MemorySourceRange | None = None
+    #: The structured coordinate this provenance was read at, in the format's
+    #: own vocabulary. Carried rather than flattened into ``source_range``: a
+    #: line number for a slide deck names nothing an operator can open.
+    source_locator: MemorySourceLocator | None = None
     source_agent_id: str | None = Field(default=None, max_length=200)
     session_id: str | None = Field(default=None, max_length=200)
     repository: str | None = Field(default=None, max_length=300)
@@ -103,6 +213,8 @@ class MemoryEvidenceRef(FrozenModel):
     source_id: str | None = Field(default=None, max_length=500)
     source_digest: str | None = Field(default=None, pattern=_SHA256_HEX)
     source_range: MemorySourceRange | None = None
+    #: Where this evidence sits, in the coordinate system its format has.
+    source_locator: MemorySourceLocator | None = None
     observed_at: datetime
 
 
@@ -149,8 +261,13 @@ class MemoryWriteRequest(FrozenModel):
     tags: tuple[str, ...] = ()
     metadata: dict[str, Any] = Field(default_factory=dict)
     idempotency_key: str | None = Field(default=None, max_length=300)
-    supersedes: tuple[str, ...] = ()
-    references: tuple[str, ...] = ()
+    #: Downstream record identities, not topology entity ids. The mirror named
+    #: these ``str`` while the canonical contract holds ``UUID``; both are empty
+    #: today, so the drift was invisible, and the first use would have emitted a
+    #: topology entity id where a memory record id was required and failed the
+    #: whole plan.
+    supersedes: tuple[UUID, ...] = ()
+    references: tuple[UUID, ...] = ()
     consent: None = None
     dry_run: bool = False
 
@@ -226,6 +343,26 @@ class PublicationPlan(FrozenModel):
 
     plan_type: Literal["l9.topology-publication-plan"] = "l9.topology-publication-plan"
     plan_version: str = PUBLICATION_PLAN_VERSION
+    #: Contract identity of this plan: ``publication-plan:<semantic digest>``.
+    #:
+    #: Derived from the plan's semantic view — plan version, producer, the source
+    #: packet reference and its semantic hash, the policy hash, and every
+    #: candidate and skip — never from a clock, a run counter, or a path. So two
+    #: plans sharing a ``plan_id`` are the same plan in meaning, and a plan whose
+    #: id has moved differs in something a consumer is entitled to care about.
+    #:
+    #: **It is not a run identifier.** Re-planning an unchanged topology under an
+    #: unchanged policy reproduces the same id, which is the property that lets a
+    #: consumer recognise a re-published plan as one it has already seen rather
+    #: than as new work. A consumer that treated it as a run id would do the work
+    #: twice; one that treated a *changed* id as cosmetic would skip work it has
+    #: never done.
+    #:
+    #: Distinct from the two identities inside it (ADR-0025): ``candidate_id``
+    #: names a logical fact, ``idempotency_key`` names one exact durable
+    #: admission, and this names the whole plan those appear in. Publication
+    #: time is deliberately outside it — the same plan published twice at
+    #: different times is the same plan.
     plan_id: str
     producer: Producer
     source_topology_packet: PacketRef

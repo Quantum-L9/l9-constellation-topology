@@ -1,11 +1,12 @@
 {
+  "captured_by": "scripts/capture_downstream_contract.py",
   "derivation_evidence_kinds": [
     "inference",
     "aggregation",
     "source_excerpt"
   ],
   "downstream_repository": "Quantum-L9/l9-graphiti-memory",
-  "downstream_revision": "f690d3f928391264cbffb8f507ad9acbba339603",
+  "downstream_revision": "20dc1703dbe933aec4faf45264d8ffa27e2905df",
   "enums": {
     "ConfidenceMethod": [
       "explicit",
@@ -45,19 +46,35 @@
       "extra": "forbid",
       "fields": {
         "calibrated_at": {
-          "required": false
+          "required": false,
+          "type": "object"
         },
         "evidence_count": {
-          "required": false
+          "constraints": {
+            "ge": 0
+          },
+          "required": false,
+          "type": "integer"
         },
         "method": {
-          "required": false
+          "required": false,
+          "type": "object"
         },
         "policy_version": {
-          "required": false
+          "constraints": {
+            "max_length": 100,
+            "min_length": 1
+          },
+          "required": false,
+          "type": "string"
         },
         "score": {
-          "required": false
+          "constraints": {
+            "ge": 0.0,
+            "le": 1.0
+          },
+          "required": false,
+          "type": "number"
         }
       }
     },
@@ -65,22 +82,39 @@
       "extra": "forbid",
       "fields": {
         "description": {
-          "required": true
+          "constraints": {
+            "max_length": 2000,
+            "min_length": 1
+          },
+          "required": true,
+          "type": "string"
         },
         "kind": {
-          "required": true
+          "required": true,
+          "type": "object"
         },
         "observed_at": {
-          "required": false
+          "required": false,
+          "type": "object"
         },
         "source_digest": {
-          "required": false
+          "required": false,
+          "type": "string"
         },
         "source_id": {
-          "required": false
+          "constraints": {
+            "max_length": 500
+          },
+          "required": false,
+          "type": "string"
+        },
+        "source_locator": {
+          "required": false,
+          "type": "union"
         },
         "source_range": {
-          "required": false
+          "required": false,
+          "type": "object"
         }
       }
     },
@@ -88,10 +122,12 @@
       "extra": "forbid",
       "fields": {
         "operation": {
-          "required": false
+          "required": false,
+          "type": "object"
         },
         "request": {
-          "required": true
+          "required": true,
+          "type": "object"
         }
       }
     },
@@ -99,13 +135,25 @@
       "extra": "forbid",
       "fields": {
         "object": {
-          "required": false
+          "constraints": {
+            "max_length": 2000
+          },
+          "required": false,
+          "type": "string"
         },
         "predicate": {
-          "required": false
+          "constraints": {
+            "max_length": 200
+          },
+          "required": false,
+          "type": "string"
         },
         "subject": {
-          "required": false
+          "constraints": {
+            "max_length": 500
+          },
+          "required": false,
+          "type": "string"
         }
       }
     },
@@ -113,55 +161,83 @@
       "extra": "forbid",
       "fields": {
         "assertion": {
-          "required": false
+          "required": false,
+          "type": "object"
         },
         "confidence": {
-          "required": false
+          "required": false,
+          "type": "object"
         },
         "consent": {
-          "required": false
+          "required": false,
+          "type": "object"
         },
         "content": {
-          "required": true
+          "constraints": {
+            "max_length": 64000,
+            "min_length": 1
+          },
+          "required": true,
+          "type": "string"
         },
         "dry_run": {
-          "required": false
+          "required": false,
+          "type": "boolean"
         },
         "evidence": {
-          "required": false
+          "required": false,
+          "type": "array"
         },
         "idempotency_key": {
-          "required": false
+          "constraints": {
+            "max_length": 300
+          },
+          "required": false,
+          "type": "string"
         },
         "memory_class": {
-          "required": false
+          "required": false,
+          "type": "object"
         },
         "metadata": {
-          "required": false
+          "required": false,
+          "type": "union"
         },
         "namespace": {
-          "required": true
+          "constraints": {
+            "max_length": 300,
+            "min_length": 1
+          },
+          "required": true,
+          "type": "string"
         },
         "provenance": {
-          "required": true
+          "required": true,
+          "type": "object"
         },
         "references": {
-          "required": false
+          "required": false,
+          "type": "array"
         },
         "source_observed_at": {
-          "required": false
+          "required": false,
+          "type": "object"
         },
         "supersedes": {
-          "required": false
+          "required": false,
+          "type": "array"
         },
         "tags": {
-          "required": false
+          "required": false,
+          "type": "array"
         },
         "valid_from": {
-          "required": false
+          "required": false,
+          "type": "object"
         },
         "valid_to": {
-          "required": false
+          "required": false,
+          "type": "object"
         }
       }
     },
@@ -169,40 +245,85 @@
       "extra": "forbid",
       "fields": {
         "extraction_method": {
-          "required": false
+          "constraints": {
+            "max_length": 100
+          },
+          "required": false,
+          "type": "string"
         },
         "model": {
-          "required": false
+          "constraints": {
+            "max_length": 200
+          },
+          "required": false,
+          "type": "string"
         },
         "repository": {
-          "required": false
+          "constraints": {
+            "max_length": 300
+          },
+          "required": false,
+          "type": "string"
         },
         "session_id": {
-          "required": false
+          "constraints": {
+            "max_length": 200
+          },
+          "required": false,
+          "type": "string"
         },
         "source": {
-          "required": true
+          "constraints": {
+            "max_length": 200,
+            "min_length": 1
+          },
+          "required": true,
+          "type": "string"
         },
         "source_agent_id": {
-          "required": false
+          "constraints": {
+            "max_length": 200
+          },
+          "required": false,
+          "type": "string"
         },
         "source_digest": {
-          "required": false
+          "required": false,
+          "type": "string"
         },
         "source_id": {
-          "required": false
+          "constraints": {
+            "max_length": 500
+          },
+          "required": false,
+          "type": "string"
+        },
+        "source_locator": {
+          "required": false,
+          "type": "union"
         },
         "source_range": {
-          "required": false
+          "required": false,
+          "type": "object"
         },
         "source_trust": {
-          "required": false
+          "constraints": {
+            "ge": 0.0,
+            "le": 1.0
+          },
+          "required": false,
+          "type": "number"
         },
         "tool": {
-          "required": false
+          "constraints": {
+            "max_length": 200
+          },
+          "required": false,
+          "type": "string"
         },
         "transformed_at": {
-          "required": false
+          "required": false,
+          "type": "object"
         }
       }
     },
@@ -210,16 +331,264 @@
       "extra": "forbid",
       "fields": {
         "end_line": {
-          "required": false
+          "constraints": {
+            "ge": 1
+          },
+          "required": false,
+          "type": "integer"
         },
         "end_offset": {
-          "required": false
+          "constraints": {
+            "ge": 0
+          },
+          "required": false,
+          "type": "integer"
         },
         "start_line": {
-          "required": false
+          "constraints": {
+            "ge": 1
+          },
+          "required": false,
+          "type": "integer"
         },
         "start_offset": {
-          "required": false
+          "constraints": {
+            "ge": 0
+          },
+          "required": false,
+          "type": "integer"
+        }
+      }
+    }
+  },
+  "source_locator_variants": {
+    "csv": {
+      "extra": "forbid",
+      "fields": {
+        "column": {
+          "constraints": {
+            "max_length": 300
+          },
+          "required": false,
+          "type": "string"
+        },
+        "kind": {
+          "required": false,
+          "type": "object"
+        },
+        "row": {
+          "constraints": {
+            "ge": 1
+          },
+          "required": true,
+          "type": "integer"
+        }
+      }
+    },
+    "docx": {
+      "extra": "forbid",
+      "fields": {
+        "block_index": {
+          "constraints": {
+            "ge": 0
+          },
+          "required": true,
+          "type": "integer"
+        },
+        "block_kind": {
+          "constraints": {
+            "max_length": 100,
+            "min_length": 1
+          },
+          "required": true,
+          "type": "string"
+        },
+        "kind": {
+          "required": false,
+          "type": "object"
+        },
+        "part": {
+          "constraints": {
+            "max_length": 300
+          },
+          "required": false,
+          "type": "string"
+        }
+      }
+    },
+    "html": {
+      "extra": "forbid",
+      "fields": {
+        "kind": {
+          "required": false,
+          "type": "object"
+        },
+        "node_path": {
+          "constraints": {
+            "max_length": 1000
+          },
+          "required": false,
+          "type": "string"
+        },
+        "stable_node_index": {
+          "constraints": {
+            "ge": 0
+          },
+          "required": true,
+          "type": "integer"
+        }
+      }
+    },
+    "line": {
+      "extra": "forbid",
+      "fields": {
+        "end_line": {
+          "constraints": {
+            "ge": 1
+          },
+          "required": false,
+          "type": "integer"
+        },
+        "end_offset": {
+          "constraints": {
+            "ge": 0
+          },
+          "required": false,
+          "type": "integer"
+        },
+        "kind": {
+          "required": false,
+          "type": "object"
+        },
+        "start_line": {
+          "constraints": {
+            "ge": 1
+          },
+          "required": false,
+          "type": "integer"
+        },
+        "start_offset": {
+          "constraints": {
+            "ge": 0
+          },
+          "required": false,
+          "type": "integer"
+        }
+      }
+    },
+    "notebook": {
+      "extra": "forbid",
+      "fields": {
+        "cell_index": {
+          "constraints": {
+            "ge": 0
+          },
+          "required": true,
+          "type": "integer"
+        },
+        "cell_type": {
+          "constraints": {
+            "max_length": 100,
+            "min_length": 1
+          },
+          "required": true,
+          "type": "string"
+        },
+        "end_line": {
+          "constraints": {
+            "ge": 1
+          },
+          "required": false,
+          "type": "integer"
+        },
+        "kind": {
+          "required": false,
+          "type": "object"
+        },
+        "start_line": {
+          "constraints": {
+            "ge": 1
+          },
+          "required": false,
+          "type": "integer"
+        }
+      }
+    },
+    "pdf": {
+      "extra": "forbid",
+      "fields": {
+        "block_index": {
+          "constraints": {
+            "ge": 0
+          },
+          "required": true,
+          "type": "integer"
+        },
+        "kind": {
+          "required": false,
+          "type": "object"
+        },
+        "page_number": {
+          "constraints": {
+            "ge": 1
+          },
+          "required": true,
+          "type": "integer"
+        }
+      }
+    },
+    "pptx": {
+      "extra": "forbid",
+      "fields": {
+        "kind": {
+          "required": false,
+          "type": "object"
+        },
+        "part": {
+          "constraints": {
+            "max_length": 300
+          },
+          "required": false,
+          "type": "string"
+        },
+        "shape_index": {
+          "constraints": {
+            "ge": 0
+          },
+          "required": true,
+          "type": "integer"
+        },
+        "slide_number": {
+          "constraints": {
+            "ge": 1
+          },
+          "required": true,
+          "type": "integer"
+        }
+      }
+    },
+    "spreadsheet": {
+      "extra": "forbid",
+      "fields": {
+        "cell_or_range": {
+          "constraints": {
+            "max_length": 100,
+            "min_length": 1
+          },
+          "required": true,
+          "type": "string"
+        },
+        "kind": {
+          "required": false,
+          "type": "object"
+        },
+        "sheet": {
+          "constraints": {
+            "max_length": 300,
+            "min_length": 1
+          },
+          "required": true,
+          "type": "string"
         }
       }
     }
