@@ -1,0 +1,305 @@
+{
+  "$defs": {
+    "ActivationIntent": {
+      "description": "Operator intent, kept separate from observed lifecycle state.",
+      "enum": [
+        "REQUIRED",
+        "OPTIONAL",
+        "DEFERRED",
+        "PROHIBITED",
+        "UNKNOWN"
+      ],
+      "title": "ActivationIntent",
+      "type": "string"
+    },
+    "Authority": {
+      "enum": [
+        "source",
+        "validated-machine",
+        "derived",
+        "candidate",
+        "unknown"
+      ],
+      "title": "Authority",
+      "type": "string"
+    },
+    "BridgeDisposition": {
+      "description": "What a reviewer should do with a detected gap.",
+      "enum": [
+        "ACTION_REQUIRED",
+        "INTENTIONAL_DORMANCY",
+        "CORRECTLY_DISCONNECTED",
+        "DECISION_REQUIRED"
+      ],
+      "title": "BridgeDisposition",
+      "type": "string"
+    },
+    "BridgeGapRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "activation_intent": {
+          "$ref": "#/$defs/ActivationIntent",
+          "default": "UNKNOWN"
+        },
+        "bridge_gap_id": {
+          "title": "Bridge Gap Id",
+          "type": "string"
+        },
+        "confidence": {
+          "$ref": "#/$defs/ConfidenceAssessment"
+        },
+        "consumer_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Consumer Ids",
+          "type": "array"
+        },
+        "disposition": {
+          "$ref": "#/$defs/BridgeDisposition",
+          "default": "DECISION_REQUIRED"
+        },
+        "evidence_refs": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "expected_state": {
+          "$ref": "#/$defs/BridgeLifecycleState"
+        },
+        "gap_type": {
+          "$ref": "#/$defs/BridgeGapType"
+        },
+        "missing_transition": {
+          "title": "Missing Transition",
+          "type": "string"
+        },
+        "observed_state": {
+          "$ref": "#/$defs/BridgeLifecycleState"
+        },
+        "producer_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Producer Ids",
+          "type": "array"
+        },
+        "reason": {
+          "title": "Reason",
+          "type": "string"
+        },
+        "recommended_action": {
+          "title": "Recommended Action",
+          "type": "string"
+        },
+        "subject_id": {
+          "title": "Subject Id",
+          "type": "string"
+        },
+        "subject_kind": {
+          "enum": [
+            "capability",
+            "output"
+          ],
+          "title": "Subject Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "bridge_gap_id",
+        "subject_id",
+        "subject_kind",
+        "gap_type",
+        "observed_state",
+        "expected_state",
+        "missing_transition",
+        "reason",
+        "recommended_action"
+      ],
+      "title": "BridgeGapRecord",
+      "type": "object"
+    },
+    "BridgeGapType": {
+      "description": "Bridge gaps that current canonical topology can prove without live scanning.",
+      "enum": [
+        "BUILT_UNREACHABLE",
+        "EXPOSED_UNCONSUMED",
+        "ORPHAN_OUTPUT"
+      ],
+      "title": "BridgeGapType",
+      "type": "string"
+    },
+    "BridgeLifecycleState": {
+      "enum": [
+        "IMPLEMENTED",
+        "VALIDATED",
+        "EXPOSED",
+        "PRODUCED",
+        "CONSUMED"
+      ],
+      "title": "BridgeLifecycleState",
+      "type": "string"
+    },
+    "Completeness": {
+      "enum": [
+        "partial",
+        "sufficient",
+        "complete"
+      ],
+      "title": "Completeness",
+      "type": "string"
+    },
+    "ConfidenceAssessment": {
+      "additionalProperties": false,
+      "properties": {
+        "authority": {
+          "$ref": "#/$defs/Authority"
+        },
+        "completeness": {
+          "$ref": "#/$defs/Completeness"
+        },
+        "conflict_status": {
+          "$ref": "#/$defs/ConflictStatus",
+          "default": "none"
+        },
+        "derivation_method": {
+          "$ref": "#/$defs/DerivationMethod"
+        },
+        "evidence_strength": {
+          "$ref": "#/$defs/EvidenceStrength"
+        },
+        "level": {
+          "$ref": "#/$defs/ConfidenceLevel"
+        }
+      },
+      "required": [
+        "level",
+        "evidence_strength",
+        "derivation_method",
+        "authority",
+        "completeness"
+      ],
+      "title": "ConfidenceAssessment",
+      "type": "object"
+    },
+    "ConfidenceLevel": {
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "title": "ConfidenceLevel",
+      "type": "string"
+    },
+    "ConflictStatus": {
+      "enum": [
+        "none",
+        "possible",
+        "confirmed"
+      ],
+      "title": "ConflictStatus",
+      "type": "string"
+    },
+    "DerivationMethod": {
+      "enum": [
+        "declared",
+        "deterministic",
+        "cross-record",
+        "heuristic",
+        "model-assisted",
+        "unknown"
+      ],
+      "title": "DerivationMethod",
+      "type": "string"
+    },
+    "EvidenceStrength": {
+      "enum": [
+        "none",
+        "weak",
+        "corroborated",
+        "direct"
+      ],
+      "title": "EvidenceStrength",
+      "type": "string"
+    }
+  },
+  "$id": "https://quantum-l9.dev/schemas/bridge-gap-projection.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Immutable report projection over one validated Topology Packet.",
+  "properties": {
+    "counts_by_disposition": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Counts By Disposition",
+      "type": "object"
+    },
+    "counts_by_type": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Counts By Type",
+      "type": "object"
+    },
+    "gaps": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/BridgeGapRecord"
+      },
+      "title": "Gaps",
+      "type": "array"
+    },
+    "policy_hash": {
+      "title": "Policy Hash",
+      "type": "string"
+    },
+    "policy_id": {
+      "title": "Policy Id",
+      "type": "string"
+    },
+    "policy_version": {
+      "title": "Policy Version",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "l9.bridge-gap-projection/v1",
+      "default": "l9.bridge-gap-projection/v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "semantic_hash": {
+      "title": "Semantic Hash",
+      "type": "string"
+    },
+    "source_packet_id": {
+      "title": "Source Packet Id",
+      "type": "string"
+    },
+    "source_semantic_hash": {
+      "title": "Source Semantic Hash",
+      "type": "string"
+    },
+    "unknown_intent_count": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Unknown Intent Count",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "source_packet_id",
+    "source_semantic_hash",
+    "policy_id",
+    "policy_version",
+    "policy_hash",
+    "semantic_hash"
+  ],
+  "title": "BridgeGapProjection",
+  "type": "object"
+}

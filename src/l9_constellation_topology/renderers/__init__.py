@@ -1,5 +1,11 @@
 """Pure report projections from validated Topology Packets."""
 
+from .bridge_gap_report import (
+    build_bridge_gap_projection,
+    render_bridge_gap_json_artifact,
+    render_bridge_gap_markdown,
+    render_bridge_gap_markdown_artifact,
+)
 from .csv_export import render_maturity_csv_artifact, render_repository_inventory_yaml_artifact
 from .json_export import (
     render_graph_records_jsonl_artifact,
@@ -25,6 +31,10 @@ __all__ = [
     "RENDERER_VERSION",
     "SUPPORTED_FORMATS",
     "ReportProjection",
+    "build_bridge_gap_projection",
+    "render_bridge_gap_json_artifact",
+    "render_bridge_gap_markdown",
+    "render_bridge_gap_markdown_artifact",
     "projection_cache_key",
     "render_graph_records_jsonl_artifact",
     "render_markdown_artifact",

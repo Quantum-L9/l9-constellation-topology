@@ -13,6 +13,7 @@ from pydantic import BaseModel
 
 from l9_constellation_topology.domain import (
     ArtifactRecord,
+    BridgeGapProjection,
     CapabilityRecord,
     DiagnosticRecord,
     EdgeRecord,
@@ -160,6 +161,11 @@ def build_schema_artifacts() -> tuple[GeneratedArtifact, ...]:
         "maturity-assessment.schema.json": (
             MaturityAssessment,
             "https://quantum-l9.dev/schemas/maturity-assessment.schema.json",
+        ),
+        # Derived decision-support projection, not canonical packet truth.
+        "bridge-gap-projection.schema.json": (
+            BridgeGapProjection,
+            "https://quantum-l9.dev/schemas/bridge-gap-projection.schema.json",
         ),
         # The publication plan is a derived artifact, not canonical packet truth,
         # so it lives beside the record schemas. Adding it to contracts/ would

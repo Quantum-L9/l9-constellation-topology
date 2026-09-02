@@ -25,6 +25,12 @@ Execution timestamps do not alter the projection cache key or report-manifest se
 - Graph-record JSONL
 - Neo4j candidate JSONL
 - Risk register Markdown
+- Bridge-gap JSON
+- Bridge-gap Markdown
+
+The bridge-gap projections identify only missing lifecycle transitions proven by the
+supplied topology. They preserve activation intent separately and carry no activation,
+dispatch, or mutation authority.
 
 Each projection is represented by a `RenderedArtifact`, committed only through an `OutputSink`, and indexed by a `ReportManifest`.
 
@@ -35,3 +41,4 @@ Each projection is represented by a `RenderedArtifact`, committed only through a
 - Report Manifest: projection index
 - Human reports and graph exports: derived, never canonical stage inputs
 - Neo4j candidate: downstream planning input only, never a direct graph write
+- Bridge-gap projection: decision support only, never an activation order
