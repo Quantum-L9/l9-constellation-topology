@@ -26,7 +26,7 @@ except ModuleNotFoundError:  # Direct script execution places scripts/ on sys.pa
     )
 
 ROOT = Path(__file__).resolve().parents[1]
-MANIFEST_ENTRY_RE = re.compile(r"^- `([^`]+)`\s+—\s+.+$")
+MANIFEST_ENTRY_RE = re.compile(r"^- `([^`]+)`\s+—\s+[^\r\n]+")
 
 
 def _git(root: Path, *args: str) -> str:
@@ -57,6 +57,9 @@ def _sha256(path: Path) -> str:
 
 def inspect_commit(root: Path = ROOT) -> dict[str, object]:
     root = root.resolve()
+    # S8707: ensure the resolved root is an actual directory before constructing sub-paths
+    if not root.is_dir():
+        raise ValueError(f"root is not a directory: {root}")
     commit_sha = _git(root, "rev-parse", "HEAD")
     tree_sha = _git(root, "rev-parse", "HEAD^{tree}")
     committed_paths = tuple(

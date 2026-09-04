@@ -129,18 +129,17 @@ def test_failed_validation_commits_zero_outputs() -> None:
             require_expected_hash_for_replace=False,
         )
     )
+    # Build the failed result outside the raises block (S5778: single raising invocation)
+    failed_result = result.__class__(
+        materialized=result.materialized,
+        validation_receipt=receipt,
+        input_bundles=result.input_bundles,
+        configuration=result.configuration,
+        artifacts=result.artifacts,
+    )
     with pytest.raises(ValueError, match="failed validation"):
         # A deliberately failed result cannot enter the sink boundary.
-        commit_compilation(
-            result.__class__(
-                materialized=result.materialized,
-                validation_receipt=receipt,
-                input_bundles=result.input_bundles,
-                configuration=result.configuration,
-                artifacts=result.artifacts,
-            ),
-            sink,
-        )
+        commit_compilation(failed_result, sink)
     assert sink.storage == {}
 
 

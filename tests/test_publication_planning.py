@@ -473,12 +473,10 @@ def test_unvalidated_topology_is_rejected(
     unvalidated = materialized.packet.model_copy(
         update={"validation": PacketValidationRef(status="failed")}
     )
+    # Build args outside raises block so only build_publication_plan can raise (S5778)
+    topology = MaterializedTopology(packet=unvalidated, state=materialized.state)
     with pytest.raises(PublicationEligibilityError):
-        build_publication_plan(
-            MaterializedTopology(packet=unvalidated, state=materialized.state),
-            policy,
-            published_at=FIXED_TIME,
-        )
+        build_publication_plan(topology, policy, published_at=FIXED_TIME)
 
 
 def test_missing_lineage_rejects_every_candidate(

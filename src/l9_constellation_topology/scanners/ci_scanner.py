@@ -9,7 +9,7 @@ from l9_constellation_topology.models import EvidenceItem, SourceType
 _CI_DIRS = [".github/workflows", ".gitlab-ci.yml", ".circleci", ".drone.yml", "Jenkinsfile"]
 
 
-def scan_ci(repo_path: Path, repo_id: str) -> tuple[list[str], list[EvidenceItem]]:
+def scan_ci(repo_path: Path, _repo_id: str) -> tuple[list[str], list[EvidenceItem]]:
     """Return (ci_workflow_paths, evidence)."""
     ci_workflows: list[str] = []
     evidence: list[EvidenceItem] = []

@@ -43,6 +43,10 @@ _CONTROL_PLANE_MODES = {"control-plane", "control_plane", "postgres", "productio
 _LOCAL_MODES = {"", "local", "single-host", "single_host"}
 _PROTOCOL_MESSAGE = "ExecutionAuthority is a structural protocol; use a concrete authority"
 
+# Repeated SQL/SQLite literals extracted to constants (S1192)
+_SQL_BEGIN_IMMEDIATE = "BEGIN IMMEDIATE"
+_SQL_LEASE_BY_IKEY = "SELECT * FROM execution_lease WHERE idempotency_key = ?"
+
 
 class ExecutionPermit(FrozenModel):
     """A non-forgeable capability to perform one stage's protected side effects."""
@@ -146,10 +150,10 @@ class SqliteExecutionAuthority:
     ) -> AcquireOutcome:
         try:
             with closing(self._connect()) as connection:
-                connection.execute("BEGIN IMMEDIATE")
+                connection.execute(_SQL_BEGIN_IMMEDIATE)
                 try:
                     existing = connection.execute(
-                        "SELECT * FROM execution_lease WHERE idempotency_key = ?",
+                        _SQL_LEASE_BY_IKEY,
                         (idempotency_key,),
                     ).fetchone()
                     if existing is not None:
@@ -281,7 +285,7 @@ class SqliteExecutionAuthority:
 
     def _load_active(self, connection: sqlite3.Connection, permit: ExecutionPermit) -> sqlite3.Row:
         row = connection.execute(
-            "SELECT * FROM execution_lease WHERE idempotency_key = ?",
+            _SQL_LEASE_BY_IKEY,
             (permit.idempotency_key,),
         ).fetchone()
         if (
@@ -329,10 +333,10 @@ class SqliteExecutionAuthority:
         # work already completed (PUBLISHED/ACKNOWLEDGED); failure cleanup must not undo it.
         try:
             with closing(self._connect()) as connection:
-                connection.execute("BEGIN IMMEDIATE")
+                connection.execute(_SQL_BEGIN_IMMEDIATE)
                 try:
                     row = connection.execute(
-                        "SELECT * FROM execution_lease WHERE idempotency_key = ?",
+                        _SQL_LEASE_BY_IKEY,
                         (permit.idempotency_key,),
                     ).fetchone()
                     if (
@@ -354,7 +358,7 @@ class SqliteExecutionAuthority:
         except sqlite3.Error as exc:
             raise WorkerError(
                 "execution-authority-write-failed",
-                str(exc),
+                f"{reason}: {exc}" if reason else str(exc),
                 retryable=True,
             ) from exc
 
@@ -368,7 +372,7 @@ class SqliteExecutionAuthority:
     ) -> None:
         try:
             with closing(self._connect()) as connection:
-                connection.execute("BEGIN IMMEDIATE")
+                connection.execute(_SQL_BEGIN_IMMEDIATE)
                 try:
                     row = self._load_active(connection, permit)
                     if expected is not None and str(row["state"]) != expected:

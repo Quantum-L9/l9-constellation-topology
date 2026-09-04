@@ -72,7 +72,7 @@ class LocalPacketRegistry:
             return None
         try:
             return RegistryEntry.model_validate(json.loads(str(row["entry_json"])))
-        except (json.JSONDecodeError, ValueError) as exc:
+        except ValueError as exc:  # json.JSONDecodeError is a subclass of ValueError
             raise WorkerError(
                 "packet-registry-invalid",
                 f"cannot decode local packet registry entry: {exc}",

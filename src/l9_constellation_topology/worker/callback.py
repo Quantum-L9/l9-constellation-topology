@@ -258,7 +258,9 @@ def _post_once(
         try:
             if parsed.scheme == "https":
                 raw_socket = socket.create_connection((address, port), timeout=timeout_seconds)
-                tls_socket = ssl.create_default_context().wrap_socket(
+                _ctx = ssl.create_default_context()
+                _ctx.minimum_version = ssl.TLSVersion.TLSv1_2  # S4423: enforce TLS ≥ 1.2
+                tls_socket = _ctx.wrap_socket(
                     raw_socket,
                     server_hostname=hostname,
                 )
@@ -286,7 +288,7 @@ def _post_once(
             return response.status
         except WorkerError:
             raise
-        except (OSError, ssl.SSLError) as exc:
+        except OSError as exc:  # ssl.SSLError is a subclass of OSError (S5713)
             last_error = exc
         finally:
             if connection is not None:

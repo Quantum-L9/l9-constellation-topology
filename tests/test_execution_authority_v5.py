@@ -316,6 +316,11 @@ def test_direct_helper_invocation_cannot_reach_side_effects(tmp_path: Path) -> N
     )
     # The helper's first action is a lease revalidation, so compile/publish/callback are
     # unreachable with a permit that was never issued by the authority.
+    # Construct args outside the raises block (S5778: single raising invocation)
+    _registry = LocalPacketRegistry(tmp_path / "registry.sqlite3")
+    _store = PacketStoreClient()
+    _config = resolve_configuration(ROOT)
+    _auth = _authority(tmp_path)
     with pytest.raises(WorkerError, match="execution-lease-lost"):
         _execute_stage(
             packet,
@@ -324,10 +329,10 @@ def test_direct_helper_invocation_cannot_reach_side_effects(tmp_path: Path) -> N
             repository_root=ROOT,
             workspace=tmp_path / "workspace",
             hmac_key=KEY,
-            registry=LocalPacketRegistry(tmp_path / "registry.sqlite3"),
-            packet_store=PacketStoreClient(),
-            configuration=resolve_configuration(ROOT),
-            authority=_authority(tmp_path),
+            registry=_registry,
+            packet_store=_store,
+            configuration=_config,
+            authority=_auth,
         )
 
 
@@ -458,7 +463,8 @@ def test_workflow_profile_event_contract_flags_mismatch() -> None:
     spec = importlib.util.spec_from_file_location(
         "validate_workflows", ROOT / "scripts" / "validate_workflows.py"
     )
-    assert spec is not None and spec.loader is not None
+    assert spec is not None
+    assert spec.loader is not None
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     errors = module._check_analysis_profile_events(

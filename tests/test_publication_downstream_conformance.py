@@ -232,20 +232,18 @@ def test_claim_intents_carry_a_structured_assertion(
 )
 def test_intents_validate_against_the_real_downstream_boundary(
     intents: list[dict[str, Any]],
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     source = Path(os.environ["L9_GRAPHITI_MEMORY_SRC"]).resolve()
-    sys.path.insert(0, str(source))
-    try:
-        from l9_graphite_memory.integrations.constellation import (
-            GateMemoryBridge,
-            IngestMemoryIntent,
-        )
+    monkeypatch.syspath_prepend(str(source))  # S8997: use monkeypatch for sys.path mutation
+    from l9_graphite_memory.integrations.constellation import (
+        GateMemoryBridge,
+        IngestMemoryIntent,
+    )
 
-        for intent in intents:
-            validated = GateMemoryBridge.validate_intent(intent)
-            assert isinstance(validated, IngestMemoryIntent)
-    finally:
-        sys.path.remove(str(source))
+    for intent in intents:
+        validated = GateMemoryBridge.validate_intent(intent)
+        assert isinstance(validated, IngestMemoryIntent)
 
 
 def test_locator_mirror_covers_every_downstream_variant(contract: dict[str, Any]) -> None:

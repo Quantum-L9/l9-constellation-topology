@@ -80,13 +80,13 @@ def test_verify_published_binds_uri_to_expected_packet(tmp_path: Path) -> None:
         subject_id="constellation:foundational-repository-intelligence",
         source_revision="git:" + "a" * 40,
     )
+    # Compute arg before the raises block so only verify_published can raise (S5778)
+    bundle_manifest_digest = artifact_hash((first_bundle / "manifest.json").read_bytes())
     with pytest.raises(WorkerError, match="published-packet-reference-mismatch"):
         PacketStoreClient().verify_published(
             expected.uri,
             expected=expected,
-            expected_bundle_manifest_digest=artifact_hash(
-                (first_bundle / "manifest.json").read_bytes()
-            ),
+            expected_bundle_manifest_digest=bundle_manifest_digest,
             expected_registry_manifest_digest=None,
             workspace=tmp_path / "verify",
         )
@@ -102,8 +102,9 @@ def test_oci_verification_rejects_mutable_tag_before_pull(tmp_path: Path) -> Non
         artifact_hash="sha256:" + "2" * 64,
         validation_status="passed",
     )
+    _client = PacketStoreClient()  # S5778: construct outside raises block
     with pytest.raises(WorkerError, match="packet-uri-not-immutable"):
-        PacketStoreClient().verify_published(
+        _client.verify_published(
             expected.uri,
             expected=expected,
             expected_bundle_manifest_digest="sha256:" + "3" * 64,
@@ -137,8 +138,9 @@ def test_oci_verification_resolves_registry_descriptor_independently(
         )
 
     monkeypatch.setattr("subprocess.run", fake_run)
+    _client2 = PacketStoreClient()  # S5778: construct outside raises block
     with pytest.raises(WorkerError, match="registry-descriptor-digest-mismatch"):
-        PacketStoreClient().verify_published(
+        _client2.verify_published(
             expected.uri,
             expected=expected,
             expected_bundle_manifest_digest="sha256:" + "3" * 64,
