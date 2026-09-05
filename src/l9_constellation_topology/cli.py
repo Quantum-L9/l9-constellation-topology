@@ -686,7 +686,7 @@ def run(argv: Sequence[str] | None = None) -> int:
         for line in str(exc).splitlines():
             print(f"ERROR: {line}", file=sys.stderr)
         return 2
-    except (PacketLoadError, ValueError, OSError, RuntimeError, json.JSONDecodeError) as exc:
+    except (PacketLoadError, ValueError, OSError, RuntimeError) as exc:  # json.JSONDecodeError ⊂ ValueError
         for line in str(exc).splitlines() or [repr(exc)]:
             print(f"ERROR: {line}", file=sys.stderr)
         return 2

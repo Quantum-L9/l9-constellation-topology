@@ -26,7 +26,7 @@ def adapt_packets(
     # validator permitted it, while this table still admitted only 1.0.0, so every
     # assertion-bearing packet was rejected as unsupported before reaching it.
     repository_model_v1 = RepositoryModelV1Adapter()
-    adapters = {version: repository_model_v1 for version in repository_model_v1.supported_versions}
+    adapters = dict.fromkeys(repository_model_v1.supported_versions, repository_model_v1)
     normalized: list[NormalizedRepositoryModel] = []
     for packet in packets:
         adapter = adapters.get(packet.packet_version)

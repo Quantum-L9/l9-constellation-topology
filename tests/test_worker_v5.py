@@ -251,13 +251,14 @@ def test_preflight_rejects_non_object_revision(tmp_path: Path) -> None:
 
 def test_worker_blocks_wrong_checkout_revision(tmp_path: Path) -> None:
     dispatch = _dispatch(tmp_path / "out", revision="git:" + "d" * 40)
+    _registry = LocalPacketRegistry(tmp_path / "registry.sqlite3")  # S5778: construct outside
     with pytest.raises(WorkerError, match="target-revision-mismatch"):
         execute_stage(
             dispatch,
             repository_root=ROOT,
             workspace=tmp_path / "workspace",
             hmac_key=KEY,
-            registry=LocalPacketRegistry(tmp_path / "registry.sqlite3"),
+            registry=_registry,
         )
 
 
@@ -271,13 +272,14 @@ def test_worker_blocks_tampered_dispatch_before_callback(tmp_path: Path) -> None
             }
         }
     )
+    _registry2 = LocalPacketRegistry(tmp_path / "registry.sqlite3")  # S5778: construct outside
     with pytest.raises(WorkerError, match="transport-signature-invalid"):
         execute_stage(
             tampered,
             repository_root=ROOT,
             workspace=tmp_path / "workspace",
             hmac_key=KEY,
-            registry=LocalPacketRegistry(tmp_path / "registry.sqlite3"),
+            registry=_registry2,
         )
 
 
@@ -293,11 +295,12 @@ def test_callback_contract_rejects_packet_selected_url_and_secret() -> None:
 
 
 def test_callback_id_must_exist_in_local_policy() -> None:
+    _policy = resolve_configuration(ROOT).callback_policy  # S5778: construct outside
     with pytest.raises(WorkerError, match="callback-id-forbidden"):
         send_callback(
             CallbackRef(callback_id="not-allowlisted"),
             {"status": "test"},
-            callback_policy=resolve_configuration(ROOT).callback_policy,
+            callback_policy=_policy,
             attempts=1,
         )
 
@@ -363,10 +366,11 @@ def test_callback_endpoint_enforces_expected_host_and_port() -> None:
 def test_disabled_production_callback_fails_closed(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("L9_CONTROL_API_URL", "https://control.example/api/results")
     monkeypatch.setenv("L9_CALLBACK_TOKEN", "test-token")
+    _policy2 = resolve_configuration(ROOT).callback_policy  # S5778: construct outside
     with pytest.raises(WorkerError, match="callback-id-disabled"):
         send_callback(
             CallbackRef(callback_id="topology-control-plane"),
             {"status": "test"},
-            callback_policy=resolve_configuration(ROOT).callback_policy,
+            callback_policy=_policy2,
             attempts=1,
         )

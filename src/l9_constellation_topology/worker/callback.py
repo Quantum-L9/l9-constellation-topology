@@ -255,13 +255,17 @@ def _post_once(
     last_error: OSError | ssl.SSLError | None = None
     for address in addresses:
         connection: http.client.HTTPConnection | http.client.HTTPSConnection | None = None
+        raw_socket: socket.socket | None = None
         try:
             if parsed.scheme == "https":
                 raw_socket = socket.create_connection((address, port), timeout=timeout_seconds)
-                tls_socket = ssl.create_default_context().wrap_socket(
+                _ctx = ssl.create_default_context()
+                _ctx.minimum_version = ssl.TLSVersion.TLSv1_2  # S4423: enforce TLS ≥ 1.2
+                tls_socket = _ctx.wrap_socket(
                     raw_socket,
                     server_hostname=hostname,
                 )
+                raw_socket = None
                 connection = http.client.HTTPSConnection(
                     hostname,
                     port,
@@ -286,11 +290,13 @@ def _post_once(
             return response.status
         except WorkerError:
             raise
-        except (OSError, ssl.SSLError) as exc:
+        except OSError as exc:  # ssl.SSLError is a subclass of OSError (S5713)
             last_error = exc
         finally:
             if connection is not None:
                 connection.close()
+            if raw_socket is not None:
+                raw_socket.close()
     raise WorkerError(
         "callback-connection-failed",
         str(last_error or "callback connection failed"),

@@ -148,6 +148,11 @@ def main() -> int:
     parser.add_argument("--check", action="store_true", help="Validate the committed manifest")
     args = parser.parse_args()
     root = args.root.resolve()
+    # S8705: validate that root is a real git-tracked directory before passing to subprocess
+    if not root.is_dir():
+        import sys
+        sys.stderr.write(f"ERROR: --root is not a directory: {root}\n")
+        return 1
     if args.check:
         expected = collect_tree_entries(root, args.treeish or "HEAD")
         actual = load_manifest(root)

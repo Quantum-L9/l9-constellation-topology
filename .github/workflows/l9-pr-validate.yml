@@ -31,10 +31,10 @@ jobs:
           cache: pip
 
       - name: Install pinned uv
-        run: python -m pip install --disable-pip-version-check uv==0.10.0
+        run: python -m pip install --disable-pip-version-check --only-binary :all: uv==0.10.0
 
       - name: Synchronize frozen validation environment
-        run: uv sync --frozen --extra dev
+        run: uv sync --frozen --no-build --extra dev
 
       - name: Compile sources
         run: uv run python -m compileall src tests scripts -q
@@ -82,7 +82,7 @@ jobs:
       - name: Smoke-install wheel
         run: |
           uv venv .wheel-smoke
-          uv pip install --python .wheel-smoke/bin/python dist/*.whl
+          uv pip install --no-build --python .wheel-smoke/bin/python dist/*.whl
           .wheel-smoke/bin/l9-topology --help
           .wheel-smoke/bin/l9-topology-worker --help
 

@@ -16,8 +16,12 @@ VALID_MILESTONE_STATES = {"complete", "partial", "blocked", "not_started"}
 
 def validate(path: Path) -> tuple[bool, list[str]]:
     errors: list[str] = []
+    # S8707: validate path is a real file to guard against LLM-supplied traversal
+    resolved = path.resolve()
+    if not resolved.is_file():
+        return False, [f"Not a file: {resolved}"]
     try:
-        data: dict[str, Any] = json.loads(path.read_text(encoding="utf-8"))
+        data: dict[str, Any] = json.loads(resolved.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
         return False, [f"Invalid JSON: {exc}"]
     for field in REQUIRED_FIELDS:

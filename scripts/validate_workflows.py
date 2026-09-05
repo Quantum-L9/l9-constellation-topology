@@ -12,12 +12,19 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 WORKFLOW_ROOT = ROOT / ".github" / "workflows"
 GOVERNANCE_ROOT = ROOT / ".github" / "governance"
+# Workflow name constants (S1192: avoid duplicating literals)
+_WF_ANALYSIS = "l9-analysis.yml"
+_WF_PR_VALIDATE = "l9-pr-validate.yml"
+_WF_INGRESS = "l9-ingress.yml"
+_WF_STAGE_WORKER = "l9-stage-worker.yml"
+_WF_MANUAL_REPLAY = "l9-manual-replay.yml"
+
 EXPECTED = {
-    "l9-pr-validate.yml",
-    "l9-ingress.yml",
-    "l9-stage-worker.yml",
-    "l9-manual-replay.yml",
-    "l9-analysis.yml",
+    _WF_PR_VALIDATE,
+    _WF_INGRESS,
+    _WF_STAGE_WORKER,
+    _WF_MANUAL_REPLAY,
+    _WF_ANALYSIS,
 }
 PINNED_ACTION = re.compile(r"^[^@\s]+@[0-9a-f]{40}$")
 
@@ -50,7 +57,7 @@ def _check_analysis_profile_events(data: dict[str, object], text: str) -> list[s
     errors: list[str] = []
     events = _trigger_events(data)
     if not events:
-        return ["l9-analysis.yml: cannot determine trigger events"]
+        return [f"{_WF_ANALYSIS}: cannot determine trigger events"]
     mapping = dict(re.findall(r"(\w+)\)\s+profile=(\w+)", text))
     try:
         profiles_doc = yaml.safe_load(
@@ -58,18 +65,18 @@ def _check_analysis_profile_events(data: dict[str, object], text: str) -> list[s
         )
         profiles = profiles_doc["profiles"]
     except (OSError, ValueError, KeyError, TypeError, yaml.YAMLError) as exc:
-        return [f"l9-analysis.yml: cannot load execution profiles: {exc}"]
+        return [f"{_WF_ANALYSIS}: cannot load execution profiles: {exc}"]
     for event in events:
         selected = mapping.get(event)
         if selected is None:
-            errors.append(f"l9-analysis.yml: no governed profile is selected for event {event}")
+            errors.append(f"{_WF_ANALYSIS}: no governed profile is selected for event {event}")
             continue
         profile = profiles.get(selected)
         if not isinstance(profile, dict):
-            errors.append(f"l9-analysis.yml: selected profile is undefined: {selected}")
+            errors.append(f"{_WF_ANALYSIS}: selected profile is undefined: {selected}")
             continue
         if event not in profile.get("allowed_events", []):
-            errors.append(f"l9-analysis.yml: profile {selected} does not permit event {event}")
+            errors.append(f"{_WF_ANALYSIS}: profile {selected} does not permit event {event}")
     return errors
 
 
@@ -116,8 +123,8 @@ def main() -> int:
             if action is not None and not PINNED_ACTION.fullmatch(action):
                 errors.append(f"{name}: action is not pinned to a full commit SHA: {action}")
 
-    if "l9-pr-validate.yml" in loaded:
-        _, _, text = loaded["l9-pr-validate.yml"]
+    if _WF_PR_VALIDATE in loaded:
+        _, _, text = loaded[_WF_PR_VALIDATE]
         required = (
             "uv sync --frozen --extra dev",
             "--cov=l9_constellation_topology",
@@ -132,16 +139,16 @@ def main() -> int:
         )
         for value in required:
             if value not in text:
-                errors.append(f"l9-pr-validate.yml: missing gate {value}")
+                errors.append(f"{_WF_PR_VALIDATE}: missing gate {value}")
 
-    if "l9-ingress.yml" in loaded:
-        _, _, text = loaded["l9-ingress.yml"]
+    if _WF_INGRESS in loaded:
+        _, _, text = loaded[_WF_INGRESS]
         for forbidden in ("compile-packet", "l9-topology-worker"):
             if forbidden in text:
-                errors.append(f"l9-ingress.yml: ingress may not compile topology: {forbidden}")
+                errors.append(f"{_WF_INGRESS}: ingress may not compile topology: {forbidden}")
 
-    if "l9-stage-worker.yml" in loaded:
-        _, steps, text = loaded["l9-stage-worker.yml"]
+    if _WF_STAGE_WORKER in loaded:
+        _, steps, text = loaded[_WF_STAGE_WORKER]
         names = [step.get("name", "") for step in steps]
         ordered = (
             "Checkout trusted worker authority",
@@ -154,19 +161,19 @@ def main() -> int:
             try:
                 positions.append(names.index(name))
             except ValueError:
-                errors.append(f"l9-stage-worker.yml: missing step {name}")
+                errors.append(f"{_WF_STAGE_WORKER}: missing step {name}")
         if positions and positions != sorted(positions):
-            errors.append("l9-stage-worker.yml: dispatch is used before authenticated preflight")
+            errors.append(f"{_WF_STAGE_WORKER}: dispatch is used before authenticated preflight")
         for required in (
             "--preflight",
             "uv sync --frozen --no-dev --no-editable",
             "ref: ${{ steps.dispatch.outputs.revision }}",
         ):
             if required not in text:
-                errors.append(f"l9-stage-worker.yml: missing exact-revision control {required}")
+                errors.append(f"{_WF_STAGE_WORKER}: missing exact-revision control {required}")
 
-    if "l9-analysis.yml" in loaded:
-        data, _, text = loaded["l9-analysis.yml"]
+    if _WF_ANALYSIS in loaded:
+        data, _, text = loaded[_WF_ANALYSIS]
         errors.extend(_check_analysis_profile_events(data, text))
 
     result = {

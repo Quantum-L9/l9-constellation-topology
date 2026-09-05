@@ -10,7 +10,7 @@ _ADR_DIRS = ["docs/adr", "doc/adr", "adr", "docs/decisions", "decisions", "docs/
 _ADR_PREFIXES = ("adr-", "adr_", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9")
 
 
-def scan_adrs(repo_path: Path, repo_id: str) -> tuple[list[str], list[EvidenceItem]]:
+def scan_adrs(repo_path: Path, _repo_id: str) -> tuple[list[str], list[EvidenceItem]]:
     """Return (adr_file_paths, evidence)."""
     adr_files: list[str] = []
     evidence: list[EvidenceItem] = []

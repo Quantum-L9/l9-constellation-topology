@@ -140,7 +140,7 @@ MARKER_EXEMPTIONS = {
     "CHANGELOG.md": ("no-stub", "placeholder bodies"),
     "RUNBOOK.md": ("no-stub gate",),
 }
-MANIFEST_ENTRY_RE = re.compile(r"^- `([^`]+)`\s+—\s+.+$")
+MANIFEST_ENTRY_RE = re.compile(r"^- `([^`]+)`\s+—\s+[^\r\n]+")
 
 
 @dataclass(frozen=True)
