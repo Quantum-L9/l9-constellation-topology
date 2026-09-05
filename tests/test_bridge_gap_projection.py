@@ -76,9 +76,7 @@ def test_exposed_capability_without_consumer_is_reported() -> None:
     )
     projection = _project(TopologyState(capability_records=(capability,)))
 
-    assert [gap.gap_type for gap in projection.gaps] == [
-        BridgeGapType.exposed_unconsumed
-    ]
+    assert [gap.gap_type for gap in projection.gaps] == [BridgeGapType.exposed_unconsumed]
     assert projection.gaps[0].missing_transition == "EXPOSED_TO_CONSUMED"
 
 
@@ -103,7 +101,6 @@ def test_real_consumer_closes_capability_and_output_gaps() -> None:
     assert _project(state).gaps == ()
 
 
-
 def test_direct_consumer_closes_earlier_reachability_gap() -> None:
     capability = CapabilityRecord(
         capability_id="capability:direct",
@@ -125,6 +122,7 @@ def test_direct_consumer_closes_earlier_reachability_gap() -> None:
     )
 
     assert _project(state).gaps == ()
+
 
 def test_produced_output_without_consumer_is_reported() -> None:
     state = TopologyState(

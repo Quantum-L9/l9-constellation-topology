@@ -99,7 +99,7 @@ def test_a_generation_without_a_bundle_reaches_the_adapter(generation: Path) -> 
     # a different one: it is the adapter's own error, not a refusal to reach it.
     # Intentionally broad: the adapter's own error class (not CorpusIngressError).
     # We verify the specific non-type rather than a fixed exception class (S5958: documented).
-    with pytest.raises(Exception) as raised:  # noqa: PT011 -- intentional; checked below
+    with pytest.raises(Exception) as raised:
         load_corpus_intelligence(generation)
     assert not isinstance(raised.value, CorpusIngressError)
 

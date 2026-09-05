@@ -456,10 +456,17 @@ def test_replace_race_fails_closed(tmp_path: Path) -> None:
     assert target.read_bytes() == b"changed-underneath"
 
 
-# ---- F-06: workflow trigger/profile contract check -------------------------------------
+# ---- Organization CI ownership contract check ------------------------------------------
 
 
-def test_workflow_profile_event_contract_flags_mismatch() -> None:
+def test_workflow_org_ci_ownership_contract_flags_core_and_sdk_references() -> None:
+    """A copied Core caller or a Core/SDK revision pin must fail the workflow contract.
+
+    Organization L9 CI runs from the GitHub organization ruleset
+    (Quantum-L9/l9-ci-core main .github/workflows/org-ci.yml); the consumer owns no
+    Core or SDK revision, so any such reference in a repository workflow is drift.
+    """
+
     spec = importlib.util.spec_from_file_location(
         "validate_workflows", ROOT / "scripts" / "validate_workflows.py"
     )
@@ -467,13 +474,18 @@ def test_workflow_profile_event_contract_flags_mismatch() -> None:
     assert spec.loader is not None
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
-    errors = module._check_analysis_profile_events(
-        {"on": {"push": None}},
-        "push) profile=pr_fast ;;",
+    assert "l9-analysis.yml" not in module.EXPECTED
+    errors = module._check_org_ci_ownership(
+        "l9-analysis.yml",
+        "env:\n  L9_CORE_REF: 'abc'\njobs:\n  analyze:\n"
+        "    uses: Quantum-L9/l9-ci-core/.github/workflows/analyze-semgrep.yml@abc\n",
     )
-    assert any("does not permit event push" in error for error in errors)
-    ok = module._check_analysis_profile_events(
-        {"on": {"push": None}},
-        "push) profile=merge ;;",
+    assert any("Quantum-L9/l9-ci-core" in error for error in errors)
+    assert any("L9_CORE_REF" in error for error in errors)
+    sdk_errors = module._check_org_ci_ownership("custom.yml", "env:\n  L9_SDK_REF: 'abc'\n")
+    assert any("L9_SDK_REF" in error for error in sdk_errors)
+    ok = module._check_org_ci_ownership(
+        "l9-pr-validate.yml",
+        "uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683\n",
     )
     assert ok == []

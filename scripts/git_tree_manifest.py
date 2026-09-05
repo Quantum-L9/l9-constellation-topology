@@ -151,6 +151,7 @@ def main() -> int:
     # S8705: validate that root is a real git-tracked directory before passing to subprocess
     if not root.is_dir():
         import sys
+
         sys.stderr.write(f"ERROR: --root is not a directory: {root}\n")
         return 1
     if args.check:

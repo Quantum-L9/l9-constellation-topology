@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import argparse
-import json
 import sys
 import tempfile
 from collections.abc import Sequence
@@ -686,7 +685,12 @@ def run(argv: Sequence[str] | None = None) -> int:
         for line in str(exc).splitlines():
             print(f"ERROR: {line}", file=sys.stderr)
         return 2
-    except (PacketLoadError, ValueError, OSError, RuntimeError) as exc:  # json.JSONDecodeError ⊂ ValueError
+    except (
+        PacketLoadError,
+        ValueError,
+        OSError,
+        RuntimeError,
+    ) as exc:  # json.JSONDecodeError ⊂ ValueError
         for line in str(exc).splitlines() or [repr(exc)]:
             print(f"ERROR: {line}", file=sys.stderr)
         return 2

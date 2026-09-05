@@ -43,8 +43,7 @@ def render_bridge_gap_markdown(projection: BridgeGapProjection) -> str:
     if projection.counts_by_type:
         lines.extend(("| Gap type | Count |", "|---|---:|"))
         lines.extend(
-            f"| `{gap_type}` | {count} |"
-            for gap_type, count in projection.counts_by_type.items()
+            f"| `{gap_type}` | {count} |" for gap_type, count in projection.counts_by_type.items()
         )
     else:
         lines.append("No bridge gaps were proven from the supplied topology.")
