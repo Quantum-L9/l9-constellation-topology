@@ -55,6 +55,6 @@ def synchronize(
         artifact = artifacts_by_path[finding.path]
         artifact.path.parent.mkdir(parents=True, exist_ok=True)
         artifact.path.write_bytes(artifact.content)
-    # After writing all stale/missing artifacts, re-check so callers receive the
-    # post-sync state rather than the pre-sync findings (fixes S3516: always-same-value).
-    return find_drift(artifacts)
+    # Return the artifacts this call wrote. A post-write re-scan is empty on
+    # success and drops the written list that update commands report.
+    return findings

@@ -13,7 +13,7 @@ from .common import make_rendered_artifact, write_compatibility_artifact
 
 
 def _safe(value: str) -> str:
-    return re.sub(r"\W", "_", value)
+    return re.sub(r"[^A-Za-z0-9_]", "_", value)
 
 
 def render_mermaid_artifact(materialized: MaterializedTopology) -> RenderedArtifact:
