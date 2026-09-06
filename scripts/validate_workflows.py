@@ -72,11 +72,14 @@ _UV_RUN = re.compile(r"\buv run\b(?P<rest>[^\n]*)")
 
 
 def _check_uv_hardening(name: str, text: str) -> list[str]:
-    """Reject uv invocations that could build or resolve outside the lockfile.
+    """Reject uv invocations that could resolve or build outside the lockfile.
 
-    Every ``uv run`` must carry ``--frozen --no-build`` (locked versions, no
-    arbitrary build scripts), and the ``uv`` pin itself must be new enough for
-    ``--no-build`` to coexist with installing the first-party project.
+    Every ``uv run`` must carry ``--frozen --no-build``: ``--frozen`` pins
+    resolution to ``uv.lock``, and ``--no-build`` refuses to build dependency
+    source distributions. ``--no-build`` does not mean no build code ever runs:
+    first-party workspace packages are still built, and an editable build
+    backend may execute Python, which is exactly why the ``uv`` pin must be new
+    enough for ``--no-build`` to coexist with installing this project.
     """
 
     errors: list[str] = []
@@ -113,9 +116,25 @@ def _steps(data: dict[str, object]) -> list[dict[str, str]]:
     return output
 
 
+WORKFLOW_EXTENSIONS = (".yml", ".yaml")
+
+
+def workflow_files(root: Path) -> list[Path]:
+    """Every workflow GitHub would run under ``root``: ``*.yml`` and ``*.yaml``.
+
+    Discovery must be extension-complete: a guard that globbed only ``*.yml``
+    could be evaded by a ``.yaml`` file carrying a Core caller, an unpinned
+    action, or an unhardened uv invocation.
+    """
+
+    return sorted(
+        path for path in root.iterdir() if path.is_file() and path.suffix in WORKFLOW_EXTENSIONS
+    )
+
+
 def main() -> int:
     errors: list[str] = []
-    actual = {path.name for path in WORKFLOW_ROOT.glob("*.yml")}
+    actual = {path.name for path in workflow_files(WORKFLOW_ROOT)}
     missing = sorted(EXPECTED - actual)
     unexpected = sorted(actual - EXPECTED)
     if missing:

@@ -12,7 +12,10 @@
   dependencies to the exact `uv.lock` versions, so no gate resolves or builds
   outside the lockfile. `scripts/validate_workflows.py` enforces the minimum
   `uv` pin and the `uv run --frozen --no-build` form so the regression cannot
-  return.
+  return. Its workflow discovery is now extension-complete (`*.yml` and
+  `*.yaml`), so a `.yaml` file cannot slip past the Core-ownership, action-pin,
+  and uv-hardening checks; `tests/test_workflow_contracts_v5.py` covers
+  discovery and both guards directly.
 - Migrated organization L9 CI to the GitHub organization required-workflow
   ruleset. Production CI source is `Quantum-L9/l9-ci-core` `main`
   `.github/workflows/org-ci.yml`; Core changes propagate with no consumer edit.

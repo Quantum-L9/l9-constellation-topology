@@ -212,7 +212,7 @@
       "path": "BUILD_SPECIFICATION.md"
     },
     {
-      "git_object_id": "a292892f8405ea74b00a385be41e1f990bc44e4f",
+      "git_object_id": "a1ea10d66bfc8935911163ef0b59716f139446ff",
       "mode": "100644",
       "object_type": "blob",
       "path": "CHANGELOG.md"
@@ -1346,7 +1346,7 @@
       "path": "scripts/validate_release_readiness.py"
     },
     {
-      "git_object_id": "dcc3f16553c10196e8b9028e1d3cd1a52262acfd",
+      "git_object_id": "e67fe5359c0d1c762fe5109d8d006b4797c9b020",
       "mode": "100644",
       "object_type": "blob",
       "path": "scripts/validate_workflows.py"
@@ -3230,7 +3230,7 @@
       "path": "tests/test_worker_v5.py"
     },
     {
-      "git_object_id": "69cd638169487a4dbc8561cdebedb2f054608269",
+      "git_object_id": "bbc51af50012c597787494eb120239812eed4b55",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_workflow_contracts_v5.py"
@@ -3260,7 +3260,7 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:cf0c12633c7bb8af2c2af469a9f960f80dab6035c83538e91bd51f931a798989",
+  "entries_sha256": "sha256:fad3fd309bbfa6130d1dfd7abd4fe7e0f13fe085ec6f1769df7e7824c265c84c",
   "entry_count": 543,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
