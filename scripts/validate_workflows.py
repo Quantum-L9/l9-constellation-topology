@@ -62,6 +62,40 @@ def _check_org_ci_ownership(name: str, text: str) -> list[str]:
     ]
 
 
+# uv 0.12.6 is the first release that exempts first-party workspace packages from
+# --no-build. Below it, `uv sync --frozen --no-build` refuses to install this
+# project ("marked as --no-build but has no binary distribution"), so every host
+# workflow failed at environment synchronization.
+_MIN_UV = (0, 12, 6)
+_UV_PIN = re.compile(r"\buv==(\d+)\.(\d+)\.(\d+)\b")
+_UV_RUN = re.compile(r"\buv run\b(?P<rest>[^\n]*)")
+
+
+def _check_uv_hardening(name: str, text: str) -> list[str]:
+    """Reject uv invocations that could build or resolve outside the lockfile.
+
+    Every ``uv run`` must carry ``--frozen --no-build`` (locked versions, no
+    arbitrary build scripts), and the ``uv`` pin itself must be new enough for
+    ``--no-build`` to coexist with installing the first-party project.
+    """
+
+    errors: list[str] = []
+    pins = _UV_PIN.findall(text)
+    if not pins:
+        errors.append(f"{name}: uv must be installed from an exact `uv==X.Y.Z` pin")
+    for major, minor, patch in pins:
+        if (int(major), int(minor), int(patch)) < _MIN_UV:
+            errors.append(
+                f"{name}: uv=={major}.{minor}.{patch} predates first-party --no-build "
+                f"support; pin uv>={'.'.join(map(str, _MIN_UV))}"
+            )
+    for match in _UV_RUN.finditer(text):
+        rest = match.group("rest")
+        if "--frozen" not in rest or "--no-build" not in rest:
+            errors.append(f"{name}: `uv run` must pass --frozen --no-build: uv run{rest.rstrip()}")
+    return errors
+
+
 def _steps(data: dict[str, object]) -> list[dict[str, str]]:
     jobs = data.get("jobs")
     if not isinstance(jobs, dict):
@@ -101,6 +135,7 @@ def main() -> int:
         text = path.read_text(encoding="utf-8")
         loaded[name] = (data, steps, text)
         errors.extend(_check_org_ci_ownership(name, text))
+        errors.extend(_check_uv_hardening(name, text))
         for step in steps:
             action = step.get("uses")
             if action is not None and not PINNED_ACTION.fullmatch(action):
@@ -110,9 +145,10 @@ def main() -> int:
         _, _, text = loaded[_WF_PR_VALIDATE]
         required = (
             "uv sync --frozen --no-build --extra dev",
+            "uv run --frozen --no-build pytest",
             "--cov=l9_constellation_topology",
-            "uv run ruff check .",
-            "uv run mypy src/l9_constellation_topology",
+            "uv run --frozen --no-build ruff check .",
+            "uv run --frozen --no-build mypy src/l9_constellation_topology",
             "scripts/validate_contracts.py",
             "scripts/validate_workflows.py",
             "scripts/architecture_boundary_check.py",
@@ -147,13 +183,13 @@ def main() -> int:
                 errors.append(f"{_WF_STAGE_WORKER}: missing step {name}")
         if positions and positions != sorted(positions):
             errors.append(f"{_WF_STAGE_WORKER}: dispatch is used before authenticated preflight")
-        for required in (
+        for control in (
             "--preflight",
             "uv sync --frozen --no-build --no-dev --no-editable",
             "ref: ${{ steps.dispatch.outputs.revision }}",
         ):
-            if required not in text:
-                errors.append(f"{_WF_STAGE_WORKER}: missing exact-revision control {required}")
+            if control not in text:
+                errors.append(f"{_WF_STAGE_WORKER}: missing exact-revision control {control}")
 
     result = {
         "status": "failed" if errors else "passed",

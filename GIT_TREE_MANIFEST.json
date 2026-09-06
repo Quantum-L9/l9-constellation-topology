@@ -92,25 +92,25 @@
       "path": ".github/governance/waivers.yaml"
     },
     {
-      "git_object_id": "50ef41fdd8f1aa2d2f3f781830166e8418e27390",
+      "git_object_id": "8ed60a51f642ef322eeb172ba42c2f112998c156",
       "mode": "100644",
       "object_type": "blob",
       "path": ".github/workflows/l9-ingress.yml"
     },
     {
-      "git_object_id": "42553f001b850916594702c08082eac5bed9341e",
+      "git_object_id": "9a0be4af0601ae5794402798e4d644bbd2f6683f",
       "mode": "100644",
       "object_type": "blob",
       "path": ".github/workflows/l9-manual-replay.yml"
     },
     {
-      "git_object_id": "c405d481cddd37719b6d837d30a1d7993f805291",
+      "git_object_id": "1953b324bde621c2054b2e70b24639fea3e22bdd",
       "mode": "100644",
       "object_type": "blob",
       "path": ".github/workflows/l9-pr-validate.yml"
     },
     {
-      "git_object_id": "a4b3a9484fe960e36b78455f464d0ea2d17d7e7c",
+      "git_object_id": "b9f0e8591ffb5261580d14bfb350fd440d43f7fe",
       "mode": "100644",
       "object_type": "blob",
       "path": ".github/workflows/l9-stage-worker.yml"
@@ -212,7 +212,7 @@
       "path": "BUILD_SPECIFICATION.md"
     },
     {
-      "git_object_id": "dbe6d8676040f8ba4bbaa19dd82ac2e555805aa4",
+      "git_object_id": "a292892f8405ea74b00a385be41e1f990bc44e4f",
       "mode": "100644",
       "object_type": "blob",
       "path": "CHANGELOG.md"
@@ -1346,7 +1346,7 @@
       "path": "scripts/validate_release_readiness.py"
     },
     {
-      "git_object_id": "432c7d5591f620fac960a559ca1cc6576d5b8b2d",
+      "git_object_id": "dcc3f16553c10196e8b9028e1d3cd1a52262acfd",
       "mode": "100644",
       "object_type": "blob",
       "path": "scripts/validate_workflows.py"
@@ -3260,7 +3260,7 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:f77a49dea3a49ed325f06ff1daab4306337b4332c956a839f3e5851e5d4d6825",
+  "entries_sha256": "sha256:cf0c12633c7bb8af2c2af469a9f960f80dab6035c83538e91bd51f931a798989",
   "entry_count": 543,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
