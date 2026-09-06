@@ -13,7 +13,8 @@ def _load_validator() -> ModuleType:
     spec = importlib.util.spec_from_file_location(
         "validate_workflows", ROOT / "scripts" / "validate_workflows.py"
     )
-    assert spec is not None and spec.loader is not None
+    assert spec is not None
+    assert spec.loader is not None
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
@@ -35,7 +36,8 @@ def test_consumer_owned_core_reference_is_rejected() -> None:
     validator = _load_validator()
     text = "jobs:\n  a:\n    uses: Quantum-L9/l9-ci-core/.github/workflows/x.yml@" + "0" * 40 + "\n"
     errors = validator._check_org_ci_ownership("probe.yaml", text)
-    assert errors and "Quantum-L9/l9-ci-core" in errors[0]
+    assert errors
+    assert "Quantum-L9/l9-ci-core" in errors[0]
     assert validator._check_org_ci_ownership("clean.yml", "jobs: {}\n") == []
 
 

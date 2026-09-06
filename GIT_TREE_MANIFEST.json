@@ -3230,7 +3230,7 @@
       "path": "tests/test_worker_v5.py"
     },
     {
-      "git_object_id": "bbc51af50012c597787494eb120239812eed4b55",
+      "git_object_id": "34ecdb977bd8a9f1f867d514d7488e506d564434",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_workflow_contracts_v5.py"
@@ -3260,7 +3260,7 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:fad3fd309bbfa6130d1dfd7abd4fe7e0f13fe085ec6f1769df7e7824c265c84c",
+  "entries_sha256": "sha256:f59619c61023e3e438dc740b35a72f0423ea52e32f609691ff650b2a8666464a",
   "entry_count": 543,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
