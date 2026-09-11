@@ -52,7 +52,11 @@ Record the ruleset export and the negative-test result alongside the audit evide
 - Freshness, one-time-use nonce, and an authoritative execution lease now gate the stage
   worker's protected side effects (`worker/execution_authority.py`,
   `worker/stage_runner.py`).
-- `l9-analysis.yml` now selects the governed profile by event so post-merge analysis is
-  reachable on `push` (audit F-06).
+- The copied `l9-analysis.yml` Core caller (and its consumer-owned `L9_CORE_REF` pin)
+  has been removed. Organization L9 analysis now runs from the GitHub organization
+  required-workflow ruleset (`Quantum-L9/l9-ci-core` `main`
+  `.github/workflows/org-ci.yml`), which owns the per-event profile selection that
+  audit F-06 previously required locally. `scripts/validate_workflows.py` rejects any
+  workflow that reintroduces a Core or SDK revision reference.
 - `MANIFEST.md` is back in sync so the release-readiness ladder runs to completion (audit
   F-07). This makes the negative test above straightforward to construct and to clear.

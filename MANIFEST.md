@@ -23,7 +23,6 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `.github/governance/semgrep-identity-map.yaml` — governed analysis semgrep rule identity resolution map
 - `.github/governance/semgrep-policy.yaml` — governed analysis semgrep provider policy
 - `.github/governance/waivers.yaml` — governed analysis finding-waiver ledger
-- `.github/workflows/l9-analysis.yml` — immutable-pinned GitHub Actions workflow
 - `.github/workflows/l9-ingress.yml` — immutable-pinned GitHub Actions workflow
 - `.github/workflows/l9-manual-replay.yml` — immutable-pinned GitHub Actions workflow
 - `.github/workflows/l9-pr-validate.yml` — immutable-pinned GitHub Actions workflow

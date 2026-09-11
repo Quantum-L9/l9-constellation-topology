@@ -30,7 +30,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install pinned uv
-        run: python -m pip install --disable-pip-version-check --only-binary :all: uv==0.10.0
+        run: python -m pip install --disable-pip-version-check --only-binary ":all:" uv==0.10.0
 
       - name: Build trusted preflight environment from lockfile
         run: |

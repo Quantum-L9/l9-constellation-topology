@@ -1,5 +1,29 @@
 # Changelog
 
+## Unreleased - organization-managed L9 CI
+
+- Migrated organization L9 CI to the GitHub organization required-workflow
+  ruleset. Production CI source is `Quantum-L9/l9-ci-core` `main`
+  `.github/workflows/org-ci.yml`; Core changes propagate with no consumer edit.
+- Removed the copied `.github/workflows/l9-analysis.yml` Core caller and its
+  consumer-owned `L9_CORE_REF` Core SHA pin. The repository selects neither a
+  Core nor an SDK revision.
+- `scripts/validate_workflows.py` now treats every workflow as repository-owned
+  and fails on any `Quantum-L9/l9-ci-core`, `Quantum-L9/l9-ci-sdk`,
+  `L9_CORE_REF`, or `L9_SDK_REF` reference, so a copied caller cannot regrow.
+  The local per-event execution-profile check it replaced is owned by Core.
+- Repository-owned workflows (`l9-pr-validate`, `l9-ingress`,
+  `l9-stage-worker`, `l9-manual-replay`) and declarative `.l9/` and
+  `.github/governance/` configuration are retained.
+- Repaired the repository-owned CI gate, which had been failing at workflow
+  startup on `main` since the S8541 hardening: the unquoted
+  `--only-binary :all:` pip argument is not valid YAML, so GitHub could not
+  parse any of the four host workflows and `l9-pr-validate` never ran. The
+  argument is now quoted, `scripts/validate_workflows.py` requires the hardened
+  `uv sync --frozen --no-build ...` forms it was still checking without
+  `--no-build`, and the ruff lint and format findings that gate had stopped
+  catching are fixed.
+
 ## Unreleased - semantic assertion activation and durable write identity
 
 - Activated the repository-model 1.1.0 assertion domain end to end. Assertions

@@ -11,22 +11,32 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 WORKFLOW_ROOT = ROOT / ".github" / "workflows"
-GOVERNANCE_ROOT = ROOT / ".github" / "governance"
 # Workflow name constants (S1192: avoid duplicating literals)
-_WF_ANALYSIS = "l9-analysis.yml"
 _WF_PR_VALIDATE = "l9-pr-validate.yml"
 _WF_INGRESS = "l9-ingress.yml"
 _WF_STAGE_WORKER = "l9-stage-worker.yml"
 _WF_MANUAL_REPLAY = "l9-manual-replay.yml"
 
+# Every workflow here is repository-owned. Organization L9 CI (Semgrep analysis,
+# SDK admission, governed publication) is executed by the GitHub organization
+# required-workflow ruleset from Quantum-L9/l9-ci-core main
+# .github/workflows/org-ci.yml. The consumer selects neither a Core nor an SDK
+# revision, so no copied caller may reappear here.
 EXPECTED = {
     _WF_PR_VALIDATE,
     _WF_INGRESS,
     _WF_STAGE_WORKER,
     _WF_MANUAL_REPLAY,
-    _WF_ANALYSIS,
 }
 PINNED_ACTION = re.compile(r"^[^@\s]+@[0-9a-f]{40}$")
+# Consumer-owned organization CI ownership markers. Any of these in a workflow means
+# the repository is again selecting a Core or SDK revision for organization CI.
+ORG_CI_OWNERSHIP_MARKERS = (
+    "Quantum-L9/l9-ci-core",
+    "Quantum-L9/l9-ci-sdk",
+    "L9_CORE_REF",
+    "L9_SDK_REF",
+)
 
 
 def _load(path: Path) -> dict[str, object]:
@@ -36,48 +46,20 @@ def _load(path: Path) -> dict[str, object]:
     return data
 
 
-def _trigger_events(data: dict[str, object]) -> list[str]:
-    # YAML 1.1 can fold the `on` key to boolean True; BaseLoader keeps it as the string
-    # "on". Accept either so the trigger set is discovered regardless of loader behavior.
-    triggers = data.get("on")
-    if triggers is None:
-        triggers = data.get("True")
-    if isinstance(triggers, str):
-        return [triggers]
-    if isinstance(triggers, dict):
-        return sorted(str(key) for key in triggers)
-    if isinstance(triggers, list):
-        return sorted(str(item) for item in triggers)
-    return []
+def _check_org_ci_ownership(name: str, text: str) -> list[str]:
+    """Reject consumer-owned organization CI (Core/SDK revision selection).
 
+    Organization L9 CI is centrally enforced from ``Quantum-L9/l9-ci-core`` ``main``
+    ``.github/workflows/org-ci.yml`` by the GitHub organization ruleset. A workflow
+    that pins or references Core or the SDK re-creates the consumer-owned revision
+    the migration removed, so it fails the contract regardless of its filename.
+    """
 
-def _check_analysis_profile_events(data: dict[str, object], text: str) -> list[str]:
-    """Verify every trigger event maps to a profile that permits it (audit F-06 / R-06)."""
-
-    errors: list[str] = []
-    events = _trigger_events(data)
-    if not events:
-        return [f"{_WF_ANALYSIS}: cannot determine trigger events"]
-    mapping = dict(re.findall(r"(\w+)\)\s+profile=(\w+)", text))
-    try:
-        profiles_doc = yaml.safe_load(
-            (GOVERNANCE_ROOT / "execution-profiles.yaml").read_text(encoding="utf-8")
-        )
-        profiles = profiles_doc["profiles"]
-    except (OSError, ValueError, KeyError, TypeError, yaml.YAMLError) as exc:
-        return [f"{_WF_ANALYSIS}: cannot load execution profiles: {exc}"]
-    for event in events:
-        selected = mapping.get(event)
-        if selected is None:
-            errors.append(f"{_WF_ANALYSIS}: no governed profile is selected for event {event}")
-            continue
-        profile = profiles.get(selected)
-        if not isinstance(profile, dict):
-            errors.append(f"{_WF_ANALYSIS}: selected profile is undefined: {selected}")
-            continue
-        if event not in profile.get("allowed_events", []):
-            errors.append(f"{_WF_ANALYSIS}: profile {selected} does not permit event {event}")
-    return errors
+    return [
+        f"{name}: consumer-owned organization CI reference is forbidden: {marker}"
+        for marker in ORG_CI_OWNERSHIP_MARKERS
+        if marker in text
+    ]
 
 
 def _steps(data: dict[str, object]) -> list[dict[str, str]]:
@@ -118,6 +100,7 @@ def main() -> int:
             continue
         text = path.read_text(encoding="utf-8")
         loaded[name] = (data, steps, text)
+        errors.extend(_check_org_ci_ownership(name, text))
         for step in steps:
             action = step.get("uses")
             if action is not None and not PINNED_ACTION.fullmatch(action):
@@ -126,7 +109,7 @@ def main() -> int:
     if _WF_PR_VALIDATE in loaded:
         _, _, text = loaded[_WF_PR_VALIDATE]
         required = (
-            "uv sync --frozen --extra dev",
+            "uv sync --frozen --no-build --extra dev",
             "--cov=l9_constellation_topology",
             "uv run ruff check .",
             "uv run mypy src/l9_constellation_topology",
@@ -166,15 +149,11 @@ def main() -> int:
             errors.append(f"{_WF_STAGE_WORKER}: dispatch is used before authenticated preflight")
         for required in (
             "--preflight",
-            "uv sync --frozen --no-dev --no-editable",
+            "uv sync --frozen --no-build --no-dev --no-editable",
             "ref: ${{ steps.dispatch.outputs.revision }}",
         ):
             if required not in text:
                 errors.append(f"{_WF_STAGE_WORKER}: missing exact-revision control {required}")
-
-    if _WF_ANALYSIS in loaded:
-        data, _, text = loaded[_WF_ANALYSIS]
-        errors.extend(_check_analysis_profile_events(data, text))
 
     result = {
         "status": "failed" if errors else "passed",

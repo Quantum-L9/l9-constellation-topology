@@ -222,10 +222,7 @@ def _capability_gap(
     consumer_edges = _of_type(incoming_edges, EdgeType.consumes)
 
     implementers = tuple(
-        sorted(
-            set(capability.implemented_by)
-            | {edge.source_id for edge in implementation_edges}
-        )
+        sorted(set(capability.implemented_by) | {edge.source_id for edge in implementation_edges})
     )
     validators = tuple(
         sorted(
@@ -342,9 +339,7 @@ def _output_gaps(
                 producer_ids=producers,
                 consumer_ids=(),
                 evidence_refs=evidence_refs,
-                reason=(
-                    f"Output has {len(producers)} observed producer(s) but no CONSUMES edge."
-                ),
+                reason=(f"Output has {len(producers)} observed producer(s) but no CONSUMES edge."),
                 confidence=_confidence(edge_groups=(producer_edges,)),
             )
         )
