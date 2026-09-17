@@ -101,3 +101,18 @@ jobs:
             validation/validation_checks.jsonl
           if-no-files-found: error
           retention-days: 14
+
+  direct-compile-smoke:
+    permissions:
+      contents: read
+      packages: read
+    uses: ./.github/workflows/compile.yml
+    with:
+      source_repository: Quantum-L9/l9-constellation-topology
+      source_revision: ${{ github.event.pull_request.head.sha || github.sha }}
+      source_name: l9-constellation-topology
+      # Step 1 intentionally stopped before the maintained v4 ref existed.
+      # The PR proof therefore binds the current real Meta producer revision exactly;
+      # the released reusable interface defaults to the canonical maintained v4 line.
+      meta_ref: e78b3c5917756ec7a13b056b07bf08b9b72f5adf
+      publish: false
