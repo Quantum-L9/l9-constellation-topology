@@ -16,6 +16,7 @@ _WF_PR_VALIDATE = "l9-pr-validate.yml"
 _WF_INGRESS = "l9-ingress.yml"
 _WF_STAGE_WORKER = "l9-stage-worker.yml"
 _WF_MANUAL_REPLAY = "l9-manual-replay.yml"
+_WF_COMPILE = "compile.yml"
 
 # Every workflow here is repository-owned. Organization L9 CI (Semgrep analysis,
 # SDK admission, governed publication) is executed by the GitHub organization
@@ -27,6 +28,7 @@ EXPECTED = {
     _WF_INGRESS,
     _WF_STAGE_WORKER,
     _WF_MANUAL_REPLAY,
+    _WF_COMPILE,
 }
 PINNED_ACTION = re.compile(r"^[^@\s]+@[0-9a-f]{40}$")
 # Consumer-owned organization CI ownership markers. Any of these in a workflow means
@@ -103,7 +105,7 @@ def main() -> int:
         errors.extend(_check_org_ci_ownership(name, text))
         for step in steps:
             action = step.get("uses")
-            if action is not None and not PINNED_ACTION.fullmatch(action):
+            if action is not None and not PINNED_ACTION.fullmatch(action.split(" #", 1)[0]):
                 errors.append(f"{name}: action is not pinned to a full commit SHA: {action}")
 
     if _WF_PR_VALIDATE in loaded:
@@ -154,6 +156,24 @@ def main() -> int:
         ):
             if required not in text:
                 errors.append(f"{_WF_STAGE_WORKER}: missing exact-revision control {required}")
+
+    if _WF_COMPILE in loaded:
+        _, _, text = loaded[_WF_COMPILE]
+        required = (
+            "workflow_call:",
+            "default: v4",
+            "source_revision must be an exact 40-character commit SHA",
+            "repository-model-cli.js",
+            "compile-packet",
+            "validate-packet",
+            "verify-determinism",
+            "docker buildx build",
+            "packet_oci_ref",
+            "docker pull",
+        )
+        for value in required:
+            if value not in text:
+                errors.append(f"{_WF_COMPILE}: missing direct-compile control {value}")
 
     result = {
         "status": "failed" if errors else "passed",
