@@ -8,6 +8,7 @@ l9-constellation-topology/
 │   │   ├── bug_report.yml
 │   │   └── config.yml
 │   ├── workflows
+│   │   ├── compile.yml
 │   │   ├── l9-ingress.yml
 │   │   ├── l9-manual-replay.yml
 │   │   ├── l9-pr-validate.yml
@@ -65,6 +66,15 @@ l9-constellation-topology/
 │   │   ├── 0018-use-immutable-oci-packet-storage-and-an-external-registry.md
 │   │   ├── 0019-use-idempotency-reuse-replay-and-reconciliation.md
 │   │   ├── 0020-delegate-publication-planning-to-the-ingestion-bridge.md
+│   │   ├── 0021-internalize-publication-planning-and-memory-lowering.md
+│   │   ├── 0022-key-memory-effects-by-fact-not-snapshot.md
+│   │   ├── 0023-declare-field-cardinality-before-detecting-conflicts.md
+│   │   ├── 0024-compile-repository-model-assertions-into-semantic-claims.md
+│   │   ├── 0025-separate-fact-identity-from-durable-write-identity.md
+│   │   ├── 0026-accept-corpus-intelligence-as-an-auxiliary-packet.md
+│   │   ├── 0027-separate-observation-time-from-publication-time.md
+│   │   ├── 0028-project-bridge-gaps-as-decision-support.md
+│   │   ├── 0029-authorize-a-bounded-github-native-direct-compile-seam.md
 │   │   └── README.md
 │   ├── archive
 │   │   └── v4

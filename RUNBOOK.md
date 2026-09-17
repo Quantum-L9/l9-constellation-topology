@@ -250,3 +250,39 @@ Dispatch packets use an approved `callback_id`. Configure destinations and crede
 ## Publication verification
 
 Production OCI publication uses a semantic-hash-derived staging tag and accepts only the returned `@sha256:<digest>` reference. Verification independently resolves the registry descriptor, then checks the retrieved bundle against the exact expected packet and manifest identities.
+
+## Direct compile seam
+
+`.github/workflows/compile.yml` compiles one exact revision on demand (ADR-0029). Call it from another workflow with `uses:` pinned to an exact Topology commit. It is stateless: a failed run is a failed run, with no lease, retry, or reconciliation. Pipelines needing those remain on the ADR-0016 Model B control plane.
+
+Permission boundary:
+
+| Job | Permissions | Runs when |
+|---|---|---|
+| `compile` | `contents: read` | always |
+| `publish` | `contents: read`, `packages: write`, `actions: read` | only when `publish` input is true |
+
+A `publish: false` run therefore holds no package-write authority at any point. Grant the calling job only `contents: read` when publication is not wanted.
+
+### Acceptance drill
+
+When publication runs, the seam executes the full ADR-0018 acceptance sequence and fails closed on any control:
+
+1. The packet is staged under `packet-<semantic-hash>`, never a run counter.
+2. The builder-reported digest is validated as `sha256:<64 hex>`; only `<registry>@<digest>` is retained.
+3. The registry descriptor is independently re-fetched and its digest recomputed from the raw manifest document, then compared to the immutable reference.
+4. The object is pulled by digest, revalidated with `validate-packet`, and compared against the `packet_id`, `semantic_hash`, and bundle `manifest.json` digest bound before publication.
+5. **Valid-object substitution** is refused: a second, genuinely valid packet sharing the expected semantic hash is published and must not be accepted.
+6. **Mutable-tag references** are refused: neither the staging tag nor a drill tag is an accepted packet reference, and the drill proves the tag moves while the accepted digest does not.
+
+If any control does not discriminate, the job exits non-zero. A green happy path alone does not discharge ADR-0018.
+
+### Failure triage
+
+| Symptom | Meaning |
+|---|---|
+| `source_revision must be an exact 40-character commit SHA` | A branch or tag was passed; resolve it to a commit first. |
+| `Topology Packet semantic hash cannot form an OCI staging tag` | The packet manifest carries a malformed semantic hash; the compile step is at fault, not the registry. |
+| `independently resolved registry descriptor does not match the immutable URI` | The registry returned a different object than the one published. Stop and investigate the registry; do not retry. |
+| `published packet identity mismatch` | The re-pulled bundle is not the compiled packet. Treat as a substitution until proven otherwise. |
+| `acceptance did not fail closed` | A negative control passed. The acceptance contract is broken; the drill is the gate and must be repaired before publication is trusted. |

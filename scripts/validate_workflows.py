@@ -64,6 +64,54 @@ def _check_org_ci_ownership(name: str, text: str) -> list[str]:
     ]
 
 
+def _job(data: dict[str, object], name: str) -> dict[str, object] | None:
+    jobs = data.get("jobs")
+    if not isinstance(jobs, dict):
+        return None
+    job = jobs.get(name)
+    return job if isinstance(job, dict) else None
+
+
+def _permissions(job: dict[str, object]) -> dict[str, str]:
+    permissions = job.get("permissions")
+    if not isinstance(permissions, dict):
+        return {}
+    return {str(key): str(value) for key, value in permissions.items()}
+
+
+def _check_compile_least_privilege(data: dict[str, object]) -> list[str]:
+    """Reject package-write authority outside the publication boundary.
+
+    ADR-0017 grants package write only where GHCR mutation happens. Compilation
+    must therefore hold no ``packages`` scope at all, and the publishing job must
+    be conditional on ``inputs.publish`` so a compile-only run never reaches it.
+    """
+
+    errors: list[str] = []
+    compile_job = _job(data, "compile")
+    publish_job = _job(data, "publish")
+    if compile_job is None:
+        return [f"{_WF_COMPILE}: missing compile job"]
+    if publish_job is None:
+        return [f"{_WF_COMPILE}: publication must be a separate job from compilation"]
+
+    compile_permissions = _permissions(compile_job)
+    if "packages" in compile_permissions:
+        errors.append(
+            f"{_WF_COMPILE}: compile job must not hold package authority: "
+            f"packages: {compile_permissions['packages']}"
+        )
+    if compile_permissions.get("contents") != "read":
+        errors.append(f"{_WF_COMPILE}: compile job must declare contents: read")
+
+    publish_permissions = _permissions(publish_job)
+    if publish_permissions.get("packages") != "write":
+        errors.append(f"{_WF_COMPILE}: publish job must declare packages: write")
+    if "inputs.publish" not in str(publish_job.get("if", "")):
+        errors.append(f"{_WF_COMPILE}: publish job must be conditional on inputs.publish")
+    return errors
+
+
 def _steps(data: dict[str, object]) -> list[dict[str, str]]:
     jobs = data.get("jobs")
     if not isinstance(jobs, dict):
@@ -105,7 +153,11 @@ def main() -> int:
         errors.extend(_check_org_ci_ownership(name, text))
         for step in steps:
             action = step.get("uses")
-            if action is not None and not PINNED_ACTION.fullmatch(action.split(" #", 1)[0]):
+            # The exact loaded scalar is the contract. YAML comments are already
+            # removed by the parser, so any remaining " #..." suffix came from a
+            # quoted value that GitHub would resolve as a different, invalid
+            # action reference. Stripping it here would accept that value.
+            if action is not None and not PINNED_ACTION.fullmatch(action):
                 errors.append(f"{name}: action is not pinned to a full commit SHA: {action}")
 
     if _WF_PR_VALIDATE in loaded:
@@ -158,7 +210,7 @@ def main() -> int:
                 errors.append(f"{_WF_STAGE_WORKER}: missing exact-revision control {required}")
 
     if _WF_COMPILE in loaded:
-        _, _, text = loaded[_WF_COMPILE]
+        data, _, text = loaded[_WF_COMPILE]
         required = (
             "workflow_call:",
             "default: v4",
@@ -167,13 +219,21 @@ def main() -> int:
             "compile-packet",
             "validate-packet",
             "verify-determinism",
-            "docker buildx build",
             "packet_oci_ref",
-            "docker pull",
+            # ADR-0018 acceptance controls. A happy-path publish/re-pull does not
+            # discharge this contract; each control below must stay present.
+            "packet-$semantic_digest",
+            "imagetools",
+            "must be digest-qualified",
+            "independently resolved registry descriptor does not match the immutable URI",
+            "published packet identity mismatch",
+            "valid-object substitution",
+            "mutable-tag reference",
         )
         for value in required:
             if value not in text:
                 errors.append(f"{_WF_COMPILE}: missing direct-compile control {value}")
+        errors.extend(_check_compile_least_privilege(data))
 
     result = {
         "status": "failed" if errors else "passed",

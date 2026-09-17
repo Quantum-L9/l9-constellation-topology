@@ -155,6 +155,44 @@ uv run l9-topology-worker \
 
 GitHub Actions validates the signature with trusted `main` code before using the requested revision. It then checks out the signed exact Git object ID, creates the exact-revision environment from `uv.lock`, recompiles, publishes, reloads, verifies, and sends a signed callback.
 
+## Direct compile seam
+
+`.github/workflows/compile.yml` is a reusable `workflow_call` interface that compiles one
+exact source revision into a validated Topology Packet, and optionally publishes it to GHCR.
+ADR-0029 authorizes it as a bounded, stateless seam: it owns no queue, lease, retry, or
+registry state, and ADR-0016 Model B remains the durable orchestration authority.
+
+```yaml
+jobs:
+  compile-topology:
+    permissions:
+      contents: read
+      packages: write   # only needed when publish is true
+      actions: read     # only needed when publish is true
+    uses: Quantum-L9/l9-constellation-topology/.github/workflows/compile.yml@<exact-sha>
+    with:
+      source_repository: <owner>/<repo>
+      source_revision: <exact 40-character commit SHA>
+      source_name: <canonical repository name>
+      publish: true
+```
+
+| Input | Required | Meaning |
+|---|---|---|
+| `source_repository` | yes | Repository observed by `l9-meta-injector` |
+| `source_revision` | yes | Exact 40-character commit SHA; branches and tags are rejected |
+| `source_name` | yes | Canonical name written into the Repository Model Packet |
+| `meta_ref` | no | Meta producer ref, default `v4` |
+| `publish` | no | Publish and accept the packet in GHCR, default `true` |
+| `packet_registry` | no | GHCR repository for Topology Packet artifacts |
+
+Outputs are `packet_id`, `packet_semantic_hash`, `packet_bundle_manifest_digest`, and, when
+publication runs, the digest-qualified `packet_oci_ref`.
+
+Compilation and publication are separate jobs. The compile job holds `contents: read` only, so
+a `publish: false` run never receives package-write authority. Publication runs the ADR-0018
+acceptance drill described in [RUNBOOK.md](RUNBOOK.md#publication-verification).
+
 ## Generated artifact synchronization
 
 Checked-in JSON Schemas and Repository Model Packet fixtures are deterministic outputs derived from canonical models and sample repositories. Validation detects drift without rewriting the worktree.

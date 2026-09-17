@@ -58,6 +58,30 @@ Do not use an update target inside validation or CI. Validation must detect drif
 make validate
 ```
 
+## Workflow changes
+
+`scripts/validate_workflows.py` is the workflow contract gate. It checks the exact loaded
+`uses` scalar against the full-SHA pin contract — a quoted value carrying a comment-like
+suffix is a different action reference and is rejected — and it enforces the direct compile
+seam's controls, including its least-privilege job split.
+
+Run it directly after editing anything under `.github/workflows/`:
+
+```bash
+make workflows
+uv run pytest tests/test_workflow_contracts_v5.py -q
+```
+
+The CI environment is built with `uv sync --frozen --no-build --extra dev --no-install-project`
+followed by `uv pip install --no-deps --editable .`. `--no-build` keeps third-party source
+distributions out of the environment; because that also refuses this project's own editable
+install, the project is installed separately from its own tree with no dependency resolution.
+Reproduce that pair locally when debugging a CI-only failure.
+
+When changing `.github/workflows/compile.yml`, keep compilation and publication in separate
+jobs. Package-write authority belongs only to the publishing job, and the ADR-0018 acceptance
+drill's negative controls are part of the contract, not optional extras.
+
 ## Design rules
 
 - Keep domain and topology stages pure.

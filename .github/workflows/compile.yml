@@ -1,5 +1,14 @@
 name: topology-compile
 
+# ADR-0029 authorizes this workflow as a bounded, stateless compile seam. It owns
+# no queue, no lease, and no registry state; ADR-0016 Model B remains the durable
+# scheduler, retry/lease owner, and packet-registry authority.
+#
+# Compile and publication are separate jobs on purpose (ADR-0017 least privilege).
+# The compile job holds `contents: read` only, so a publish=false run never
+# receives package-write authority. `packages: write` exists solely in the
+# publish job, which does not run unless `inputs.publish` is true.
+
 on:
   workflow_call:
     inputs:
@@ -21,7 +30,7 @@ on:
         type: string
         default: v4
       publish:
-        description: Publish the validated Topology Packet to GHCR and prove it by digest re-pull.
+        description: Publish the validated Topology Packet to GHCR and accept it under ADR-0018.
         required: false
         type: boolean
         default: true
@@ -37,21 +46,26 @@ on:
       packet_semantic_hash:
         description: Canonical Topology Packet semantic hash.
         value: ${{ jobs.compile.outputs.packet_semantic_hash }}
+      packet_bundle_manifest_digest:
+        description: SHA-256 of the packet bundle manifest.json, bound before publication.
+        value: ${{ jobs.compile.outputs.packet_bundle_manifest_digest }}
       packet_oci_ref:
-        description: Immutable OCI reference when publication is enabled.
-        value: ${{ jobs.compile.outputs.packet_oci_ref }}
+        description: Immutable digest-qualified OCI reference when publication is enabled.
+        value: ${{ jobs.publish.outputs.packet_oci_ref }}
 
 jobs:
   compile:
+    # Least privilege: compilation reads source and nothing else. No package
+    # write authority is granted on this path, whatever `inputs.publish` is.
     permissions:
       contents: read
-      packages: write
     runs-on: ubuntu-latest
     timeout-minutes: 30
     outputs:
       packet_id: ${{ steps.packet.outputs.packet_id }}
       packet_semantic_hash: ${{ steps.packet.outputs.packet_semantic_hash }}
-      packet_oci_ref: ${{ steps.publish.outputs.packet_oci_ref }}
+      packet_bundle_manifest_digest: ${{ steps.packet.outputs.packet_bundle_manifest_digest }}
+      packet_artifact_name: ${{ steps.packet.outputs.packet_artifact_name }}
     steps:
       - name: Reject mutable or malformed source revision
         env:
@@ -151,32 +165,146 @@ jobs:
         run: |
           set -euo pipefail
           python - <<'PY'
+          import hashlib
           import json
           import os
           from pathlib import Path
 
-          manifest = json.loads(Path(os.environ["PACKET_MANIFEST"]).read_text(encoding="utf-8"))
+          manifest_path = Path(os.environ["PACKET_MANIFEST"])
+          manifest_bytes = manifest_path.read_bytes()
+          manifest = json.loads(manifest_bytes.decode("utf-8"))
           packet_id = manifest["packet_id"]
           semantic_hash = manifest["semantic_hash"]
+          # The bundle manifest digest is bound here, before the bundle ever
+          # leaves the runner, so acceptance can compare the re-pulled bytes
+          # against an expectation the registry never influenced.
+          bundle_manifest_digest = "sha256:" + hashlib.sha256(manifest_bytes).hexdigest()
+          artifact_name = f"topology-packet-{os.environ['GITHUB_RUN_ID']}-{os.environ['GITHUB_RUN_ATTEMPT']}"
           with Path(os.environ["GITHUB_OUTPUT"]).open("a", encoding="utf-8") as handle:
               handle.write(f"packet_id={packet_id}\n")
               handle.write(f"packet_semantic_hash={semantic_hash}\n")
+              handle.write(f"packet_bundle_manifest_digest={bundle_manifest_digest}\n")
+              handle.write(f"packet_artifact_name={artifact_name}\n")
           print(f"packet_id={packet_id}")
           print(f"packet_semantic_hash={semantic_hash}")
+          print(f"packet_bundle_manifest_digest={bundle_manifest_digest}")
+          PY
+
+      - name: Upload compiled Topology Packet
+        if: inputs.publish
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.6.0
+        with:
+          name: ${{ steps.packet.outputs.packet_artifact_name }}
+          path: ${{ runner.temp }}/topology-packet
+          if-no-files-found: error
+          retention-days: 1
+
+  publish:
+    # This job exists only to mutate GHCR. It is the sole holder of
+    # `packages: write`, and it does not run when `inputs.publish` is false.
+    # `actions: read` is the minimum needed to fetch the compiled bundle from
+    # this same run; it grants no package authority.
+    needs: compile
+    if: inputs.publish
+    permissions:
+      contents: read
+      packages: write
+      actions: read
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      packet_oci_ref: ${{ steps.publish.outputs.packet_oci_ref }}
+    steps:
+      - name: Checkout exact Topology workflow revision
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          repository: Quantum-L9/l9-constellation-topology
+          ref: ${{ github.workflow_sha }}
+          path: topology
+          fetch-depth: 1
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5.4.0
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Synchronize frozen Topology dependencies
+        working-directory: topology
+        run: |
+          python -m pip install --disable-pip-version-check --only-binary ":all:" uv==0.10.0
+          uv sync --frozen --no-build --extra dev --no-install-project
+
+      - name: Download compiled Topology Packet
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PACKET_ARTIFACT_NAME: ${{ needs.compile.outputs.packet_artifact_name }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/topology-packet"
+          gh run download "$GITHUB_RUN_ID" \
+            --repo "$GITHUB_REPOSITORY" \
+            --name "$PACKET_ARTIFACT_NAME" \
+            --dir "$RUNNER_TEMP/topology-packet"
+          test -f "$RUNNER_TEMP/topology-packet/manifest.json"
+
+      - name: Bind expected identity to the downloaded bundle
+        env:
+          PACKET_MANIFEST: ${{ runner.temp }}/topology-packet/manifest.json
+          EXPECTED_PACKET_ID: ${{ needs.compile.outputs.packet_id }}
+          EXPECTED_SEMANTIC_HASH: ${{ needs.compile.outputs.packet_semantic_hash }}
+          EXPECTED_BUNDLE_MANIFEST_DIGEST: ${{ needs.compile.outputs.packet_bundle_manifest_digest }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Artifact upload/download must not have altered packet identity. If it
+          # did, publication stops here rather than binding a drifted expectation.
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          import sys
+          from pathlib import Path
+
+          manifest_bytes = Path(os.environ["PACKET_MANIFEST"]).read_bytes()
+          manifest = json.loads(manifest_bytes.decode("utf-8"))
+          digest = "sha256:" + hashlib.sha256(manifest_bytes).hexdigest()
+          mismatches = []
+          if manifest["packet_id"] != os.environ["EXPECTED_PACKET_ID"]:
+              mismatches.append("packet_id")
+          if manifest["semantic_hash"] != os.environ["EXPECTED_SEMANTIC_HASH"]:
+              mismatches.append("semantic_hash")
+          if digest != os.environ["EXPECTED_BUNDLE_MANIFEST_DIGEST"]:
+              mismatches.append("bundle_manifest_digest")
+          if mismatches:
+              print(f"transferred bundle does not match compiled identity: {mismatches}", file=sys.stderr)
+              raise SystemExit(1)
+          print("transferred bundle identity matches the compile job")
           PY
 
       - name: Publish immutable Topology Packet to GHCR
-        if: inputs.publish
         id: publish
         env:
           GH_TOKEN: ${{ github.token }}
           PACKET_REGISTRY: ${{ inputs.packet_registry }}
-          PACKET_SEMANTIC_HASH: ${{ steps.packet.outputs.packet_semantic_hash }}
+          PACKET_SEMANTIC_HASH: ${{ needs.compile.outputs.packet_semantic_hash }}
           SOURCE_REVISION: ${{ inputs.source_revision }}
         shell: bash
         run: |
           set -euo pipefail
           echo "$GH_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+
+          # ADR-0018: staging is derived from the packet semantic hash, never
+          # from a run counter. A run-scoped tag carries no packet identity and
+          # cannot be reconciled by any other consumer.
+          semantic_digest="${PACKET_SEMANTIC_HASH#sha256:}"
+          [[ "$semantic_digest" =~ ^[0-9a-f]{64}$ ]] || {
+            echo "Topology Packet semantic hash cannot form an OCI staging tag" >&2
+            exit 2
+          }
+          staging_tag="packet-$semantic_digest"
+
           context="$RUNNER_TEMP/topology-packet-oci"
           mkdir -p "$context/topology-packet"
           cp -R "$RUNNER_TEMP/topology-packet/." "$context/topology-packet/"
@@ -184,13 +312,12 @@ jobs:
           FROM scratch
           COPY topology-packet/ /l9/topology-packet/
           EOF
-          trace_tag="run-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           docker buildx build \
             --provenance=false \
             --label "org.opencontainers.image.source=https://github.com/Quantum-L9/l9-constellation-topology" \
             --label "io.quantum-l9.topology.semantic-hash=$PACKET_SEMANTIC_HASH" \
             --label "io.quantum-l9.source.revision=$SOURCE_REVISION" \
-            --tag "$PACKET_REGISTRY:$trace_tag" \
+            --tag "$PACKET_REGISTRY:$staging_tag" \
             --push \
             --metadata-file "$RUNNER_TEMP/oci-metadata.json" \
             "$context"
@@ -199,28 +326,257 @@ jobs:
             echo "GHCR did not return an immutable OCI digest" >&2
             exit 1
           }
-          immutable_ref="$PACKET_REGISTRY@$digest"
-          echo "packet_oci_ref=$immutable_ref" >> "$GITHUB_OUTPUT"
-          echo "packet_oci_ref=$immutable_ref"
 
-      - name: Re-pull immutable packet and validate
-        if: inputs.publish
+          # Only the digest-qualified reference is retained. The staging tag is
+          # an addressing convenience and is never an accepted packet reference.
+          immutable_ref="$PACKET_REGISTRY@$digest"
+          {
+            echo "packet_oci_ref=$immutable_ref"
+            echo "packet_staging_tag=$staging_tag"
+            echo "packet_registry_manifest_digest=$digest"
+          } >> "$GITHUB_OUTPUT"
+          echo "packet_oci_ref=$immutable_ref"
+          echo "packet_staging_tag=$staging_tag"
+
+      - name: Accept published packet under the ADR-0018 acceptance drill
         env:
+          PACKET_REGISTRY: ${{ inputs.packet_registry }}
           PACKET_OCI_REF: ${{ steps.publish.outputs.packet_oci_ref }}
-          EXPECTED_SEMANTIC_HASH: ${{ steps.packet.outputs.packet_semantic_hash }}
+          PACKET_STAGING_TAG: ${{ steps.publish.outputs.packet_staging_tag }}
+          PUSH_MANIFEST_DIGEST: ${{ steps.publish.outputs.packet_registry_manifest_digest }}
+          EXPECTED_PACKET_ID: ${{ needs.compile.outputs.packet_id }}
+          EXPECTED_SEMANTIC_HASH: ${{ needs.compile.outputs.packet_semantic_hash }}
+          EXPECTED_BUNDLE_MANIFEST_DIGEST: ${{ needs.compile.outputs.packet_bundle_manifest_digest }}
         working-directory: topology
         shell: bash
         run: |
           set -euo pipefail
-          docker pull "$PACKET_OCI_REF"
-          # The packet image is a non-runnable FROM scratch artifact. Supply a dummy
-          # command only so Docker can create a stopped container for docker cp.
-          cid="$(docker create "$PACKET_OCI_REF" /bin/true)"
-          trap 'docker rm -f "$cid" >/dev/null 2>&1 || true' EXIT
-          mkdir -p "$RUNNER_TEMP/repulled-topology-packet"
-          docker cp "$cid:/l9/topology-packet/." "$RUNNER_TEMP/repulled-topology-packet/"
-          PYTHONPATH="$PWD/src" uv run --no-sync python -c \
-            'from l9_constellation_topology.cli import main; main()' \
-            validate-packet --input-bundle "$RUNNER_TEMP/repulled-topology-packet"
-          actual="$(python -c 'import json,sys; print(json.load(open(sys.argv[1]))["semantic_hash"])' "$RUNNER_TEMP/repulled-topology-packet/manifest.json")"
-          test "$actual" = "$EXPECTED_SEMANTIC_HASH"
+
+          # A valid object that is not the expected object. It contains the real
+          # bundle plus one extra file, so it validates and carries the same
+          # semantic hash — exactly the case a happy-path check cannot tell apart
+          # from the genuine packet.
+          substitute_context="$RUNNER_TEMP/substitute-oci"
+          mkdir -p "$substitute_context/topology-packet"
+          cp -R "$RUNNER_TEMP/topology-packet/." "$substitute_context/topology-packet/"
+          echo "substituted-but-valid" > "$substitute_context/topology-packet/substitution.marker"
+          cat > "$substitute_context/Dockerfile" <<'EOF'
+          FROM scratch
+          COPY topology-packet/ /l9/topology-packet/
+          EOF
+          # The mutable-tag drill needs a tag that genuinely moves, so the drill
+          # tag first holds the real packet and is then re-pointed at the
+          # substitute. The canonical semantic-hash staging tag is never touched.
+          drill_tag="drill-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          docker buildx build \
+            --provenance=false \
+            --tag "$PACKET_REGISTRY:$drill_tag" \
+            --push \
+            "$RUNNER_TEMP/topology-packet-oci"
+          docker buildx build \
+            --provenance=false \
+            --tag "$PACKET_REGISTRY:$drill_tag" \
+            --push \
+            --metadata-file "$RUNNER_TEMP/substitute-metadata.json" \
+            "$substitute_context"
+          substitute_digest="$(python -c 'import json,sys; print(json.load(open(sys.argv[1]))["containerimage.digest"])' "$RUNNER_TEMP/substitute-metadata.json")"
+
+          export SUBSTITUTE_OCI_REF="$PACKET_REGISTRY@$substitute_digest"
+          export DRILL_TAG_REF="$PACKET_REGISTRY:$drill_tag"
+          export STAGING_TAG_REF="$PACKET_REGISTRY:$PACKET_STAGING_TAG"
+          # Acceptance runs the real compiler CLI, so it must use the frozen
+          # environment rather than the bare runner interpreter.
+          export TOPOLOGY_PYTHON="$PWD/.venv/bin/python"
+          export TOPOLOGY_SRC="$PWD/src"
+
+          python - <<'PY'
+          """ADR-0018 acceptance drill.
+
+          Proves the full publication/acceptance sequence and both negative
+          boundaries. Every control fails closed; the drill exits non-zero if any
+          expectation is not discriminated.
+          """
+
+          import hashlib
+          import json
+          import os
+          import shutil
+          import subprocess
+          import sys
+          import tempfile
+          from pathlib import Path
+
+          REGISTRY = os.environ["PACKET_REGISTRY"]
+          IMMUTABLE_REF = os.environ["PACKET_OCI_REF"]
+          PUSH_DIGEST = os.environ["PUSH_MANIFEST_DIGEST"]
+          STAGING_TAG_REF = os.environ["STAGING_TAG_REF"]
+          SUBSTITUTE_REF = os.environ["SUBSTITUTE_OCI_REF"]
+          DRILL_TAG_REF = os.environ["DRILL_TAG_REF"]
+          EXPECTED = {
+              "packet_id": os.environ["EXPECTED_PACKET_ID"],
+              "semantic_hash": os.environ["EXPECTED_SEMANTIC_HASH"],
+              "bundle_manifest_digest": os.environ["EXPECTED_BUNDLE_MANIFEST_DIGEST"],
+          }
+          WORKSPACE = Path(os.environ["RUNNER_TEMP"]) / "acceptance"
+          WORKSPACE.mkdir(parents=True, exist_ok=True)
+          TOPOLOGY_PYTHON = os.environ["TOPOLOGY_PYTHON"]
+          checks: list[str] = []
+
+
+          class AcceptanceError(Exception):
+              """An acceptance control refused the object."""
+
+
+          def run(command: list[str]) -> str:
+              completed = subprocess.run(
+                  command, check=False, capture_output=True, text=True, timeout=600
+              )
+              if completed.returncode != 0:
+                  detail = (completed.stderr or completed.stdout or "").strip()
+                  raise AcceptanceError(f"{command[0]} failed: {detail}")
+              return completed.stdout
+
+
+          def validate_packet(bundle: Path) -> None:
+              run(
+                  [
+                      TOPOLOGY_PYTHON,
+                      "-c",
+                      "from l9_constellation_topology.cli import main; main()",
+                      "validate-packet",
+                      "--input-bundle",
+                      str(bundle),
+                  ]
+              )
+
+
+          def resolve_descriptor_digest(reference: str) -> str:
+              """Independently resolve registry descriptor metadata.
+
+              A fresh registry query that never reuses the digest the builder
+              reported. The raw manifest document is fetched and hashed here, so
+              the resolved digest is verified rather than taken on trust.
+              """
+
+              completed = subprocess.run(
+                  ["docker", "buildx", "imagetools", "inspect", "--raw", reference],
+                  check=False,
+                  capture_output=True,
+                  timeout=600,
+              )
+              if completed.returncode != 0:
+                  detail = completed.stderr.decode("utf-8", "replace").strip()
+                  raise AcceptanceError(f"registry descriptor fetch failed for {reference}: {detail}")
+              return "sha256:" + hashlib.sha256(completed.stdout).hexdigest()
+
+
+          def accept(reference: str, *, expected: dict[str, str]) -> str:
+              """Accept a published packet, or fail closed.
+
+              Mirrors the canonical packet-store contract: digest-qualified only,
+              independently resolved descriptor, exact packet and bundle-manifest
+              identity.
+              """
+
+              if "@sha256:" not in reference:
+                  raise AcceptanceError(f"published OCI packet must be digest-qualified: {reference}")
+              uri_digest = reference.rsplit("@", 1)[1]
+              descriptor_digest = resolve_descriptor_digest(reference)
+              if descriptor_digest != uri_digest:
+                  raise AcceptanceError(
+                      "independently resolved registry descriptor does not match the immutable URI"
+                  )
+
+              destination = Path(tempfile.mkdtemp(prefix="accept-", dir=WORKSPACE))
+              run(["docker", "pull", reference])
+              container = run(["docker", "create", reference, "/bin/true"]).strip()
+              try:
+                  run(["docker", "cp", f"{container}:/l9/topology-packet/.", str(destination)])
+              finally:
+                  subprocess.run(["docker", "rm", "-f", container], check=False, capture_output=True)
+
+              validate_packet(destination)
+
+              manifest_bytes = (destination / "manifest.json").read_bytes()
+              manifest = json.loads(manifest_bytes.decode("utf-8"))
+              actual_bundle_digest = "sha256:" + hashlib.sha256(manifest_bytes).hexdigest()
+              mismatches = []
+              if manifest["packet_id"] != expected["packet_id"]:
+                  mismatches.append("packet_id")
+              if manifest["semantic_hash"] != expected["semantic_hash"]:
+                  mismatches.append("semantic_hash")
+              if actual_bundle_digest != expected["bundle_manifest_digest"]:
+                  mismatches.append("bundle_manifest_digest")
+              if mismatches:
+                  raise AcceptanceError(f"published packet identity mismatch: {', '.join(mismatches)}")
+              shutil.rmtree(destination, ignore_errors=True)
+              return descriptor_digest
+
+
+          def expect_refusal(label: str, reference: str) -> None:
+              try:
+                  accept(reference, expected=EXPECTED)
+              except AcceptanceError as exc:
+                  checks.append(f"PASS {label}: refused - {exc}")
+                  return
+              print(f"FAIL {label}: acceptance did not fail closed for {reference}", file=sys.stderr)
+              raise SystemExit(1)
+
+
+          os.environ["PYTHONPATH"] = os.environ["TOPOLOGY_SRC"]
+
+          # 1. Semantic-hash staging resolves to the object we accepted.
+          staging_digest = resolve_descriptor_digest(STAGING_TAG_REF)
+          if staging_digest != PUSH_DIGEST:
+              print("FAIL staging: semantic-hash tag does not resolve to the published digest", file=sys.stderr)
+              raise SystemExit(1)
+          checks.append(f"PASS semantic-hash staging resolves to {staging_digest}")
+
+          # 2. Full acceptance of the genuine digest-qualified packet.
+          accepted = accept(IMMUTABLE_REF, expected=EXPECTED)
+          if accepted != PUSH_DIGEST:
+              print("FAIL acceptance: accepted digest differs from publication digest", file=sys.stderr)
+              raise SystemExit(1)
+          checks.append(f"PASS exact packet and manifest identity accepted at {accepted}")
+
+          # 3. The substitute is a genuinely valid packet with the same semantic
+          #    hash. Prove that first, so the refusal below is known to come from
+          #    identity binding rather than from the object being malformed.
+          substitute_probe = Path(tempfile.mkdtemp(prefix="substitute-", dir=WORKSPACE))
+          run(["docker", "pull", SUBSTITUTE_REF])
+          substitute_container = run(["docker", "create", SUBSTITUTE_REF, "/bin/true"]).strip()
+          try:
+              run(["docker", "cp", f"{substitute_container}:/l9/topology-packet/.", str(substitute_probe)])
+          finally:
+              subprocess.run(["docker", "rm", "-f", substitute_container], check=False, capture_output=True)
+          validate_packet(substitute_probe)
+          substitute_manifest = json.loads((substitute_probe / "manifest.json").read_text(encoding="utf-8"))
+          if substitute_manifest["semantic_hash"] != EXPECTED["semantic_hash"]:
+              print("FAIL drill setup: substitute does not share the expected semantic hash", file=sys.stderr)
+              raise SystemExit(1)
+          checks.append("PASS substitute is a valid packet sharing the expected semantic hash")
+
+          # 4. Valid-object substitution must fail closed.
+          expect_refusal("valid-object substitution", SUBSTITUTE_REF)
+
+          # 5. Mutable-tag rejection: a tag reference is never accepted...
+          expect_refusal("mutable-tag reference", STAGING_TAG_REF)
+          expect_refusal("mutable drill-tag reference", DRILL_TAG_REF)
+
+          # ...and the registry proves why: the drill tag now resolves to the
+          # substitute, while the accepted digest still resolves to the packet.
+          drill_digest = resolve_descriptor_digest(DRILL_TAG_REF)
+          if drill_digest == PUSH_DIGEST:
+              print("FAIL mutable-tag drill: drill tag did not move to the substitute", file=sys.stderr)
+              raise SystemExit(1)
+          if resolve_descriptor_digest(IMMUTABLE_REF) != PUSH_DIGEST:
+              print("FAIL immutability: digest-qualified reference moved", file=sys.stderr)
+              raise SystemExit(1)
+          checks.append(
+              f"PASS tag {DRILL_TAG_REF} moved to {drill_digest} while {PUSH_DIGEST} stayed immutable"
+          )
+
+          for line in checks:
+              print(line)
+          print("ADR-0018 acceptance drill complete")
+          PY
