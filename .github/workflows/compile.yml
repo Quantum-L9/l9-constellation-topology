@@ -41,12 +41,11 @@ on:
         description: Immutable OCI reference when publication is enabled.
         value: ${{ jobs.compile.outputs.packet_oci_ref }}
 
-permissions:
-  contents: read
-  packages: write
-
 jobs:
   compile:
+    permissions:
+      contents: read
+      packages: write
     runs-on: ubuntu-latest
     timeout-minutes: 30
     outputs:
