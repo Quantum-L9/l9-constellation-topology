@@ -105,7 +105,10 @@ jobs:
   direct-compile-smoke:
     permissions:
       contents: read
-      packages: read
+      # Reusable-workflow permissions cannot elevate above their caller. The canonical
+      # compiler may publish to GHCR, so the caller must explicitly authorize this scope.
+      # This PR smoke sets publish=false and therefore never exercises the write.
+      packages: write
     uses: ./.github/workflows/compile.yml
     with:
       source_repository: Quantum-L9/l9-constellation-topology
