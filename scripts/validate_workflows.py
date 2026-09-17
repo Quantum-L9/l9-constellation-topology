@@ -82,9 +82,13 @@ def _permissions(job: dict[str, object]) -> dict[str, str]:
 def _check_compile_least_privilege(data: dict[str, object]) -> list[str]:
     """Reject package-write authority outside the publication boundary.
 
-    ADR-0017 grants package write only where GHCR mutation happens. Compilation
-    must therefore hold no ``packages`` scope at all, and the publishing job must
-    be conditional on ``inputs.publish`` so a compile-only run never reaches it.
+    ADR-0017 requires workflows to use least privilege. ADR-0029 applies that to
+    this seam: package write exists only in the publication boundary that mutates
+    GHCR. Compilation must therefore hold no ``packages`` scope at all, and the
+    publishing job must be conditional on ``inputs.publish`` so a compile-only
+    run never reaches it. ``actions: read`` is asserted because the publish job
+    fetches the compiled bundle from its own run; without it publication cannot
+    read the artifact it is meant to accept.
     """
 
     errors: list[str] = []
@@ -107,6 +111,10 @@ def _check_compile_least_privilege(data: dict[str, object]) -> list[str]:
     publish_permissions = _permissions(publish_job)
     if publish_permissions.get("packages") != "write":
         errors.append(f"{_WF_COMPILE}: publish job must declare packages: write")
+    if publish_permissions.get("actions") != "read":
+        errors.append(
+            f"{_WF_COMPILE}: publish job must declare actions: read to fetch the compiled bundle"
+        )
     if "inputs.publish" not in str(publish_job.get("if", "")):
         errors.append(f"{_WF_COMPILE}: publish job must be conditional on inputs.publish")
     return errors

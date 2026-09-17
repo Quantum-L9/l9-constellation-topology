@@ -4,7 +4,8 @@ name: topology-compile
 # no queue, no lease, and no registry state; ADR-0016 Model B remains the durable
 # scheduler, retry/lease owner, and packet-registry authority.
 #
-# Compile and publication are separate jobs on purpose (ADR-0017 least privilege).
+# Compilation and publication are separate jobs on purpose (ADR-0017 least
+# privilege, applied to this seam by ADR-0029).
 # The compile job holds `contents: read` only, so a publish=false run never
 # receives package-write authority. `packages: write` exists solely in the
 # publish job, which does not run unless `inputs.publish` is true.

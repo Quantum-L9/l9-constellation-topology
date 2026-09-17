@@ -56,6 +56,22 @@ def _quote_first_pin_with_comment_suffix(workflow: Path) -> str:
     raise AssertionError(f"no pinned uses reference found in {workflow}")
 
 
+def _mutate(workflow: Path, old: str, new: str) -> None:
+    text = workflow.read_text(encoding="utf-8")
+    assert old in text, f"{workflow.name} no longer contains the text this test mutates: {old!r}"
+    workflow.write_text(text.replace(old, new, 1), encoding="utf-8")
+
+
+def _compile_workflow(validator: Path) -> Path:
+    return validator.parent.parent / ".github" / "workflows" / "compile.yml"
+
+
+def _errors(validator: Path) -> list[str]:
+    completed = _run(validator)
+    assert completed.returncode == 1, completed.stdout + completed.stderr
+    return list(json.loads(completed.stdout)["errors"])
+
+
 def test_github_workflow_contracts_pass() -> None:
     completed = _run(VALIDATOR)
     assert completed.returncode == 0, completed.stdout + completed.stderr
@@ -81,3 +97,70 @@ def test_quoted_comment_suffixed_uses_is_rejected(tmp_path: Path) -> None:
         error == f"l9-pr-validate.yml: action is not pinned to a full commit SHA: {malformed}"
         for error in result["errors"]
     ), result["errors"]
+
+
+def test_compile_job_holding_package_authority_is_rejected(tmp_path: Path) -> None:
+    validator = _clone_workflow_tree(tmp_path)
+    _mutate(
+        _compile_workflow(validator),
+        "    permissions:\n      contents: read\n    runs-on: ubuntu-latest",
+        "    permissions:\n      contents: read\n      packages: write\n    runs-on: ubuntu-latest",
+    )
+
+    assert "compile.yml: compile job must not hold package authority: packages: write" in _errors(
+        validator
+    )
+
+
+def test_compile_job_without_contents_read_is_rejected(tmp_path: Path) -> None:
+    validator = _clone_workflow_tree(tmp_path)
+    _mutate(
+        _compile_workflow(validator),
+        "    permissions:\n      contents: read\n    runs-on: ubuntu-latest",
+        "    permissions:\n      contents: write\n    runs-on: ubuntu-latest",
+    )
+
+    assert "compile.yml: compile job must declare contents: read" in _errors(validator)
+
+
+def test_publish_job_without_package_authority_is_rejected(tmp_path: Path) -> None:
+    validator = _clone_workflow_tree(tmp_path)
+    _mutate(_compile_workflow(validator), "      packages: write\n", "")
+
+    assert "compile.yml: publish job must declare packages: write" in _errors(validator)
+
+
+def test_publish_job_without_actions_read_is_rejected(tmp_path: Path) -> None:
+    """Without it the publish job cannot fetch the bundle it is meant to accept."""
+
+    validator = _clone_workflow_tree(tmp_path)
+    _mutate(_compile_workflow(validator), "      actions: read\n", "")
+
+    assert (
+        "compile.yml: publish job must declare actions: read to fetch the compiled bundle"
+        in _errors(validator)
+    )
+
+
+def test_unconditional_publish_job_is_rejected(tmp_path: Path) -> None:
+    validator = _clone_workflow_tree(tmp_path)
+    _mutate(
+        _compile_workflow(validator),
+        "    needs: compile\n    if: inputs.publish\n",
+        "    needs: compile\n",
+    )
+
+    assert "compile.yml: publish job must be conditional on inputs.publish" in _errors(validator)
+
+
+def test_publication_merged_back_into_compilation_is_rejected(tmp_path: Path) -> None:
+    """Collapsing the split would put package authority back on the compile path."""
+
+    validator = _clone_workflow_tree(tmp_path)
+    workflow = _compile_workflow(validator)
+    text = workflow.read_text(encoding="utf-8")
+    head, separator, _ = text.partition("\n  publish:\n")
+    assert separator, "compile.yml no longer declares a separate publish job"
+    workflow.write_text(head + "\n", encoding="utf-8")
+
+    assert "compile.yml: publication must be a separate job from compilation" in _errors(validator)

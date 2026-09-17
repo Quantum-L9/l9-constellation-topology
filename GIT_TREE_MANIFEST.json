@@ -92,7 +92,7 @@
       "path": ".github/governance/waivers.yaml"
     },
     {
-      "git_object_id": "5ef8f21820df1c697e386180d0769e807f3ebc4e",
+      "git_object_id": "5ac722ad392f1c9ff9f25a355e35941b0c78978a",
       "mode": "100644",
       "object_type": "blob",
       "path": ".github/workflows/compile.yml"
@@ -1358,7 +1358,7 @@
       "path": "scripts/validate_release_readiness.py"
     },
     {
-      "git_object_id": "bdf674b0601a0b9cc8d5615dede47b47f0c330c3",
+      "git_object_id": "bb04a3cdcffbe5114540b37330ab1a86792d24bc",
       "mode": "100644",
       "object_type": "blob",
       "path": "scripts/validate_workflows.py"
@@ -3242,7 +3242,7 @@
       "path": "tests/test_worker_v5.py"
     },
     {
-      "git_object_id": "27c7a4db67954d671b742fbd0f16d2ef1adbc62d",
+      "git_object_id": "f3f2ea4ea1fdd476cc3268b11200c5c56ce66a79",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_workflow_contracts_v5.py"
@@ -3272,7 +3272,7 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:9b2551d720954675aaa6cd1dc285616ef0b95682b84fb22391e8e8891b305058",
+  "entries_sha256": "sha256:f3e1f8008676f4aa393b2782badd13b64362a65bab3f503871444df613593a10",
   "entry_count": 545,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
