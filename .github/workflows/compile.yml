@@ -213,7 +213,9 @@ jobs:
         run: |
           set -euo pipefail
           docker pull "$PACKET_OCI_REF"
-          cid="$(docker create "$PACKET_OCI_REF")"
+          # The packet image is a non-runnable FROM scratch artifact. Supply a dummy
+          # command only so Docker can create a stopped container for docker cp.
+          cid="$(docker create "$PACKET_OCI_REF" /bin/true)"
           trap 'docker rm -f "$cid" >/dev/null 2>&1 || true' EXIT
           mkdir -p "$RUNNER_TEMP/repulled-topology-packet"
           docker cp "$cid:/l9/topology-packet/." "$RUNNER_TEMP/repulled-topology-packet/"
