@@ -105,9 +105,6 @@ jobs:
   direct-compile-smoke:
     permissions:
       contents: read
-      # Reusable-workflow permissions cannot elevate above their caller. The canonical
-      # compiler may publish to GHCR, so the caller must explicitly authorize this scope.
-      # This PR smoke sets publish=false and therefore never exercises the write.
       packages: write
     uses: ./.github/workflows/compile.yml
     with:
@@ -118,4 +115,4 @@ jobs:
       # The PR proof therefore binds the current real Meta producer revision exactly;
       # the released reusable interface defaults to the canonical maintained v4 line.
       meta_ref: e78b3c5917756ec7a13b056b07bf08b9b72f5adf
-      publish: false
+      publish: true
