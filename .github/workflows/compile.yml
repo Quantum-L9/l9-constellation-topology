@@ -178,8 +178,21 @@ jobs:
           # The bundle manifest digest is bound here, before the bundle ever
           # leaves the runner, so acceptance can compare the re-pulled bytes
           # against an expectation the registry never influenced.
+          #
+          # This reproduces the canonical control byte for byte: it is the same
+          # value as worker/packet_store.py::_bundle_manifest_digest, which is
+          # run.artifact_hash -> run.evidence.sha256_bytes, i.e. "sha256:" plus
+          # the hex digest of manifest.json. Keep the two definitions identical.
           bundle_manifest_digest = "sha256:" + hashlib.sha256(manifest_bytes).hexdigest()
-          artifact_name = f"topology-packet-{os.environ['GITHUB_RUN_ID']}-{os.environ['GITHUB_RUN_ATTEMPT']}"
+          # Keyed on the calling job as well as the run, so two callers of this
+          # reusable workflow in one run cannot collide on the artifact name and
+          # cross packets between jobs.
+          artifact_name = (
+              "topology-packet"
+              f"-{os.environ['GITHUB_RUN_ID']}"
+              f"-{os.environ['GITHUB_RUN_ATTEMPT']}"
+              f"-{os.environ['GITHUB_JOB']}"
+          )
           with Path(os.environ["GITHUB_OUTPUT"]).open("a", encoding="utf-8") as handle:
               handle.write(f"packet_id={packet_id}\n")
               handle.write(f"packet_semantic_hash={semantic_hash}\n")
