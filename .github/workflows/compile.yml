@@ -119,23 +119,27 @@ jobs:
           python-version: "3.12"
           cache: pip
 
-      - name: Synchronize frozen Topology environment
+      - name: Synchronize frozen Topology dependencies
         working-directory: topology
         run: |
           python -m pip install --disable-pip-version-check --only-binary ":all:" uv==0.10.0
-          uv sync --frozen --no-build --extra dev
+          uv sync --frozen --no-build --extra dev --no-install-project
 
       - name: Validate producer packet and compile topology
         working-directory: topology
         shell: bash
         run: |
           set -euo pipefail
-          uv run l9-topology compile-packet \
+          topology() {
+            PYTHONPATH="$PWD/src" uv run --no-sync python -c \
+              'from l9_constellation_topology.cli import main; main()' "$@"
+          }
+          topology compile-packet \
             --repo-root . \
             --input-bundle "$RUNNER_TEMP/repository-model" \
             --out "$RUNNER_TEMP/topology-packet"
-          uv run l9-topology validate-packet --input-bundle "$RUNNER_TEMP/topology-packet"
-          uv run l9-topology verify-determinism \
+          topology validate-packet --input-bundle "$RUNNER_TEMP/topology-packet"
+          topology verify-determinism \
             --repo-root . \
             --input-bundle "$RUNNER_TEMP/repository-model"
 
@@ -213,6 +217,8 @@ jobs:
           trap 'docker rm -f "$cid" >/dev/null 2>&1 || true' EXIT
           mkdir -p "$RUNNER_TEMP/repulled-topology-packet"
           docker cp "$cid:/l9/topology-packet/." "$RUNNER_TEMP/repulled-topology-packet/"
-          uv run l9-topology validate-packet --input-bundle "$RUNNER_TEMP/repulled-topology-packet"
+          PYTHONPATH="$PWD/src" uv run --no-sync python -c \
+            'from l9_constellation_topology.cli import main; main()' \
+            validate-packet --input-bundle "$RUNNER_TEMP/repulled-topology-packet"
           actual="$(python -c 'import json,sys; print(json.load(open(sys.argv[1]))["semantic_hash"])' "$RUNNER_TEMP/repulled-topology-packet/manifest.json")"
           test "$actual" = "$EXPECTED_SEMANTIC_HASH"
