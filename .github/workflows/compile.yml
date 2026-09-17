@@ -1,0 +1,219 @@
+name: topology-compile
+
+on:
+  workflow_call:
+    inputs:
+      source_repository:
+        description: Repository to observe with l9-meta-injector.
+        required: true
+        type: string
+      source_revision:
+        description: Exact 40-character source commit to observe.
+        required: true
+        type: string
+      source_name:
+        description: Canonical repository name written into the Repository Model Packet.
+        required: true
+        type: string
+      meta_ref:
+        description: l9-meta-injector release ref. Canonical released default is the maintained major line.
+        required: false
+        type: string
+        default: v4
+      publish:
+        description: Publish the validated Topology Packet to GHCR and prove it by digest re-pull.
+        required: false
+        type: boolean
+        default: true
+      packet_registry:
+        description: GHCR repository for Topology Packet OCI artifacts.
+        required: false
+        type: string
+        default: ghcr.io/quantum-l9/l9-constellation-topology-packets
+    outputs:
+      packet_id:
+        description: Canonical Topology Packet id.
+        value: ${{ jobs.compile.outputs.packet_id }}
+      packet_semantic_hash:
+        description: Canonical Topology Packet semantic hash.
+        value: ${{ jobs.compile.outputs.packet_semantic_hash }}
+      packet_oci_ref:
+        description: Immutable OCI reference when publication is enabled.
+        value: ${{ jobs.compile.outputs.packet_oci_ref }}
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      packet_id: ${{ steps.packet.outputs.packet_id }}
+      packet_semantic_hash: ${{ steps.packet.outputs.packet_semantic_hash }}
+      packet_oci_ref: ${{ steps.publish.outputs.packet_oci_ref }}
+    steps:
+      - name: Reject mutable or malformed source revision
+        env:
+          SOURCE_REVISION: ${{ inputs.source_revision }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$SOURCE_REVISION" =~ ^[0-9a-f]{40}$ ]] || {
+            echo "source_revision must be an exact 40-character commit SHA" >&2
+            exit 2
+          }
+
+      - name: Checkout exact source revision
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          repository: ${{ inputs.source_repository }}
+          ref: ${{ inputs.source_revision }}
+          path: source
+          fetch-depth: 1
+
+      - name: Checkout exact Topology workflow revision
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          repository: Quantum-L9/l9-constellation-topology
+          ref: ${{ github.workflow_sha }}
+          path: topology
+          fetch-depth: 1
+
+      - name: Checkout Meta producer
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          repository: Quantum-L9/l9-meta-injector
+          ref: ${{ inputs.meta_ref }}
+          path: meta
+          fetch-depth: 1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: meta/package-lock.json
+
+      - name: Build exact Meta producer
+        working-directory: meta
+        run: |
+          npm ci
+          npm run build
+
+      - name: Produce real Repository Model Packet
+        env:
+          SOURCE_NAME: ${{ inputs.source_name }}
+          SOURCE_REVISION: ${{ inputs.source_revision }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          node meta/scripts/repository-model-cli.js "$GITHUB_WORKSPACE/source" \
+            --name "$SOURCE_NAME" \
+            --revision "git:$SOURCE_REVISION" \
+            --out "$RUNNER_TEMP/repository-model"
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5.4.0
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Synchronize frozen Topology environment
+        working-directory: topology
+        run: |
+          python -m pip install --disable-pip-version-check --only-binary ":all:" uv==0.10.0
+          uv sync --frozen --no-build --extra dev
+
+      - name: Validate producer packet and compile topology
+        working-directory: topology
+        shell: bash
+        run: |
+          set -euo pipefail
+          uv run l9-topology compile-packet \
+            --repo-root . \
+            --input-bundle "$RUNNER_TEMP/repository-model" \
+            --out "$RUNNER_TEMP/topology-packet"
+          uv run l9-topology validate-packet --input-bundle "$RUNNER_TEMP/topology-packet"
+          uv run l9-topology verify-determinism \
+            --repo-root . \
+            --input-bundle "$RUNNER_TEMP/repository-model"
+
+      - name: Capture canonical packet identity
+        id: packet
+        env:
+          PACKET_MANIFEST: ${{ runner.temp }}/topology-packet/manifest.json
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          manifest = json.loads(Path(os.environ["PACKET_MANIFEST"]).read_text(encoding="utf-8"))
+          packet_id = manifest["packet_id"]
+          semantic_hash = manifest["semantic_hash"]
+          with Path(os.environ["GITHUB_OUTPUT"]).open("a", encoding="utf-8") as handle:
+              handle.write(f"packet_id={packet_id}\n")
+              handle.write(f"packet_semantic_hash={semantic_hash}\n")
+          print(f"packet_id={packet_id}")
+          print(f"packet_semantic_hash={semantic_hash}")
+          PY
+
+      - name: Publish immutable Topology Packet to GHCR
+        if: inputs.publish
+        id: publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PACKET_REGISTRY: ${{ inputs.packet_registry }}
+          PACKET_SEMANTIC_HASH: ${{ steps.packet.outputs.packet_semantic_hash }}
+          SOURCE_REVISION: ${{ inputs.source_revision }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "$GH_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+          context="$RUNNER_TEMP/topology-packet-oci"
+          mkdir -p "$context/topology-packet"
+          cp -R "$RUNNER_TEMP/topology-packet/." "$context/topology-packet/"
+          cat > "$context/Dockerfile" <<'EOF'
+          FROM scratch
+          COPY topology-packet/ /l9/topology-packet/
+          EOF
+          trace_tag="run-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          docker buildx build \
+            --provenance=false \
+            --label "org.opencontainers.image.source=https://github.com/Quantum-L9/l9-constellation-topology" \
+            --label "io.quantum-l9.topology.semantic-hash=$PACKET_SEMANTIC_HASH" \
+            --label "io.quantum-l9.source.revision=$SOURCE_REVISION" \
+            --tag "$PACKET_REGISTRY:$trace_tag" \
+            --push \
+            --metadata-file "$RUNNER_TEMP/oci-metadata.json" \
+            "$context"
+          digest="$(python -c 'import json,sys; print(json.load(open(sys.argv[1]))["containerimage.digest"])' "$RUNNER_TEMP/oci-metadata.json")"
+          [[ "$digest" =~ ^sha256:[0-9a-f]{64}$ ]] || {
+            echo "GHCR did not return an immutable OCI digest" >&2
+            exit 1
+          }
+          immutable_ref="$PACKET_REGISTRY@$digest"
+          echo "packet_oci_ref=$immutable_ref" >> "$GITHUB_OUTPUT"
+          echo "packet_oci_ref=$immutable_ref"
+
+      - name: Re-pull immutable packet and validate
+        if: inputs.publish
+        env:
+          PACKET_OCI_REF: ${{ steps.publish.outputs.packet_oci_ref }}
+          EXPECTED_SEMANTIC_HASH: ${{ steps.packet.outputs.packet_semantic_hash }}
+        working-directory: topology
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker pull "$PACKET_OCI_REF"
+          cid="$(docker create "$PACKET_OCI_REF")"
+          trap 'docker rm -f "$cid" >/dev/null 2>&1 || true' EXIT
+          mkdir -p "$RUNNER_TEMP/repulled-topology-packet"
+          docker cp "$cid:/l9/topology-packet/." "$RUNNER_TEMP/repulled-topology-packet/"
+          uv run l9-topology validate-packet --input-bundle "$RUNNER_TEMP/repulled-topology-packet"
+          actual="$(python -c 'import json,sys; print(json.load(open(sys.argv[1]))["semantic_hash"])' "$RUNNER_TEMP/repulled-topology-packet/manifest.json")"
+          test "$actual" = "$EXPECTED_SEMANTIC_HASH"
