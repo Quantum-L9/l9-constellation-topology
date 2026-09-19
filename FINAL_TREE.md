@@ -347,6 +347,7 @@ l9-constellation-topology/
 │   ├── test_packet_ingress_v5.py
 │   ├── test_packet_models_v5.py
 │   ├── test_packet_store_v5.py
+│   ├── test_oci_acceptance_drill_v5.py
 │   ├── test_release_readiness.py
 │   ├── test_renderers.py
 │   ├── test_repo_scanner.py
