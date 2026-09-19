@@ -430,6 +430,10 @@ jobs:
               "packet_id": os.environ["EXPECTED_PACKET_ID"],
               "semantic_hash": os.environ["EXPECTED_SEMANTIC_HASH"],
               "bundle_manifest_digest": os.environ["EXPECTED_BUNDLE_MANIFEST_DIGEST"],
+              # The registry object this publication produced. Without it,
+              # acceptance only proves an object is internally consistent and
+              # carries the expected packet - not that it is the expected object.
+              "registry_manifest_digest": PUSH_DIGEST,
           }
           WORKSPACE = Path(os.environ["RUNNER_TEMP"]) / "acceptance"
           WORKSPACE.mkdir(parents=True, exist_ok=True)
@@ -488,13 +492,23 @@ jobs:
               """Accept a published packet, or fail closed.
 
               Mirrors the canonical packet-store contract: digest-qualified only,
-              independently resolved descriptor, exact packet and bundle-manifest
-              identity.
+              bound to the exact expected registry object, independently resolved
+              descriptor, exact packet and bundle-manifest identity.
               """
 
               if "@sha256:" not in reference:
                   raise AcceptanceError(f"published OCI packet must be digest-qualified: {reference}")
               uri_digest = reference.rsplit("@", 1)[1]
+              # worker/packet_store.py::verify_published binds the reference to the
+              # digest publication actually returned. Comparing the descriptor to
+              # the URI alone only proves internal consistency, so any valid object
+              # carrying the expected packet would pass - including one that merely
+              # contains it alongside other content.
+              if uri_digest != expected["registry_manifest_digest"]:
+                  raise AcceptanceError(
+                      "published OCI URI digest does not match registry evidence: "
+                      f"{uri_digest} is not {expected['registry_manifest_digest']}"
+                  )
               descriptor_digest = resolve_descriptor_digest(reference)
               if descriptor_digest != uri_digest:
                   raise AcceptanceError(

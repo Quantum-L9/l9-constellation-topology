@@ -92,7 +92,7 @@
       "path": ".github/governance/waivers.yaml"
     },
     {
-      "git_object_id": "5ac722ad392f1c9ff9f25a355e35941b0c78978a",
+      "git_object_id": "b34ebf1999469fdddb1dfe3c7abc91ed57a9bd64",
       "mode": "100644",
       "object_type": "blob",
       "path": ".github/workflows/compile.yml"
@@ -272,7 +272,7 @@
       "path": "EFFECT_IDENTITY_MIGRATION_PREFLIGHT.json"
     },
     {
-      "git_object_id": "9af3af3503890e9528306f4df87d4a2de9b1b972",
+      "git_object_id": "d9eeb9a43a156403c4afed9a4597d164e855f930",
       "mode": "100644",
       "object_type": "blob",
       "path": "FINAL_TREE.md"
@@ -314,7 +314,7 @@
       "path": "MAINTAINERS.md"
     },
     {
-      "git_object_id": "a04292f34870398604f775f7bdbd78433ffc9cc0",
+      "git_object_id": "08ca6d0ce0f7231481a0857996e7282412060122",
       "mode": "100644",
       "object_type": "blob",
       "path": "MANIFEST.md"
@@ -410,7 +410,7 @@
       "path": "UNKNOWN_REGISTER.md"
     },
     {
-      "git_object_id": "3b55e212bbb8c8395b8ea79780d5bf20c5df11c5",
+      "git_object_id": "f4d26726cf0b70c2c492e0cddfe8464cadde4aa0",
       "mode": "100644",
       "object_type": "blob",
       "path": "VALIDATION.md"
@@ -3050,6 +3050,12 @@
       "path": "tests/test_meta_work_signal_payload.py"
     },
     {
+      "git_object_id": "6b2ef7510b8f13f0609c624408a45dc1d2436a94",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/test_oci_acceptance_drill_v5.py"
+    },
+    {
       "git_object_id": "b49bcaaf2b3be471095bd9da62b81df8f817b4ed",
       "mode": "100644",
       "object_type": "blob",
@@ -3272,8 +3278,8 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:f3e1f8008676f4aa393b2782badd13b64362a65bab3f503871444df613593a10",
-  "entry_count": 545,
+  "entries_sha256": "sha256:8294b02f461ec3c9d2535f885b7bb6929a93ff26816bc1a1258be66879a02e78",
+  "entry_count": 546,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
   ],

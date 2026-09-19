@@ -135,16 +135,42 @@ Proven locally:
 | Exact `uses` pin enforcement | PASS | a quoted comment-suffixed pin is rejected; reintroducing the strip makes the validator report `passed` and the regression test fail |
 | Compile job holds no package authority | PASS | adding `packages:` to the compile job is rejected by the contract gate |
 | Publication gated on `inputs.publish` | PASS | removing the condition is rejected by the contract gate |
+| ADR-0018 acceptance drill, every control | PASS | `tests/test_oci_acceptance_drill_v5.py` executes the drill source extracted from `compile.yml` against a fake registry; removing the expected-registry-digest control makes both tests fail |
 
-Not provable locally — requires a GitHub Actions run with GHCR credentials:
+Captured from GitHub Actions run `35451617285`:
+
+| Check | Status | Evidence |
+|---|---|---|
+| `l9-pr-validate / validate` | PASS | job `105919650979` executed environment sync, compile, tests with coverage, format, lint, typing, contracts, workflow validation, architecture, readiness, commit-bound integrity, determinism, build, and wheel smoke |
+| `direct-compile-smoke / compile` | PASS | job `105919651169` |
+| `direct-compile-smoke / publish` | FAIL, then repaired | job `105919770043` reported `FAIL valid-object substitution: acceptance did not fail closed`. Root cause and repair below. |
+
+### The substitution control's first real execution failed
+
+The drill's negative control did not discriminate. `accept()` compared the
+independently resolved descriptor against the reference's own digest — internal
+consistency — and then compared packet id, semantic hash, and bundle manifest
+digest. It never compared the reference against the digest publication actually
+returned. The substitute carries the same `manifest.json` plus one extra file,
+so every one of those checks matched and a different registry object was
+accepted.
+
+This is the same omission ADR-0018 and finding F001 name: reproducing part of
+the canonical acceptance contract rather than all of it.
+`worker/packet_store.py::verify_published` binds
+`expected_registry_manifest_digest`; the seam did not. That binding is now
+present, and `tests/test_oci_acceptance_drill_v5.py` executes the real drill
+source so the control cannot regress unobserved again.
+
+Still not provable locally — requires a GitHub Actions run with GHCR credentials:
 
 | Check | Status | What would discharge it |
 |---|---|---|
-| ADR-0018 acceptance drill | UNKNOWN | A `direct-compile-smoke` run in which semantic-hash staging, independent descriptor resolution, exact identity acceptance, valid-object substitution refusal, and mutable-tag refusal all report PASS |
+| ADR-0018 acceptance drill against a real registry | UNKNOWN | A `direct-compile-smoke` run on the repaired seam in which every control reports PASS |
 | `publish: false` permission boundary | UNKNOWN | A run with `publish: false` whose job log shows no `Packages: write` grant |
 
-These two remain UNKNOWN until captured from a real run. No deployment or publication success is
-claimed from the workflow source alone.
+No deployment or publication success is claimed from the workflow source or from
+the fake-registry tests alone.
 
 ## Release decision
 
