@@ -40,7 +40,7 @@ OCI/Postgres acceptance drills in `UNKNOWN_REGISTER.md`.
 | Full test suite | PASS | 112 tests passed |
 | Branch coverage | PASS | 81.62%, above the configured 80% floor |
 | Contract and schema validation | PASS | 31 checked-in schemas passed |
-| GitHub workflow contract validation | PASS | four workflows passed |
+| GitHub workflow contract validation | PASS | five workflows passed |
 | Architecture boundary validation | PASS | 111 production source files, zero violations |
 | Release-readiness validation | PASS | 338 tracked delivery files, zero findings |
 | Callback boundary regression | PASS | exact and descendant paths allowed; sibling-prefix and encoded-separator paths rejected |
@@ -120,6 +120,31 @@ make hash-locality-update   # explicit regeneration
   expected verdict of every case, so regeneration cannot bless a wrong answer.
 - `tests/test_generated_artifact_sync.py` covers missing, stale, explicit-update, and
   duplicate-destination (fail-closed) behavior of the drift helper.
+
+## Direct compile seam
+
+`.github/workflows/compile.yml` is authorized by ADR-0029 as a bounded, stateless compile
+seam. ADR-0016 Model B remains the durable scheduler, retry/lease owner, and packet-registry
+authority; the seam carries none of that state.
+
+Proven locally:
+
+| Check | Status | Evidence summary |
+|---|---|---|
+| Workflow contract, five workflows | PASS | `scripts/validate_workflows.py` exits 0 |
+| Exact `uses` pin enforcement | PASS | a quoted comment-suffixed pin is rejected; reintroducing the strip makes the validator report `passed` and the regression test fail |
+| Compile job holds no package authority | PASS | adding `packages:` to the compile job is rejected by the contract gate |
+| Publication gated on `inputs.publish` | PASS | removing the condition is rejected by the contract gate |
+
+Not provable locally — requires a GitHub Actions run with GHCR credentials:
+
+| Check | Status | What would discharge it |
+|---|---|---|
+| ADR-0018 acceptance drill | UNKNOWN | A `direct-compile-smoke` run in which semantic-hash staging, independent descriptor resolution, exact identity acceptance, valid-object substitution refusal, and mutable-tag refusal all report PASS |
+| `publish: false` permission boundary | UNKNOWN | A run with `publish: false` whose job log shows no `Packages: write` grant |
+
+These two remain UNKNOWN until captured from a real run. No deployment or publication success is
+claimed from the workflow source alone.
 
 ## Release decision
 

@@ -6,7 +6,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 
 ## Inventory
 
-**Tracked delivery files:** 545
+**Tracked delivery files:** 546
 
 - `.editorconfig` — editor encoding, indentation, and whitespace policy
 - `.env.example` — documented worker and control-plane environment variables
@@ -23,6 +23,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `.github/governance/semgrep-identity-map.yaml` — governed analysis semgrep rule identity resolution map
 - `.github/governance/semgrep-policy.yaml` — governed analysis semgrep provider policy
 - `.github/governance/waivers.yaml` — governed analysis finding-waiver ledger
+- `.github/workflows/compile.yml` — reusable direct compile seam that compiles, validates, and optionally publishes and accepts a Topology Packet in GHCR (ADR-0029)
 - `.github/workflows/l9-ingress.yml` — immutable-pinned GitHub Actions workflow
 - `.github/workflows/l9-manual-replay.yml` — immutable-pinned GitHub Actions workflow
 - `.github/workflows/l9-pr-validate.yml` — immutable-pinned GitHub Actions workflow
@@ -125,6 +126,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `docs/adr/0026-accept-corpus-intelligence-as-an-auxiliary-packet.md` — architecture decision record
 - `docs/adr/0027-separate-observation-time-from-publication-time.md` — accepted architecture decision record
 - `docs/adr/0028-project-bridge-gaps-as-decision-support.md` — accepted architecture decision record
+- `docs/adr/0029-authorize-a-bounded-github-native-direct-compile-seam.md` — accepted architecture decision record
 - `docs/adr/README.md` — ADR directory governance and navigation
 - `docs/architecture.md` — architecture, contract, deployment, recovery, or model documentation
 - `docs/archive/v4/01_SPEC_ATTACK.md` — superseded v4 historical artifact retained for migration evidence

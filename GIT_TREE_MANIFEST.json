@@ -92,6 +92,12 @@
       "path": ".github/governance/waivers.yaml"
     },
     {
+      "git_object_id": "5ac722ad392f1c9ff9f25a355e35941b0c78978a",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": ".github/workflows/compile.yml"
+    },
+    {
       "git_object_id": "50ef41fdd8f1aa2d2f3f781830166e8418e27390",
       "mode": "100644",
       "object_type": "blob",
@@ -104,7 +110,7 @@
       "path": ".github/workflows/l9-manual-replay.yml"
     },
     {
-      "git_object_id": "c405d481cddd37719b6d837d30a1d7993f805291",
+      "git_object_id": "53b94a1ebb0e02c938e6f6594a67ebb8823a10d5",
       "mode": "100644",
       "object_type": "blob",
       "path": ".github/workflows/l9-pr-validate.yml"
@@ -182,13 +188,13 @@
       "path": ".python-version"
     },
     {
-      "git_object_id": "73de3dd672aca1eed89c4d69c37ac254e56bed28",
+      "git_object_id": "150a130290f73624e25199da1a0094a41e87a858",
       "mode": "100644",
       "object_type": "blob",
       "path": "ADR_INDEX.md"
     },
     {
-      "git_object_id": "e2c83e9257351b02a557df163b9bc47327632ed6",
+      "git_object_id": "05dff04479b4249029556ab2ed59f8e7887e4245",
       "mode": "100644",
       "object_type": "blob",
       "path": "AGENTS.md"
@@ -254,7 +260,7 @@
       "path": "DEPENDENCY_POLICY.md"
     },
     {
-      "git_object_id": "d740bbb8be0a6335dde5e4379a2aa93bbc74d4c4",
+      "git_object_id": "ab5d5ea9907dccb667a9d0f2c14082931eebdc2b",
       "mode": "100644",
       "object_type": "blob",
       "path": "DEVELOPMENT.md"
@@ -266,7 +272,7 @@
       "path": "EFFECT_IDENTITY_MIGRATION_PREFLIGHT.json"
     },
     {
-      "git_object_id": "426ad11ce22f67bc78699230c7a05cb5bd483599",
+      "git_object_id": "9af3af3503890e9528306f4df87d4a2de9b1b972",
       "mode": "100644",
       "object_type": "blob",
       "path": "FINAL_TREE.md"
@@ -308,7 +314,7 @@
       "path": "MAINTAINERS.md"
     },
     {
-      "git_object_id": "9f48a64419e608aff2baac58f79fd33c2dc851c5",
+      "git_object_id": "a04292f34870398604f775f7bdbd78433ffc9cc0",
       "mode": "100644",
       "object_type": "blob",
       "path": "MANIFEST.md"
@@ -332,7 +338,7 @@
       "path": "QUALIFICATION.json"
     },
     {
-      "git_object_id": "cb8ae7d1fccd22423f64c5d01feaa5e1cf22c7a7",
+      "git_object_id": "b054a6417e60f6d24b4bacc6b1856d439cf805a4",
       "mode": "100644",
       "object_type": "blob",
       "path": "README.md"
@@ -356,7 +362,7 @@
       "path": "ROADMAP.md"
     },
     {
-      "git_object_id": "a232b9d85602053f0b7308fdead996b5c8870470",
+      "git_object_id": "a2a3995218c96d473804a3013860a8e0aa42ba03",
       "mode": "100644",
       "object_type": "blob",
       "path": "RUNBOOK.md"
@@ -404,7 +410,7 @@
       "path": "UNKNOWN_REGISTER.md"
     },
     {
-      "git_object_id": "689eb7fc36c51b5bc8ddce59d122f0fca5558469",
+      "git_object_id": "3b55e212bbb8c8395b8ea79780d5bf20c5df11c5",
       "mode": "100644",
       "object_type": "blob",
       "path": "VALIDATION.md"
@@ -696,6 +702,12 @@
       "mode": "100644",
       "object_type": "blob",
       "path": "docs/adr/0028-project-bridge-gaps-as-decision-support.md"
+    },
+    {
+      "git_object_id": "8d3ce523f5af7c3fceb0343d5c51907e9e8c2f1f",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "docs/adr/0029-authorize-a-bounded-github-native-direct-compile-seam.md"
     },
     {
       "git_object_id": "3c2466071d4b3c021b1969946079823ae4bcfae7",
@@ -1346,7 +1358,7 @@
       "path": "scripts/validate_release_readiness.py"
     },
     {
-      "git_object_id": "432c7d5591f620fac960a559ca1cc6576d5b8b2d",
+      "git_object_id": "bb04a3cdcffbe5114540b37330ab1a86792d24bc",
       "mode": "100644",
       "object_type": "blob",
       "path": "scripts/validate_workflows.py"
@@ -3230,7 +3242,7 @@
       "path": "tests/test_worker_v5.py"
     },
     {
-      "git_object_id": "69cd638169487a4dbc8561cdebedb2f054608269",
+      "git_object_id": "f3f2ea4ea1fdd476cc3268b11200c5c56ce66a79",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_workflow_contracts_v5.py"
@@ -3260,8 +3272,8 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:f77a49dea3a49ed325f06ff1daab4306337b4332c956a839f3e5851e5d4d6825",
-  "entry_count": 543,
+  "entries_sha256": "sha256:f3e1f8008676f4aa393b2782badd13b64362a65bab3f503871444df613593a10",
+  "entry_count": 545,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
   ],
