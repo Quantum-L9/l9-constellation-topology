@@ -6,7 +6,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 
 ## Inventory
 
-**Tracked delivery files:** 546
+**Tracked delivery files:** 547
 
 - `.editorconfig` — editor encoding, indentation, and whitespace policy
 - `.env.example` — documented worker and control-plane environment variables
@@ -531,6 +531,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `tests/test_publication_planning.py` — unit, contract, integration, regression, or governance test
 - `tests/test_publication_temporal.py` — proves observation time and publication time stay distinct coordinates
 - `tests/test_reasoning_router.py` — automated regression and contract test suite
+- `tests/test_oci_acceptance_drill_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_release_readiness.py` — unit, contract, integration, regression, or governance test
 - `tests/test_renderers.py` — unit, contract, integration, regression, or governance test
 - `tests/test_repo_scanner.py` — unit, contract, integration, regression, or governance test
