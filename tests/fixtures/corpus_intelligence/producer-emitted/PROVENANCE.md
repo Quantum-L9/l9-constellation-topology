@@ -62,7 +62,16 @@ changing what the fixture says.
 | | |
 |---|---|
 | Producer repository | `Quantum-L9/l9-meta-injector` |
-| Producer revision | `79bd7a31f56958095a275b2fda7380df8e1ec69a` |
+| Producer revision | `953b7cba7a2a694abf02f73d1261a895c2bbc3d3` (release `v4.2.0`) |
+| Producer version | `l9-meta-injector.corpus-intelligence` 4.2.0 over `l9.repository-model` 1.1.0 roots |
 | Packet type | `l9.corpus-intelligence` 1.0.0 |
-| Packet id | `packet:a4a2b6d4efca458ef462283e1cf4a7a3cf924bbc76e4c7fd3f768d64bff34517` |
-| Generated | 2026-08-30 |
+| Packet id | `packet:1165b10de751b2789b53bc9e4aa951fdfc545667f28290c004ae2c2f1e8ace8b` |
+| Generated | 2026-10-22 |
+
+Previously generated at `79bd7a31f56958095a275b2fda7380df8e1ec69a` (producer 4.0.0,
+packet `packet:a4a2b6d4…bff34517`, 2026-08-30). Regenerated at v4.2.0 because the
+producer's repository-model contract changed on its side: every repository
+record now carries an observed evidence record (`artifact_ids` over the
+inventory walk), which is what lets these five roots and the corpus bundle
+compile here with `evidence-canonical-claims-backed` passing instead of the
+refusal `CURRENT_VALIDATION_REPORT.md` recorded against 4.0.0.

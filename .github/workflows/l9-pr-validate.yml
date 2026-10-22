@@ -122,8 +122,9 @@ jobs:
       source_repository: Quantum-L9/l9-constellation-topology
       source_revision: ${{ github.event.pull_request.head.sha || github.sha }}
       source_name: l9-constellation-topology
-      # Step 1 intentionally stopped before the maintained v4 ref existed.
-      # The PR proof therefore binds the current real Meta producer revision exactly;
-      # the released reusable interface defaults to the canonical maintained v4 line.
-      meta_ref: e78b3c5917756ec7a13b056b07bf08b9b72f5adf
+      # The PR proof binds the exact commit the maintained v4 line resolves to:
+      # l9-meta-injector v4.2.0 (release.yml moved v4 to it on 2026-10-22). The
+      # released reusable interface defaults to the mutable v4 tag; this proof
+      # pins its current target so a later move of v4 is a deliberate re-pin here.
+      meta_ref: 953b7cba7a2a694abf02f73d1261a895c2bbc3d3
       publish: true

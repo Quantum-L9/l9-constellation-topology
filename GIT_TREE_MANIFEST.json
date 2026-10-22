@@ -110,7 +110,7 @@
       "path": ".github/workflows/l9-manual-replay.yml"
     },
     {
-      "git_object_id": "53b94a1ebb0e02c938e6f6594a67ebb8823a10d5",
+      "git_object_id": "e27b8349ac0c9dc6790cda58d48db7f615c5b0a5",
       "mode": "100644",
       "object_type": "blob",
       "path": ".github/workflows/l9-pr-validate.yml"
@@ -218,7 +218,7 @@
       "path": "BUILD_SPECIFICATION.md"
     },
     {
-      "git_object_id": "dbe6d8676040f8ba4bbaa19dd82ac2e555805aa4",
+      "git_object_id": "0becca3a6da6a6958f544dd278483a4b0712afae",
       "mode": "100644",
       "object_type": "blob",
       "path": "CHANGELOG.md"
@@ -248,7 +248,7 @@
       "path": "CONVERGENCE_REPORT.yaml"
     },
     {
-      "git_object_id": "c1f6ec4e7876ca251013b3d9bb9fbe948319d06b",
+      "git_object_id": "67a877c8ca1d937c7c78fb016702bfcd5a65d923",
       "mode": "100644",
       "object_type": "blob",
       "path": "CURRENT_VALIDATION_REPORT.md"
@@ -290,7 +290,7 @@
       "path": "GOVERNANCE.md"
     },
     {
-      "git_object_id": "f27912be668584b4db8b50768e41d1db19c28661",
+      "git_object_id": "3bc5ed76e01f82d460f8181231f88f2f6207a576",
       "mode": "100644",
       "object_type": "blob",
       "path": "HASH_LOCALITY_EVALUATION.json"
@@ -332,7 +332,7 @@
       "path": "NOTICE.md"
     },
     {
-      "git_object_id": "15910ce8ef6900e5bdd10031f3a8211beb2e7658",
+      "git_object_id": "e4f3f5bcdb41417c7bba3cf82fbc30f7408c8409",
       "mode": "100644",
       "object_type": "blob",
       "path": "QUALIFICATION.json"
@@ -2312,19 +2312,19 @@
       "path": "tests/corpus_fixtures.py"
     },
     {
-      "git_object_id": "f798b5a98f5240ae312ca7992317eaab6443e4b5",
+      "git_object_id": "79cf3e3b5069214de4783f7ac1bd68609306256c",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/corpus_intelligence/producer-emitted/PROVENANCE.md"
     },
     {
-      "git_object_id": "f200e618064a27921a196594f54f29cc7abfa95d",
+      "git_object_id": "6605794fa52547a814b090adafccb3bbab88953c",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/corpus_intelligence/producer-emitted/corpus-intelligence/manifest.json"
     },
     {
-      "git_object_id": "aeb4b06a35511c916d91da5a7170462cbfd75136",
+      "git_object_id": "e689888072d3794c30f563c819f9171be621f547",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/corpus_intelligence/producer-emitted/corpus-intelligence/packet.json"
@@ -2384,91 +2384,91 @@
       "path": "tests/fixtures/corpus_intelligence/producer-emitted/corpus-intelligence/payload/topic-candidates.json"
     },
     {
-      "git_object_id": "16e0f1d2513e44312cf317c3a37dee8db0cd9761",
+      "git_object_id": "96e93afd4d42fdcf2de38742de212809516016d0",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/corpus_intelligence/producer-emitted/roots/ArchiveZips/manifest.json"
     },
     {
-      "git_object_id": "e28849486ae48d08da8606686b888fc1fe10eec8",
+      "git_object_id": "6ba2d212d656f8bef9caf6256b6369e25b20b913",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/corpus_intelligence/producer-emitted/roots/ArchiveZips/packet.json"
     },
     {
-      "git_object_id": "db00e991809ab6f27dec963cbb38bbf4b6728f7d",
+      "git_object_id": "3abc32f71010c5beacc93c1ed2b1e4148b9e1215",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/corpus_intelligence/producer-emitted/roots/ArchiveZips/receipts/validation-receipt.json"
     },
     {
-      "git_object_id": "3b8b8ee9a2edbaed310daaf31a22549ea80b5362",
+      "git_object_id": "2f65f28ce5c35a04fe9aa6eb49f4dac3429a2ab6",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/corpus_intelligence/producer-emitted/roots/Backup/manifest.json"
     },
     {
-      "git_object_id": "25fada081045198ed2f7db8090847d2f31c2dc07",
+      "git_object_id": "95ee7250de218c24687ac0310dd323165c7bc64f",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/corpus_intelligence/producer-emitted/roots/Backup/packet.json"
     },
     {
-      "git_object_id": "582af7693e83284760e479748e37a31f1885a27c",
+      "git_object_id": "8457877c6c256bdca04dc4796858b3f55eccf3c7",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/corpus_intelligence/producer-emitted/roots/Backup/receipts/validation-receipt.json"
     },
     {
-      "git_object_id": "164a096061fba59fbe2162c1a4307dc6d062c25c",
+      "git_object_id": "662d98a81070c7d6ab7a3a0d6aa1919011b14769",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/corpus_intelligence/producer-emitted/roots/Documents/manifest.json"
     },
     {
-      "git_object_id": "33a7580c4e70c9eef8dd7f68fa1f12e4c3b2b170",
+      "git_object_id": "2f9451017cc07d1d03e8ddb85e6b275df1aa0677",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/corpus_intelligence/producer-emitted/roots/Documents/packet.json"
     },
     {
-      "git_object_id": "0af66fbb4e8d2285eacbc983ff97f831e7e8e10b",
+      "git_object_id": "2d7a0b7432a74b17b6f880aa273564bdbe1d860d",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/corpus_intelligence/producer-emitted/roots/Documents/receipts/validation-receipt.json"
     },
     {
-      "git_object_id": "36cf35fe6a0a4c97589354d4e69696a98d89c356",
+      "git_object_id": "1b7d7710199c85d83ec9a2b8be1bdbad1084a67d",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/corpus_intelligence/producer-emitted/roots/OldSSD/manifest.json"
     },
     {
-      "git_object_id": "11f1ad2289bc5ce670b0019adf5578130daa7b96",
+      "git_object_id": "31d95a1629342a2c3c1142077cff7d2a16dbf81c",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/corpus_intelligence/producer-emitted/roots/OldSSD/packet.json"
     },
     {
-      "git_object_id": "b26bcc9ed76061110f362e129264e4ee9ca8e15c",
+      "git_object_id": "10ac75079e565c5d39482642eb609195e7e7192f",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/corpus_intelligence/producer-emitted/roots/OldSSD/receipts/validation-receipt.json"
     },
     {
-      "git_object_id": "94960696fafa5ae45d202275ba9c35d5e39980ae",
+      "git_object_id": "327a02e03b1bc840c5602984aeb8b56fd0cb9153",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/corpus_intelligence/producer-emitted/roots/corpus/manifest.json"
     },
     {
-      "git_object_id": "3ced0c193c0160312067ea1cad9fe3b781f717ed",
+      "git_object_id": "4f48a996f151c86c7a71703b632002985f598135",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/corpus_intelligence/producer-emitted/roots/corpus/packet.json"
     },
     {
-      "git_object_id": "522a55a5a008c99dc987eff32256170c6c6e88d6",
+      "git_object_id": "90b4fb848a88f30100377fbeedbbfe9ee61cd666",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/corpus_intelligence/producer-emitted/roots/corpus/receipts/validation-receipt.json"
@@ -2594,19 +2594,19 @@
       "path": "tests/fixtures/repository_model_packets/l9-gate-sdk/PROVENANCE.md"
     },
     {
-      "git_object_id": "cf2502f5f31fcbd36471ddd74b7515f51de9c67b",
+      "git_object_id": "1dcb8ce78a8ccf4371f32070902a97afb17f6f1e",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/repository_model_packets/l9-gate-sdk/manifest.json"
     },
     {
-      "git_object_id": "1389edbbfeaf317cdbb345d324248dbebefd06a4",
+      "git_object_id": "b8a1cff84fca73cca44732a19fb10d991bccece6",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/repository_model_packets/l9-gate-sdk/packet.json"
     },
     {
-      "git_object_id": "3990b2881a0a65e0d44dd3b468a21463c485f7cb",
+      "git_object_id": "f606ec98bee161efe9243c01a44c52b1961fa4cf",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/repository_model_packets/l9-gate-sdk/receipts/validation-receipt.json"
@@ -2744,19 +2744,19 @@
       "path": "tests/fixtures/semantic_assertion_repository/spec.yaml"
     },
     {
-      "git_object_id": "3798f0f4fd902204015f9ab05f217215d2960c58",
+      "git_object_id": "6fe925faceaff6b7851b239e0344e19773432584",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/topology_packets/foundational-two-repo/manifest.json"
     },
     {
-      "git_object_id": "40bc74cd6fedff0d7320b9a1b31f2f52c85be6c5",
+      "git_object_id": "6500d85a59577e8d8b6d81b4b9e3d9f20e6e781f",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/topology_packets/foundational-two-repo/packet.json"
     },
     {
-      "git_object_id": "fc79b1dd1036a11764c08b50ef4cd04d11b11e85",
+      "git_object_id": "7d27f927a6a856c457e3ac5fd5093d6f3868f189",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/topology_packets/foundational-two-repo/payload/artifact-records.json"
@@ -2774,7 +2774,7 @@
       "path": "tests/fixtures/topology_packets/foundational-two-repo/payload/candidate-relations.json"
     },
     {
-      "git_object_id": "2bc2aef5070827317e0f5fcce4d017e447ef0e5b",
+      "git_object_id": "2c28ab8922c6378b76dd22e027918e1f45b44839",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/topology_packets/foundational-two-repo/payload/capability-records.json"
@@ -2798,13 +2798,13 @@
       "path": "tests/fixtures/topology_packets/foundational-two-repo/payload/diagnostics.json"
     },
     {
-      "git_object_id": "4b5a1bafb813a7be4f4fc7bacd7cd4f582f08586",
+      "git_object_id": "af4427de6cfaca6a6a551474bbd9673b8ab13c09",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/topology_packets/foundational-two-repo/payload/edge-records.json"
     },
     {
-      "git_object_id": "e798d2092c4be5e0060f287e3f1ddca040c90d34",
+      "git_object_id": "33e43e5490a2ce70bf35e40a03c0b9bdf2b82047",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/topology_packets/foundational-two-repo/payload/evidence.json"
@@ -2816,7 +2816,7 @@
       "path": "tests/fixtures/topology_packets/foundational-two-repo/payload/flow-records.json"
     },
     {
-      "git_object_id": "1195d040fb9363167ded586c2803cabd3b0eb61b",
+      "git_object_id": "2e5969dde4be858f1cbbb1a99a5bb51cfdbc95be",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/topology_packets/foundational-two-repo/payload/graph-records.json"
@@ -2828,7 +2828,7 @@
       "path": "tests/fixtures/topology_packets/foundational-two-repo/payload/impact-indexes.json"
     },
     {
-      "git_object_id": "8b890e2ce3a87a9bfa762fc6160e2dd9d6d328d5",
+      "git_object_id": "684bf2de983879f76bdaad0112f48d61d31337a4",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/topology_packets/foundational-two-repo/payload/maturity.json"
@@ -2840,13 +2840,13 @@
       "path": "tests/fixtures/topology_packets/foundational-two-repo/payload/readiness-evidence.json"
     },
     {
-      "git_object_id": "f01684ff60a4120ae12d2516ca941c43fa4d231c",
+      "git_object_id": "296c3205acfe610b0be6b3fb5fde4936088b1cf2",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/topology_packets/foundational-two-repo/payload/repository-records.json"
     },
     {
-      "git_object_id": "43994a8ea985d69fd6820b5384b3c4c65d256aed",
+      "git_object_id": "9579cc3ae021479bd9d50406509e08ffafe72131",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/topology_packets/foundational-two-repo/payload/risks.json"
@@ -2870,13 +2870,13 @@
       "path": "tests/fixtures/topology_packets/foundational-two-repo/payload/topology-reasoning-candidates.json"
     },
     {
-      "git_object_id": "832c6488ed54e9ad2ae7d2a158bba25f22670977",
+      "git_object_id": "846d3583e15c2ab843cf962c05c079f80af40579",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/topology_packets/foundational-two-repo/payload/unknowns.json"
     },
     {
-      "git_object_id": "fa4468d5a01180113d33398f4e789547a5d81260",
+      "git_object_id": "5eed6fd3066e7028fad1711fef1b5390b8baa498",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/topology_packets/foundational-two-repo/receipts/validation-receipt.json"
@@ -3278,7 +3278,7 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:8294b02f461ec3c9d2535f885b7bb6929a93ff26816bc1a1258be66879a02e78",
+  "entries_sha256": "sha256:f2a7ff25646da3660c82d2ad9341b87d9d04418e946010ae632bca0b8f4a93b8",
   "entry_count": 546,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
