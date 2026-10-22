@@ -1,5 +1,29 @@
 # Changelog
 
+## Unreleased - producer alignment with l9-meta-injector v4.2.0
+
+- Re-pinned the PR compile proof (`l9-pr-validate` → `direct-compile-smoke`)
+  from the pre-`v4` producer revision `e78b3c5` to
+  `953b7cba7a2a694abf02f73d1261a895c2bbc3d3`, the exact commit
+  `Quantum-L9/l9-meta-injector` `v4.2.0` and the maintained `v4` line now
+  resolve to. `compile.yml` keeps `v4` as its released default.
+- Regenerated `tests/fixtures/corpus_intelligence/producer-emitted` from the
+  v4.2.0 producer. Its repository records now carry an observed evidence
+  record, so the five roots and the corpus bundle compile here with
+  `evidence-canonical-claims-backed` passing; the 4.0.0 fixture only loaded.
+- Regenerated `QUALIFICATION.json` from v4.2.0 bundles of the same two external
+  repositories at the same recorded revisions.
+- Regenerated `CURRENT_VALIDATION_REPORT.md` against the v4.2.0 producer. The
+  open blocker it recorded (unbacked `validated-machine` repository records)
+  is closed on the producer side by its ADR-055; the end-to-end compile is
+  green.
+- Ran `make fixtures-update`: the `l9-gate-sdk` sample tree changed on
+  2026-09-05 (#21) after its packet fixture was last generated on 2026-08-24,
+  so `make fixtures-check` had been failing on `main`. The regenerated
+  `l9-gate-sdk` packet and the `foundational-two-repo` topology bundle differ
+  only in the sample's content-derived `source_revision` and the hashes that
+  follow from it.
+
 ## Unreleased - organization-managed L9 CI
 
 - Migrated organization L9 CI to the GitHub organization required-workflow

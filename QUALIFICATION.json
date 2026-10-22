@@ -2,13 +2,13 @@
   "canonical_ingress": "repository-model-packet",
   "dispatches_performed": 0,
   "effect_identity_algorithm": "v3",
-  "predicate_policy_version": "1.0.0",
+  "predicate_policy_version": "1.1.0",
   "schema": "l9.assertion-activation-qualification/v1",
   "source_rescan_performed": false,
   "specimens": [
     {
       "assertion_conservation_check": "passed",
-      "assertion_count_in": 77,
+      "assertion_count_in": 430,
       "assertion_loss_count": 0,
       "claim_derived_unknown_count": 0,
       "conflicts_generated": [
@@ -22,13 +22,15 @@
         }
       ],
       "dispatches_performed": 0,
-      "interpretation_profile": "meta-injector-repository-interpretation/1.0.0",
+      "interpretation_profile": "meta-injector-repository-interpretation/1.1.0",
       "name": "golden-repo",
       "predicates_in": {
         "authority.canonical_contract": 8,
         "authority.canonical_contract_count": 2,
         "contract.declares_invariants": 3,
         "contract.invariant": 7,
+        "document.heading": 221,
+        "document.title": 29,
         "http.handler_body_marker": 1,
         "http.route": 13,
         "http.route_handler": 13,
@@ -46,7 +48,9 @@
         "repository.status": 1,
         "service.action": 2,
         "service.name": 1,
-        "service.version": 1
+        "service.version": 1,
+        "work.kind": 2,
+        "work.task.open": 101
       },
       "predicates_lost": [],
       "predicates_out": {
@@ -54,6 +58,8 @@
         "authority.canonical_contract_count": 1,
         "contract.declares_invariants": 3,
         "contract.invariant": 5,
+        "document.heading": 209,
+        "document.title": 29,
         "http.handler_body_marker": 1,
         "http.route": 6,
         "http.route_handler": 6,
@@ -71,21 +77,23 @@
         "repository.status": 1,
         "service.action": 2,
         "service.name": 1,
-        "service.version": 1
+        "service.version": 1,
+        "work.kind": 2,
+        "work.task.open": 101
       },
-      "producer": "l9-meta-injector.repository-model/4.0.0",
-      "publication_candidate_count": 118,
-      "publication_claim_candidate_count": 56,
+      "producer": "l9-meta-injector.repository-model/4.2.0",
+      "publication_candidate_count": 459,
+      "publication_claim_candidate_count": 397,
       "publication_claim_status_counts": {
-        "eligible": 54,
+        "eligible": 395,
         "held": 2
       },
-      "repository_model_packet_id": "packet:f713ee46620d70a9ed2454b3dffc981084d693ab07e58af20d5b754fb7fa7239",
+      "repository_model_packet_id": "packet:a7fc704c92738485f3a29ab2aed34634f00158ee4e0980ebe2e494e23e71b17d",
       "repository_model_packet_version": "1.1.0",
-      "repository_model_semantic_hash": "sha256:f713ee46620d70a9ed2454b3dffc981084d693ab07e58af20d5b754fb7fa7239",
-      "semantic_claim_count_out": 56,
+      "repository_model_semantic_hash": "sha256:a7fc704c92738485f3a29ab2aed34634f00158ee4e0980ebe2e494e23e71b17d",
+      "semantic_claim_count_out": 397,
       "source_revision": "git:0b9f9202c80fc066e8c23dc1d783b99a2789160b",
-      "topology_packet_id": "packet:b868ceeea6162bf77ebb9e3111bfd70174d6521f330de4b89aa7214a3850622e",
+      "topology_packet_id": "packet:ce801793a37feacc7b74afdf3e6bf4d944c4bbc8debcb29c34c936ae618ae3f5",
       "topology_projection_counts": {
         "authority.canonical_contract": 4,
         "http.route": 6,
@@ -98,40 +106,226 @@
     },
     {
       "assertion_conservation_check": "passed",
-      "assertion_count_in": 4,
+      "assertion_count_in": 1312,
       "assertion_loss_count": 0,
       "claim_derived_unknown_count": 0,
-      "conflicts_generated": [],
+      "conflicts_generated": [
+        {
+          "field": "document.title",
+          "subject_id": "artifact:918b4b4c2072738f72a109bd88ca34e8610f5a8ebdd1d1b9a70f3ef5c420bf0f",
+          "values": [
+            "============================================================================",
+            "Closes concrete artifact-quality gaps not covered by architecture, reasoning,",
+            "L9 BUILD KERNEL \u2014 EXECUTION ARTIFACT QUALITY ENFORCEMENT",
+            "convergence, or no-stub kernels.",
+            "date: 2026-06-08 | status: supplemental_active_candidate"
+          ]
+        },
+        {
+          "field": "document.title",
+          "subject_id": "artifact:4b58cc91784f72e00492a14e61b2a429093a3540f5a745834fe472c1ab4703ff",
+          "values": [
+            "OPTIMIZED WORKFLOW PROMPT CHAIN",
+            "constellation: {SERVICE_CONTEXT_RECORD.constellation_position}",
+            "l9-node-role: {SERVICE_CONTEXT_RECORD.l9_node_role}",
+            "layer: contracts",
+            "service: {SERVICE_CONTEXT_RECORD.service_name}",
+            "version: 1.0.0"
+          ]
+        },
+        {
+          "field": "document.title",
+          "subject_id": "artifact:933ec245e0a90c743ac0382c183a3a3811a393592e4424fb1e7b5f02d67c28c5",
+          "values": [
+            "Eval Fixture: memory_admission_kernel \u2014 5-criteria gate",
+            "fixture_id: memory_admission_gate_001",
+            "kernel: memory_admission_kernel.v1",
+            "test_type: admission_criteria_enforcement"
+          ]
+        },
+        {
+          "field": "document.title",
+          "subject_id": "artifact:8ca4625017b291254a5a31a2c93c7c8b2c1ce6ad5ebe0053070f8ee96c676773",
+          "values": [
+            "Microservice Build Pipeline",
+            "PLAYBOOK: new-constellation-node"
+          ]
+        },
+        {
+          "field": "document.title",
+          "subject_id": "artifact:cf90b2589719434b734f2121a5cbe0e6074397206caeaca8859a3311f6500642",
+          "values": [
+            "KERNEL DOCTRINE",
+            "KERNEL DOCTRINE \u2014 L9 Agent System"
+          ]
+        },
+        {
+          "field": "document.title",
+          "subject_id": "artifact:bf0cb77044b01467cc56f3bf407d237cb42135a7fe2f2be228bf8b363a05809c",
+          "values": [
+            "Eval Fixture: context_budget_kernel \u2014 hydrator view enforcement",
+            "fixture_id: hydrator_view_001",
+            "kernel: context_budget_kernel.v1",
+            "test_type: invariant_enforcement \u2014 handoff_packets_are_views"
+          ]
+        },
+        {
+          "field": "document.title",
+          "subject_id": "artifact:e72c0a44894154227a80f54219cc4332ddd7d41e562a752645ac50d52dc295cb",
+          "values": [
+            "AI_Model_Drift_Monitoring_Policy",
+            "AI_Model_Drift_Monitoring_Policy_v4.0.md"
+          ]
+        },
+        {
+          "field": "document.title",
+          "subject_id": "artifact:ee087b655b9f5b89d0dc5ed25ad8b8daf0f1ade8928150d000fada824637515e",
+          "values": [
+            "Governance Engine",
+            "Governance Engine \u2014 System Integrity and Ethical Enforcement Layer (v4.0)"
+          ]
+        },
+        {
+          "field": "document.title",
+          "subject_id": "artifact:65a78bbd5da2cebacb1e16bc2ebc250b3d327c98d6b99b98d289f560a95cc629",
+          "values": [
+            "============================================================================",
+            "L9 KERNEL CODING STACK \u2014 CONSTELLATION NODE",
+            "Source of truth: constellation_node_sdk contracts + L9 SSOT specs",
+            "TransportPacket is the ONLY wire format. PacketEnvelope is dead. No fallback.",
+            "Violate any law \u2192 revert and ask."
+          ]
+        },
+        {
+          "field": "document.title",
+          "subject_id": "artifact:01d1d43aba69333937f80da4869a2463657cfbe498ad4f2d625220fbf30acac0",
+          "values": [
+            "1. config/policies/protected_files.yaml \u2014 policy source of truth",
+            "2. .github/scripts/validate-protected-files-v6.py \u2014 CI validator",
+            "3. Updated CI workflow (v3.3) with \"\ud83d\udee1\ufe0f Protected Files Gate\" job",
+            "4. Updated DEPLOY.sh (v3.3) with ruleset including the new gate",
+            "5. Nightly drift reconciliation job",
+            "Integration strategy: ADDITIVE. No existing jobs modified.",
+            "One new blocking job + one nightly job added.",
+            "Produces:",
+            "Protected Files Enforcement v6.0 \u2014 L11 Integration Guide",
+            "This doc specifies how to integrate the Protected Files Enforcement Spec v6.0",
+            "into the existing L11 Debt Governance Pipeline (v3.2)."
+          ]
+        },
+        {
+          "field": "document.title",
+          "subject_id": "artifact:9baedacce62869909c25c0fd6c0f42396a4e51562e65529fa59673ff5bc9708f",
+          "values": [
+            "--- /L9_META ---",
+            "--- L9_META ---",
+            "L9 Precision Context Injection: P1-P8 Implementation Plan",
+            "artifact_type: documentation",
+            "l9_schema: 1",
+            "retrieval: on_demand",
+            "status: active",
+            "tags: ['docs', 'architecture', 'context-engineering', 'implementation-plan']"
+          ]
+        },
+        {
+          "field": "document.title",
+          "subject_id": "artifact:84d367a70fc8abd6baa3056fb65ee1c424312a3fac1f805b7a3561c783095713",
+          "values": [
+            "OPTIMIZED WORKFLOW PROMPT CHAIN",
+            "constellation: {SERVICE_CONTEXT_RECORD.constellation_position}",
+            "l9-node-role: {SERVICE_CONTEXT_RECORD.l9_node_role}",
+            "layer: contracts",
+            "service: {SERVICE_CONTEXT_RECORD.service_name}",
+            "version: 1.0.0"
+          ]
+        },
+        {
+          "field": "document.title",
+          "subject_id": "artifact:ec1b97b64b76ce9943cfe595d13a4e1ef6c60ef64cea0ec279db14bca872a18a",
+          "values": [
+            "Decision Ledger",
+            "Decision Ledger \u2014 Universal Record of Accountability (v4.0)"
+          ]
+        },
+        {
+          "field": "document.title",
+          "subject_id": "artifact:105dd552f9cb5c463c106c4d31b6de16bf7ad91646dcb8b08fbc206f4862a148",
+          "values": [
+            "SKILLS DOCTRINE",
+            "SKILLS DOCTRINE \u2014 L9 Library System"
+          ]
+        },
+        {
+          "field": "document.title",
+          "subject_id": "artifact:0ca0f4688328027ceb3d6c3c84cf1fed9317b4be1b20c104521e976debbfdb1a",
+          "values": [
+            "Relational_Trust_Model",
+            "Relational_Trust_Model_v4.0.md"
+          ]
+        },
+        {
+          "field": "document.title",
+          "subject_id": "artifact:96b4da622e169df34061c025c6e7cd24c4875fda141f9975173b39e2b5c07c68",
+          "values": [
+            "Eval Fixture: trust_ladder_kernel \u2014 L3 gate enforcement",
+            "fixture_id: trust_ladder_l3_gate_001",
+            "skill: trust_ladder_kernel.v1",
+            "test_type: hard_ban_enforcement"
+          ]
+        },
+        {
+          "field": "document.title",
+          "subject_id": "artifact:5acc691aec1a239fa9854fc5be8f546334dbf3a141598ae459824d0f3b678a59",
+          "values": [
+            "PLAYBOOKS DOCTRINE",
+            "PLAYBOOKS DOCTRINE \u2014 L9 Library System"
+          ]
+        }
+      ],
       "dispatches_performed": 0,
-      "interpretation_profile": "meta-injector-repository-interpretation/1.0.0",
+      "interpretation_profile": "meta-injector-repository-interpretation/1.1.0",
       "name": "l9-ops-mcp",
       "predicates_in": {
+        "document.heading": 941,
+        "document.title": 172,
         "package.build_backend": 1,
         "package.dependency": 1,
         "package.name": 1,
-        "package.packaging_system": 1
+        "package.packaging_system": 1,
+        "work.depends_on": 36,
+        "work.kind": 6,
+        "work.status": 88,
+        "work.task.open": 65
       },
       "predicates_lost": [],
       "predicates_out": {
+        "document.heading": 936,
+        "document.title": 167,
         "package.build_backend": 1,
         "package.dependency": 1,
         "package.name": 1,
-        "package.packaging_system": 1
+        "package.packaging_system": 1,
+        "work.depends_on": 36,
+        "work.kind": 5,
+        "work.status": 86,
+        "work.task.open": 65
       },
-      "producer": "l9-meta-injector.repository-model/4.0.0",
-      "publication_candidate_count": 120,
-      "publication_claim_candidate_count": 4,
+      "producer": "l9-meta-injector.repository-model/4.2.0",
+      "publication_candidate_count": 1415,
+      "publication_claim_candidate_count": 1299,
       "publication_claim_status_counts": {
-        "eligible": 4
+        "eligible": 1230,
+        "held": 69
       },
-      "repository_model_packet_id": "packet:38ea90f973e3936c8bb4a94fca29354aae476c989c92585176e5bd90969f977c",
+      "repository_model_packet_id": "packet:3ecfc376f447a90dcd25c59ccec764c151228d3cec3939c65c207a6d4110f423",
       "repository_model_packet_version": "1.1.0",
-      "repository_model_semantic_hash": "sha256:38ea90f973e3936c8bb4a94fca29354aae476c989c92585176e5bd90969f977c",
-      "semantic_claim_count_out": 4,
+      "repository_model_semantic_hash": "sha256:3ecfc376f447a90dcd25c59ccec764c151228d3cec3939c65c207a6d4110f423",
+      "semantic_claim_count_out": 1299,
       "source_revision": "git:70f8bbc3154cc3be277edf43c5c0048c4a2662c6",
-      "topology_packet_id": "packet:a1ada8e6b9c5c76d6752cf3a382428c4d057c8a7cda55d6aca1b9fdf9134063b",
+      "topology_packet_id": "packet:ca80d0e5f6349e52924a7b93b08a081e04baffdf4c7732130babe35d85584f8a",
       "topology_projection_counts": {
-        "package.dependency": 1
+        "package.dependency": 1,
+        "work.depends_on": 36
       },
       "topology_validation_status": "passed",
       "unsupported_predicates_preserved": []
