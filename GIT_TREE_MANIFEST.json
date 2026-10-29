@@ -1412,7 +1412,7 @@
       "path": "src/l9_constellation_topology/compatibility/v4_models.py"
     },
     {
-      "git_object_id": "4c7694fd6fc138d38b4f28512569f951f6aeef47",
+      "git_object_id": "33ad7c3e1a2c23cf9bfe75f94d28baab2c7e11fa",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/compiler.py"
@@ -1880,7 +1880,7 @@
       "path": "src/l9_constellation_topology/renderers/json_export.py"
     },
     {
-      "git_object_id": "7e0bcd367f9a8e4ab0c9302061fde88ff3124f18",
+      "git_object_id": "118be328e4f3012285f809c93574a3d7293762ca",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/renderers/markdown_report.py"
@@ -2960,7 +2960,7 @@
       "path": "tests/test_corpus_publication_containment.py"
     },
     {
-      "git_object_id": "c84f3fe1914187bd98be3db2f27c19bb51bd1fa2",
+      "git_object_id": "44ba07442e48da20d360ae5d572b43cb63ea4b7e",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_corpus_topology_compilation.py"
@@ -3284,7 +3284,7 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:d2d2b27f221ee0b45a64254cedc17f27ef666fcc05c6ebdb71ec586386db425a",
+  "entries_sha256": "sha256:57215852450d967e4018787a6cd39b5b25e50792ddce74af90502d7c566ffdb5",
   "entry_count": 547,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
