@@ -7,7 +7,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from l9_constellation_topology.config import ResolvedConfiguration
-from l9_constellation_topology.domain import TopologyState
+from l9_constellation_topology.domain import TopologyState, UnknownRecord
 from l9_constellation_topology.domain.edge import (
     EDGE_TAXONOMY_VERSION,
     edge_taxonomy_hash,
@@ -62,7 +62,7 @@ from l9_constellation_topology.reconciliation import (
     predicate_policy_hash,
     reconciliation_policy_hash,
 )
-from l9_constellation_topology.run import artifact_hash, canonical_bytes, semantic_hash
+from l9_constellation_topology.run import artifact_hash, canonical_bytes, semantic_hash, stable_id
 from l9_constellation_topology.stages import aggregate_capabilities, aggregate_repositories
 from l9_constellation_topology.stages.assess_impact import run as assess_impact
 from l9_constellation_topology.stages.assess_maturity import run as assess_maturity
@@ -194,6 +194,49 @@ def _check_corpus_inputs(
             corpus,
             tuple(packet for packet in packets if packet.packet_id in declared),
         )
+
+
+def _corpus_domains_not_run_unknowns(
+    corpus_packets: tuple[CorpusIntelligencePacket, ...],
+) -> tuple[UnknownRecord, ...]:
+    """Preserve each producer-declared skipped corpus domain as an unknown.
+
+    A 1.1.0 corpus packet distinguishes an empty completed pass from a pass that
+    did not run. The topology model already has an unknown register for exactly
+    such unanswered questions, so retain the declaration there rather than
+    allowing an empty payload to be read as a negative result. The corpus-scope
+    evidence is packet-scoped, preserving the input packet that made each
+    declaration even when multiple corpus packets share a corpus identifier.
+    """
+    unknowns: list[UnknownRecord] = []
+    for packet in corpus_packets:
+        evidence_refs = tuple(
+            record.evidence_id
+            for record in corpus_scope_evidence_records(packet)
+            if record.subject_id == packet.corpus.corpus_id
+        )
+        for statement in packet.domains_not_run or ():
+            unknowns.append(
+                UnknownRecord(
+                    unknown_id=stable_id(
+                        "unknown",
+                        {
+                            "source_packet_id": packet.packet_id,
+                            "subject_id": packet.corpus.corpus_id,
+                            "field": statement.domain,
+                            "reason": statement.reason,
+                        },
+                    ),
+                    subject_id=packet.corpus.corpus_id,
+                    field=statement.domain,
+                    reason=(
+                        f"Corpus analysis domain {statement.domain!r} was not run: "
+                        f"{statement.reason}"
+                    ),
+                    evidence_refs=evidence_refs,
+                )
+            )
+    return tuple(sorted(unknowns, key=lambda record: record.unknown_id))
 
 
 def _policy_hashes(configuration: ResolvedConfiguration) -> dict[str, str]:
@@ -404,7 +447,12 @@ def compile_topology(
         evidence_conflicts + repository_conflicts + capability_conflicts + claim_conflicts
     )
     all_unknowns = (
-        repository_unknowns + evidence_unknowns + declared_unknowns + claim_unknowns + work.unknowns
+        repository_unknowns
+        + evidence_unknowns
+        + declared_unknowns
+        + _corpus_domains_not_run_unknowns(corpus_packets)
+        + claim_unknowns
+        + work.unknowns
     )
     candidate_clusters = tuple(
         cluster

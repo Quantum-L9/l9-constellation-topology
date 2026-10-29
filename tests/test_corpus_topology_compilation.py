@@ -25,7 +25,12 @@ from l9_constellation_topology.domain.edge import (
 )
 from l9_constellation_topology.domain.readiness import FORBIDDEN_READINESS_FIELDS
 from l9_constellation_topology.domain.topology import TopologyState
-from l9_constellation_topology.packets.corpus_intelligence import ExactDuplicateRelation
+from l9_constellation_topology.packets.corpus_bundle import finalize_corpus_intelligence_packet
+from l9_constellation_topology.packets.corpus_intelligence import (
+    CorpusDomainNotRun,
+    ExactDuplicateRelation,
+)
+from l9_constellation_topology.renderers.markdown_report import render_topology_markdown
 from l9_constellation_topology.topology.candidates import CANDIDATE_MARKER
 from l9_constellation_topology.topology.impact import assess_impact
 from l9_constellation_topology.topology.work_projection import (
@@ -39,8 +44,10 @@ from tests.corpus_fixtures import (
     REPO_PLANS,
     ROOT_ENGINE,
     ROOT_PLANS,
+    corpus_packet,
     corpus_payload,
     write_corpus,
+    write_corpus_bundle,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -69,6 +76,36 @@ def _claim(state: TopologyState, predicate: str, obj: str):
     ]
     assert matches, f"no claim for {predicate}={obj}"
     return matches[0]
+
+
+def _compile_with_domains_not_run(
+    tmp_path: Path,
+    *,
+    payload,
+    domains_not_run: tuple[CorpusDomainNotRun, ...],
+):
+    """Compile a finalized 1.1 packet built from the native corpus fixture."""
+    repositories, corpus = write_corpus(tmp_path, payload=payload)
+    packet = finalize_corpus_intelligence_packet(
+        corpus_packet(payload).model_copy(
+            update={"packet_version": "1.1.0", "domains_not_run": domains_not_run}
+        )
+    )
+    write_corpus_bundle(packet, corpus)
+    return (
+        compile_topology(ROOT, repositories, corpus_bundle_paths=(corpus,), created_at=FIXED_TIME),
+        packet,
+    )
+
+
+def _payload_without_duplicate_analysis():
+    """A valid completed/skipped duplicate-domain payload with no dangling support."""
+    project_without_duplicate_support = PROJECT_CANDIDATE.model_copy(
+        update={"supporting_relation_ids": ("pair:lexical",)}
+    )
+    return corpus_payload(
+        exact_duplicate_relations=(), project_candidates=(project_without_duplicate_support,)
+    )
 
 
 # ── document work signals become claims ─────────────────────────────────────
@@ -248,6 +285,71 @@ def test_a_near_duplicate_never_becomes_a_duplicate_edge(state: TopologyState) -
     near = frozenset({ARTIFACTS["engine_v1"].artifact_id, ARTIFACTS["engine_v2"].artifact_id})
     for edge in _edges(state, EdgeType.duplicate_of):
         assert frozenset({edge.source_id, edge.target_id}) != near
+
+
+def test_a_not_run_duplicate_domain_survives_and_does_not_render_as_none(
+    tmp_path: Path,
+) -> None:
+    result, corpus_packet_1_1 = _compile_with_domains_not_run(
+        tmp_path,
+        payload=_payload_without_duplicate_analysis(),
+        domains_not_run=(
+            CorpusDomainNotRun(
+                domain="exact_duplicate_relations", reason="byte comparison was skipped"
+            ),
+        ),
+    )
+    unknown = next(
+        record
+        for record in result.materialized.state.unknowns
+        if record.field == "exact_duplicate_relations"
+    )
+    assert unknown.reason == (
+        "Corpus analysis domain 'exact_duplicate_relations' was not run: "
+        "byte comparison was skipped"
+    )
+    evidence = {record.evidence_id: record for record in result.materialized.state.evidence}
+    assert unknown.evidence_refs
+    assert {evidence[reference].source_ref.packet_id for reference in unknown.evidence_refs} == {
+        corpus_packet_1_1.packet_id
+    }
+    report = render_topology_markdown(result.materialized)
+    assert "Corpus analysis domain `exact_duplicate_relations` was not run:" in report
+    assert "No byte-identical artifacts were observed." not in report
+
+
+def test_another_not_run_domain_preserves_its_reason_and_report_wording(tmp_path: Path) -> None:
+    result, _ = _compile_with_domains_not_run(
+        tmp_path,
+        payload=corpus_payload(readiness_evidence=()),
+        domains_not_run=(
+            CorpusDomainNotRun(domain="readiness_evidence", reason="metrics pass timed out"),
+        ),
+    )
+    unknown = next(
+        record
+        for record in result.materialized.state.unknowns
+        if record.field == "readiness_evidence"
+    )
+    assert unknown.reason.endswith("metrics pass timed out")
+    report = render_topology_markdown(result.materialized)
+    assert "Corpus analysis domain `readiness_evidence` was not run: " in report
+    assert "No readiness evidence was compiled." not in report
+
+
+def test_completed_empty_duplicate_analysis_still_reports_no_results(tmp_path: Path) -> None:
+    repositories, corpus = write_corpus(tmp_path, payload=_payload_without_duplicate_analysis())
+    result = compile_topology(
+        ROOT, repositories, corpus_bundle_paths=(corpus,), created_at=FIXED_TIME
+    )
+    assert not [
+        record
+        for record in result.materialized.state.unknowns
+        if record.field == "exact_duplicate_relations"
+    ]
+    report = render_topology_markdown(result.materialized)
+    assert "No byte-identical artifacts were observed." in report
+    assert "Corpus analysis domain `exact_duplicate_relations` was not run:" not in report
 
 
 def test_duplicate_edges_do_not_contribute_to_dependency_impact(
