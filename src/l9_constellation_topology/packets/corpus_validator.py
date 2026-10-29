@@ -277,6 +277,22 @@ def _check_reasoning(
             )
 
 
+def _check_domains_not_run(
+    packet: CorpusIntelligencePacket,
+    payload: CorpusIntelligencePayload,
+    errors: list[str],
+) -> None:
+    """Refuse a run statement that contradicts materialized payload evidence."""
+    if packet.domains_not_run is None:
+        return
+    for statement in packet.domains_not_run:
+        if getattr(payload, statement.domain):
+            errors.append(
+                f"domains_not_run declares {statement.domain} not run, but that payload domain "
+                "carries records"
+            )
+
+
 def validate_corpus_intelligence_packet(
     packet: CorpusIntelligencePacket,
     repository_model_packets: tuple[RepositoryModelPacket, ...],
@@ -303,6 +319,7 @@ def validate_corpus_intelligence_packet(
     candidate_ids = _check_candidates(payload, artifacts, errors)
     _check_readiness(payload, identities, candidate_ids, errors)
     _check_reasoning(payload, candidate_ids, artifacts, errors)
+    _check_domains_not_run(packet, payload, errors)
 
     if errors:
         raise CorpusIntelligenceValidationError(tuple(sorted(set(errors))))

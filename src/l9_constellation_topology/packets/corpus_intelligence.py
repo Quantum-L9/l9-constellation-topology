@@ -59,8 +59,14 @@ from .refs import PacketRef
 #: The packet type this module contracts.
 CORPUS_INTELLIGENCE_PACKET_TYPE = "l9.corpus-intelligence"
 
-#: 1.0.0 is the first corpus-intelligence contract.
+#: 1.0.0 is the first corpus-intelligence contract and remains the default for
+#: locally constructed legacy packets. 1.1.0 adds an explicit statement for a
+#: payload domain whose pass did not run (ADR-0030).
 CORPUS_INTELLIGENCE_PACKET_VERSION = "1.0.0"
+
+#: The versions this consumer can parse at its boundary. Unknown versions are
+#: refused by the closed model rather than interpreted as an accidental variant.
+CorpusIntelligencePacketVersion = Literal["1.0.0", "1.1.0"]
 
 #: Payload domains, in the order a reader meets them. Every one is serialized to
 #: its own file and its own hash; an empty tuple means the producer found
@@ -80,6 +86,19 @@ CORPUS_PAYLOAD_FIELDS: tuple[str, ...] = (
     "reasoning_candidates",
     "reasoning_evidence_pack_refs",
 )
+
+#: A payload-domain name is a closed contract value, not an arbitrary label.
+CorpusPayloadField = Literal[
+    "document_work_signals",
+    "exact_duplicate_relations",
+    "semantic_pair_relations",
+    "topic_candidates",
+    "project_candidates",
+    "consolidation_candidates",
+    "readiness_evidence",
+    "reasoning_candidates",
+    "reasoning_evidence_pack_refs",
+]
 
 #: How confident the producer's fusion profile was in a candidate relation.
 #: Deliberately a class rather than a score: a number invites arithmetic across
@@ -460,17 +479,31 @@ class CorpusIntelligenceInputs(FrozenModel):
         return self
 
 
+class CorpusDomainNotRun(FrozenModel):
+    """One payload domain no producer pass populated in a 1.1.0 run.
+
+    An empty payload means the pass ran and found no records. This explicit,
+    closed statement is the only representation for a pass that did not run.
+    """
+
+    domain: CorpusPayloadField
+    reason: str = Field(min_length=1)
+
+
 class CorpusIntelligencePacket(FrozenModel):
     """The auxiliary corpus-analysis packet topology accepts beside RMPs."""
 
     packet_type: Literal["l9.corpus-intelligence"] = "l9.corpus-intelligence"
-    packet_version: str = CORPUS_INTELLIGENCE_PACKET_VERSION
+    packet_version: CorpusIntelligencePacketVersion = "1.0.0"
     packet_id: str
     producer: Producer
     profile: ProfileRef
     inputs: CorpusIntelligenceInputs
     corpus: CorpusDescriptor
     validation: PacketValidationRef
+    #: Required by 1.1.0; absent from 1.0.0 serialized packets and hashes so
+    #: their established identities remain exactly unchanged.
+    domains_not_run: tuple[CorpusDomainNotRun, ...] | None = None
     schema_hash: str
     semantic_hash: str
     artifact_hash: str | None = None
@@ -479,6 +512,21 @@ class CorpusIntelligencePacket(FrozenModel):
     payload: CorpusIntelligencePayload | None = None
     lineage: PacketLineage = Field(default_factory=PacketLineage)
     created_at: datetime = Field(default_factory=utc_now)
+
+    @model_validator(mode="after")
+    def versioned_run_statement_is_closed(self) -> CorpusIntelligencePacket:
+        """Enforce the additive 1.1.0 field without changing 1.0.0 meaning."""
+        if self.packet_version == "1.0.0":
+            if self.domains_not_run is not None:
+                raise ValueError("corpus-intelligence 1.0.0 must not carry domains_not_run")
+            return self
+        if self.domains_not_run is None:
+            raise ValueError("corpus-intelligence 1.1.0 requires domains_not_run")
+        domains = [entry.domain for entry in self.domains_not_run]
+        duplicates = sorted({domain for domain in domains if domains.count(domain) > 1})
+        if duplicates:
+            raise ValueError(f"domains_not_run names a payload domain more than once: {duplicates}")
+        return self
 
     @model_validator(mode="after")
     def roots_reference_declared_inputs(self) -> CorpusIntelligencePacket:
@@ -530,15 +578,26 @@ def corpus_intelligence_semantic_view(packet: CorpusIntelligencePacket) -> dict[
     ``payload_hashes`` rather than serialized twice into two identities that
     could drift.
     """
-    return {
+    view: dict[str, object] = {
         "packet_type": packet.packet_type,
         "packet_version": packet.packet_version,
         "producer": packet.producer,
         "profile": packet.profile,
         "inputs": packet.inputs,
         "corpus": packet.corpus,
-        "schema_hash": packet.schema_hash,
-        "payload_refs": packet.payload_refs,
-        "payload_hashes": packet.payload_hashes,
-        "lineage": packet.lineage,
     }
+    # ADR-0030 requires the producer and consumer to hash this field between
+    # corpus and schema_hash. It is deliberately absent from a 1.0.0 view.
+    if packet.packet_version == "1.1.0":
+        if packet.domains_not_run is None:  # pragma: no cover - model construction refuses it
+            raise ValueError("corpus-intelligence 1.1.0 requires domains_not_run")
+        view["domains_not_run"] = packet.domains_not_run
+    view.update(
+        {
+            "schema_hash": packet.schema_hash,
+            "payload_refs": packet.payload_refs,
+            "payload_hashes": packet.payload_hashes,
+            "lineage": packet.lineage,
+        }
+    )
+    return view

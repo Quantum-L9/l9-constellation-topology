@@ -6,7 +6,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 
 ## Inventory
 
-**Tracked delivery files:** 547
+**Tracked delivery files:** 548
 
 - `.editorconfig` — editor encoding, indentation, and whitespace policy
 - `.env.example` — documented worker and control-plane environment variables
@@ -127,6 +127,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `docs/adr/0027-separate-observation-time-from-publication-time.md` — accepted architecture decision record
 - `docs/adr/0028-project-bridge-gaps-as-decision-support.md` — accepted architecture decision record
 - `docs/adr/0029-authorize-a-bounded-github-native-direct-compile-seam.md` — accepted architecture decision record
+- `docs/adr/0030-accept-corpus-intelligence-v1-1-domains-not-run.md` — accepted architecture decision record
 - `docs/adr/README.md` — ADR directory governance and navigation
 - `docs/architecture.md` — architecture, contract, deployment, recovery, or model documentation
 - `docs/archive/v4/01_SPEC_ATTACK.md` — superseded v4 historical artifact retained for migration evidence
