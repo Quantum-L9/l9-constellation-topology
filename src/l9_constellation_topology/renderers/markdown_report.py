@@ -149,7 +149,7 @@ def _routing_movement(row: TopologyReasoningCandidate) -> str:
     return "unchanged"
 
 
-def _candidate_table(state: TopologyState, candidate_type: str) -> list[str]:
+def _candidate_table(state: TopologyState, candidate_type: str, domain: str) -> list[str]:
     """Render one candidate class, with the structure topology measured for it."""
     rows = [
         candidate
@@ -157,7 +157,7 @@ def _candidate_table(state: TopologyState, candidate_type: str) -> list[str]:
         if candidate.candidate_type == candidate_type
     ]
     if not rows:
-        return ["No candidates of this class were carried."]
+        return [_domain_empty_message(state, domain, "No candidates of this class were carried.")]
     lines = [
         CANDIDATE_DISCLAIMER,
         "",
@@ -218,11 +218,30 @@ def _corpus_overview(state: TopologyState) -> list[str]:
     return lines
 
 
+def _domain_empty_message(state: TopologyState, domain: str, completed_empty: str) -> str:
+    """Say whether an empty corpus domain completed or was explicitly skipped."""
+    corpus_ids = {record.corpus_id for record in state.corpus_records}
+    reasons = sorted(
+        unknown.reason
+        for unknown in state.unknowns
+        if unknown.subject_id in corpus_ids and unknown.field == domain
+    )
+    if not reasons:
+        return completed_empty
+    return f"Corpus analysis domain `{domain}` was not run: " + "; ".join(reasons)
+
+
 def _duplicate_section(state: TopologyState) -> list[str]:
     """Byte-identical artifacts, and the hash that decided each pair."""
     duplicates = [edge for edge in state.edge_records if edge.edge_type is EdgeType.duplicate_of]
     if not duplicates:
-        return ["No byte-identical artifacts were observed."]
+        return [
+            _domain_empty_message(
+                state,
+                "exact_duplicate_relations",
+                "No byte-identical artifacts were observed.",
+            )
+        ]
     lines = [
         "_Byte identity only. Every pair below carries the same content hash; "
         + "no similarity score contributes to this table._",
@@ -245,7 +264,13 @@ def _work_relation_section(state: TopologyState) -> list[str]:
     """Explicitly declared work relations, with how each target resolved."""
     work_edges = [edge for edge in state.edge_records if "target_resolution" in edge.properties]
     if not work_edges:
-        return ["No explicit work relationships were declared."]
+        return [
+            _domain_empty_message(
+                state,
+                "document_work_signals",
+                "No explicit work relationships were declared.",
+            )
+        ]
     lines = list(_table("Source", "Relation", "Target", "Resolution"))
     lines.extend(
         _row(
@@ -262,7 +287,13 @@ def _work_relation_section(state: TopologyState) -> list[str]:
 def _readiness_section(state: TopologyState) -> list[str]:
     """Readiness counts. Never a score — see the disclaimer it carries."""
     if not state.readiness_evidence:
-        return ["No readiness evidence was compiled."]
+        return [
+            _domain_empty_message(
+                state,
+                "readiness_evidence",
+                "No readiness evidence was compiled.",
+            )
+        ]
     lines = [
         READINESS_DISCLAIMER,
         "",
@@ -287,7 +318,13 @@ def _readiness_section(state: TopologyState) -> list[str]:
 def _reasoning_section(state: TopologyState) -> list[str]:
     """The reasoning queue, with both routings and how they differ."""
     if not state.topology_reasoning_candidates:
-        return ["No reasoning candidates were routed."]
+        return [
+            _domain_empty_message(
+                state,
+                "reasoning_candidates",
+                "No reasoning candidates were routed.",
+            )
+        ]
     lines = [
         "_A deterministic handoff. No model was called to produce this queue, and "
         + "nothing in it has been adjudicated._",
@@ -314,11 +351,19 @@ _CORPUS_SECTIONS: tuple[tuple[str, Callable[[TopologyState], list[str]]], ...] =
     ("Corpus Overview", _corpus_overview),
     ("Cross-Root Exact Duplicates", _duplicate_section),
     ("Explicit Work Relationships", _work_relation_section),
-    ("Candidate Topics", lambda state: _candidate_table(state, "TOPIC_CANDIDATE")),
-    ("Candidate Bodies of Work", lambda state: _candidate_table(state, "PROJECT_CANDIDATE")),
+    (
+        "Candidate Topics",
+        lambda state: _candidate_table(state, "TOPIC_CANDIDATE", "topic_candidates"),
+    ),
+    (
+        "Candidate Bodies of Work",
+        lambda state: _candidate_table(state, "PROJECT_CANDIDATE", "project_candidates"),
+    ),
     (
         "Consolidation Candidates",
-        lambda state: _candidate_table(state, "CONSOLIDATION_CANDIDATE"),
+        lambda state: _candidate_table(
+            state, "CONSOLIDATION_CANDIDATE", "consolidation_candidates"
+        ),
     ),
     ("Readiness Evidence", _readiness_section),
     ("Reasoning Queue", _reasoning_section),
