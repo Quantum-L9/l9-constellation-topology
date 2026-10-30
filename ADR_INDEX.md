@@ -1,6 +1,6 @@
 # Architecture Decision Record Index
 
-The following 29 ADRs define the highest-priority architectural decisions for this
+The following 30 ADRs define the highest-priority architectural decisions for this
 repository. Accepted ADRs are immutable except for clerical fixes and links. A
 changed decision requires a new ADR that explicitly supersedes the old record.
 
@@ -35,6 +35,7 @@ changed decision requires a new ADR that explicitly supersedes the old record.
 | ADR-0027 | [Separate observation time from publication time, and do not retract on absence](docs/adr/0027-separate-observation-time-from-publication-time.md) | Accepted |
 | ADR-0028 | [Project bridge gaps as non-authoritative decision support](docs/adr/0028-project-bridge-gaps-as-decision-support.md) | Accepted |
 | ADR-0029 | [Authorize a bounded GitHub-native direct compile seam](docs/adr/0029-authorize-a-bounded-github-native-direct-compile-seam.md) | Accepted |
+| ADR-0030 | [Accept corpus-intelligence 1.1.0 `domains_not_run`](docs/adr/0030-accept-corpus-intelligence-v1-1-domains-not-run.md) | Accepted |
 
 ## Decision order
 

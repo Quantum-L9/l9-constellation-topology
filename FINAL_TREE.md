@@ -75,6 +75,7 @@ l9-constellation-topology/
 │   │   ├── 0027-separate-observation-time-from-publication-time.md
 │   │   ├── 0028-project-bridge-gaps-as-decision-support.md
 │   │   ├── 0029-authorize-a-bounded-github-native-direct-compile-seam.md
+│   │   ├── 0030-accept-corpus-intelligence-v1-1-domains-not-run.md
 │   │   └── README.md
 │   ├── archive
 │   │   └── v4

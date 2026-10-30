@@ -246,11 +246,12 @@ changes:
       - tests/test_repository_governance.py
     status: implemented
   - id: ACT-009
-    source: src/l9_constellation_topology/packets/corpus_intelligence.py, src/l9_constellation_topology/packets/corpus_validator.py, src/l9_constellation_topology/domain/candidate.py, src/l9_constellation_topology/domain/readiness.py, docs/adr/0026-accept-corpus-intelligence-as-an-auxiliary-packet.md
+    source: src/l9_constellation_topology/packets/corpus_intelligence.py, src/l9_constellation_topology/packets/corpus_validator.py, src/l9_constellation_topology/domain/candidate.py, src/l9_constellation_topology/domain/readiness.py, docs/adr/0026-accept-corpus-intelligence-as-an-auxiliary-packet.md, docs/adr/0030-accept-corpus-intelligence-v1-1-domains-not-run.md
     gap: topology could compile per-root repository observation only, so the corpus analysis l9-meta-injector now produces — cross-root byte identity, candidate bodies of work, readiness measurement, reasoning routing — had no way in; widening l9.repository-model to carry it would have made source observation and derived candidate analysis indistinguishable at the one boundary where that distinction can still be made
-    fix: accept l9.corpus-intelligence 1.0.0 as a separate optional auxiliary packet with fail-closed referential integrity against exactly the repository packets it names; carry the epistemic classes in the type system so candidates live outside edge_records and cannot reach impact, flow, maturity, risk, or publication by being forgotten
+    fix: accept l9.corpus-intelligence 1.0.0 and additive 1.1.0 as separate optional auxiliary packet versions with fail-closed referential integrity against exactly the repository packets each names; 1.1.0 binds closed domains_not_run statements into its semantic hash and preserves lexical TOPIC_CANDIDATE lineage, while 1.0.0 identity and output remain unchanged; candidates live outside edge_records and cannot reach impact, flow, maturity, risk, or publication by being forgotten
     validation:
       - tests/test_corpus_intelligence_contract.py
+      - tests/test_producer_emitted_corpus_packet.py
       - tests/test_corpus_topology_compilation.py
       - tests/test_corpus_publication_containment.py
     status: implemented
@@ -287,4 +288,3 @@ changes:
       - tests/test_corpus_topology_compilation.py
       - tests/test_topology_compiler_v5.py::test_golden_topology_bundle_matches_fixed_compiler_output
     status: implemented
-

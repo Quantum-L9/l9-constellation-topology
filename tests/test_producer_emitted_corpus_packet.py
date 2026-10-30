@@ -32,6 +32,7 @@ from pathlib import Path
 
 import pytest
 
+from l9_constellation_topology.compiler import compile_topology
 from l9_constellation_topology.packets.corpus_bundle import (
     calculate_corpus_semantic_hash,
     load_corpus_intelligence_bundle,
@@ -74,7 +75,8 @@ def test_provenance_names_the_revision_it_came_from() -> None:
 def test_the_consumer_loads_what_the_producer_wrote(bundle) -> None:
     """The whole verification path, on bytes this repository did not produce."""
     assert bundle.packet.packet_type == "l9.corpus-intelligence"
-    assert bundle.packet.packet_version == "1.0.0"
+    assert bundle.packet.packet_version == "1.1.0"
+    assert bundle.packet.domains_not_run == ()
     assert bundle.packet.payload is not None
 
 
@@ -122,6 +124,30 @@ def test_the_payload_carries_every_domain_with_content(bundle) -> None:
     assert len(payload.consolidation_candidates) > 0
     assert len(payload.readiness_evidence) > 0
     assert len(payload.reasoning_candidates) > 0
+
+
+def test_lexical_topic_candidates_from_the_producer_compile_as_candidates(bundle) -> None:
+    """ADR-068 lexical topics cross the packet boundary without canonical promotion."""
+    lexical = tuple(
+        candidate
+        for candidate in bundle.packet.payload.topic_candidates
+        if candidate.analysis_profile.profile_id == "lexical-topic-candidate/v1"
+    )
+    assert lexical
+    result = compile_topology(
+        Path(__file__).resolve().parents[1],
+        tuple(sorted((FIXTURE / "roots").iterdir())),
+        corpus_bundle_paths=(BUNDLE,),
+    )
+    compiled = {
+        candidate.candidate_id: candidate
+        for candidate in result.materialized.state.candidate_clusters
+    }
+    for candidate in lexical:
+        assert compiled[candidate.candidate_id].candidate_type == "TOPIC_CANDIDATE"
+        assert (
+            compiled[candidate.candidate_id].analysis_profile == "lexical-topic-candidate/v1/1.1.0"
+        )
 
 
 def test_work_signal_locators_cross_in_every_coordinate_system(bundle) -> None:
@@ -201,4 +227,34 @@ def test_an_edited_byte_fails_the_load_rather_than_changing_the_meaning(
     document[0]["confidence_class"] = "strong"
     target.write_text(json.dumps(document), encoding="utf-8")
     with pytest.raises(PacketLoadError):
+        load_corpus_intelligence_bundle(copy)
+
+
+def test_a_tampered_1_1_run_statement_fails_the_semantic_hash_check(tmp_path: Path) -> None:
+    """A manifest-valid packet edit cannot silently change the run statement."""
+    import shutil
+
+    copy = tmp_path / "corpus-intelligence"
+    shutil.copytree(BUNDLE, copy)
+    packet_path = copy / "packet.json"
+    document = json.loads(packet_path.read_text(encoding="utf-8"))
+    document["domains_not_run"] = [
+        {"domain": "semantic_pair_relations", "reason": "tampered after emission"}
+    ]
+    packet_path.write_text(json.dumps(document), encoding="utf-8")
+    manifest_path = copy / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    content = packet_path.read_bytes()
+    for entry in manifest["files"]:
+        if entry["path"] == "packet.json":
+            entry["content_hash"] = artifact_hash(content)
+            entry["size_bytes"] = len(content)
+    from l9_constellation_topology.packets.common import PacketFileEntry
+    from l9_constellation_topology.run.evidence import semantic_hash
+
+    manifest["artifact_hash"] = semantic_hash(
+        tuple(PacketFileEntry.model_validate(entry) for entry in manifest["files"])
+    )
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+    with pytest.raises(PacketLoadError, match="semantic hash mismatch"):
         load_corpus_intelligence_bundle(copy)

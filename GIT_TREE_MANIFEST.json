@@ -188,7 +188,7 @@
       "path": ".python-version"
     },
     {
-      "git_object_id": "150a130290f73624e25199da1a0094a41e87a858",
+      "git_object_id": "fc4b1fb95ae31da32a43a653534e51f8c903f402",
       "mode": "100644",
       "object_type": "blob",
       "path": "ADR_INDEX.md"
@@ -272,7 +272,7 @@
       "path": "EFFECT_IDENTITY_MIGRATION_PREFLIGHT.json"
     },
     {
-      "git_object_id": "d9eeb9a43a156403c4afed9a4597d164e855f930",
+      "git_object_id": "8414aab9e78c8a7b880605cf7d158fcb8a92da0a",
       "mode": "100644",
       "object_type": "blob",
       "path": "FINAL_TREE.md"
@@ -314,7 +314,7 @@
       "path": "MAINTAINERS.md"
     },
     {
-      "git_object_id": "08ca6d0ce0f7231481a0857996e7282412060122",
+      "git_object_id": "f8d203849ea3b61dc12bc6d9f56898c5ab7ce489",
       "mode": "100644",
       "object_type": "blob",
       "path": "MANIFEST.md"
@@ -398,7 +398,7 @@
       "path": "THREAT_MODEL.md"
     },
     {
-      "git_object_id": "597b37c49ec23307221894efc69fa8fa6f7c2219",
+      "git_object_id": "9d4375072e9081e71816abd6d85b2d56c1451f76",
       "mode": "100644",
       "object_type": "blob",
       "path": "TRACEABILITY_MAP.yaml"
@@ -708,6 +708,12 @@
       "mode": "100644",
       "object_type": "blob",
       "path": "docs/adr/0029-authorize-a-bounded-github-native-direct-compile-seam.md"
+    },
+    {
+      "git_object_id": "c118af5e0072914f5c4fe377c894b67e6d37b453",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "docs/adr/0030-accept-corpus-intelligence-v1-1-domains-not-run.md"
     },
     {
       "git_object_id": "3c2466071d4b3c021b1969946079823ae4bcfae7",
@@ -1664,7 +1670,7 @@
       "path": "src/l9_constellation_topology/packets/control.py"
     },
     {
-      "git_object_id": "d26a24a7ffedd05909ba152674bc54262ca736bb",
+      "git_object_id": "0c49b2e08a06b10c4b054512a53609b416d6e0e6",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/packets/corpus_bundle.py"
@@ -1682,13 +1688,13 @@
       "path": "src/l9_constellation_topology/packets/corpus_ingress.py"
     },
     {
-      "git_object_id": "023ff40942df63b6f153e18cc49eb2843fcf6f7b",
+      "git_object_id": "4779a64f612c758eddf0433170444496b5a402f9",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/packets/corpus_intelligence.py"
     },
     {
-      "git_object_id": "f25eedde8261ef98073715e614109ec3cc35948c",
+      "git_object_id": "1a8de3ef8b8b6f53427d2b69f1bcb62841ebbe82",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/packets/corpus_validator.py"
@@ -2312,163 +2318,163 @@
       "path": "tests/corpus_fixtures.py"
     },
     {
-      "git_object_id": "79cf3e3b5069214de4783f7ac1bd68609306256c",
+      "git_object_id": "75144e5f26c1862f0e5207f5a193544695c6d4aa",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/corpus_intelligence/producer-emitted/PROVENANCE.md"
     },
     {
-      "git_object_id": "6605794fa52547a814b090adafccb3bbab88953c",
+      "git_object_id": "162f644cc99469fe801ebeaccb8af8e146541ad5",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/corpus_intelligence/producer-emitted/corpus-intelligence/manifest.json"
     },
     {
-      "git_object_id": "e689888072d3794c30f563c819f9171be621f547",
+      "git_object_id": "a48c0a1535f96dccd64278ab5e2e15e8854b8a8b",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/corpus_intelligence/producer-emitted/corpus-intelligence/packet.json"
     },
     {
-      "git_object_id": "1469c58ba99cc4cdbf0a9c2766d0096380f6d0a5",
+      "git_object_id": "d60360d51f168dc20d66c0d498a9f4c35a79e3c5",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/corpus_intelligence/producer-emitted/corpus-intelligence/payload/consolidation-candidates.json"
     },
     {
-      "git_object_id": "67721efefcb9cda0e7d10c8a7b8b712c6ceecaf5",
+      "git_object_id": "cc71bd055aa77589b07543c6d539ee3eecb2d932",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/corpus_intelligence/producer-emitted/corpus-intelligence/payload/document-work-signals.json"
     },
     {
-      "git_object_id": "3af9e7749d9fa93dba5b35e3ac7eb44dd2e7747a",
+      "git_object_id": "30b7fa5a95e39dd85a369122b71d0d4ac34b242b",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/corpus_intelligence/producer-emitted/corpus-intelligence/payload/exact-duplicate-relations.json"
     },
     {
-      "git_object_id": "0566ae38116379f364b40d404fca0a506e3c5f58",
+      "git_object_id": "9bdbf235d3162e3426eaac91accc5e57343217a7",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/corpus_intelligence/producer-emitted/corpus-intelligence/payload/project-candidates.json"
     },
     {
-      "git_object_id": "718f6d061be7a6cb2425b9b2af913c96fe33aef5",
+      "git_object_id": "f99a98a58f1e2239db692e71aeef11079feb86c0",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/corpus_intelligence/producer-emitted/corpus-intelligence/payload/readiness-evidence.json"
     },
     {
-      "git_object_id": "1cc125f624a77396f291edae34b38832920bb133",
+      "git_object_id": "be91b89a2734f113700189a6fef89b47c76cecf7",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/corpus_intelligence/producer-emitted/corpus-intelligence/payload/reasoning-candidates.json"
     },
     {
-      "git_object_id": "e16cfc18ea6c43164b344cbad8122d7b9365218c",
+      "git_object_id": "aa54910e0f94a5b902ee983a89fcf0eed681a932",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/corpus_intelligence/producer-emitted/corpus-intelligence/payload/reasoning-evidence-pack-refs.json"
     },
     {
-      "git_object_id": "8df40c024e397a7040806d95dac0e3676b3002b7",
+      "git_object_id": "74e55fb9aa6abb4cf3c637aa67625973eceeea05",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/corpus_intelligence/producer-emitted/corpus-intelligence/payload/semantic-pair-relations.json"
     },
     {
-      "git_object_id": "052f8d30b3bb4626551066c784bc2fe65e126536",
+      "git_object_id": "5c67dfd55690263269a0ccd19f14194667d71c47",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/corpus_intelligence/producer-emitted/corpus-intelligence/payload/topic-candidates.json"
     },
     {
-      "git_object_id": "96e93afd4d42fdcf2de38742de212809516016d0",
+      "git_object_id": "5b3276ec3998734ade7bdb281828bdfcb009f646",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/corpus_intelligence/producer-emitted/roots/ArchiveZips/manifest.json"
     },
     {
-      "git_object_id": "6ba2d212d656f8bef9caf6256b6369e25b20b913",
+      "git_object_id": "37444b41044c53375e42e68dea0191ad638f6447",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/corpus_intelligence/producer-emitted/roots/ArchiveZips/packet.json"
     },
     {
-      "git_object_id": "3abc32f71010c5beacc93c1ed2b1e4148b9e1215",
+      "git_object_id": "3dcce10c862ecab1de34ca4a1247ab5f8050ee97",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/corpus_intelligence/producer-emitted/roots/ArchiveZips/receipts/validation-receipt.json"
     },
     {
-      "git_object_id": "2f65f28ce5c35a04fe9aa6eb49f4dac3429a2ab6",
+      "git_object_id": "fad71fbe64127d9e602624e33df7c94279b556db",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/corpus_intelligence/producer-emitted/roots/Backup/manifest.json"
     },
     {
-      "git_object_id": "95ee7250de218c24687ac0310dd323165c7bc64f",
+      "git_object_id": "2c8648a74598c8c2f5b62015ca87ffb35ede652c",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/corpus_intelligence/producer-emitted/roots/Backup/packet.json"
     },
     {
-      "git_object_id": "8457877c6c256bdca04dc4796858b3f55eccf3c7",
+      "git_object_id": "dc36987754f333b84013afdf9f11c38cf9345c76",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/corpus_intelligence/producer-emitted/roots/Backup/receipts/validation-receipt.json"
     },
     {
-      "git_object_id": "662d98a81070c7d6ab7a3a0d6aa1919011b14769",
+      "git_object_id": "55e204170096d8e8ada56f3d5498b88f321aebbe",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/corpus_intelligence/producer-emitted/roots/Documents/manifest.json"
     },
     {
-      "git_object_id": "2f9451017cc07d1d03e8ddb85e6b275df1aa0677",
+      "git_object_id": "1427f411b0cce5ed61a8830572d72117e125e4e0",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/corpus_intelligence/producer-emitted/roots/Documents/packet.json"
     },
     {
-      "git_object_id": "2d7a0b7432a74b17b6f880aa273564bdbe1d860d",
+      "git_object_id": "e4284bc3ca5aaeaa0237ad78b20e7b5f3c6de064",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/corpus_intelligence/producer-emitted/roots/Documents/receipts/validation-receipt.json"
     },
     {
-      "git_object_id": "1b7d7710199c85d83ec9a2b8be1bdbad1084a67d",
+      "git_object_id": "2b906367fd0773e476f3365155bfedc9164f855d",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/corpus_intelligence/producer-emitted/roots/OldSSD/manifest.json"
     },
     {
-      "git_object_id": "31d95a1629342a2c3c1142077cff7d2a16dbf81c",
+      "git_object_id": "2b69fb4fc8d4f65bee0bb757dca1ab96a41e52c9",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/corpus_intelligence/producer-emitted/roots/OldSSD/packet.json"
     },
     {
-      "git_object_id": "10ac75079e565c5d39482642eb609195e7e7192f",
+      "git_object_id": "28bfd027e6a1673558a81d62cbc2177a6630e691",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/corpus_intelligence/producer-emitted/roots/OldSSD/receipts/validation-receipt.json"
     },
     {
-      "git_object_id": "327a02e03b1bc840c5602984aeb8b56fd0cb9153",
+      "git_object_id": "0fc2379fabd8950d1d1e6710e68f4b3447847a69",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/corpus_intelligence/producer-emitted/roots/corpus/manifest.json"
     },
     {
-      "git_object_id": "4f48a996f151c86c7a71703b632002985f598135",
+      "git_object_id": "3cd2dbb2bed0a22293c0a1bbd2904ac9a813169d",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/corpus_intelligence/producer-emitted/roots/corpus/packet.json"
     },
     {
-      "git_object_id": "90b4fb848a88f30100377fbeedbbfe9ee61cd666",
+      "git_object_id": "a6e1a22b8d40ef338dc554048832b94a55000fa1",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/corpus_intelligence/producer-emitted/roots/corpus/receipts/validation-receipt.json"
@@ -2942,7 +2948,7 @@
       "path": "tests/test_corpus_ingress.py"
     },
     {
-      "git_object_id": "e4e4d0b54f5e9d0cf6e8357db90209ad6345f72e",
+      "git_object_id": "b0a19aee5b5298e30d6af37136612ee81280095c",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_corpus_intelligence_contract.py"
@@ -3080,7 +3086,7 @@
       "path": "tests/test_packet_store_v5.py"
     },
     {
-      "git_object_id": "2d90096e1274b9f29a30c832ebf250e4f8774487",
+      "git_object_id": "70fda4215b80353005478e9554bc69e010046983",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_producer_emitted_corpus_packet.py"
@@ -3278,8 +3284,8 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:f2a7ff25646da3660c82d2ad9341b87d9d04418e946010ae632bca0b8f4a93b8",
-  "entry_count": 546,
+  "entries_sha256": "sha256:d2d2b27f221ee0b45a64254cedc17f27ef666fcc05c6ebdb71ec586386db425a",
+  "entry_count": 547,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
   ],

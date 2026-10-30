@@ -62,11 +62,11 @@ changing what the fixture says.
 | | |
 |---|---|
 | Producer repository | `Quantum-L9/l9-meta-injector` |
-| Producer revision | `953b7cba7a2a694abf02f73d1261a895c2bbc3d3` (release `v4.2.0`) |
+| Producer revision | `ebc0dd30d8527ac8812da2995181306458ee5dde` (PR-113 head) |
 | Producer version | `l9-meta-injector.corpus-intelligence` 4.2.0 over `l9.repository-model` 1.1.0 roots |
-| Packet type | `l9.corpus-intelligence` 1.0.0 |
-| Packet id | `packet:1165b10de751b2789b53bc9e4aa951fdfc545667f28290c004ae2c2f1e8ace8b` |
-| Generated | 2026-10-22 |
+| Packet type | `l9.corpus-intelligence` 1.1.0 |
+| Packet id | `packet:ef022aace39683ced270f2036899d702d2fc64eaffe573c8ab9c96ec5ec62090` |
+| Generated | 2026-10-29 |
 
 Previously generated at `79bd7a31f56958095a275b2fda7380df8e1ec69a` (producer 4.0.0,
 packet `packet:a4a2b6d4…bff34517`, 2026-08-30). Regenerated at v4.2.0 because the

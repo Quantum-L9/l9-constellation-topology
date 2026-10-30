@@ -24,6 +24,7 @@ from l9_constellation_topology.packets.corpus_bundle import (
 from l9_constellation_topology.packets.corpus_intelligence import (
     CORPUS_PAYLOAD_FIELDS,
     CandidateCluster,
+    CorpusIntelligencePacket,
     CorpusIntelligencePayload,
     ExactDuplicateRelation,
     ReadinessEvidence,
@@ -106,6 +107,74 @@ def test_identity_excludes_the_payload_and_the_wall_clock() -> None:
     second = corpus_packet()
     assert first.packet_id == second.packet_id
     assert first.semantic_hash == second.semantic_hash
+
+
+def test_1_0_packet_identity_and_rendering_remain_unchanged() -> None:
+    """ADR-0030 is additive: an absent 1.1.0 field cannot move legacy bytes."""
+    packet = corpus_packet()
+    assert packet.packet_version == "1.0.0"
+    assert (
+        packet.semantic_hash
+        == "sha256:9e2ebcb00c8b3ed8db932c136e38ffde518a15348987d287ade6bdcd18cf778c"
+    )
+    assert (
+        packet.packet_id
+        == "packet:9e2ebcb00c8b3ed8db932c136e38ffde518a15348987d287ade6bdcd18cf778c"
+    )
+    rendered = {
+        artifact.destination_path: artifact.content
+        for artifact in build_corpus_intelligence_bundle_artifacts(packet)
+    }
+    assert b'"domains_not_run"' not in rendered["packet.json"]
+
+
+def test_1_1_packet_hashes_its_explicit_empty_run_statement() -> None:
+    document = corpus_packet().model_dump(mode="json")
+    document["packet_version"] = "1.1.0"
+    document["domains_not_run"] = []
+    packet = finalize_corpus_intelligence_packet(CorpusIntelligencePacket.model_validate(document))
+    assert packet.domains_not_run == ()
+    assert calculate_corpus_semantic_hash(packet) == packet.semantic_hash
+    assert packet.semantic_hash != corpus_packet().semantic_hash
+
+
+@pytest.mark.parametrize(
+    "domains_not_run, match",
+    (
+        (None, "requires domains_not_run"),
+        ([{"domain": "not_a_payload", "reason": "skipped"}], "Input should be"),
+        (
+            [
+                {"domain": "topic_candidates", "reason": "skipped"},
+                {"domain": "topic_candidates", "reason": "also skipped"},
+            ],
+            "more than once",
+        ),
+        ([{"domain": "topic_candidates", "reason": "skipped", "unexpected": True}], "extra"),
+    ),
+)
+def test_1_1_rejects_malformed_or_extraneous_run_statements(
+    domains_not_run: object, match: str
+) -> None:
+    document = corpus_packet().model_dump(mode="json")
+    document["packet_version"] = "1.1.0"
+    if domains_not_run is None:
+        document.pop("domains_not_run", None)
+    else:
+        document["domains_not_run"] = domains_not_run
+    with pytest.raises(ValueError, match=match):
+        CorpusIntelligencePacket.model_validate(document)
+
+
+def test_1_1_rejects_a_not_run_domain_that_carries_records() -> None:
+    document = corpus_packet().model_dump(mode="json")
+    document["packet_version"] = "1.1.0"
+    document["domains_not_run"] = [
+        {"domain": "topic_candidates", "reason": "semantic pass skipped"}
+    ]
+    packet = CorpusIntelligencePacket.model_validate(document)
+    with pytest.raises(CorpusIntelligenceValidationError, match="carries records"):
+        validate_corpus_intelligence_packet(packet, REPOSITORY_PACKETS)
 
 
 def test_a_changed_payload_moves_packet_identity() -> None:

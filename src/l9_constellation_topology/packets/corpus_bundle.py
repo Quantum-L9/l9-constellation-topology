@@ -131,7 +131,13 @@ def build_corpus_intelligence_bundle_artifacts(
     # The payload is written to its own files and referenced by hash, so the
     # packet document itself carries refs rather than a second inline copy that
     # could disagree with them.
-    packet_bytes = canonical_bytes(packet.model_dump(exclude={"payload"})) + b"\n"
+    excluded = {"payload"}
+    # `domains_not_run` was introduced in 1.1.0. Retain every existing null in
+    # a 1.0.0 rendering, but omit this absent additive field so legacy packet
+    # bytes stay byte-for-byte unchanged.
+    if packet.domains_not_run is None:
+        excluded.add("domains_not_run")
+    packet_bytes = canonical_bytes(packet.model_dump(exclude=excluded)) + b"\n"
     artifacts.append(
         _artifact("corpus-intelligence-packet", "packet.json", packet_bytes, packet.semantic_hash)
     )
