@@ -95,17 +95,22 @@ EXCLUDED_PARTS = {
 #: Repository-relative prefixes holding agent runtime state rather than
 #: delivered files: L4 local-autonomy phase and release receipts, the PR
 #: remediation handoff, and the agent adapter wiring the governance sessionStart
-#: bootstrap writes into the worktree. They are written by the governance flow,
-#: are git-ignored, and are never part of the delivery inventory, so a readiness
+#: bootstrap writes into the worktree, including its secrets-plane receipt and
+#: the consumer governance links and IDE profile. They are written by the governance flow, are
+#: git-ignored, and are never part of the delivery inventory, so a readiness
 #: scan must not report them as manifest omissions.
 EXCLUDED_RELATIVE_PREFIXES = (
     ".claude/",
+    ".cursor/",
     ".l9/autonomy/",
     ".l9/pr/",
+    ".l9/session/",
+    ".vscode/",
 )
 #: Repository-relative files in the same category as the prefixes above. A whole
-#: directory is not the right unit for the MCP server map, which is one file.
-EXCLUDED_RELATIVE_FILES = frozenset({".mcp.json"})
+#: directory is not the right unit for the MCP server map, the locked-venv
+#: receipt, or the governance command link, each of which is one path.
+EXCLUDED_RELATIVE_FILES = frozenset({".cursor-commands", ".l9/uv-environment.lock", ".mcp.json"})
 ALLOWED_THIN_NAMES = {"__init__.py", "py.typed", ".gitkeep"}
 
 

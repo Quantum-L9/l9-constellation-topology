@@ -29,3 +29,14 @@ outputs/*
 # MCP server map. Session-local, machine-specific, and never part of delivery.
 .claude/
 .mcp.json
+
+# Governance session state written into the worktree by the sessionStart
+# bootstrap and the agent worktree launcher: the secrets-plane receipt
+# (`.l9/session/`), the locked-venv receipt, and the consumer governance links
+# (`.cursor/`, `.cursor-commands`), and the governed IDE profile (`.vscode/`).
+# Session-local and never part of delivery.
+.l9/session/
+.l9/uv-environment.lock
+.cursor/
+.cursor-commands
+.vscode/
