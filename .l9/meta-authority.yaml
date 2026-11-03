@@ -1,0 +1,7 @@
+schema: l9.meta-authority/v1
+writer:
+  repository: Quantum-L9/l9-meta-injector
+  ref: v4
+default_carrier: central_manifest
+legacy_writers: forbidden
+inline_allow: []

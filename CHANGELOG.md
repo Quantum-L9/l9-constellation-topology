@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased - repository metadata from l9-meta-injector
+
+- Added `.l9/meta-authority.yaml` (`l9.meta-authority/v1`, central-manifest
+  carrier) and generated `.l9/metadata-index.jsonl` with `l9-meta-injector`
+  v4.3.0 (ADR-0031). No source file changes; no CI job runs it.
+- Deleted the unused legacy `schemas/graph_record.schema.json`. Its name
+  collided with the canonical `schemas/graph-record.schema.json` and stopped
+  the producer with `DUPLICATE_METADATA_ID`.
+- Documented the manual refresh in `DEVELOPMENT.md`.
+- `FINAL_TREE.md` now lists `.l9/publication-policy.yaml`, which it had omitted.
+
 ## Unreleased - producer alignment with l9-meta-injector v4.3.0
 
 - Re-pinned the PR compile proof (`l9-pr-validate` → `direct-compile-smoke`)
