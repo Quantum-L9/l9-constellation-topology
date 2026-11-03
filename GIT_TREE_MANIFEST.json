@@ -2318,7 +2318,7 @@
       "path": "tests/corpus_fixtures.py"
     },
     {
-      "git_object_id": "d6f7e21a03620f9ba552ca61a9d9e13912f792b9",
+      "git_object_id": "613fc72af94c6f5c1c5ff8823bf25cd0db7616e1",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/corpus_intelligence/producer-emitted/PROVENANCE.md"
@@ -3284,7 +3284,7 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:e3c603edf16c6d6ba070798f4ba91ef1b2a33ad71907836dea0ddcf5a4826087",
+  "entries_sha256": "sha256:954e9e0c4127070ad0f908026b7f872ee0bc8c587c5ca0edcd875620fa76166e",
   "entry_count": 547,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"

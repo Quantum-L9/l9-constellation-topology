@@ -79,7 +79,8 @@ domain keeps its record count (42 work signals with the same per-format split,
 artifact ids. Two emits at that revision differ only in the wall-clock
 `created_at` of the corpus-intelligence packet and manifest; packet ids and
 semantic hashes are identical. Emitted from a `git archive` snapshot of the tag
-with `npm ci --ignore-scripts`; `tsx` was resolved by `npx` (4.23.15).
+with `npm ci --ignore-scripts`; `npx` resolved `tsx` 4.23.15, which is not in
+the producer's lockfile.
 
 Generated at `ebc0dd30d8527ac8812da2995181306458ee5dde` before that (PR-113
 head, producer 4.2.0, packet `packet:ef022aac…ec62090`, 2026-10-29).
