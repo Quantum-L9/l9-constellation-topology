@@ -122,7 +122,7 @@
       "path": ".github/workflows/l9-stage-worker.yml"
     },
     {
-      "git_object_id": "634a3c21b34d02c9184dc615ee5a727e96a5c028",
+      "git_object_id": "15cae226da594f67d68929e0bdce0dff59c81c84",
       "mode": "100644",
       "object_type": "blob",
       "path": ".gitignore"
@@ -1358,7 +1358,7 @@
       "path": "scripts/validate_nuclear_execution.py"
     },
     {
-      "git_object_id": "30ef44ccce7289645e54aaeaa1564126be432274",
+      "git_object_id": "98159f87efaaa60093a9e38f870199a339b40c8a",
       "mode": "100755",
       "object_type": "blob",
       "path": "scripts/validate_release_readiness.py"
@@ -3146,7 +3146,7 @@
       "path": "tests/test_reasoning_router.py"
     },
     {
-      "git_object_id": "5cda29f8d6d354b4ade98744355d16ccc981e82c",
+      "git_object_id": "5cc9f495b4f9b0c0813ff54968eaa74f0f9ee7cf",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_release_readiness.py"
@@ -3284,7 +3284,7 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:57215852450d967e4018787a6cd39b5b25e50792ddce74af90502d7c566ffdb5",
+  "entries_sha256": "sha256:d5c509cdf4db37f5871d11dfaac930eaf852aa1b13089c6ca0aaebcc7fd74541",
   "entry_count": 547,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
