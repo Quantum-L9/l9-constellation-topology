@@ -19,6 +19,7 @@ def test_release_readiness_has_no_blocking_findings() -> None:
         ".l9/uv-environment.lock",
         ".cursor/governance/CANONICAL_LAW.md",
         ".cursor-commands",
+        ".vscode/settings.json",
         ".l9/autonomy/l4-release-receipt.json",
         ".l9/pr/pr-summary.json",
         ".claude/settings.json",
@@ -37,6 +38,7 @@ def test_governance_session_state_is_not_delivery_inventory(relative: str) -> No
         ".l9/sessions.yaml",
         ".cursor-commands.md",
         "docs/cursor/notes.md",
+        "docs/.vscode-notes.md",
     ],
 )
 def test_delivered_paths_near_session_state_remain_scanned(relative: str) -> None:
