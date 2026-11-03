@@ -60,3 +60,19 @@ hash-bound fixtures.
 
 **A `check` gate in `l9-pr-validate`.** Rejected by the operator for now: it
 would force every pull request to regenerate the index.
+
+## Compliance and validation
+
+- The producer's own `check` mode, run with the flags in `DEVELOPMENT.md` on a
+  clean export of the committed tree, reports `drift=0` and
+  `authorityConflicts=0` at the commit that adds the index.
+- `apply` writes only `.l9/metadata-index.jsonl`; a second run changes nothing.
+- `scripts/validate_contracts.py` checks every remaining schema under
+  `schemas/`; none references the deleted legacy schema.
+
+## Related artifacts
+
+- `.l9/meta-authority.yaml`
+- `.l9/metadata-index.jsonl`
+- `DEVELOPMENT.md` (Repository metadata)
+- `schemas/graph-record.schema.json`

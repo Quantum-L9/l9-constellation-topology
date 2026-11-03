@@ -146,7 +146,7 @@
       "path": ".l9/meta-authority.yaml"
     },
     {
-      "git_object_id": "aac6c99e21e88e86050cca2f2945794628f397f1",
+      "git_object_id": "8119d44c260b52ae20ea3fa9a9ad41ff3e646fb5",
       "mode": "100644",
       "object_type": "blob",
       "path": ".l9/metadata-index.jsonl"
@@ -728,7 +728,7 @@
       "path": "docs/adr/0030-accept-corpus-intelligence-v1-1-domains-not-run.md"
     },
     {
-      "git_object_id": "5439075cb8da1dd320fad23189da0f4a2df3821f",
+      "git_object_id": "d75aac4b7a99f69f1ca9f4a6959fb2f7746aa3fd",
       "mode": "100644",
       "object_type": "blob",
       "path": "docs/adr/0031-bind-repository-metadata-to-l9-meta-injector.md"
@@ -3296,7 +3296,7 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:705faeef76a860998fe7b1b59e194f448607386c5ddf798c6e058220a51cbf12",
+  "entries_sha256": "sha256:8835759c76872e0cc2335d85598bcf82703cc0aa5a283b3d6abcdac5c2d701f8",
   "entry_count": 549,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
