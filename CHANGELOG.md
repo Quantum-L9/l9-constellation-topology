@@ -1,5 +1,23 @@
 # Changelog
 
+## Unreleased - producer alignment with l9-meta-injector v4.3.0
+
+- Re-pinned the PR compile proof (`l9-pr-validate` → `direct-compile-smoke`)
+  from `953b7cba7a2a694abf02f73d1261a895c2bbc3d3` (v4.2.0) to
+  `c53ef3aa0ccea04af2adfe67800ad09843b6e0fe`, the exact commit
+  `Quantum-L9/l9-meta-injector` `v4.3.0` and the maintained `v4` line resolve
+  to since the producer's release workflow advanced them on 2026-11-03.
+  `compile.yml` keeps `v4` as its released default.
+- Regenerated `tests/fixtures/corpus_intelligence/producer-emitted` from the
+  v4.3.0 producer. Same file set and the same record count in every payload
+  domain; derived ids moved with the `python-route-observation/v1` 1.2.0
+  extractor. The five roots and the corpus bundle compile with
+  `validation_status` passed.
+- Regenerated `CURRENT_VALIDATION_REPORT.md` against v4.3.0.
+- `QUALIFICATION.json` is not regenerated: its two external specimen
+  repositories are out of scope for this change, so it remains the v4.2.0
+  record and the report says so.
+
 ## Unreleased - producer alignment with l9-meta-injector v4.2.0
 
 - Re-pinned the PR compile proof (`l9-pr-validate` → `direct-compile-smoke`)

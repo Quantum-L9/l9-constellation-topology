@@ -62,11 +62,28 @@ changing what the fixture says.
 | | |
 |---|---|
 | Producer repository | `Quantum-L9/l9-meta-injector` |
-| Producer revision | `ebc0dd30d8527ac8812da2995181306458ee5dde` (PR-113 head) |
-| Producer version | `l9-meta-injector.corpus-intelligence` 4.2.0 over `l9.repository-model` 1.1.0 roots |
+| Producer revision | `c53ef3aa0ccea04af2adfe67800ad09843b6e0fe` (tag `v4.3.0`, maintained `v4`) |
+| Producer version | `l9-meta-injector.corpus-intelligence` 4.3.0 over `l9.repository-model` 1.1.0 roots |
 | Packet type | `l9.corpus-intelligence` 1.1.0 |
-| Packet id | `packet:ef022aace39683ced270f2036899d702d2fc64eaffe573c8ab9c96ec5ec62090` |
-| Generated | 2026-10-29 |
+| Packet id | `packet:52c365061ae6e0a5f0dfd2746d50f53e64f1d7c3e58342849c8beea8e08c24e5` |
+| Generated | 2026-11-03 |
+
+Regenerated at the v4.3.0 release so the fixture is bound to a released
+producer rather than a PR head. Against the `ebc0dd30` emit, the
+`python-route-observation/v1` extractor moved 1.1.0 → 1.2.0 (so the
+interpretation profile hash and every derived artifact, evidence, block and
+relation id moved with it) and the validator version reads 4.3.0. Every payload
+domain keeps its record count (42 work signals with the same per-format split,
+188 semantic pairs, 26 exact duplicates, 22 consolidation, 36 reasoning,
+14 topic and 4 project candidates); work-signal order follows the moved
+artifact ids. Two emits at that revision differ only in the wall-clock
+`created_at` of the corpus-intelligence packet and manifest; packet ids and
+semantic hashes are identical. Emitted from a `git archive` snapshot of the tag
+with `npm ci --ignore-scripts`; `npx` resolved `tsx` 4.23.15, which is not in
+the producer's lockfile.
+
+Generated at `ebc0dd30d8527ac8812da2995181306458ee5dde` before that (PR-113
+head, producer 4.2.0, packet `packet:ef022aac…ec62090`, 2026-10-29).
 
 Previously generated at `79bd7a31f56958095a275b2fda7380df8e1ec69a` (producer 4.0.0,
 packet `packet:a4a2b6d4…bff34517`, 2026-08-30). Regenerated at v4.2.0 because the
