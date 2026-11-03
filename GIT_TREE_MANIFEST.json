@@ -146,7 +146,7 @@
       "path": ".l9/meta-authority.yaml"
     },
     {
-      "git_object_id": "8119d44c260b52ae20ea3fa9a9ad41ff3e646fb5",
+      "git_object_id": "c41e5340ca3fd0abcdb16266b211401e33c77b86",
       "mode": "100644",
       "object_type": "blob",
       "path": ".l9/metadata-index.jsonl"
@@ -206,7 +206,7 @@
       "path": "ADR_INDEX.md"
     },
     {
-      "git_object_id": "05dff04479b4249029556ab2ed59f8e7887e4245",
+      "git_object_id": "41ce996e7e0505a64e320fcae30ca77e1046be60",
       "mode": "100644",
       "object_type": "blob",
       "path": "AGENTS.md"
@@ -350,7 +350,7 @@
       "path": "QUALIFICATION.json"
     },
     {
-      "git_object_id": "b054a6417e60f6d24b4bacc6b1856d439cf805a4",
+      "git_object_id": "d06d9957795e9fee8861e61aefc82204d586d5d9",
       "mode": "100644",
       "object_type": "blob",
       "path": "README.md"
@@ -374,7 +374,7 @@
       "path": "ROADMAP.md"
     },
     {
-      "git_object_id": "a2a3995218c96d473804a3013860a8e0aa42ba03",
+      "git_object_id": "061ac4a2c65007d3a011e1ae74c99c53b5469993",
       "mode": "100644",
       "object_type": "blob",
       "path": "RUNBOOK.md"
@@ -422,7 +422,7 @@
       "path": "UNKNOWN_REGISTER.md"
     },
     {
-      "git_object_id": "f4d26726cf0b70c2c492e0cddfe8464cadde4aa0",
+      "git_object_id": "2ce613ad3d263668f929ad8d7e8c458e7af6e1d4",
       "mode": "100644",
       "object_type": "blob",
       "path": "VALIDATION.md"
@@ -3296,7 +3296,7 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:8835759c76872e0cc2335d85598bcf82703cc0aa5a283b3d6abcdac5c2d701f8",
+  "entries_sha256": "sha256:fec78c4579dd5574b82e63fc22f81f869004a697c0e1586836361fc1f4fcba2e",
   "entry_count": 549,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
