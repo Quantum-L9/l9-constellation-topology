@@ -123,8 +123,8 @@ jobs:
       source_revision: ${{ github.event.pull_request.head.sha || github.sha }}
       source_name: l9-constellation-topology
       # The PR proof binds the exact commit the maintained v4 line resolves to:
-      # l9-meta-injector v4.2.0 (release.yml moved v4 to it on 2026-10-22). The
+      # l9-meta-injector v4.3.0 (release.yml moved v4 to it on 2026-11-03). The
       # released reusable interface defaults to the mutable v4 tag; this proof
       # pins its current target so a later move of v4 is a deliberate re-pin here.
-      meta_ref: 953b7cba7a2a694abf02f73d1261a895c2bbc3d3
+      meta_ref: c53ef3aa0ccea04af2adfe67800ad09843b6e0fe
       publish: true
