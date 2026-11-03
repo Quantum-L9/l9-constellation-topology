@@ -146,7 +146,7 @@
       "path": ".l9/meta-authority.yaml"
     },
     {
-      "git_object_id": "c41e5340ca3fd0abcdb16266b211401e33c77b86",
+      "git_object_id": "fe376199ce86a10d97e5ba681eb5f51e73b5defd",
       "mode": "100644",
       "object_type": "blob",
       "path": ".l9/metadata-index.jsonl"
@@ -230,7 +230,7 @@
       "path": "BUILD_SPECIFICATION.md"
     },
     {
-      "git_object_id": "0d3619f70b6cb013063ff91ce13fa632ebb0baa8",
+      "git_object_id": "424959820fea28fe9a7b8795247c85cb158e1fab",
       "mode": "100644",
       "object_type": "blob",
       "path": "CHANGELOG.md"
@@ -272,7 +272,7 @@
       "path": "DEPENDENCY_POLICY.md"
     },
     {
-      "git_object_id": "8d635244fcb8eb33eb6004dd60fce16b453e78b4",
+      "git_object_id": "176377bde3a6b7d656e89464563d0e1e1257ca7b",
       "mode": "100644",
       "object_type": "blob",
       "path": "DEVELOPMENT.md"
@@ -326,7 +326,7 @@
       "path": "MAINTAINERS.md"
     },
     {
-      "git_object_id": "e32dd5fc1dd40d550d0f10a9490fcd127e9f35cd",
+      "git_object_id": "601b283517e3fe3fbf2915af819353252b0bf533",
       "mode": "100644",
       "object_type": "blob",
       "path": "MANIFEST.md"
@@ -3296,7 +3296,7 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:fec78c4579dd5574b82e63fc22f81f869004a697c0e1586836361fc1f4fcba2e",
+  "entries_sha256": "sha256:b7d885e3652672fe047e4930a24293995305194ccf467b2289be3fd24f82e6b6",
   "entry_count": 549,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"

@@ -2,7 +2,7 @@
 
 ## Unreleased - repository metadata from l9-meta-injector
 
-- Added `.l9/meta-authority.yaml` (`l9.meta-authority/v1`, central-manifest
+- Added `.l9/meta-authority.yaml` (`l9.meta-authority/v1`, `central_manifest`
   carrier) and generated `.l9/metadata-index.jsonl` with `l9-meta-injector`
   v4.3.0 (ADR-0031). No source file changes; no CI job runs it.
 - Deleted the unused legacy `schemas/graph_record.schema.json`. Its name

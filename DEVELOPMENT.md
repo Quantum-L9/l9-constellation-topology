@@ -66,7 +66,8 @@ it. Install the released producer outside this tree and run it from the
 repository root:
 
 ```bash
-npm install --prefix /tmp/meta github:Quantum-L9/l9-meta-injector#v4.3.0
+# c53ef3a… is the v4.3.0 release commit; a tag can be moved, a commit cannot.
+npm install --prefix /tmp/meta github:Quantum-L9/l9-meta-injector#c53ef3aa0ccea04af2adfe67800ad09843b6e0fe
 /tmp/meta/node_modules/.bin/l9-meta-injector apply . \
   --authority Quantum-L9 --namespace l9-constellation-topology \
   --omit GIT_TREE_MANIFEST.json
