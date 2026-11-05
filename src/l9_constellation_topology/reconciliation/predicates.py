@@ -60,7 +60,98 @@ PREDICATE_POLICY_ID = "l9-topology-assertion-predicates"
 #: file format happened to state it — and a `.docx` saying ``Complete`` beside a
 #: `.md` saying ``WIP`` is exactly the contradiction a reader needs surfaced, not
 #: one routed into a different subsystem.
-PREDICATE_POLICY_VERSION = "1.1.0"
+#:
+#: 1.2.0 registers the native ``L9_META`` header predicates whose meaning the
+#: Semantic Foundation now governs: ``l9.artifact-header-model/global@1``
+#: (Quantum-L9/.github v3.27.0, ADR-024), transcribed by the producer's governed
+#: mapping (l9-meta-injector ADR-084). Each is a declaration the carrying file
+#: makes about itself. Scalars reconcile as ``single``, so two different
+#: declarations about one file are a conflict; lists reconcile as ``set``; the
+#: carrier and schema claims are ``auxiliary``. None of them may project: the
+#: ledger's projection boundary admits no canonical relation from a header
+#: (ADR-0032).
+PREDICATE_POLICY_VERSION = "1.2.0"
+
+#: The ledger every header predicate below takes its meaning from.
+HEADER_SEMANTICS_LEDGER = "l9.artifact-header-model/global@1"
+
+#: Predicate namespaces of the declared schemas the ledger recognizes (``l9_schema`` 1 and 2).
+HEADER_SCHEMA_NAMESPACES: tuple[str, ...] = ("l9v1", "l9v2")
+
+#: ``(field, category, value_kind)`` exactly as the ledger defines them, in its order.
+#: List value kinds are set-valued; every other kind declares one value.
+HEADER_FIELDS: tuple[tuple[str, str, str], ...] = (
+    ("id", "identity", "label"),
+    ("origin", "identity", "label"),
+    ("engine", "identity", "label"),
+    ("namespace", "identity", "label"),
+    ("component", "identity", "label"),
+    ("canonical_path", "identity", "path"),
+    ("version", "identity", "label"),
+    ("title", "identity", "text"),
+    ("source_repo", "identity", "text"),
+    ("source_file", "identity", "text"),
+    ("source_adr", "identity", "label"),
+    ("layer", "classification", "label_list"),
+    ("tags", "classification", "label_list"),
+    ("artifact_type", "classification", "label"),
+    ("status", "classification", "label"),
+    ("ring", "classification", "label"),
+    ("category", "classification", "label"),
+    ("owner", "governance", "label"),
+    ("ssot_for", "governance", "label_list"),
+    ("canonical", "governance", "label"),
+    ("canonical_source", "governance", "url"),
+    ("single_source_rule", "governance", "text"),
+    ("retrieval", "retrieval", "label"),
+    ("load_when", "retrieval", "label_list"),
+    ("load_condition", "retrieval", "text"),
+    ("references", "retrieval", "reference_list"),
+    ("requires", "retrieval", "reference_list"),
+    ("amplifies", "retrieval", "reference_list"),
+    ("retrieval_keys", "retrieval", "text"),
+    ("token_estimate", "retrieval", "count"),
+)
+
+_SET_VALUE_KINDS = frozenset({"label_list", "reference_list"})
+
+#: Structural header claims: that a header was found in a carrier, and which
+#: schema it declared. Recognized, possibly several per file, never projected.
+HEADER_STRUCTURE_PREDICATES: frozenset[str] = frozenset(
+    {"meta.declaration.carrier", "meta.declaration.schema"}
+)
+
+
+def _header_declarations() -> dict[str, dict[str, str]]:
+    declarations: dict[str, dict[str, str]] = {}
+    for namespace in HEADER_SCHEMA_NAMESPACES:
+        for field, category, value_kind in HEADER_FIELDS:
+            set_valued = value_kind in _SET_VALUE_KINDS
+            declarations[f"meta.{namespace}.{category}.{field}"] = {
+                "definition": f"{HEADER_SEMANTICS_LEDGER}#fields.{field}",
+                "subject_scope": "artifact",
+                "object_type": value_kind,
+                "cardinality": "set" if set_valued else "single",
+                "support": "set" if set_valued else "single",
+                "authority": "declared-source-claim; grants no ownership, identity or canonical status",
+                "projection": "none",
+                "conflict": "aggregate-distinct" if set_valued else "preserve-all-and-conflict",
+                "unknown": "unresolved-or-out-of-vocabulary-fields-arrive-as-other-predicates",
+            }
+    return declarations
+
+
+#: Every governed header predicate with the nine properties its declaration
+#: must carry: definition, subject scope, object type, cardinality, support
+#: class, authority, projection eligibility, conflict and unknown behavior.
+HEADER_DECLARATION_PREDICATES: dict[str, dict[str, str]] = _header_declarations()
+
+#: Predicates that are recognized for reconciliation but may never project,
+#: whatever their cardinality. ``is_projectable`` refuses them before the
+#: projection table is ever consulted.
+DECLARATION_ONLY_PREDICATES: frozenset[str] = (
+    frozenset(HEADER_DECLARATION_PREDICATES) | HEADER_STRUCTURE_PREDICATES
+)
 
 #: Predicates whose objects are simultaneously true. These aggregate.
 SET_VALUED_PREDICATES: frozenset[str] = frozenset(
@@ -87,6 +178,11 @@ SET_VALUED_PREDICATES: frozenset[str] = frozenset(
         "work.supersedes",
         "work.superseded_by",
     }
+) | frozenset(
+    # Governed list-valued header fields (1.2.0): several declared values at once.
+    predicate
+    for predicate, declaration in HEADER_DECLARATION_PREDICATES.items()
+    if declaration["cardinality"] == "set"
 )
 
 #: Predicates admitting at most one true object. Divergence here is a conflict.
@@ -112,14 +208,23 @@ SINGLE_VALUED_PREDICATES: frozenset[str] = frozenset(
         "work.status",
         "work.kind",
     }
+) | frozenset(
+    # Governed scalar header fields (1.2.0): one declared value per file, so a
+    # second, different declaration is a conflict and no winner is chosen.
+    predicate
+    for predicate, declaration in HEADER_DECLARATION_PREDICATES.items()
+    if declaration["cardinality"] == "single"
 )
 
 #: Recognized multi-valued predicates that deliberately project to nothing.
-AUXILIARY_PREDICATES: frozenset[str] = frozenset(
-    {
-        "authority.unresolved_reference",
-        "contract.declares_invariants",
-    }
+AUXILIARY_PREDICATES: frozenset[str] = (
+    frozenset(
+        {
+            "authority.unresolved_reference",
+            "contract.declares_invariants",
+        }
+    )
+    | HEADER_STRUCTURE_PREDICATES
 )
 
 _CLASSIFIED = (SET_VALUED_PREDICATES, SINGLE_VALUED_PREDICATES, AUXILIARY_PREDICATES)
@@ -174,10 +279,13 @@ def predicate_cardinality(predicate: str) -> Cardinality:
 def is_projectable(predicate: str) -> bool:
     """Return whether a predicate may carry meaning beyond the claim itself.
 
-    Auxiliary and unsupported predicates never do. A ``True`` here means only
-    that projection is *permitted*; the projection table decides whether one
-    exists.
+    Auxiliary and unsupported predicates never do, and neither does a
+    declaration-only predicate (a governed header field), whatever its
+    cardinality. A ``True`` here means only that projection is *permitted*; the
+    projection table decides whether one exists.
     """
+    if predicate in DECLARATION_ONLY_PREDICATES:
+        return False
     return predicate_support(predicate) in {"set", "single"}
 
 
@@ -189,6 +297,14 @@ def predicate_policy_view() -> dict[str, object]:
         "set_valued_predicates": sorted(SET_VALUED_PREDICATES),
         "single_valued_predicates": sorted(SINGLE_VALUED_PREDICATES),
         "auxiliary_predicates": sorted(AUXILIARY_PREDICATES),
+        "declaration_only_predicates": sorted(DECLARATION_ONLY_PREDICATES),
+        "header_semantics": {
+            "ledger": HEADER_SEMANTICS_LEDGER,
+            "declarations": {
+                predicate: HEADER_DECLARATION_PREDICATES[predicate]
+                for predicate in sorted(HEADER_DECLARATION_PREDICATES)
+            },
+        },
         "unsupported_predicate_behavior": "preserve-claim-evidence-and-emit-diagnostic",
     }
 

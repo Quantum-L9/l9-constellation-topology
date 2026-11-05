@@ -25,6 +25,7 @@ from l9_constellation_topology.packets.repository_model import (
 )
 from l9_constellation_topology.reconciliation import (
     AUXILIARY_PREDICATES,
+    DECLARATION_ONLY_PREDICATES,
     SET_VALUED_PREDICATES,
     SINGLE_VALUED_PREDICATES,
     UNSUPPORTED_PREDICATE_CODE,
@@ -93,15 +94,21 @@ def test_registry_classifications_are_disjoint_and_complete() -> None:
     assert SET_VALUED_PREDICATES.isdisjoint(SINGLE_VALUED_PREDICATES)
     assert SET_VALUED_PREDICATES.isdisjoint(AUXILIARY_PREDICATES)
     assert SINGLE_VALUED_PREDICATES.isdisjoint(AUXILIARY_PREDICATES)
+    # Policy 1.2.0 (ADR-0032): a governed header predicate reconciles as set or
+    # single but is declaration-only, so it never projects; every other set or
+    # single predicate remains projectable.
     for predicate in SET_VALUED_PREDICATES:
         assert predicate_cardinality(predicate) == "set"
-        assert is_projectable(predicate)
+        assert is_projectable(predicate) == (predicate not in DECLARATION_ONLY_PREDICATES)
     for predicate in SINGLE_VALUED_PREDICATES:
         assert predicate_cardinality(predicate) == "single"
-        assert is_projectable(predicate)
+        assert is_projectable(predicate) == (predicate not in DECLARATION_ONLY_PREDICATES)
     for predicate in AUXILIARY_PREDICATES:
         # Auxiliary predicates aggregate like sets but carry no further meaning.
         assert predicate_cardinality(predicate) == "set"
+        assert not is_projectable(predicate)
+    for predicate in DECLARATION_ONLY_PREDICATES:
+        assert predicate_support(predicate) != "unsupported"
         assert not is_projectable(predicate)
 
 
