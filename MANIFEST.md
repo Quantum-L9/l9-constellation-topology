@@ -134,6 +134,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `docs/adr/0030-accept-corpus-intelligence-v1-1-domains-not-run.md` — accepted architecture decision record
 - `docs/adr/0031-bind-repository-metadata-to-l9-meta-injector.md` — accepted architecture decision record
 - `docs/adr/0032-adopt-core-repository-execution-v2.md` — accepted architecture decision record
+- `docs/adr/0033-register-governed-header-predicates-as-declaration-only.md` — accepted architecture decision record
 - `docs/adr/README.md` — ADR directory governance and navigation
 - `docs/architecture.md` — architecture, contract, deployment, recovery, or model documentation
 - `docs/archive/v4/01_SPEC_ATTACK.md` — superseded v4 historical artifact retained for migration evidence
@@ -519,6 +520,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `tests/test_git_integrity.py` — Git path, mode, object-type, and blob-identity regression tests
 - `tests/test_graph_builder.py` — unit, contract, integration, regression, or governance test
 - `tests/test_hash_locality.py` — unit, contract, integration, regression, or governance test
+- `tests/test_header_predicates.py` — governed native-header predicate registry, reconciliation and projection-gate tests (ADR-0033)
 - `tests/test_impact.py` — unit, contract, integration, regression, or governance test
 - `tests/test_maturity.py` — unit, contract, integration, regression, or governance test
 - `tests/test_meta_generation_adapter.py` — automated regression and contract test suite

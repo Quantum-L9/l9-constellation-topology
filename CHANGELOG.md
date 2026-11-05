@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased - governed native-header predicates (ADR-0033)
+
+- Predicate policy 1.2.0 registers the 60 native `L9_META` header predicates
+  whose meaning `l9.artifact-header-model/global@1` (Quantum-L9/.github
+  v3.27.0) governs: list fields as `set`, scalar fields as `single`, the carrier
+  and schema claims as `auxiliary`. Every one is declaration-only:
+  `is_projectable` refuses it, so no ownership, governance, dependency or
+  capability edge comes from a header. Fields without a governed meaning stay
+  `unsupported`.
+- The `foundational-two-repo` golden changes only in its predicate policy hash
+  and derived identities.
+
 ## Unreleased - Core repository execution V2 (ADR-0032)
 
 - Added `.l9/repo-workflow.json` (`l9.repo-execution/v2`, `make-v1`). The root
