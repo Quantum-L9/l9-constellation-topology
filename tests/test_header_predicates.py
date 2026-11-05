@@ -252,7 +252,8 @@ def test_owner_ssot_and_references_create_no_ownership_governance_or_dependency_
     assert "DEPENDS_ON" in edge_types  # the control projected
     assert not {"OWNED_BY", "GOVERNED_BY"} & edge_types
     header_claims = [claim for claim in claims if claim.predicate.startswith("meta.")]
-    assert header_claims and all(claim.projected is False for claim in header_claims)
+    assert header_claims
+    assert all(claim.projected is False for claim in header_claims)
     assert all(claim.claim_id not in projection.entities_by_claim for claim in header_claims)
     # Only the control's own claim reaches the graph.
     assert len(projection.edges) == 1
