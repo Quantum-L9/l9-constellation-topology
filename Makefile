@@ -1,80 +1,33 @@
-UV ?= uv
-PYTHON ?= python
+# GENERATED repository execution facade: make-v1. DO NOT EDIT.
+#
+# This file is owned by the central repository-execution tooling and is
+# reproduced byte-for-byte into each consumer's root Makefile. It defines only
+# the portable four-phase ABI and routes every phase to a repository-owned
+# leaf in Repo.mk. Repository implementation, product logic, CI orchestration,
+# and organization governance never live here.
+#
+# Regenerate from the versioned facade template with the repository-execution
+# reconcile command; make-v1 behavior is immutable once released.
+.DEFAULT_GOAL := help
+SHELL := /usr/bin/env bash
+.SHELLFLAGS := -eu -o pipefail -c
 
-.PHONY: sync compile test coverage lint type contracts workflows architecture readiness schemas-check schemas-update fixtures-check fixtures-update generated-check generated-update git-manifest git-integrity determinism hash-locality hash-locality-update build validate clean
+# Composition, not isolation: the repository-owned implementation is included
+# and must exist. A repository without Repo.mk has no execution implementation
+# and fails here rather than passing silently.
+include Repo.mk
 
-sync:
-	$(UV) sync --frozen --extra dev
+.PHONY: help setup validate check test
 
-compile:
-	$(UV) run $(PYTHON) -m compileall src tests scripts -q
+help: ## Show the portable repository-execution phases
+	@awk '\
+		BEGIN { FS = ":.*## "; } \
+		/^[A-Za-z0-9_.-]+:.*## / { \
+			printf "  %-24s %s\n", $$1, $$2; \
+		}' $(MAKEFILE_LIST)
 
-test:
-	$(UV) run pytest -q
-
-coverage:
-	$(UV) run pytest --cov=l9_constellation_topology --cov-report=term-missing -q
-
-# CI runs both `ruff check` and `ruff format --check`. Keep them together here so a
-# formatting-only failure cannot pass locally and then fail the PR validation job.
-lint:
-	$(UV) run ruff check .
-	$(UV) run ruff format --check .
-
-type:
-	$(UV) run mypy src/l9_constellation_topology
-
-contracts:
-	$(UV) run $(PYTHON) scripts/validate_contracts.py
-
-workflows:
-	$(UV) run $(PYTHON) scripts/validate_workflows.py
-
-architecture:
-	$(UV) run $(PYTHON) scripts/architecture_boundary_check.py
-
-readiness:
-	$(UV) run $(PYTHON) scripts/validate_release_readiness.py
-
-schemas-check:
-	$(UV) run $(PYTHON) scripts/generate_schemas.py --check
-
-schemas-update:
-	$(UV) run $(PYTHON) scripts/generate_schemas.py
-
-# Fixture generation pins `created_at` and derives `source_revision` from the
-# sample tree's own content, so regeneration is byte-for-byte reproducible at any
-# commit and this check is part of `validate`.
-fixtures-check:
-	$(UV) run $(PYTHON) scripts/generate_fixture_packets.py --check
-
-fixtures-update:
-	$(UV) run $(PYTHON) scripts/generate_fixture_packets.py
-
-hash-locality-update:
-	$(UV) run $(PYTHON) scripts/evaluate_hash_locality.py
-
-generated-check: schemas-check fixtures-check hash-locality
-
-generated-update: schemas-update fixtures-update hash-locality-update
-
-git-manifest:
-	$(UV) run $(PYTHON) scripts/git_tree_manifest.py
-
-git-integrity:
-	$(UV) run $(PYTHON) scripts/validate_git_integrity.py
-
-determinism:
-	$(UV) run $(PYTHON) scripts/verify_determinism.py
-
-hash-locality:
-	$(UV) run $(PYTHON) scripts/evaluate_hash_locality.py --check
-
-build:
-	$(UV) build
-
-validate: compile coverage lint type contracts workflows architecture readiness generated-check git-integrity determinism hash-locality build
-
-clean:
-	rm -rf .coverage coverage.xml htmlcov build dist .pytest_cache .ruff_cache .mypy_cache .wheel-smoke
-	find . -type d -name __pycache__ -prune -exec rm -rf {} +
+# Portable make-v1 ABI. Each phase is exactly one repository-owned leaf.
+setup: repo-setup ## Establish repository dependencies
+validate: repo-validate ## Run repository validation
+check: repo-check ## Run repository static and quality checks
+test: repo-test ## Run repository tests

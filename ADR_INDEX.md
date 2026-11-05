@@ -37,6 +37,7 @@ changed decision requires a new ADR that explicitly supersedes the old record.
 | ADR-0029 | [Authorize a bounded GitHub-native direct compile seam](docs/adr/0029-authorize-a-bounded-github-native-direct-compile-seam.md) | Accepted |
 | ADR-0030 | [Accept corpus-intelligence 1.1.0 `domains_not_run`](docs/adr/0030-accept-corpus-intelligence-v1-1-domains-not-run.md) | Accepted |
 | ADR-0031 | [Bind repository metadata to `l9-meta-injector` through a central manifest](docs/adr/0031-bind-repository-metadata-to-l9-meta-injector.md) | Accepted |
+| ADR-0032 | [Adopt Core repository execution V2 through the make-v1 facade](docs/adr/0032-adopt-core-repository-execution-v2.md) | Accepted |
 | ADR-0033 | [Register governed native-header predicates as declaration-only claims](docs/adr/0033-register-governed-header-predicates-as-declaration-only.md) | Accepted |
 
 ## Decision order

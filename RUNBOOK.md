@@ -7,7 +7,7 @@ Run, validate, inspect, replay, and diagnose the topology compiler without bypas
 ## Prerequisites
 
 - Python 3.12
-- `uv` 0.10.0 recommended
+- `uv` 0.10.0 (`make setup` enforces it; pass `UV=` to use a pinned binary off `PATH`)
 - read access to validated Repository Model Packet bundles
 - write access only to the selected output root
 - signing and callback credentials only for stage-worker execution
@@ -181,7 +181,7 @@ Then review the diff before proceeding:
 git status --short
 git diff -- contracts schemas tests/fixtures/repository_model_packets
 make generated-check
-make validate
+make setup validate check test
 ```
 
 Do not accept unexplained generated changes. If output changes unexpectedly, stop and inspect the canonical model, generator inputs, dependency lock, and runtime version.

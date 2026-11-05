@@ -23,6 +23,7 @@ l9-constellation-topology/
 │   ├── packet-profile.yaml
 │   ├── pipeline.yaml
 │   ├── publication-policy.yaml
+│   ├── repo-workflow.json
 │   ├── report-profile.yaml
 │   ├── risk-profile.yaml
 │   └── topology-profile.yaml
@@ -80,6 +81,7 @@ l9-constellation-topology/
 │   │   ├── 0029-authorize-a-bounded-github-native-direct-compile-seam.md
 │   │   ├── 0030-accept-corpus-intelligence-v1-1-domains-not-run.md
 │   │   ├── 0031-bind-repository-metadata-to-l9-meta-injector.md
+│   │   ├── 0032-adopt-core-repository-execution-v2.md
 │   │   ├── 0033-register-governed-header-predicates-as-declaration-only.md
 │   │   └── README.md
 │   ├── archive
@@ -401,6 +403,7 @@ l9-constellation-topology/
 ├── README.md
 ├── REGRESSION_GUARD.md
 ├── RELEASING.md
+├── Repo.mk
 ├── ROADMAP.md
 ├── RUNBOOK.md
 ├── SECURITY.md
