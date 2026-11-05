@@ -181,7 +181,7 @@ Then review the diff before proceeding:
 git status --short
 git diff -- contracts schemas tests/fixtures/repository_model_packets
 make generated-check
-make validate
+make setup validate check test
 ```
 
 Do not accept unexplained generated changes. If output changes unexpectedly, stop and inspect the canonical model, generator inputs, dependency lock, and runtime version.

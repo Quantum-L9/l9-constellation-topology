@@ -210,7 +210,7 @@ make fixtures-update
 make generated-update
 ```
 
-Review every generated diff, then rerun `make generated-check` and the full validation ladder. `make validate` includes the schema drift gate (`schemas-check`) and fails when a checked-in schema is missing or stale. Fixture packet drift is verified on demand with `make fixtures-check` (or `make generated-check`), which is kept out of `make validate` because fixture packets embed a wall-clock timestamp and the live repository revision; it becomes gate-eligible once fixture generation is deterministic.
+Review every generated diff, then rerun `make generated-check` and the full validation ladder (`make setup validate check test`, ADR-0032). The `validate` phase includes the schema drift gate (`schemas-check`) and fails when a checked-in schema is missing or stale. Fixture packet drift is verified on demand with `make fixtures-check` (or `make generated-check`), which is kept out of `make validate` because fixture packets embed a wall-clock timestamp and the live repository revision; it becomes gate-eligible once fixture generation is deterministic.
 
 ## Repository metadata
 

@@ -122,7 +122,7 @@
       "path": ".github/workflows/l9-stage-worker.yml"
     },
     {
-      "git_object_id": "a812cdd929d96b839d40a7cae2acb0a77533fdd2",
+      "git_object_id": "b63873923cac00fc2db8ef75bcc8e947e9fd97fd",
       "mode": "100644",
       "object_type": "blob",
       "path": ".gitignore"
@@ -176,6 +176,12 @@
       "path": ".l9/publication-policy.yaml"
     },
     {
+      "git_object_id": "caabf7a7f9948f37423dc04462f5348a230202a2",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": ".l9/repo-workflow.json"
+    },
+    {
       "git_object_id": "a5975fe3db649549b394c34eb99600736781540c",
       "mode": "100644",
       "object_type": "blob",
@@ -200,13 +206,13 @@
       "path": ".python-version"
     },
     {
-      "git_object_id": "83d63fefa9092f5df39ea7643a1d1a644d529bf4",
+      "git_object_id": "8ec04b5eed633d846388f6e4dfac9bc1b162e39b",
       "mode": "100644",
       "object_type": "blob",
       "path": "ADR_INDEX.md"
     },
     {
-      "git_object_id": "41ce996e7e0505a64e320fcae30ca77e1046be60",
+      "git_object_id": "a19443274de835dfbda96fecb332fa475f370460",
       "mode": "100644",
       "object_type": "blob",
       "path": "AGENTS.md"
@@ -230,7 +236,7 @@
       "path": "BUILD_SPECIFICATION.md"
     },
     {
-      "git_object_id": "424959820fea28fe9a7b8795247c85cb158e1fab",
+      "git_object_id": "c91a7257fefc1e905642a8f60a7767246d1ba6a9",
       "mode": "100644",
       "object_type": "blob",
       "path": "CHANGELOG.md"
@@ -248,7 +254,7 @@
       "path": "CODE_OF_CONDUCT.md"
     },
     {
-      "git_object_id": "2e5574af069ca14bdd60b10c0cccba44417b37ac",
+      "git_object_id": "988554f41f8cf672069b2220cdb5cef4a9c85b1b",
       "mode": "100644",
       "object_type": "blob",
       "path": "CONTRIBUTING.md"
@@ -272,7 +278,7 @@
       "path": "DEPENDENCY_POLICY.md"
     },
     {
-      "git_object_id": "176377bde3a6b7d656e89464563d0e1e1257ca7b",
+      "git_object_id": "c628cf8c12b671ed6f131116c1c231b9f4a16b11",
       "mode": "100644",
       "object_type": "blob",
       "path": "DEVELOPMENT.md"
@@ -284,7 +290,7 @@
       "path": "EFFECT_IDENTITY_MIGRATION_PREFLIGHT.json"
     },
     {
-      "git_object_id": "49c8775f3f86c82f2936194dde85249ad416fc48",
+      "git_object_id": "92743221c1bd189e2fafa7cb2736725b2396e66a",
       "mode": "100644",
       "object_type": "blob",
       "path": "FINAL_TREE.md"
@@ -326,13 +332,13 @@
       "path": "MAINTAINERS.md"
     },
     {
-      "git_object_id": "601b283517e3fe3fbf2915af819353252b0bf533",
+      "git_object_id": "aad7b60b8645731470db8f48952136037f1f68f5",
       "mode": "100644",
       "object_type": "blob",
       "path": "MANIFEST.md"
     },
     {
-      "git_object_id": "7ef06d3676335d4669e87712cc28c84cf246be5f",
+      "git_object_id": "f092bae889673a05cdf6a16170822a652bdc90f2",
       "mode": "100644",
       "object_type": "blob",
       "path": "Makefile"
@@ -350,7 +356,7 @@
       "path": "QUALIFICATION.json"
     },
     {
-      "git_object_id": "d06d9957795e9fee8861e61aefc82204d586d5d9",
+      "git_object_id": "0d4691c757d02c2a02b4417db393415b1899a262",
       "mode": "100644",
       "object_type": "blob",
       "path": "README.md"
@@ -374,10 +380,16 @@
       "path": "ROADMAP.md"
     },
     {
-      "git_object_id": "061ac4a2c65007d3a011e1ae74c99c53b5469993",
+      "git_object_id": "6d93984ae5f5d91d6c391c34838e645502a5b60d",
       "mode": "100644",
       "object_type": "blob",
       "path": "RUNBOOK.md"
+    },
+    {
+      "git_object_id": "d7ec4839ab0d7ca4494b1edff37698fcd7f25e79",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "Repo.mk"
     },
     {
       "git_object_id": "d0cca91b79fe770313eae1e42a3379e82b8b26ee",
@@ -422,7 +434,7 @@
       "path": "UNKNOWN_REGISTER.md"
     },
     {
-      "git_object_id": "2ce613ad3d263668f929ad8d7e8c458e7af6e1d4",
+      "git_object_id": "2eafed88a9477c183ec5d79fb926b350e200bf07",
       "mode": "100644",
       "object_type": "blob",
       "path": "VALIDATION.md"
@@ -732,6 +744,12 @@
       "mode": "100644",
       "object_type": "blob",
       "path": "docs/adr/0031-bind-repository-metadata-to-l9-meta-injector.md"
+    },
+    {
+      "git_object_id": "826cbd8681c821fdb7a19081ac7c15ee74d649e6",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "docs/adr/0032-adopt-core-repository-execution-v2.md"
     },
     {
       "git_object_id": "3c2466071d4b3c021b1969946079823ae4bcfae7",
@@ -3188,6 +3206,12 @@
       "path": "tests/test_repository_aggregation_v5.py"
     },
     {
+      "git_object_id": "0156dab3bcb189822bed740ec4775b5275174668",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/test_repository_execution.py"
+    },
+    {
       "git_object_id": "c36fee465ab7654ecb1490d74421f0271e741922",
       "mode": "100644",
       "object_type": "blob",
@@ -3296,8 +3320,8 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:b7d885e3652672fe047e4930a24293995305194ccf467b2289be3fd24f82e6b6",
-  "entry_count": 549,
+  "entries_sha256": "sha256:8a65a577bc6dd6fce7d356b8bdc712d140d4ee2586752cdf1bda20c4d430e62d",
+  "entry_count": 553,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
   ],

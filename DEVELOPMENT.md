@@ -22,7 +22,7 @@ uv sync --frozen --extra dev
 ## Fast loop
 
 ```bash
-make test
+make unit
 make contracts
 make generated-check
 make architecture
@@ -47,16 +47,23 @@ After regeneration:
 1. Review every changed schema, packet, receipt, and manifest.
 2. Run `make generated-check` again.
 3. Run targeted tests for the changed generator or model.
-4. Run `make validate`.
+4. Run the full gate: `make setup validate check test`.
 5. Synchronize `MANIFEST.md`, `FINAL_TREE.md`, traceability records, validation evidence, and the commit-bound `GIT_TREE_MANIFEST.json` from the final staged tree.
 
 Do not use an update target inside validation or CI. Validation must detect drift without mutating tracked files.
 
 ## Full loop
 
+The root `Makefile` is the generated make-v1 facade from `Quantum-L9/l9-ci-core`
+(ADR-0032): never edit it by hand. Repository targets live in `Repo.mk`. The four
+phases together run the whole gate:
+
 ```bash
-make validate
+make setup validate check test
 ```
+
+`make validate`, `make check` and `make test` each run one phase. Plain pytest is
+`make unit`.
 
 ## Repository metadata
 

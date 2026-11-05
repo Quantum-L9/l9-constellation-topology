@@ -25,7 +25,10 @@ contracts, migration notes, tests, and validation evidence together.
 ## Complete gate
 
 ```bash
-make validate
+make setup validate check test
 ```
+
+The root `Makefile` is Core's generated make-v1 facade (ADR-0032); change
+execution steps in `Repo.mk`.
 
 See `DEVELOPMENT.md`, `DEPENDENCY_POLICY.md`, and `RELEASING.md`.
