@@ -10,7 +10,10 @@
 - `make validate` and `make test` now run single phases. The full gate is
   `make setup validate check test`, which runs exactly the former
   `make validate` command set. Plain pytest is `make unit`.
-- `.l9/runtime/` (Core's verification staging directory) is gitignored.
+- `.l9/runtime/` (Core's verification staging directory) is gitignored, and the
+  release-readiness scan skips it. Core stages its SDK source and venv there
+  before `make validate`, which the scan otherwise reported as 1653 blocking
+  findings.
 
 ## Unreleased - repository metadata from l9-meta-injector
 

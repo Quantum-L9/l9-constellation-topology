@@ -98,12 +98,15 @@ EXCLUDED_PARTS = {
 #: bootstrap writes into the worktree, including its secrets-plane receipt and
 #: the consumer governance links and IDE profile. They are written by the governance flow, are
 #: git-ignored, and are never part of the delivery inventory, so a readiness
-#: scan must not report them as manifest omissions.
+#: scan must not report them as manifest omissions. `.l9/runtime/` is where
+#: central Core stages its SDK source, venv and verification evidence before it
+#: runs `make validate` (ADR-0032); it is git-ignored and never delivery.
 EXCLUDED_RELATIVE_PREFIXES = (
     ".claude/",
     ".cursor/",
     ".l9/autonomy/",
     ".l9/pr/",
+    ".l9/runtime/",
     ".l9/session/",
     ".vscode/",
 )

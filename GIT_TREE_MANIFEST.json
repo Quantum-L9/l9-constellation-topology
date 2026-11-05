@@ -236,7 +236,7 @@
       "path": "BUILD_SPECIFICATION.md"
     },
     {
-      "git_object_id": "c91a7257fefc1e905642a8f60a7767246d1ba6a9",
+      "git_object_id": "00a235d59bf178dcf90d9be4e530268dbb97a06e",
       "mode": "100644",
       "object_type": "blob",
       "path": "CHANGELOG.md"
@@ -746,7 +746,7 @@
       "path": "docs/adr/0031-bind-repository-metadata-to-l9-meta-injector.md"
     },
     {
-      "git_object_id": "826cbd8681c821fdb7a19081ac7c15ee74d649e6",
+      "git_object_id": "1cfc508b4188ee3188f42c29b789d487a46081ae",
       "mode": "100644",
       "object_type": "blob",
       "path": "docs/adr/0032-adopt-core-repository-execution-v2.md"
@@ -1388,7 +1388,7 @@
       "path": "scripts/validate_nuclear_execution.py"
     },
     {
-      "git_object_id": "493c348cd91977e6600456a84a8f2dd70084afa5",
+      "git_object_id": "953833d8212afcd3c264c874f28b2412ca5bd745",
       "mode": "100755",
       "object_type": "blob",
       "path": "scripts/validate_release_readiness.py"
@@ -3176,7 +3176,7 @@
       "path": "tests/test_reasoning_router.py"
     },
     {
-      "git_object_id": "8adb85f4df2909ef9d97f558781c024567086d12",
+      "git_object_id": "0a3b83a546c9e6a79ee924622c8c727a41ee4f66",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_release_readiness.py"
@@ -3320,7 +3320,7 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:c7e2e73595b6bcec3d3c3cdbd870773240a404483a05c95d93fc0036e9cbee43",
+  "entries_sha256": "sha256:c010aeae7516ce500a278c38979fe311dd0221e28b79762e649ca1a328e38506",
   "entry_count": 553,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"

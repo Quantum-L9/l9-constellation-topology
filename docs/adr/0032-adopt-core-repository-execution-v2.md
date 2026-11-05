@@ -31,7 +31,7 @@ The former root Makefile defined `test` (plain pytest) and an all-in-one `valida
    - `repo-test` runs coverage, git-integrity, determinism and build. git-integrity runs before build, while the tree is still clean.
 
    Together the four phases are exactly the command set the former `make validate` ran, so the full local gate is now `make setup validate check test`.
-4. **Runtime staging.** `.l9/runtime/` is gitignored. Core writes there before verification, and git-integrity requires a clean tree. Nothing else in `.l9/` changes status.
+4. **Runtime staging.** `.l9/runtime/` is gitignored. Core writes there before verification, and git-integrity requires a clean tree. `scripts/validate_release_readiness.py` also excludes it, because Core stages its SDK source and venv there before `make validate` and the scan would otherwise report them as blocking findings. Nothing else in `.l9/` changes status.
 
 ## Consequences
 
@@ -52,7 +52,7 @@ The former root Makefile defined `test` (plain pytest) and an all-in-one `valida
   - the exact contract;
   - the facade's sha256;
   - that `Repo.mk` declares the four phony leaves and defines none of the facade-owned targets;
-  - the `.l9/runtime/` ignore rule;
+  - the `.l9/runtime/` ignore rule (with `tests/test_release_readiness.py` proving the readiness scan skips it while still scanning delivered `.l9/` files);
   - through `make -n`, that the four phases together run every command of the former gate, with git-integrity before build.
 - Core's own validator (`tools.l9_repo.contract.RepositoryExecution(root).validate()` at l9-ci-core `c16cc32`) passes on this tree.
 - Remote `Analyze (central Core)` on this pull request is the authoritative proof that the phases run green on Core's runner. A local pass is not that proof.
@@ -61,5 +61,6 @@ The former root Makefile defined `test` (plain pytest) and an all-in-one `valida
 
 - `.l9/repo-workflow.json`, `Makefile`, `Repo.mk`, `.gitignore`
 - `tests/test_repository_execution.py`
+- `scripts/validate_release_readiness.py`, `tests/test_release_readiness.py`
 - `Quantum-L9/l9-ci-core` `.github/actions/run-repository-verification/`, `tools/l9_repo/contract.py`, `tools/l9_repo/facades/make-v1.mk`
 - Issue #40
