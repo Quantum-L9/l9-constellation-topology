@@ -1,4 +1,4 @@
-"""Governed native-header predicates (predicate policy 1.2.0, ADR-0032).
+"""Governed native-header predicates (predicate policy 1.2.0, ADR-0033).
 
 The header predicates take their meaning from the Semantic Foundation's
 ``l9.artifact-header-model/global@1``: every one is a declaration the carrying

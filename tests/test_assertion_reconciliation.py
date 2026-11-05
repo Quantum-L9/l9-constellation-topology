@@ -94,7 +94,7 @@ def test_registry_classifications_are_disjoint_and_complete() -> None:
     assert SET_VALUED_PREDICATES.isdisjoint(SINGLE_VALUED_PREDICATES)
     assert SET_VALUED_PREDICATES.isdisjoint(AUXILIARY_PREDICATES)
     assert SINGLE_VALUED_PREDICATES.isdisjoint(AUXILIARY_PREDICATES)
-    # Policy 1.2.0 (ADR-0032): a governed header predicate reconciles as set or
+    # Policy 1.2.0 (ADR-0033): a governed header predicate reconciles as set or
     # single but is declaration-only, so it never projects; every other set or
     # single predicate remains projectable.
     for predicate in SET_VALUED_PREDICATES:

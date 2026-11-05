@@ -69,7 +69,7 @@ PREDICATE_POLICY_ID = "l9-topology-assertion-predicates"
 #: declarations about one file are a conflict; lists reconcile as ``set``; the
 #: carrier and schema claims are ``auxiliary``. None of them may project: the
 #: ledger's projection boundary admits no canonical relation from a header
-#: (ADR-0032).
+#: (ADR-0033).
 PREDICATE_POLICY_VERSION = "1.2.0"
 
 #: The ledger every header predicate below takes its meaning from.

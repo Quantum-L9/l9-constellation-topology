@@ -1,4 +1,4 @@
-# ADR-0032: Register governed native-header predicates as declaration-only claims
+# ADR-0033: Register governed native-header predicates as declaration-only claims
 
 **Status:** Accepted (operator decision, 2026-11-05: admit header meanings in `Quantum-L9/.github` first, then integrate)
 

@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased - governed native-header predicates (ADR-0032)
+## Unreleased - governed native-header predicates (ADR-0033)
 
 - Predicate policy 1.2.0 registers the 60 native `L9_META` header predicates
   whose meaning `l9.artifact-header-model/global@1` (Quantum-L9/.github
