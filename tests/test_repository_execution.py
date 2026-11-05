@@ -56,7 +56,8 @@ def test_contract_is_the_exact_v2_declaration() -> None:
 
 def test_root_makefile_is_the_byte_identical_make_v1_facade() -> None:
     makefile = ROOT / "Makefile"
-    assert makefile.is_file() and not makefile.is_symlink()
+    assert makefile.is_file()
+    assert not makefile.is_symlink()
     assert hashlib.sha256(makefile.read_bytes()).hexdigest() == MAKE_V1_FACADE_SHA256
 
 
