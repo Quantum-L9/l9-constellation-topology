@@ -199,6 +199,18 @@ PYTHONPATH=src python scripts/validate_git_integrity.py
 
 The Git tree manifest must be generated from the final staged tree. Any later tracked-file edit invalidates it.
 
+## Repository metadata refresh
+
+`.l9/metadata-index.jsonl` is refreshed by hand, never by CI (ADR-0031). After
+changing tracked files, when current metadata is wanted:
+
+1. Work in a clean clone; out-of-tree links such as a `.cursor-commands`
+   symlink make `l9-meta-injector apply` refuse with `DISCOVERY_INCOMPLETE`.
+2. Run the install and `apply` command in
+   [`DEVELOPMENT.md`](DEVELOPMENT.md#repository-metadata) with its exact flags.
+3. Confirm the same flags with `check` report `drift=0`.
+4. Stage the index, regenerate `GIT_TREE_MANIFEST.json`, stage it, and commit.
+
 ## Release-readiness validation
 
 Run the repository completeness and no-stub gate before publishing changes:

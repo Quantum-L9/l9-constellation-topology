@@ -17,9 +17,12 @@ l9-constellation-topology/
 ├── .l9
 │   ├── callback-policy.yaml
 │   ├── maturity-profile.yaml
+│   ├── meta-authority.yaml
+│   ├── metadata-index.jsonl
 │   ├── output-policy.yaml
 │   ├── packet-profile.yaml
 │   ├── pipeline.yaml
+│   ├── publication-policy.yaml
 │   ├── report-profile.yaml
 │   ├── risk-profile.yaml
 │   └── topology-profile.yaml
@@ -76,6 +79,7 @@ l9-constellation-topology/
 │   │   ├── 0028-project-bridge-gaps-as-decision-support.md
 │   │   ├── 0029-authorize-a-bounded-github-native-direct-compile-seam.md
 │   │   ├── 0030-accept-corpus-intelligence-v1-1-domains-not-run.md
+│   │   ├── 0031-bind-repository-metadata-to-l9-meta-injector.md
 │   │   └── README.md
 │   ├── archive
 │   │   └── v4
@@ -111,7 +115,6 @@ l9-constellation-topology/
 │   ├── flow-record.schema.json
 │   ├── flow_card.schema.json
 │   ├── graph-record.schema.json
-│   ├── graph_record.schema.json
 │   ├── maturity-assessment.schema.json
 │   ├── repo_card.schema.json
 │   ├── repository-record.schema.json

@@ -140,6 +140,18 @@
       "path": ".l9/maturity-profile.yaml"
     },
     {
+      "git_object_id": "cc4b1a3cd78f26c9c9800836d96c5a1fdefd54db",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": ".l9/meta-authority.yaml"
+    },
+    {
+      "git_object_id": "fe376199ce86a10d97e5ba681eb5f51e73b5defd",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": ".l9/metadata-index.jsonl"
+    },
+    {
       "git_object_id": "7c8b6fd733190ff68268a5b29a438c788d96f63e",
       "mode": "100644",
       "object_type": "blob",
@@ -188,13 +200,13 @@
       "path": ".python-version"
     },
     {
-      "git_object_id": "fc4b1fb95ae31da32a43a653534e51f8c903f402",
+      "git_object_id": "83d63fefa9092f5df39ea7643a1d1a644d529bf4",
       "mode": "100644",
       "object_type": "blob",
       "path": "ADR_INDEX.md"
     },
     {
-      "git_object_id": "05dff04479b4249029556ab2ed59f8e7887e4245",
+      "git_object_id": "41ce996e7e0505a64e320fcae30ca77e1046be60",
       "mode": "100644",
       "object_type": "blob",
       "path": "AGENTS.md"
@@ -218,7 +230,7 @@
       "path": "BUILD_SPECIFICATION.md"
     },
     {
-      "git_object_id": "38b65af78712481f43a44ad9aeb34be7b288bf16",
+      "git_object_id": "424959820fea28fe9a7b8795247c85cb158e1fab",
       "mode": "100644",
       "object_type": "blob",
       "path": "CHANGELOG.md"
@@ -260,7 +272,7 @@
       "path": "DEPENDENCY_POLICY.md"
     },
     {
-      "git_object_id": "ab5d5ea9907dccb667a9d0f2c14082931eebdc2b",
+      "git_object_id": "176377bde3a6b7d656e89464563d0e1e1257ca7b",
       "mode": "100644",
       "object_type": "blob",
       "path": "DEVELOPMENT.md"
@@ -272,7 +284,7 @@
       "path": "EFFECT_IDENTITY_MIGRATION_PREFLIGHT.json"
     },
     {
-      "git_object_id": "8414aab9e78c8a7b880605cf7d158fcb8a92da0a",
+      "git_object_id": "49c8775f3f86c82f2936194dde85249ad416fc48",
       "mode": "100644",
       "object_type": "blob",
       "path": "FINAL_TREE.md"
@@ -314,7 +326,7 @@
       "path": "MAINTAINERS.md"
     },
     {
-      "git_object_id": "f8d203849ea3b61dc12bc6d9f56898c5ab7ce489",
+      "git_object_id": "601b283517e3fe3fbf2915af819353252b0bf533",
       "mode": "100644",
       "object_type": "blob",
       "path": "MANIFEST.md"
@@ -338,7 +350,7 @@
       "path": "QUALIFICATION.json"
     },
     {
-      "git_object_id": "b054a6417e60f6d24b4bacc6b1856d439cf805a4",
+      "git_object_id": "d06d9957795e9fee8861e61aefc82204d586d5d9",
       "mode": "100644",
       "object_type": "blob",
       "path": "README.md"
@@ -362,7 +374,7 @@
       "path": "ROADMAP.md"
     },
     {
-      "git_object_id": "a2a3995218c96d473804a3013860a8e0aa42ba03",
+      "git_object_id": "061ac4a2c65007d3a011e1ae74c99c53b5469993",
       "mode": "100644",
       "object_type": "blob",
       "path": "RUNBOOK.md"
@@ -410,7 +422,7 @@
       "path": "UNKNOWN_REGISTER.md"
     },
     {
-      "git_object_id": "f4d26726cf0b70c2c492e0cddfe8464cadde4aa0",
+      "git_object_id": "2ce613ad3d263668f929ad8d7e8c458e7af6e1d4",
       "mode": "100644",
       "object_type": "blob",
       "path": "VALIDATION.md"
@@ -714,6 +726,12 @@
       "mode": "100644",
       "object_type": "blob",
       "path": "docs/adr/0030-accept-corpus-intelligence-v1-1-domains-not-run.md"
+    },
+    {
+      "git_object_id": "d75aac4b7a99f69f1ca9f4a6959fb2f7746aa3fd",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "docs/adr/0031-bind-repository-metadata-to-l9-meta-injector.md"
     },
     {
       "git_object_id": "3c2466071d4b3c021b1969946079823ae4bcfae7",
@@ -1218,12 +1236,6 @@
       "mode": "100644",
       "object_type": "blob",
       "path": "schemas/graph-record.schema.json"
-    },
-    {
-      "git_object_id": "8d3191a3fa274df4578bb52b9fd208c2525d2a10",
-      "mode": "100644",
-      "object_type": "blob",
-      "path": "schemas/graph_record.schema.json"
     },
     {
       "git_object_id": "8248573fcbfc5cee5090e59928acda1a57615b7d",
@@ -3284,8 +3296,8 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:954e9e0c4127070ad0f908026b7f872ee0bc8c587c5ca0edcd875620fa76166e",
-  "entry_count": 547,
+  "entries_sha256": "sha256:b7d885e3652672fe047e4930a24293995305194ccf467b2289be3fd24f82e6b6",
+  "entry_count": 549,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
   ],

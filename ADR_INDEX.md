@@ -36,6 +36,7 @@ changed decision requires a new ADR that explicitly supersedes the old record.
 | ADR-0028 | [Project bridge gaps as non-authoritative decision support](docs/adr/0028-project-bridge-gaps-as-decision-support.md) | Accepted |
 | ADR-0029 | [Authorize a bounded GitHub-native direct compile seam](docs/adr/0029-authorize-a-bounded-github-native-direct-compile-seam.md) | Accepted |
 | ADR-0030 | [Accept corpus-intelligence 1.1.0 `domains_not_run`](docs/adr/0030-accept-corpus-intelligence-v1-1-domains-not-run.md) | Accepted |
+| ADR-0031 | [Bind repository metadata to `l9-meta-injector` through a central manifest](docs/adr/0031-bind-repository-metadata-to-l9-meta-injector.md) | Accepted |
 
 ## Decision order
 
