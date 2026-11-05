@@ -7,7 +7,7 @@ Run, validate, inspect, replay, and diagnose the topology compiler without bypas
 ## Prerequisites
 
 - Python 3.12
-- `uv` 0.10.0 recommended
+- `uv` 0.10.0 (`make setup` enforces it; pass `UV=` to use a pinned binary off `PATH`)
 - read access to validated Repository Model Packet bundles
 - write access only to the selected output root
 - signing and callback credentials only for stage-worker execution

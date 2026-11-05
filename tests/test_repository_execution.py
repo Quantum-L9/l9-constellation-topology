@@ -96,6 +96,10 @@ def test_the_four_phases_together_run_the_whole_former_gate() -> None:
         assert command in combined, command
     # Setup reproduces the PR validation workflow's environment exactly.
     assert "uv==0.10.0" in planned["setup"]
+    # The pin is enforced by version, not by presence: a different uv on PATH is
+    # replaced and setup fails closed if the pin still is not what $(UV) reports.
+    assert "command -v" not in planned["setup"]
+    assert planned["setup"].count('= "0.10.0"') == 2
     assert "uv sync --frozen --no-build --extra dev --no-install-project" in planned["setup"]
     assert "uv pip install --no-deps --editable ." in planned["setup"]
     # git-integrity runs before build, while the tree it checks is still clean.

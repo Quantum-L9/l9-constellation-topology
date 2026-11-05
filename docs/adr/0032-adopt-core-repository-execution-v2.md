@@ -25,13 +25,15 @@ The former root Makefile defined `test` (plain pytest) and an all-in-one `valida
 1. **Contract.** Add `.l9/repo-workflow.json`, byte-identical to l9-meta-injector's.
 2. **Facade.** The root `Makefile` becomes the unmodified `make-v1` facade, regenerated only by Core's reconcile command.
 3. **Implementation.** `Repo.mk` holds every former target unchanged, except that `test` is renamed `unit` and the all-in-one `validate` is removed. It adds the four leaves:
-   - `repo-setup` installs `uv==0.10.0` if absent, then runs `uv sync --frozen --no-build --extra dev --no-install-project` and `uv pip install --no-deps --editable .`. This is exactly the environment `.github/workflows/l9-pr-validate.yml` builds, which Core's runner can reproduce.
+   - `repo-setup` installs `uv==0.10.0` unless `$(UV)` already reports exactly that version, fails closed if it still does not, then runs `uv sync --frozen --no-build --extra dev --no-install-project` and `uv pip install --no-deps --editable .`. This is exactly the environment `.github/workflows/l9-pr-validate.yml` builds, which Core's runner can reproduce.
    - `repo-validate` runs contracts, workflows, architecture, readiness and generated-check (schemas, fixtures, hash-locality).
    - `repo-check` runs compile, lint (`ruff check` and `ruff format --check`) and type.
    - `repo-test` runs coverage, git-integrity, determinism and build. git-integrity runs before build, while the tree is still clean.
 
    Together the four phases are exactly the command set the former `make validate` ran, so the full local gate is now `make setup validate check test`.
 4. **Runtime staging.** `.l9/runtime/` is gitignored. Core writes there before verification, and git-integrity requires a clean tree. `scripts/validate_release_readiness.py` also excludes it, because Core stages its SDK source and venv there before `make validate` and the scan would otherwise report them as blocking findings. Nothing else in `.l9/` changes status.
+
+5. **Core's Semgrep gate.** Once repository verification passes, Core's SDK technical gate blocks on Semgrep findings. Its one blocking finding here, `AST-ROUTING-004` (raw `/execute` bypassing GateClient), is in `evidence/live-qualify-2026-08-02/run_gate_qualify.py`. That file is a sealed evidence harness: it is never packaged or run by CI, and it posts to Gate itself as the external originator. It carries an inline `nosemgrep: gateclient-bypass-execute` with that rationale instead of being rewritten, because rewriting it would break the provenance of the evidence it produced.
 
 ## Consequences
 
@@ -55,6 +57,7 @@ The former root Makefile defined `test` (plain pytest) and an all-in-one `valida
   - the `.l9/runtime/` ignore rule (with `tests/test_release_readiness.py` proving the readiness scan skips it while still scanning delivered `.l9/` files);
   - through `make -n`, that the four phases together run every command of the former gate, with git-integrity before build.
 - Core's own validator (`tools.l9_repo.contract.RepositoryExecution(root).validate()` at l9-ci-core `c16cc32`) passes on this tree.
+- With Core's pinned Semgrep 1.171.0, the `nosemgrep` annotation suppresses the `/execute` finding on the harness, including under the path-prefixed check id Core's staged ruleset produces. Without it the finding fires.
 - Remote `Analyze (central Core)` on this pull request is the authoritative proof that the phases run green on Core's runner. A local pass is not that proof.
 
 ## Related artifacts
@@ -62,5 +65,6 @@ The former root Makefile defined `test` (plain pytest) and an all-in-one `valida
 - `.l9/repo-workflow.json`, `Makefile`, `Repo.mk`, `.gitignore`
 - `tests/test_repository_execution.py`
 - `scripts/validate_release_readiness.py`, `tests/test_release_readiness.py`
+- `evidence/live-qualify-2026-08-02/run_gate_qualify.py`
 - `Quantum-L9/l9-ci-core` `.github/actions/run-repository-verification/`, `tools/l9_repo/contract.py`, `tools/l9_repo/facades/make-v1.mk`
 - Issue #40

@@ -14,6 +14,13 @@
   release-readiness scan skips it. Core stages its SDK source and venv there
   before `make validate`, which the scan otherwise reported as 1653 blocking
   findings.
+- `make setup` enforces the uv 0.10.0 pin by version: a different uv on `PATH`
+  is replaced by the pin, and setup fails if `UV` still does not report it.
+- The sealed 2026-08-02 live-qualify harness
+  (`evidence/live-qualify-2026-08-02/run_gate_qualify.py`) carries an inline
+  `nosemgrep: gateclient-bypass-execute` with its rationale. Core's Semgrep gate
+  blocks on it, and rewriting the harness would break the provenance of the
+  evidence it produced.
 
 ## Unreleased - repository metadata from l9-meta-injector
 

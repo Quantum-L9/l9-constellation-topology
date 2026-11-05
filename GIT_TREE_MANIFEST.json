@@ -236,7 +236,7 @@
       "path": "BUILD_SPECIFICATION.md"
     },
     {
-      "git_object_id": "00a235d59bf178dcf90d9be4e530268dbb97a06e",
+      "git_object_id": "8d60de2326c22e380dcce3c492e3092c0202e28b",
       "mode": "100644",
       "object_type": "blob",
       "path": "CHANGELOG.md"
@@ -278,7 +278,7 @@
       "path": "DEPENDENCY_POLICY.md"
     },
     {
-      "git_object_id": "c628cf8c12b671ed6f131116c1c231b9f4a16b11",
+      "git_object_id": "39e1d6b2a561ff28dcdcc577f4b2a41af41e0406",
       "mode": "100644",
       "object_type": "blob",
       "path": "DEVELOPMENT.md"
@@ -380,13 +380,13 @@
       "path": "ROADMAP.md"
     },
     {
-      "git_object_id": "6d93984ae5f5d91d6c391c34838e645502a5b60d",
+      "git_object_id": "cc6a36b3ed787f93b468157681ff21bd109220cc",
       "mode": "100644",
       "object_type": "blob",
       "path": "RUNBOOK.md"
     },
     {
-      "git_object_id": "d7ec4839ab0d7ca4494b1edff37698fcd7f25e79",
+      "git_object_id": "f2b70a72f425997bb16101ec49bea6b920d3e9f9",
       "mode": "100644",
       "object_type": "blob",
       "path": "Repo.mk"
@@ -746,7 +746,7 @@
       "path": "docs/adr/0031-bind-repository-metadata-to-l9-meta-injector.md"
     },
     {
-      "git_object_id": "1cfc508b4188ee3188f42c29b789d487a46081ae",
+      "git_object_id": "5b8f271cb69f7c1d6b8c4804789730e6a72ff5ca",
       "mode": "100644",
       "object_type": "blob",
       "path": "docs/adr/0032-adopt-core-repository-execution-v2.md"
@@ -1178,7 +1178,7 @@
       "path": "evidence/live-qualify-2026-08-02/odoo-e2e-recipes/odoo-etc-e2e/odoo.conf"
     },
     {
-      "git_object_id": "b6f3e69c65a0cb46b538f9d6b2cf72ae2bc20ed3",
+      "git_object_id": "defd0887877178843f3f239d444cf350feb90e00",
       "mode": "100644",
       "object_type": "blob",
       "path": "evidence/live-qualify-2026-08-02/run_gate_qualify.py"
@@ -3206,7 +3206,7 @@
       "path": "tests/test_repository_aggregation_v5.py"
     },
     {
-      "git_object_id": "3ca64374311dbd22e02d49ae8fb8ef08c704f309",
+      "git_object_id": "83523e941e61ba1022118b7a7b09aebc645a107c",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_repository_execution.py"
@@ -3320,7 +3320,7 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:c010aeae7516ce500a278c38979fe311dd0221e28b79762e649ca1a328e38506",
+  "entries_sha256": "sha256:af8b6d3b0fe3c6bc0bf894174b44d22dc99f67ee8fe79c629075d72aa1e70313",
   "entry_count": 553,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"

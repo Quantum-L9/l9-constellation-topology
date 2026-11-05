@@ -102,9 +102,15 @@ clean:
 # repo-setup reproduces .github/workflows/l9-pr-validate.yml exactly: Core's
 # runner provides Python but not uv, and --no-build keeps third-party source
 # distributions out of the environment, so the project itself is installed
-# editable from its own tree with --no-deps.
+# editable from its own tree with --no-deps. The uv pin is enforced, not just
+# its presence: a different uv already on PATH is replaced by the pin, and if
+# $(UV) still does not report it, setup fails rather than running the gate under
+# another uv. Point UV at a uv $(UV_VERSION) binary to use one off PATH.
+UV_REPORTED = $$($(UV) --version 2>/dev/null | awk '{print $$2}')
+
 repo-setup:
-	command -v $(UV) >/dev/null 2>&1 || $(PYTHON) -m pip install --disable-pip-version-check --only-binary ":all:" uv==$(UV_VERSION)
+	test "$(UV_REPORTED)" = "$(UV_VERSION)" || $(PYTHON) -m pip install --disable-pip-version-check --only-binary ":all:" uv==$(UV_VERSION)
+	@test "$(UV_REPORTED)" = "$(UV_VERSION)" || { echo "repo-setup: $(UV) reports uv $(UV_REPORTED); uv $(UV_VERSION) is required (set UV to a uv $(UV_VERSION) binary)" >&2; exit 1; }
 	$(UV) sync --frozen --no-build --extra dev --no-install-project
 	$(UV) pip install --no-deps --editable .
 
