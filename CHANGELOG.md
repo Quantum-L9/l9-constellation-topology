@@ -1,5 +1,27 @@
 # Changelog
 
+## Unreleased - Core repository execution V2 (ADR-0032)
+
+- Added `.l9/repo-workflow.json` (`l9.repo-execution/v2`, `make-v1`). The root
+  `Makefile` is now Core's byte-identical `make-v1` facade, and `Repo.mk` holds
+  this repository's targets plus the `repo-setup`/`repo-validate`/`repo-check`/
+  `repo-test` phase leaves. This unblocks `Analyze (central Core)` repository
+  verification (issue #40).
+- `make validate` and `make test` now run single phases. The full gate is
+  `make setup validate check test`, which runs exactly the former
+  `make validate` command set. Plain pytest is `make unit`.
+- `.l9/runtime/` (Core's verification staging directory) is gitignored, and the
+  release-readiness scan skips it. Core stages its SDK source and venv there
+  before `make validate`, which the scan otherwise reported as 1653 blocking
+  findings.
+- `make setup` enforces the uv 0.10.0 pin by version: a different uv on `PATH`
+  is replaced by the pin, and setup fails if `UV` still does not report it.
+- The sealed 2026-08-02 live-qualify harness
+  (`evidence/live-qualify-2026-08-02/run_gate_qualify.py`) carries an inline
+  `nosemgrep: gateclient-bypass-execute` with its rationale. Core's Semgrep gate
+  blocks on it, and rewriting the harness would break the provenance of the
+  evidence it produced.
+
 ## Unreleased - repository metadata from l9-meta-injector
 
 - Added `.l9/meta-authority.yaml` (`l9.meta-authority/v1`, `central_manifest`
