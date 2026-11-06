@@ -1,5 +1,19 @@
 # Changelog
 
+## Unreleased - claim query pagination and categorized differential (ADR-0034 amendment)
+
+- `ClaimQuery.after` / `query-claims --after` add deterministic keyset
+  pagination ordered by `claim_id`; each page reports `next_after`.
+  `total_matched` still counts every match.
+- The differential keeps four kinds of change apart: logical (added,
+  removed), evidence (`source_locations`), interpretation (support,
+  cardinality, authority, confidence, conflict), and projection. Each
+  re-read claim lists its `categories`. Both packets' recorded predicate
+  policy hashes are reported, and `interpretation_under_changed_policy`
+  says when an interpretation change is attributable to a policy change.
+- Read-only and derived per read: no packet field, persisted view or second
+  claim model.
+
 ## Unreleased - qualified projection and resolution-aware impact (ADR-0035, proposed)
 
 - Claim-level projection eligibility: a claim whose conflict status is

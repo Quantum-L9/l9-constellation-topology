@@ -39,6 +39,10 @@ Rejected for now: the view is derivable from data the packet already carries. Ad
 4. `SemanticClaimIndex` answers a bounded, deterministic `ClaimQuery` (subject, subject kind, predicate, whole-segment predicate prefix, value, interpretation, conflict, projection, source path, minimum distinct source locations; limit 1–10,000, truncation reported) and a differential between two snapshots (added, removed, re-read). The differential compares where support was read, not packet-scoped evidence ids.
 5. **`l9-topology query-claims`** exposes both over a compiled bundle, read-only. It reports whether the packet was compiled under the same predicate registry the reading uses (`matches_packet`).
 
+### Amendment (2026-11-06): pagination and categorized differential
+
+Freeze candidate L9-SEMANTIC-LEVERAGE-FREEZE/1.0 (D2) asks for deterministic pagination and a differential that separates kinds of change. `ClaimQuery.after` adds keyset pagination by `claim_id`, and results report `next_after`. Each re-read claim in a differential lists `categories` (`evidence`, `interpretation`, `projection`), with logical additions and removals reported separately. The two packets' recorded predicate policy hashes are compared, so an interpretation change can be attributed to a policy change. The view remains a transient presentation type; nothing is persisted or serialized into a packet. This amendment does not admit the managed-header vocabulary (D3), and it does not resolve the Semantic Foundation admission question.
+
 ## Consequences
 
 - Managed declarations reach consumers as declarations at their actual strength. No new edge type, owner identity, capability record or graph mutation is introduced. `owner: platform` is retrievable as a declared owner, never as an `OWNED_BY` edge (pack Case D).
