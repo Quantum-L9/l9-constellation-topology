@@ -48,6 +48,17 @@ Rejected for now: the compiler's own impact stage and every existing caller rely
      - anything else → unresolved. An absent `target_resolution` is never read as resolved.
    - It never crosses an unresolved edge and never counts that edge's endpoint as affected. It reports every such edge it reaches in the existing `ImpactIndex.unresolved_edge_ids`. No new impact record, graph engine or dependency ontology is introduced.
 
+### Amendment (2026-11-06): what decision 4 establishes
+
+Decision 4 adds a second interpretation of the same graph; it does not redefine the first.
+
+- **Two interpretations.** Generic reachability answers "which entities can be reached through the selected edge types and direction". Resolution-aware dependency impact answers "which entities are connected through dependency relations whose targets the emitting producer resolved, and which reached dependency declarations could not be resolved". They are different questions, and a result of one is not a result of the other. A consumer must not present a reachability result as dependency impact.
+- **Unresolved is not blast radius.** An unresolved or ambiguous reference is preserved as evidence that a source declared a relation. It never establishes that its target is affected, and a resolved impact chain never continues through it. It is reported in `unresolved_edge_ids` so that the unknown stays visible.
+- **What the result is.** A resolution-aware result is a derived, evidence-backed Topology assessment over source-evidenced repository and artifact relations. It is not an admitted ProductTopology, not a canonical relation, and not the Semantic Foundation's semantic dependency closure (`l9.semantic-dependency-model/global@1`), whose dependencies, invalidation and resolution stay governed by the Foundation's own contracts. No declaration-derived relation gains authority from appearing in it.
+- **The default is unchanged.** `assess_impact` without `resolution_aware`, `l9-topology impact` without `--resolution-aware`, and the compiler's stored `impact_indexes` keep their established reachability semantics and identity.
+
+Decision 4 stays part of this record. Recording resolution-aware impact as its own decision later requires either an explicit transfer of ownership of decision 4 to that record or a supersession of decision 4. A second accepted record must not describe the same behaviour beside this one.
+
 ## Consequences
 
 - Conflicting projectable declarations no longer produce canonical relations (pack Case G).
