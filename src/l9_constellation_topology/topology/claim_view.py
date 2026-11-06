@@ -68,7 +68,7 @@ from l9_constellation_topology.topology.claim_projection import (
 
 #: Whether a claim produced canonical topology, and whether it could have.
 #: ``withheld`` means the predicate may project but the shared projection
-#: boundary refused this claim (a conflict, or insufficient authority; ADR-0035).
+#: boundary refused this claim because it is conflicted (ADR-0035).
 ProjectionStatus = Literal["projected", "not-projected", "not-projectable", "withheld"]
 
 #: Conflict filter a query accepts.

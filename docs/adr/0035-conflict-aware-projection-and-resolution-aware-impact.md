@@ -32,43 +32,53 @@ Rejected for now: the compiler's own impact stage and every existing caller rely
 
 ## Decision
 
-1. `projection_ineligibility(claim)` is the single projection-boundary decision, consulted by the claim projector and the work projector before any projector-specific endpoint rule. A claim is ineligible when:
+1. **Claim-level projection eligibility (D5a).** `projection_ineligibility(claim)` is consulted by the claim projector and the work projector before any projector-specific rule. A claim does not project when:
    - its predicate is not projectable (`predicate-not-projectable`);
-   - it carries any conflict, confirmed or possible, or names conflict ids (`conflicted`);
-   - its authority is `candidate` or `unknown` (`insufficient-authority`).
+   - its conflict status is in `PROJECTION_WITHHELD_CONFLICT_STATUSES` (`possible`, `confirmed`), or it names a conflict id (`conflicted`).
 
-   The current enums are used, never string comparison.
-2. Target resolution stays each projector's own rule. External packages stay external identities, and unresolved work references stay reference nodes.
-3. A conflicting claim remains a claim and a conflict record and produces no canonical relation. The claim view reports it as `projection_status: withheld` with `projection_withheld_reason`.
-4. `assess_impact(..., resolution_aware=True)` (`l9-topology impact --resolution-aware`) treats an edge as unresolved only when its projector recorded `target_resolution` as `unresolved` or `ambiguous`. It does not traverse such an edge, does not count its endpoint as affected, and reports every unresolved edge the traversal reaches in `unresolved_edge_ids`. Every other edge, including an external-package dependency, is resolved. The default traversal is unchanged.
+   The rule compares the existing `ConflictStatus` enum, never strings. It is not a global authority gate. Relation-specific authority and endpoint identity requirements stay inside each projector, and an unconflicted claim projects exactly as before this decision.
+2. **Policy identity (freeze F12).** The rule is part of the predicate registry's policy view (`projection_eligibility`), and the registry moves to 1.4.0. Under the file-scope invariant (ADR-0052) the binding lands in a pull request stacked on this one, and the two merge together. That view is hashed into `TopologyPacket.policy_hashes["assertion_predicates"]` and into the compile idempotency key. A packet realized under a different rule therefore cannot share an identity. No packet field or schema changes.
+3. A conflicting claim stays a claim and a conflict record. The claim view reports it as `projection_status: withheld` with `projection_withheld_reason: conflicted`.
+4. **Resolved dependency impact (D5b)** is an explicit opt-in mode: `assess_impact(..., resolution_aware=True, observed_entity_ids=...)`, or `l9-topology impact --resolution-aware`. The default reachability traversal is unchanged.
+   - It walks only `DEPENDENCY_EDGE_TYPES` (`DEPENDS_ON`, `BLOCKED_BY`). A caller-supplied edge set outside that set is refused.
+   - It judges each target by the evidence of the producer that emitted the edge (`dependency_target_resolution`):
+     - work projector `target_resolution: exact-artifact` → resolved; any other recorded value → unresolved;
+     - claim projector `endpoint_kind: external-package-reference` → resolved, as an external package identity (Case H);
+     - graph-builder repository dependency with a target the packet observed → resolved;
+     - anything else → unresolved. An absent `target_resolution` is never read as resolved.
+   - It never crosses an unresolved edge and never counts that edge's endpoint as affected. It reports every such edge it reaches in the existing `ImpactIndex.unresolved_edge_ids`. No new impact record, graph engine or dependency ontology is introduced.
 
 ## Consequences
 
-- Conflicting projectable declarations no longer produce canonical relations (pack Case G). Unconflicted ones project exactly as before.
-- Dependency-impact consumers can separate resolved paths from declared-but-unresolved references (pack Case E), without losing provenance or legitimate external dependencies (Case H).
-- No committed golden changes: the fixtures contain no conflicted projectable claim, the default traversal is unchanged, and the predicate policy is unchanged.
-- Whether resolution-aware traversal should become the default, including for the compiler's `impact_indexes`, is left open. It needs its own decision because it changes packet identity.
+- Conflicting projectable declarations no longer produce canonical relations (pack Case G).
+- The predicate policy hash moves, so the `foundational-two-repo` golden and `HASH_LOCALITY_EVALUATION.json` change in that hash and the identities derived from it. No record content changes, because the fixtures contain no conflicted projectable claim.
+- Dependency-impact consumers can separate resolved chains from declared-but-unresolved references (Case E) without losing legitimate external dependencies (Case H). Containment, documentation and governance relations stay out of the dependency question.
+- Resolution-aware impact is a read-time interpretation; the compiler's stored `impact_indexes` remain generic reachability. Making it a default, or storing it, needs its own decision because it changes packet identity.
+- The projection *table* (which predicates have a projector) is code bound by the compiler build identity, not by a policy hash. That was true before this decision and is unchanged here.
 
 ## Compliance and validation
 
 - `tests/test_qualified_projection.py`:
   - conflicting successors project no supersession edge, while an unconflicted one still projects;
-  - a possible conflict and a candidate authority each withhold projection;
+  - a possible conflict withholds projection, and an unconflicted candidate-authority claim still projects (no global authority gate);
   - declaration-only predicates report their own reason;
   - the claim view reports `withheld` with its reason;
   - a conflicted work claim projects no work edge;
   - an unresolved target is reported and not traversed, while the generic traversal is unchanged;
   - an external package dependency stays resolved;
   - an ambiguous target is unresolved;
+  - an absent `target_resolution` is unresolved, while a graph-builder dependency on an observed repository is resolved;
+  - only `DEPENDS_ON` and `BLOCKED_BY` are walked, and other caller-supplied relations are refused;
   - traversal stops only at the unresolved hop;
   - the CLI accepts `--resolution-aware`.
-- The decision changes no committed fixture or golden: `make generated-check` must pass without running an update target. The captured run of record is the `validate` CI job on the head of the pull request that introduces this ADR; this document asserts no result of its own.
+- Generated artifacts are refreshed with `make generated-update` and checked with `make generated-check`; only the predicate policy hash and identities derived from it move. The captured run of record is the `validate` CI job on the head of the pull request that introduces this ADR; this document asserts no result of its own.
 
 ## Related artifacts
 
+- `src/l9_constellation_topology/reconciliation/predicates.py` (policy 1.4.0, `PROJECTION_WITHHELD_CONFLICT_STATUSES`)
 - `src/l9_constellation_topology/topology/claim_projection.py` (`projection_ineligibility`, `eligible_for_canonical_projection`)
 - `src/l9_constellation_topology/topology/work_projection.py`
-- `src/l9_constellation_topology/topology/impact.py` (`edge_is_resolved`, `resolution_aware`)
+- `src/l9_constellation_topology/topology/impact.py` (`DEPENDENCY_EDGE_TYPES`, `dependency_target_resolution`, `resolution_aware`)
 - `src/l9_constellation_topology/topology/claim_view.py` (`withheld`, `projection_withheld_reason`)
 - `src/l9_constellation_topology/cli.py`
 - `tests/test_qualified_projection.py`

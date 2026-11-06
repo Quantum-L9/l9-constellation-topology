@@ -1,15 +1,20 @@
 # Changelog
 
-## Unreleased - qualified projection and resolution-aware impact (ADR-0035)
+## Unreleased - qualified projection and resolution-aware impact (ADR-0035, proposed)
 
-- One projection-boundary decision, `projection_ineligibility`, gates both the
-  claim projector and the work projector: a claim with any conflict, or with
-  `candidate`/`unknown` authority, projects no canonical relation. Competing
-  `repository.replaced_by` values no longer each produce a `SUPERSEDES` edge.
-- The claim view reports such claims as `withheld` with the reason.
+- Claim-level projection eligibility: a claim whose conflict status is
+  possible or confirmed, or which names a conflict, projects no canonical
+  relation in the claim or work projector. Competing `repository.replaced_by`
+  values no longer each produce a `SUPERSEDES` edge. There is no global
+  authority gate; relation-specific requirements stay in each projector.
+- The rule is bound into `policy_hashes.assertion_predicates` (predicate
+  policy 1.4.0) by the stacked binding pull request, which merges together
+  with this one (freeze F12, file-scope invariant ADR-0052).
+- The claim view reports withheld claims with `projection_withheld_reason`.
 - `assess_impact(resolution_aware=True)` / `l9-topology impact
-  --resolution-aware` does not traverse edges whose recorded
-  `target_resolution` is `unresolved` or `ambiguous`, and reports them in
+  --resolution-aware` walks only `DEPENDS_ON` and `BLOCKED_BY`, judges each
+  target by its producer's evidence (an absent `target_resolution` is not
+  resolved), never crosses an unresolved target, and reports such edges in
   `unresolved_edge_ids`. External package dependencies stay resolved. The
   default traversal is unchanged.
 

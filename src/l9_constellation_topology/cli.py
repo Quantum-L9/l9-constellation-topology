@@ -331,6 +331,10 @@ def cmd_impact(args: argparse.Namespace) -> int:
         edge_types={EdgeType(value) for value in args.edge_type} if args.edge_type else None,
         minimum_confidence=ConfidenceLevel(args.minimum_confidence),
         resolution_aware=args.resolution_aware,
+        observed_entity_ids=frozenset(
+            record.repository_id for record in materialized.state.repository_records
+        )
+        | frozenset(record.artifact_id for record in materialized.state.artifact_records),
     )
     _print_json(result)
     return 0
@@ -675,8 +679,9 @@ def build_parser() -> argparse.ArgumentParser:
         "--resolution-aware",
         action="store_true",
         help=(
-            "Answer dependency impact: do not traverse edges whose target is unresolved "
-            "or ambiguous, and report them in unresolved_edge_ids"
+            "Answer resolved dependency impact: walk only DEPENDS_ON and BLOCKED_BY, "
+            "judge each target by its producer's evidence, never cross an unresolved "
+            "or ambiguous target, and report such edges in unresolved_edge_ids"
         ),
     )
     impact_parser.set_defaults(handler=cmd_impact)
