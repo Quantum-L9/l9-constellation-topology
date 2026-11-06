@@ -62,7 +62,7 @@ Rejected for now: the compiler's own impact stage and every existing caller rely
   - an ambiguous target is unresolved;
   - traversal stops only at the unresolved hop;
   - the CLI accepts `--resolution-aware`.
-- The whole existing suite, `make fixtures-check` and `make hash-locality` pass with no fixture regeneration.
+- The decision changes no committed fixture or golden: `make generated-check` must pass without running an update target. The captured run of record is the `validate` CI job on the head of the pull request that introduces this ADR; this document asserts no result of its own.
 
 ## Related artifacts
 
