@@ -93,7 +93,10 @@ declaration, never as a verified owner or capability. Results page with
 `impact` without flags answers generic reachability. `impact --resolution-aware`
 answers qualified dependency impact instead (ADR-0035): only `DEPENDS_ON` and
 `BLOCKED_BY`, each target judged by its producer's evidence, and unresolved
-targets reported rather than crossed. See `RUNBOOK.md`.
+targets reported rather than crossed. Its output names that reading with
+`"interpretation": "resolution-aware-dependency-impact"` beside the
+`ImpactIndex` fields; output without the flag is the bare `ImpactIndex`. See
+`RUNBOOK.md`.
 
 Every record these commands return is a derived Topology record. None is an
 admitted product topology record, and this repository admits none. The status
