@@ -155,7 +155,11 @@ Two further distinctions hold everywhere:
   is an admitted product topology record, and this repository admits none.
 - **Reachability versus dependency impact.** `impact` answers generic
   reachability; `impact --resolution-aware` answers qualified dependency
-  impact. They are different questions and stay distinguishable.
+  impact. They are different questions and stay distinguishable: the
+  resolution-aware output carries `"interpretation":
+  "resolution-aware-dependency-impact"`, and the default output stays the
+  bare `ImpactIndex` with no such key. The label is presentation only; it is
+  not in `ImpactIndex`, the stored `impact_indexes` or the packet identity.
 
 Behavioral evidence: `tests/test_claim_view.py`,
 `tests/test_qualified_projection.py` and `tests/test_header_predicates.py`.

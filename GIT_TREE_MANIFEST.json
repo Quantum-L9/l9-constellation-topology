@@ -296,7 +296,7 @@
       "path": "BUILD_SPECIFICATION.md"
     },
     {
-      "git_object_id": "22bb9b0fa15a67d6d99221107949aff19ebc1d0b",
+      "git_object_id": "b54581ccb491cff13cbaf40ef60aff3b0064c1b5",
       "mode": "100644",
       "object_type": "blob",
       "path": "CHANGELOG.md"
@@ -338,7 +338,7 @@
       "path": "DEPENDENCY_POLICY.md"
     },
     {
-      "git_object_id": "a1f259ce57f99d0d888e5d2df51f4aaeae6258e5",
+      "git_object_id": "b40a96c51b23b59040ed7abbf71a2d8e32113257",
       "mode": "100644",
       "object_type": "blob",
       "path": "DEVELOPMENT.md"
@@ -416,7 +416,7 @@
       "path": "QUALIFICATION.json"
     },
     {
-      "git_object_id": "91775756074cb3fc00b2cb171278907e14be8ead",
+      "git_object_id": "15c115d171f33fe077d89da6e1148966a874e9ef",
       "mode": "100644",
       "object_type": "blob",
       "path": "README.md"
@@ -440,7 +440,7 @@
       "path": "ROADMAP.md"
     },
     {
-      "git_object_id": "2ce13d3531a9a1f03035386984fd782dcc242b18",
+      "git_object_id": "4a88e7baef0f519aa28ff90ac3a83aed96744bbf",
       "mode": "100644",
       "object_type": "blob",
       "path": "RUNBOOK.md"
@@ -494,7 +494,7 @@
       "path": "UNKNOWN_REGISTER.md"
     },
     {
-      "git_object_id": "4448b2fe89f2dea2ef52fbff43bb4452d5c44e24",
+      "git_object_id": "9da9149e93d975f2b9c0ed1ec0d48a393d63d2fd",
       "mode": "100644",
       "object_type": "blob",
       "path": "VALIDATION.md"
@@ -818,13 +818,13 @@
       "path": "docs/adr/0033-register-governed-header-predicates-as-declaration-only.md"
     },
     {
-      "git_object_id": "ab92308be2c1760fe723915caa87556a46f676e9",
+      "git_object_id": "8fb2450d832502e4744a15e4e6acbe63e2764dbc",
       "mode": "100644",
       "object_type": "blob",
       "path": "docs/adr/0034-semantic-claim-read-model-and-managed-header-vocabulary.md"
     },
     {
-      "git_object_id": "29333addcbf441e9c1c5273612eb116b79659f3e",
+      "git_object_id": "55a7266470029d35537614f4641190cfe9eb708f",
       "mode": "100644",
       "object_type": "blob",
       "path": "docs/adr/0035-conflict-aware-projection-and-resolution-aware-impact.md"
@@ -1496,7 +1496,7 @@
       "path": "src/l9_constellation_topology/cardinality.py"
     },
     {
-      "git_object_id": "4490f9920931deb3ede032444305ead45b6a6994",
+      "git_object_id": "f99368c891e38171b46139d094a832cbea5247ac",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/cli.py"
@@ -3266,7 +3266,7 @@
       "path": "tests/test_publication_temporal.py"
     },
     {
-      "git_object_id": "6056fdc8e13fa41ca122e01a12a8027f434508e2",
+      "git_object_id": "00d18f9cf85e91af606549d6997931453052f779",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_qualified_projection.py"
@@ -3422,7 +3422,7 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:41f56ebebfcbc392fec8cc70b08bb2836d6695f6d2b073221b12f25799c632fb",
+  "entries_sha256": "sha256:a8e0becb5726c8ed173d02eef0ed8e89cf234866fb67c020de24bca1570bb165",
   "entry_count": 570,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
