@@ -152,31 +152,31 @@
       "path": ".github/pull_request_template.md"
     },
     {
-      "git_object_id": "5a0853272495c592cff445029f1e06dd72ba0a63",
+      "git_object_id": "b32927dd197b06e674e3e8202dcf276b4c4d582c",
       "mode": "100644",
       "object_type": "blob",
       "path": ".github/workflows/compile.yml"
     },
     {
-      "git_object_id": "50ef41fdd8f1aa2d2f3f781830166e8418e27390",
+      "git_object_id": "000bce6d69c90e14ff991925893cde3e09fd1669",
       "mode": "100644",
       "object_type": "blob",
       "path": ".github/workflows/l9-ingress.yml"
     },
     {
-      "git_object_id": "42553f001b850916594702c08082eac5bed9341e",
+      "git_object_id": "6c53ec0bcd2f84c47f92f0248fca75fe0cbcdc59",
       "mode": "100644",
       "object_type": "blob",
       "path": ".github/workflows/l9-manual-replay.yml"
     },
     {
-      "git_object_id": "48c9f8b01953cccb26ac8922cbf67c6de43ab79c",
+      "git_object_id": "fe4d1aed7709df4ec1c49309601a11eae7ee2eb6",
       "mode": "100644",
       "object_type": "blob",
       "path": ".github/workflows/l9-pr-validate.yml"
     },
     {
-      "git_object_id": "a4b3a9484fe960e36b78455f464d0ea2d17d7e7c",
+      "git_object_id": "a1b241d90860e5bc88b525564d56491e21de97b3",
       "mode": "100644",
       "object_type": "blob",
       "path": ".github/workflows/l9-stage-worker.yml"
@@ -806,7 +806,7 @@
       "path": "docs/adr/0031-bind-repository-metadata-to-l9-meta-injector.md"
     },
     {
-      "git_object_id": "5b8f271cb69f7c1d6b8c4804789730e6a72ff5ca",
+      "git_object_id": "658980d50f2d8191f02c3957734c37331f39606c",
       "mode": "100644",
       "object_type": "blob",
       "path": "docs/adr/0032-adopt-core-repository-execution-v2.md"
@@ -1256,7 +1256,7 @@
       "path": "evidence/live-qualify-2026-08-02/odoo-e2e-recipes/odoo-etc-e2e/odoo.conf"
     },
     {
-      "git_object_id": "defd0887877178843f3f239d444cf350feb90e00",
+      "git_object_id": "ec69a5bb4b72a78d171e7d1a659f42cc6530cedc",
       "mode": "100644",
       "object_type": "blob",
       "path": "evidence/live-qualify-2026-08-02/run_gate_qualify.py"
@@ -3422,7 +3422,7 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:bd39a9a656c57da4c491d4fd2a68b458ef4c0e499dffbd8207179e670b6c2b7f",
+  "entries_sha256": "sha256:7307e67cae051a863bc36b33068c0cd6d42db4a3b21a72595639fc92508152fb",
   "entry_count": 570,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
