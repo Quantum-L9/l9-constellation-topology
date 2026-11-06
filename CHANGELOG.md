@@ -16,6 +16,16 @@
 - Read-only and derived per read: no packet field, persisted view or second
   claim model.
 
+## Unreleased - impact interpretation label
+
+- `l9-topology impact --resolution-aware` output adds a top-level
+  `"interpretation": "resolution-aware-dependency-impact"` beside the
+  `ImpactIndex` fields, so a consumer can tell it from generic reachability
+  (ADR-0035 decision 4). Output without the flag is byte-identical to before.
+  `ImpactIndex`, the stored `impact_indexes`, the packet schema and identity
+  are unchanged. A consumer that validates the opt-in output strictly as an
+  `ImpactIndex` (`extra="forbid"`) must drop the key first.
+
 ## Unreleased - qualified projection and resolution-aware impact (ADR-0035, proposed)
 
 - Claim-level projection eligibility: a claim whose conflict status is

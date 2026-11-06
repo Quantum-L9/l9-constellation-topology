@@ -125,6 +125,10 @@ dependency.
   recorded `target_resolution`, is unresolved;
 - unresolved and ambiguous targets are never crossed and never counted as
   affected; their edge ids are listed in `unresolved_edge_ids`.
+- the output names the reading that produced it: the `ImpactIndex` fields
+  plus `"interpretation": "resolution-aware-dependency-impact"`. Output
+  without the flag is the bare `ImpactIndex`, unchanged, and carries no
+  `interpretation` key.
 
 ```bash
 uv run l9-topology impact \
