@@ -403,7 +403,6 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `src/l9_constellation_topology/worker/stage_runner.py` — production Python package implementation
 - `src/l9_constellation_topology/worker/transport_factory.py` — production Python package implementation
 - `tests/__init__.py` — unit, contract, integration, regression, or governance test
-- `tests/claim_fixtures.py` — shared reconciled-claim builder for claim view and projection tests
 - `tests/corpus_fixtures.py` — automated regression and contract test suite
 - `tests/fixtures/corpus_intelligence/producer-emitted/PROVENANCE.md` — provenance of the producer-emitted corpus intelligence fixture
 - `tests/fixtures/corpus_intelligence/producer-emitted/corpus-intelligence/manifest.json` — corpus intelligence bundle emitted by l9-meta-injector, verified byte for byte by this repository

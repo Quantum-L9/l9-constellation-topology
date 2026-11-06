@@ -29,7 +29,7 @@ from l9_constellation_topology.topology.claim_projection import (
 from l9_constellation_topology.topology.claim_view import ClaimQuery, SemanticClaimIndex
 from l9_constellation_topology.topology.impact import assess_impact, edge_is_resolved
 from l9_constellation_topology.topology.work_projection import project_work_relations
-from tests.claim_fixtures import reconciled_state
+from tests.test_claim_view import _state as reconciled_state
 
 ROOT = Path(__file__).resolve().parents[1]
 SAMPLE = ROOT / "tests/fixtures/repository_model_packets/l9-assertion-sample"
@@ -63,7 +63,7 @@ def _assertion(
 
 
 def _reconciled(assertions: tuple[RepositoryModelAssertion, ...]) -> TopologyState:
-    return reconciled_state(assertions, repository_id=REPO)
+    return reconciled_state(assertions)
 
 
 def _claim(state: TopologyState, predicate: str, obj: str) -> SemanticClaimRecord:
