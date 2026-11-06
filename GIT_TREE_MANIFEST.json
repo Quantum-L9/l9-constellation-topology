@@ -206,7 +206,7 @@
       "path": ".python-version"
     },
     {
-      "git_object_id": "2f1a22dc875ce73869096641f7dafd8688961604",
+      "git_object_id": "eec297f4beb100a467f02efb790d589aa2480992",
       "mode": "100644",
       "object_type": "blob",
       "path": "ADR_INDEX.md"
@@ -236,7 +236,7 @@
       "path": "BUILD_SPECIFICATION.md"
     },
     {
-      "git_object_id": "e06d5347b6535684bc11cebb313dd11dbfcea676",
+      "git_object_id": "78ee54729b59861551f5d53de6ed04546478f761",
       "mode": "100644",
       "object_type": "blob",
       "path": "CHANGELOG.md"
@@ -332,7 +332,7 @@
       "path": "MAINTAINERS.md"
     },
     {
-      "git_object_id": "3ecb7324e53daebc98e1d554db57f1716281fe6e",
+      "git_object_id": "661bee095c240ceb6930a3952e9546149ed0a4cf",
       "mode": "100644",
       "object_type": "blob",
       "path": "MANIFEST.md"
@@ -762,6 +762,12 @@
       "mode": "100644",
       "object_type": "blob",
       "path": "docs/adr/0034-semantic-claim-read-model-and-managed-header-vocabulary.md"
+    },
+    {
+      "git_object_id": "c15dd911eb6edc968422963ef771c3a4dc86d475",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "docs/adr/0035-conflict-aware-projection-and-resolution-aware-impact.md"
     },
     {
       "git_object_id": "3c2466071d4b3c021b1969946079823ae4bcfae7",
@@ -1430,7 +1436,7 @@
       "path": "src/l9_constellation_topology/cardinality.py"
     },
     {
-      "git_object_id": "983a3a03ffe9955d58bcc8381b805060bca348b0",
+      "git_object_id": "179c39d39cf364c1028a2f5c93e607e95174621d",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/cli.py"
@@ -2180,13 +2186,13 @@
       "path": "src/l9_constellation_topology/topology/capability_builder.py"
     },
     {
-      "git_object_id": "c4673185514c93250c2badf19cfb6a3154b1d1b0",
+      "git_object_id": "a765395aa1570167f653deab10dcce24c80c1b14",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/topology/claim_projection.py"
     },
     {
-      "git_object_id": "cd93afeba2b39784216a817506100290a07339a2",
+      "git_object_id": "a51310af19ce0add74e5865b3aa5656dcd85dd75",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/topology/claim_view.py"
@@ -2222,7 +2228,7 @@
       "path": "src/l9_constellation_topology/topology/graph_builder.py"
     },
     {
-      "git_object_id": "84ea529f1d940b85ad04e5f320595c0488d7af11",
+      "git_object_id": "af7f8326c8be27ae8571743716d488170a54500a",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/topology/impact.py"
@@ -2252,7 +2258,7 @@
       "path": "src/l9_constellation_topology/topology/risk.py"
     },
     {
-      "git_object_id": "ec9ec7327bb49a7eca48e9d4e2e85e4c95932ce6",
+      "git_object_id": "4be35363b921cbbb277b9149d6da2c1ade8e8866",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/topology/work_projection.py"
@@ -3200,6 +3206,12 @@
       "path": "tests/test_publication_temporal.py"
     },
     {
+      "git_object_id": "7ee362156786cd28f350ff747615cc0facb279be",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/test_qualified_projection.py"
+    },
+    {
       "git_object_id": "177530ca1a407a2ebea8c8cbc33e2291705ff749",
       "mode": "100644",
       "object_type": "blob",
@@ -3350,8 +3362,8 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:4a8fbaa2f329a496fde57fc82189fa1f1f521339b1339da103e864f0e3ff074a",
-  "entry_count": 558,
+  "entries_sha256": "sha256:12ae263e13e1a6cf5333d97eaae688a371667898f83496a81e789df4cb0e7edd",
+  "entry_count": 560,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
   ],
