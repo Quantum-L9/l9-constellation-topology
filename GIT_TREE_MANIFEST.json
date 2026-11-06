@@ -1466,7 +1466,7 @@
       "path": "scripts/validate_nuclear_execution.py"
     },
     {
-      "git_object_id": "8c686efb586dd30d90dc146ddbd385366b2e44c0",
+      "git_object_id": "7baa779524fe40b3f94de72f0091b570d3b88ca2",
       "mode": "100755",
       "object_type": "blob",
       "path": "scripts/validate_release_readiness.py"
@@ -3422,7 +3422,7 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:acac7601aadadc9dbfe256f4a858084ab7d1a76318763cf2f6833b272ab36d42",
+  "entries_sha256": "sha256:41f56ebebfcbc392fec8cc70b08bb2836d6695f6d2b073221b12f25799c632fb",
   "entry_count": 570,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
