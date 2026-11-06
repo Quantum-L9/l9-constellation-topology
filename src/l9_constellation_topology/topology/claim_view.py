@@ -248,6 +248,12 @@ class ClaimQuery:
     #: Only claims supported by at least this many distinct source locations.
     minimum_locations: int = 0
     limit: int = DEFAULT_QUERY_LIMIT
+    #: Keyset pagination: return only claims whose ``claim_id`` sorts after this
+    #: one. Claims are ordered by ``claim_id``, so passing a page's
+    #: ``next_after`` yields the next page deterministically, and the same packet
+    #: always pages the same way. It is not a filter: ``total_matched`` counts
+    #: every match regardless of the page.
+    after: str | None = None
 
     def __post_init__(self) -> None:
         if not 1 <= self.limit <= MAXIMUM_QUERY_LIMIT:
@@ -312,12 +318,28 @@ def _distinct_locations(view: SemanticClaimView) -> int:
 
 
 class ClaimQueryResult(FrozenModel):
-    """What a query matched, how many, and whether the bound truncated it."""
+    """One page of what a query matched, and how to ask for the next page."""
 
     total_matched: int
     returned: int
+    #: True when matches remain after this page.
     truncated: bool
+    #: Pass as ``ClaimQuery.after`` to read the next page; ``None`` on the last.
+    next_after: str | None = None
     claims: tuple[SemanticClaimView, ...]
+
+
+#: What kind of difference a re-read claim shows between two snapshots. A claim
+#: added or removed is the *logical* kind and is reported in
+#: ``ClaimDifferential.added`` / ``removed`` rather than here.
+#:
+#: ``policy-interpretation`` holds only fields that are a pure function of the
+#: predicate and the predicate policy (support, cardinality); for one claim they
+#: can change only when the policy did. ``reconciliation`` holds what
+#: reconciliation concluded from the evidence and the other claims (authority,
+#: confidence, conflict); those can change with the data alone, so they are
+#: never attributed to a policy change, even when one coincides.
+ChangeCategory = Literal["evidence", "policy-interpretation", "reconciliation", "projection"]
 
 
 class ClaimChange(FrozenModel):
@@ -327,36 +349,53 @@ class ClaimChange(FrozenModel):
     before: SemanticClaimView
     after: SemanticClaimView
     changed_fields: tuple[str, ...]
+    #: Which kinds of difference ``changed_fields`` fall into, in fixed order.
+    categories: tuple[ChangeCategory, ...]
+    #: True only when a ``policy-interpretation`` field changed *and* both packets'
+    #: recorded predicate policies are known and differ: the one case where the
+    #: change is demonstrably caused by policy. A ``reconciliation`` change is
+    #: never attributed, even when it coincides with a policy change.
+    caused_by_policy_change: bool = False
 
 
 class ClaimDifferential(FrozenModel):
     """Logical claims added, removed and re-read between two packet snapshots.
 
     Claim identity is the logical claim — subject, predicate, object — so the same
-    statement in two snapshots is one claim even when its evidence moved.
+    statement in two snapshots is one claim even when its evidence moved. The kinds
+    of change stay apart: logical (``added``/``removed``), evidence,
+    policy-interpretation, reconciliation, and projection (``ClaimChange.categories``).
     """
 
     added: tuple[SemanticClaimView, ...]
     removed: tuple[SemanticClaimView, ...]
     changed: tuple[ClaimChange, ...]
+    #: The predicate policy each packet was compiled under, as recorded in its
+    #: ``policy_hashes``; ``None`` when the caller did not supply it.
+    before_predicate_policy_hash: str | None = None
+    after_predicate_policy_hash: str | None = None
+    #: True only when both hashes are known and differ.
+    predicate_policy_changed: bool = False
 
 
-#: View fields compared by a differential. Evidence and assertion identities are
-#: deliberately not compared: they name the packet that carried them, so two
-#: independent compiles of the same source would differ on every claim. Where the
-#: support was *read* is compared instead (see ``_support_signature``): a claim
-#: whose support moved is a change a reader must see.
-_DIFFERENTIAL_FIELDS: tuple[str, ...] = (
-    "interpretation",
-    "support",
-    "cardinality",
-    "authority",
-    "confidence",
-    "conflict_status",
-    "conflict_ids",
-    "projection_status",
-    "projection_withheld_reason",
-    "projected_entity_ids",
+#: View fields a differential compares, grouped by the kind of change they show.
+#: Evidence and assertion identities are deliberately not compared: they name the
+#: packet that carried them, so two independent compiles of the same source would
+#: differ on every claim. Where the support was *read* is compared instead
+#: (``source_locations``, see ``_support_signature``).
+#:
+#: ``interpretation`` (the reading) is absent: both snapshots are read by this
+#: build's registry, so it cannot differ for one claim. What the packets
+#: themselves recorded under their compile-time policy is compared instead.
+#:
+#: ``authority`` and ``confidence`` are reconciliation, not evidence: they are what
+#: reconciliation concluded from the evidence (the weakest supporting authority,
+#: a confidence lowered by a conflict).
+_FIELDS_BY_CATEGORY: tuple[tuple[ChangeCategory, tuple[str, ...]], ...] = (
+    ("evidence", ()),
+    ("policy-interpretation", ("support", "cardinality")),
+    ("reconciliation", ("authority", "confidence", "conflict_status", "conflict_ids")),
+    ("projection", ("projection_status", "projection_withheld_reason", "projected_entity_ids")),
 )
 
 
@@ -388,7 +427,14 @@ class SemanticClaimIndex:
     so the same packet answers the same query with the same bytes.
     """
 
-    def __init__(self, views: Iterable[SemanticClaimView]) -> None:
+    def __init__(
+        self,
+        views: Iterable[SemanticClaimView],
+        *,
+        packet_predicate_policy_hash: str | None = None,
+    ) -> None:
+        #: The predicate policy the packet was compiled under, when known.
+        self.packet_predicate_policy_hash = packet_predicate_policy_hash
         self._views: tuple[SemanticClaimView, ...] = tuple(
             sorted(views, key=lambda item: item.claim_id)
         )
@@ -397,13 +443,18 @@ class SemanticClaimIndex:
             raise ValueError("a packet carries two claims with one claim_id")
 
     @classmethod
-    def from_state(cls, state: TopologyState) -> SemanticClaimIndex:
+    def from_state(
+        cls, state: TopologyState, *, packet_predicate_policy_hash: str | None = None
+    ) -> SemanticClaimIndex:
         """Index every semantic claim in ``state`` with the evidence it cites."""
         evidence_by_id = {record.evidence_id: record for record in state.evidence}
         policy_ref = interpretation_policy_ref()
         return cls(
-            claim_view(claim, evidence_by_id, policy_ref=policy_ref)
-            for claim in state.semantic_claims
+            (
+                claim_view(claim, evidence_by_id, policy_ref=policy_ref)
+                for claim in state.semantic_claims
+            ),
+            packet_predicate_policy_hash=packet_predicate_policy_hash,
         )
 
     @property
@@ -414,13 +465,20 @@ class SemanticClaimIndex:
         return self._by_id.get(claim_id)
 
     def query(self, query: ClaimQuery) -> ClaimQueryResult:
-        """Return the views ``query`` matches, bounded by ``query.limit``."""
+        """Return one page of the views ``query`` matches, ordered by ``claim_id``."""
         matched = [view for view in self._views if query.matches(view)]
-        returned = tuple(matched[: query.limit])
+        remaining = (
+            matched
+            if query.after is None
+            else [view for view in matched if view.claim_id > query.after]
+        )
+        returned = tuple(remaining[: query.limit])
+        truncated = len(remaining) > len(returned)
         return ClaimQueryResult(
             total_matched=len(matched),
             returned=len(returned),
-            truncated=len(matched) > len(returned),
+            truncated=truncated,
+            next_after=returned[-1].claim_id if truncated and returned else None,
             claims=returned,
         )
 
@@ -440,20 +498,41 @@ class SemanticClaimIndex:
             }
 
         before, after = scoped(self), scoped(later)
+        before_policy = self.packet_predicate_policy_hash
+        after_policy = later.packet_predicate_policy_hash
+        policy_changed = (
+            before_policy is not None and after_policy is not None and before_policy != after_policy
+        )
         changed: list[ClaimChange] = []
         for claim_id in sorted(before.keys() & after.keys()):
             old, new = before[claim_id], after[claim_id]
-            fields = tuple(
-                name for name in _DIFFERENTIAL_FIELDS if getattr(old, name) != getattr(new, name)
-            ) + (
-                ("source_locations",) if _support_signature(old) != _support_signature(new) else ()
-            )
+            fields: list[str] = []
+            categories: list[ChangeCategory] = []
+            for category, names in _FIELDS_BY_CATEGORY:
+                moved = [name for name in names if getattr(old, name) != getattr(new, name)]
+                if category == "evidence" and _support_signature(old) != _support_signature(new):
+                    moved.append("source_locations")
+                if moved:
+                    fields.extend(moved)
+                    categories.append(category)
             if fields:
                 changed.append(
-                    ClaimChange(claim_id=claim_id, before=old, after=new, changed_fields=fields)
+                    ClaimChange(
+                        claim_id=claim_id,
+                        before=old,
+                        after=new,
+                        changed_fields=tuple(fields),
+                        categories=tuple(categories),
+                        caused_by_policy_change=(
+                            policy_changed and "policy-interpretation" in categories
+                        ),
+                    )
                 )
         return ClaimDifferential(
             added=tuple(after[claim_id] for claim_id in sorted(after.keys() - before.keys())),
             removed=tuple(before[claim_id] for claim_id in sorted(before.keys() - after.keys())),
             changed=tuple(changed),
+            before_predicate_policy_hash=before_policy,
+            after_predicate_policy_hash=after_policy,
+            predicate_policy_changed=policy_changed,
         )

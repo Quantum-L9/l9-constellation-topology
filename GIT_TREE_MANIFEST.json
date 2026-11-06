@@ -236,7 +236,7 @@
       "path": "BUILD_SPECIFICATION.md"
     },
     {
-      "git_object_id": "d2fd8939012328d6b33e1fe19e9ddecb75f428d2",
+      "git_object_id": "5517513549d17b47107051431a362dcfa673e865",
       "mode": "100644",
       "object_type": "blob",
       "path": "CHANGELOG.md"
@@ -758,7 +758,7 @@
       "path": "docs/adr/0033-register-governed-header-predicates-as-declaration-only.md"
     },
     {
-      "git_object_id": "7bd5b0c432c21082c882674563a68350e34ffbb8",
+      "git_object_id": "39fbe190387c5754cfe78dad1d634b87073fe2a0",
       "mode": "100644",
       "object_type": "blob",
       "path": "docs/adr/0034-semantic-claim-read-model-and-managed-header-vocabulary.md"
@@ -1436,7 +1436,7 @@
       "path": "src/l9_constellation_topology/cardinality.py"
     },
     {
-      "git_object_id": "845fbd5b2fed94e963ef790930a8bd526cd57678",
+      "git_object_id": "4490f9920931deb3ede032444305ead45b6a6994",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/cli.py"
@@ -2192,7 +2192,7 @@
       "path": "src/l9_constellation_topology/topology/claim_projection.py"
     },
     {
-      "git_object_id": "9a1b7b6e4a73cf10ff82da0d79d1088cfa5b9be1",
+      "git_object_id": "cad9101634ec92e8c00ba8c302cbf051ee0698b4",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/topology/claim_view.py"
@@ -2972,7 +2972,7 @@
       "path": "tests/test_bridge_gap_renderer.py"
     },
     {
-      "git_object_id": "23b196dc17c96f5b42d58229bb1af78a1f8758e5",
+      "git_object_id": "f0e56e3f0e8c41ed79c875dc35b89e127ed9b9f2",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_claim_view.py"
@@ -3362,7 +3362,7 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:d263b6101f490ef3a9577e7587ce5d8edbf50c985e7472146b37c5f5eefda432",
+  "entries_sha256": "sha256:5af3434fa705377b10ddff956d125bcc12800902c27889bbb6ea3e457ce6c5fb",
   "entry_count": 560,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"

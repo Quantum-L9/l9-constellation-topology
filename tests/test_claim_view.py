@@ -387,6 +387,127 @@ def test_differential_reports_added_removed_and_re_read_claims() -> None:
     assert (scoped.added, scoped.removed) == ((), ())
 
 
+def test_keyset_pagination_walks_every_match_exactly_once() -> None:
+    state = _state(
+        tuple(
+            _assertion("meta.l9v1.classification.tags", f"tag-{index:02d}", line=index + 1)
+            for index in range(7)
+        )
+    )
+    index = SemanticClaimIndex.from_state(state)
+    seen: list[str] = []
+    after: str | None = None
+    pages = 0
+    while True:
+        page = index.query(ClaimQuery(predicate_prefix="meta.l9v1", limit=3, after=after))
+        assert page.total_matched == 7
+        seen.extend(view.claim_id for view in page.claims)
+        pages += 1
+        if not page.truncated:
+            assert page.next_after is None
+            break
+        assert page.next_after == page.claims[-1].claim_id
+        after = page.next_after
+    assert pages == 3
+    assert seen == sorted(view.claim_id for view in index.views)
+    assert len(set(seen)) == 7
+    # A cursor names its page exactly, on a freshly built index too.
+    rebuilt = SemanticClaimIndex.from_state(state)
+    resumed = rebuilt.query(ClaimQuery(limit=3, after=seen[2]))
+    assert [view.claim_id for view in resumed.claims] == seen[3:6]
+    assert resumed.next_after == seen[5]
+
+
+def test_differential_separates_evidence_and_reconciliation() -> None:
+    owner = _assertion("meta.managed.governance.owner", "platform", line=2)
+    before = SemanticClaimIndex.from_state(
+        _state((owner,)), packet_predicate_policy_hash="sha256:a"
+    )
+    moved_owner = owner.model_copy(
+        update={"source_range": AssertionSourceRange(start_line=9, end_line=9)}
+    )
+    moved = SemanticClaimIndex.from_state(
+        _state((moved_owner,)), packet_predicate_policy_hash="sha256:a"
+    )
+    evidence_only = before.differential(moved)
+    assert [change.categories for change in evidence_only.changed] == [("evidence",)]
+    assert evidence_only.predicate_policy_changed is False
+    assert evidence_only.changed[0].caused_by_policy_change is False
+
+    rival = _assertion("meta.managed.governance.owner", "infra", line=3)
+    conflicted = SemanticClaimIndex.from_state(
+        _state((owner, rival)), packet_predicate_policy_hash="sha256:a"
+    )
+    reconciled = before.differential(conflicted)
+    original_id = before.views[0].claim_id
+    changes = [change for change in reconciled.changed if change.claim_id == original_id]
+    assert [change.categories for change in changes] == [("reconciliation",)]
+    assert changes[0].caused_by_policy_change is False
+    assert [view.raw_value for view in reconciled.added] == ["infra"]
+
+
+def test_differential_attributes_interpretation_changes_to_a_policy_change() -> None:
+    state = _state((_assertion("meta.managed.governance.owner", "platform", line=2),))
+    before = SemanticClaimIndex.from_state(state, packet_predicate_policy_hash="sha256:old")
+    recompiled = state.model_copy(
+        update={
+            "semantic_claims": tuple(
+                claim.model_copy(update={"support": "unsupported", "cardinality": "unknown"})
+                for claim in state.semantic_claims
+            )
+        }
+    )
+    after = SemanticClaimIndex.from_state(recompiled, packet_predicate_policy_hash="sha256:new")
+    differential = before.differential(after)
+    assert differential.predicate_policy_changed is True
+    assert differential.before_predicate_policy_hash == "sha256:old"
+    assert differential.after_predicate_policy_hash == "sha256:new"
+    change = differential.changed[0]
+    assert change.categories == ("policy-interpretation",)
+    assert change.changed_fields == ("support", "cardinality")
+    assert change.caused_by_policy_change is True
+    # An unknown policy on either side never claims a policy change.
+    assert (
+        not SemanticClaimIndex.from_state(recompiled).differential(before).predicate_policy_changed
+    )
+
+
+def test_a_conflict_coinciding_with_a_policy_change_is_not_attributed_to_it() -> None:
+    """A rival claim, not the new policy, caused this conflict."""
+    owner = _assertion("meta.managed.governance.owner", "platform", line=2)
+    rival = _assertion("meta.managed.governance.owner", "infra", line=3)
+    before = SemanticClaimIndex.from_state(
+        _state((owner,)), packet_predicate_policy_hash="sha256:old"
+    )
+    after = SemanticClaimIndex.from_state(
+        _state((owner, rival)), packet_predicate_policy_hash="sha256:new"
+    )
+    differential = before.differential(after)
+    assert differential.predicate_policy_changed is True
+    change = next(c for c in differential.changed if c.claim_id == before.views[0].claim_id)
+    assert change.categories == ("reconciliation",)
+    assert change.caused_by_policy_change is False
+
+
+def test_differential_reports_a_projection_change() -> None:
+    dependency = _assertion(
+        "package.dependency", "fastapi", subject="repo:sample", path="pyproject.toml"
+    )
+    state = _state((dependency,))
+    before = SemanticClaimIndex.from_state(state)
+    projected = state.model_copy(
+        update={
+            "semantic_claims": tuple(
+                claim.model_copy(update={"projected": True, "projected_entity_ids": ("edge:x",)})
+                for claim in state.semantic_claims
+            )
+        }
+    )
+    change = before.differential(SemanticClaimIndex.from_state(projected)).changed[0]
+    assert change.categories == ("projection",)
+    assert change.changed_fields == ("projection_status", "projected_entity_ids")
+
+
 @pytest.mark.parametrize(
     "kwargs",
     [
@@ -431,4 +552,15 @@ def test_query_claims_cli_answers_from_a_compiled_bundle(
         run(["query-claims", "--input-bundle", str(bundle), "--compare-bundle", str(bundle)]) == 0
     )
     same = json.loads(capsys.readouterr().out)["differential"]
-    assert same == {"added": [], "removed": [], "changed": []}
+    assert (same["added"], same["removed"], same["changed"]) == ([], [], [])
+    assert same["predicate_policy_changed"] is False
+    assert same["before_predicate_policy_hash"] == same["after_predicate_policy_hash"]
+    assert same["before_predicate_policy_hash"].startswith("sha256:")
+
+    page = ["query-claims", "--input-bundle", str(bundle), "--predicate", "http.route"]
+    assert run([*page, "--limit", "2"]) == 0
+    first = json.loads(capsys.readouterr().out)["result"]
+    assert (first["returned"], first["truncated"]) == (2, True)
+    assert run([*page, "--limit", "2", "--after", first["next_after"]]) == 0
+    second = json.loads(capsys.readouterr().out)["result"]
+    assert (second["returned"], second["truncated"], second["next_after"]) == (1, False, None)
