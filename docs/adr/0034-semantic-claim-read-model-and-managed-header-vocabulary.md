@@ -1,6 +1,6 @@
 # ADR-0034: Semantic claim read model and recognized managed-header vocabulary
 
-**Status:** Accepted (operator instruction, 2026-11-06: execute the L9 Semantic Leverage Architecture Decision Pack, decisions D2 and D3, PR 2)
+**Status:** Accepted as a repository implementation decision (operator instruction, 2026-11-06, PR #42; amended by #46). This is not a formal freeze: the D2 read model implements freeze candidate L9-SEMANTIC-LEVERAGE-FREEZE/1.0, which is architecture-converged and authority-resolution-pending. The managed-header vocabulary (D3) is implemented but **not formally admitted** by a domain authority, and Semantic Foundation v3.27.0 admission remains unresolved.
 
 - **Decision owner:** Repository maintainers
 - **Scope:** `reconciliation/predicates.py` (policy 1.3.0), new `topology/claim_view.py`, `cli.py` (`query-claims`)
@@ -38,6 +38,10 @@ Rejected for now: the view is derivable from data the packet already carries. Ad
 3. **`topology/claim_view.py`** derives a `SemanticClaimView` from each claim and the evidence records it cites: subject kind, raw value, declared value kind, interpretation, definition reference, support, cardinality, authority, confidence, conflict state and ids, assertion ids, evidence refs, source locations, any missing evidence refs, projection status (`projected`, `not-projected`, `not-projectable`), projected entity ids, and the registry identity (`id@version#hash`) it was read under. It is an internal read type: never serialized into a packet, never written, recomputed per read.
 4. `SemanticClaimIndex` answers a bounded, deterministic `ClaimQuery` (subject, subject kind, predicate, whole-segment predicate prefix, value, interpretation, conflict, projection, source path, minimum distinct source locations; limit 1–10,000, truncation reported) and a differential between two snapshots (added, removed, re-read). The differential compares where support was read, not packet-scoped evidence ids.
 5. **`l9-topology query-claims`** exposes both over a compiled bundle, read-only. It reports whether the packet was compiled under the same predicate registry the reading uses (`matches_packet`).
+
+### Amendment (2026-11-06): pagination and categorized differential
+
+Freeze candidate L9-SEMANTIC-LEVERAGE-FREEZE/1.0 (D2) asks for deterministic pagination and a differential that separates kinds of change. `ClaimQuery.after` adds keyset pagination by `claim_id`, and results report `next_after`. Each re-read claim in a differential lists `categories` (`evidence`, `policy-interpretation`, `reconciliation`, `projection`), with logical additions and removals reported separately. Only `policy-interpretation` fields (support, cardinality) are pure functions of predicate and policy. A change in them between two packets with known, different recorded predicate policy hashes is reported as `caused_by_policy_change`. Reconciliation outcomes (authority, confidence, conflict) can change with the data alone, so they are never attributed to a coinciding policy change. The view remains a transient presentation type; nothing is persisted or serialized into a packet. This amendment does not admit the managed-header vocabulary (D3), and it does not resolve the Semantic Foundation admission question.
 
 ## Consequences
 

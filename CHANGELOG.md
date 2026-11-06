@@ -1,5 +1,38 @@
 # Changelog
 
+## Unreleased - claim query pagination and categorized differential (ADR-0034 amendment)
+
+- `ClaimQuery.after` / `query-claims --after` add deterministic keyset
+  pagination ordered by `claim_id`; each page reports `next_after`.
+  `total_matched` still counts every match.
+- The differential keeps the kinds of change apart: logical (added,
+  removed), evidence (`source_locations`), policy-interpretation (support,
+  cardinality: pure functions of predicate and policy), reconciliation
+  (authority, confidence, conflict: data-dependent), and projection. Each
+  re-read claim lists its `categories`. Both packets' recorded predicate
+  policy hashes are reported, and `caused_by_policy_change` is true only for
+  a policy-interpretation change between two known, different policies; a
+  reconciliation change is never attributed to a coinciding policy change.
+- Read-only and derived per read: no packet field, persisted view or second
+  claim model.
+
+## Unreleased - qualified projection and resolution-aware impact (ADR-0035, proposed)
+
+- Claim-level projection eligibility: a claim whose conflict status is
+  possible or confirmed, or which names a conflict, projects no canonical
+  relation in the claim or work projector. Competing `repository.replaced_by`
+  values no longer each produce a `SUPERSEDES` edge. There is no global
+  authority gate; relation-specific requirements stay in each projector.
+- The rule is bound into `policy_hashes.assertion_predicates` (predicate
+  policy 1.4.0, #45; freeze F12).
+- The claim view reports withheld claims with `projection_withheld_reason`.
+- `assess_impact(resolution_aware=True)` / `l9-topology impact
+  --resolution-aware` walks only `DEPENDS_ON` and `BLOCKED_BY`, judges each
+  target by its producer's evidence (an absent `target_resolution` is not
+  resolved), never crosses an unresolved target, and reports such edges in
+  `unresolved_edge_ids`. External package dependencies stay resolved. The
+  default traversal is unchanged.
+
 ## Unreleased - semantic claim read model (ADR-0034)
 
 - Predicate policy 1.3.0 recognizes the 13 producer-owned managed header

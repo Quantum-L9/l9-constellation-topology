@@ -132,6 +132,40 @@ freshness. Its own drift check is `l9-meta-injector check` with the flags in
 `GIT_TREE_MANIFEST.json` is omitted from the index, so the commit-bound
 integrity model above is unaffected.
 
+## Claim read model and qualified impact
+
+This section separates what the code on `main` does from the status of the
+decisions behind it. A merged change is implemented; it is not thereby frozen
+or admitted.
+
+| Item | Status |
+|---|---|
+| Claim read model, `query-claims`, pagination, categorized differential (ADR-0034 and its amendment) | Implemented. Freeze candidate `L9-SEMANTIC-LEVERAGE-FREEZE/1.0` decision D2. |
+| Claim-level projection eligibility; policy 1.4.0 hash binding (ADR-0035) | Implemented. Freeze candidate decision D5a and invariant F12. |
+| Resolution-aware dependency impact (ADR-0035) | Implemented as an opt-in mode. Freeze candidate decision D5b. |
+| Freeze candidate `L9-SEMANTIC-LEVERAGE-FREEZE/1.0` as a whole | Architecture-converged, authority-resolution-pending. Not formally frozen. |
+| 13 producer-managed header predicates (`meta.managed.*`, policy 1.3.0+) | Implemented on `main`. Semantically compatible subject to field-level review. **Not formally admitted** by a domain authority (freeze decision D3 is held). |
+| Semantic Foundation v3.27.0 admission (`l9.artifact-header-model/global@1`, bound `admission: candidate`) | **Unresolved.** Producer-local managed meanings confer no Foundation authority. |
+| Subject identity for packages and document titles (freeze decision D4) | Held; not implemented. |
+
+Two further distinctions hold everywhere:
+
+- **Derived records versus admitted topology.** Every record these commands
+  return is a derived Topology record compiled from source declarations. None
+  is an admitted product topology record, and this repository admits none.
+- **Reachability versus dependency impact.** `impact` answers generic
+  reachability; `impact --resolution-aware` answers qualified dependency
+  impact. They are different questions and stay distinguishable.
+
+Behavioral evidence: `tests/test_claim_view.py`,
+`tests/test_qualified_projection.py` and `tests/test_header_predicates.py`.
+Generated artifacts are covered by the existing drift guard: `make
+generated-check` reads the `foundational-two-repo` golden and
+`HASH_LOCALITY_EVALUATION.json`, which move only in the predicate policy hash
+and its derived identities. The run of record for each change is the
+`validate` CI job on its pull request head; this section records no result of
+its own.
+
 ## Direct compile seam
 
 `.github/workflows/compile.yml` is authorized by ADR-0029 as a bounded, stateless compile
