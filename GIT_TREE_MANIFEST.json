@@ -806,7 +806,7 @@
       "path": "docs/adr/0031-bind-repository-metadata-to-l9-meta-injector.md"
     },
     {
-      "git_object_id": "5b8f271cb69f7c1d6b8c4804789730e6a72ff5ca",
+      "git_object_id": "658980d50f2d8191f02c3957734c37331f39606c",
       "mode": "100644",
       "object_type": "blob",
       "path": "docs/adr/0032-adopt-core-repository-execution-v2.md"
@@ -1256,7 +1256,7 @@
       "path": "evidence/live-qualify-2026-08-02/odoo-e2e-recipes/odoo-etc-e2e/odoo.conf"
     },
     {
-      "git_object_id": "defd0887877178843f3f239d444cf350feb90e00",
+      "git_object_id": "ec69a5bb4b72a78d171e7d1a659f42cc6530cedc",
       "mode": "100644",
       "object_type": "blob",
       "path": "evidence/live-qualify-2026-08-02/run_gate_qualify.py"
@@ -3422,7 +3422,7 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:a8e0becb5726c8ed173d02eef0ed8e89cf234866fb67c020de24bca1570bb165",
+  "entries_sha256": "sha256:8d49a1088a278f21056a04096bcb75fa17fa1f512d687d02037e71a427d86420",
   "entry_count": 570,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
