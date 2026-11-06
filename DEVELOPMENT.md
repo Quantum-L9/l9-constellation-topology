@@ -126,3 +126,6 @@ drill's negative controls are part of the contract, not optional extras.
 - Add tests for every behavioral change.
 - Record architecture changes as ADRs before implementation.
 - Keep generated artifacts synchronized through explicit update commands and read-only drift checks.
+- Expose source-backed claims through the claim read model (`topology/claim_view.py`, `query-claims`) rather than projecting a stronger relation; it is derived per read and never serialized into a packet (ADR-0034).
+- Gate every canonical projection through `projection_ineligibility` in `topology/claim_projection.py`; a new projector keeps its own endpoint rule but never bypasses the shared conflict and authority check (ADR-0035).
+- Changing the predicate registry moves `policy_hashes.assertion_predicates`: run `make generated-update` and review that only the policy hash and derived identities moved.

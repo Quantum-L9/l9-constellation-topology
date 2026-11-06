@@ -132,6 +132,19 @@ freshness. Its own drift check is `l9-meta-injector check` with the flags in
 `GIT_TREE_MANIFEST.json` is omitted from the index, so the commit-bound
 integrity model above is unaffected.
 
+## Claim read model and qualified impact
+
+ADR-0034 adds predicate policy 1.3.0, the claim read model and `query-claims`.
+ADR-0035 adds the shared projection boundary and resolution-aware impact. Their
+behavioral evidence is `tests/test_claim_view.py`,
+`tests/test_qualified_projection.py` and the updated
+`tests/test_header_predicates.py`. Generated artifacts are covered by the
+existing drift guard: `make generated-check` reads the `foundational-two-repo`
+golden and `HASH_LOCALITY_EVALUATION.json`, which move only in the predicate
+policy hash and its derived identities. The run of record for each change is
+the `validate` CI job on its pull request head; this section records no result
+of its own.
+
 ## Direct compile seam
 
 `.github/workflows/compile.yml` is authorized by ADR-0029 as a bounded, stateless compile

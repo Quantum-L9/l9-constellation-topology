@@ -68,6 +68,29 @@ uv run l9-topology verify-determinism \
   --input-bundle tests/fixtures/repository_model_packets/l9-mcp-server
 ```
 
+Query the semantic claims a packet carries, at their evidentiary strength
+(ADR-0034). The command is read-only and bounded; each claim reports its
+interpretation (`declaration`, `auxiliary-observation`, `unresolved-value`,
+`unsupported-field`, `unsupported-predicate`), source locations, conflict state
+and projection status, and whether the packet was compiled under the same
+predicate registry:
+
+```bash
+uv run l9-topology query-claims \
+  --input-bundle outputs/fixture-topology \
+  --predicate-prefix package \
+  --conflict any \
+  --limit 100
+uv run l9-topology query-claims \
+  --input-bundle outputs/fixture-topology \
+  --compare-bundle outputs/other-topology
+```
+
+A declared header value such as `owner` or `injectable` is returned as a
+declaration, never as a verified owner or capability. For dependency impact
+that must not run through unresolved targets, add `--resolution-aware` to
+`impact` (ADR-0035).
+
 Render optional projections from the packet:
 
 ```bash

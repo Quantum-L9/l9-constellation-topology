@@ -109,6 +109,49 @@ uv run l9-topology impact \
   --maximum-depth 5
 ```
 
+`impact` without flags is generic reachability over the traversable edge
+taxonomy, the same reading the compiler stores in `impact_indexes`. Add
+`--resolution-aware` to answer dependency impact instead (ADR-0035): edges whose
+recorded `target_resolution` is `unresolved` or `ambiguous` are not traversed,
+their endpoints are not counted as affected, and their ids are listed in
+`unresolved_edge_ids`. Dependencies on explicitly-labelled external packages are
+still followed.
+
+```bash
+uv run l9-topology impact \
+  --input-bundle outputs/local-run \
+  --entity repo:l9-gate-sdk \
+  --direction upstream \
+  --resolution-aware
+```
+
+## Query semantic claims
+
+`query-claims` is a read-only, bounded view over the packet's semantic claims
+(ADR-0034). Filters narrow and combine: `--subject`, `--subject-kind`,
+`--predicate`, `--predicate-prefix` (whole dot-separated segments), `--value`,
+`--interpretation`, `--conflict {any,none,conflicted}`,
+`--projection {any,projected,unprojected}`, `--source-path`,
+`--minimum-locations N` and `--limit N` (1 to 10000; truncation is reported).
+
+```bash
+uv run l9-topology query-claims \
+  --input-bundle outputs/local-run \
+  --predicate meta.managed.classification.injectable \
+  --value true
+uv run l9-topology query-claims \
+  --input-bundle outputs/local-run \
+  --conflict conflicted
+```
+
+`--compare-bundle <bundle>` reports logical claims added, removed and re-read
+between two packets instead. A claim whose projection the boundary refused (a
+conflict, or `candidate`/`unknown` authority) reads `projection_status:
+withheld` with `projection_withheld_reason`. When `interpretation_policy.
+matches_packet` is `false`, the packet was compiled under a different predicate
+registry than the one reading it; recompile before relying on the
+interpretation.
+
 ## Build a signed control packet
 
 Prepare a typed payload JSON, then:
