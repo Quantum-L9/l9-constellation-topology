@@ -147,6 +147,15 @@ MARKER_EXEMPTIONS = {
     ".github/workflows/l9-pr-validate.yml": ("no-stub policy",),
     "CHANGELOG.md": ("no-stub", "placeholder bodies"),
     "RUNBOOK.md": ("no-stub gate",),
+    # GitHub issue forms seeded from Quantum-L9/.github. `placeholder:` is the
+    # issue-form attribute GitHub renders as example input text, so the word
+    # names a UI hint, not unfinished work. Only lines carrying that attribute
+    # are exempt; any other marker in these files is still reported. Owner: the
+    # org template seed; remove an entry when its form no longer uses
+    # `placeholder:`.
+    ".github/ISSUE_TEMPLATE/3-task.yml": ("placeholder: ",),
+    ".github/ISSUE_TEMPLATE/4-incident.yml": ("placeholder: ",),
+    ".github/ISSUE_TEMPLATE/ci-failure.yml": ("placeholder: ",),
 }
 MANIFEST_ENTRY_RE = re.compile(r"^- `([^`]+)`\s+—\s+[^\r\n]+")
 

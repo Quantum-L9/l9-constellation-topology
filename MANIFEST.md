@@ -11,10 +11,19 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `.editorconfig` — editor encoding, indentation, and whitespace policy
 - `.env.example` — documented worker and control-plane environment variables
 - `.gitattributes` — Git text normalization and binary-file policy
+- `.github/CODEOWNERS` — code-owner review routing seeded from Quantum-L9/.github
+- `.github/ISSUE_TEMPLATE/1-bug.yml` — organization issue form for bug reports, seeded from Quantum-L9/.github
+- `.github/ISSUE_TEMPLATE/2-feature.yml` — organization issue form for feature requests, seeded from Quantum-L9/.github
+- `.github/ISSUE_TEMPLATE/3-task.yml` — organization issue form for tasks, seeded from Quantum-L9/.github
+- `.github/ISSUE_TEMPLATE/4-incident.yml` — organization issue form for incidents, seeded from Quantum-L9/.github
 - `.github/ISSUE_TEMPLATE/architecture_change.yml` — structured GitHub issue intake contract
 - `.github/ISSUE_TEMPLATE/bug_report.yml` — structured GitHub issue intake contract
+- `.github/ISSUE_TEMPLATE/ci-failure.yml` — organization issue form for CI failures, seeded from Quantum-L9/.github
 - `.github/ISSUE_TEMPLATE/config.yml` — structured GitHub issue intake contract
+- `.github/ISSUE_TEMPLATE/gov-violation.yml` — organization issue form for governance violations, seeded from Quantum-L9/.github
 - `.github/PULL_REQUEST_TEMPLATE.md` — pull-request evidence and architecture checklist
+- `.github/PULL_REQUEST_TEMPLATE/release.md` — organization release pull-request template, seeded from Quantum-L9/.github
+- `.github/dependabot.yml` — Dependabot update configuration seeded from Quantum-L9/.github
 - `.github/governance/execution-profiles.yaml` — governed analysis execution-profile definitions
 - `.github/governance/promotion-policy.yaml` — governed analysis finding-promotion policy
 - `.github/governance/provider-requiredness.yaml` — governed analysis provider-requiredness policy
@@ -23,6 +32,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `.github/governance/semgrep-identity-map.yaml` — governed analysis semgrep rule identity resolution map
 - `.github/governance/semgrep-policy.yaml` — governed analysis semgrep provider policy
 - `.github/governance/waivers.yaml` — governed analysis finding-waiver ledger
+- `.github/pull_request_template.md` — organization pull-request template, seeded from Quantum-L9/.github
 - `.github/workflows/compile.yml` — reusable direct compile seam that compiles, validates, and optionally publishes and accepts a Topology Packet in GHCR (ADR-0029)
 - `.github/workflows/l9-ingress.yml` — immutable-pinned GitHub Actions workflow
 - `.github/workflows/l9-manual-replay.yml` — immutable-pinned GitHub Actions workflow
