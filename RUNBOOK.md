@@ -109,6 +109,72 @@ uv run l9-topology impact \
   --maximum-depth 5
 ```
 
+`impact` without flags answers **generic reachability**: which entities are
+connected over the traversable edge taxonomy. It is the reading the compiler
+stores in `impact_indexes`, and it does not by itself prove an operational
+dependency.
+
+`--resolution-aware` answers **qualified dependency impact** instead (ADR-0035):
+
+- only `DEPENDS_ON` and `BLOCKED_BY` are walked; passing any other
+  `--edge-type` is refused;
+- each target is judged by the producer that emitted the edge: a work
+  relation resolved to `exact-artifact`, a manifest dependency on an
+  explicitly-labelled external package, or a repository dependency whose
+  target the packet observed. Anything else, including an edge with no
+  recorded `target_resolution`, is unresolved;
+- unresolved and ambiguous targets are never crossed and never counted as
+  affected; their edge ids are listed in `unresolved_edge_ids`.
+
+```bash
+uv run l9-topology impact \
+  --input-bundle outputs/local-run \
+  --entity repo:l9-gate-sdk \
+  --direction upstream \
+  --resolution-aware
+```
+
+## Query semantic claims
+
+`query-claims` is a read-only, bounded view over the packet's semantic claims
+(ADR-0034). Filters narrow and combine: `--subject`, `--subject-kind`,
+`--predicate`, `--predicate-prefix` (whole dot-separated segments), `--value`,
+`--interpretation`, `--conflict {any,none,conflicted}`,
+`--projection {any,projected,unprojected}`, `--source-path`,
+`--minimum-locations N` and `--limit N` (1 to 10000). Results are ordered by
+`claim_id`. When `truncated` is true, pass `next_after` as `--after` to read
+the next page; `total_matched` always counts every match.
+
+```bash
+uv run l9-topology query-claims \
+  --input-bundle outputs/local-run \
+  --predicate meta.managed.classification.injectable \
+  --value true
+uv run l9-topology query-claims \
+  --input-bundle outputs/local-run \
+  --conflict conflicted
+```
+
+`--compare-bundle <bundle>` reports a differential instead:
+
+- logical claims `added` and `removed`;
+- for each re-read claim, `categories`:
+  - `evidence`: where its support was read;
+  - `policy-interpretation`: support and cardinality;
+  - `reconciliation`: authority, confidence and conflict;
+  - `projection`: projection status and projected entities.
+
+The differential also reports both packets' recorded predicate policy hashes.
+`caused_by_policy_change` is true only for a `policy-interpretation` change
+between two known, different policies; a reconciliation change is never
+attributed to a coinciding policy change.
+
+A claim whose projection the boundary refused because it is conflicted reads
+`projection_status: withheld` with `projection_withheld_reason: conflicted`.
+When `interpretation_policy.matches_packet` is `false`, the packet was compiled
+under a different predicate registry than the one reading it; recompile before
+relying on the interpretation.
+
 ## Build a signed control packet
 
 Prepare a typed payload JSON, then:
