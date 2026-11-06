@@ -24,8 +24,7 @@
   values no longer each produce a `SUPERSEDES` edge. There is no global
   authority gate; relation-specific requirements stay in each projector.
 - The rule is bound into `policy_hashes.assertion_predicates` (predicate
-  policy 1.4.0) by the stacked binding pull request, which merges together
-  with this one (freeze F12, file-scope invariant ADR-0052).
+  policy 1.4.0, #45; freeze F12).
 - The claim view reports withheld claims with `projection_withheld_reason`.
 - `assess_impact(resolution_aware=True)` / `l9-topology impact
   --resolution-aware` walks only `DEPENDS_ON` and `BLOCKED_BY`, judges each

@@ -1,6 +1,6 @@
 # ADR-0034: Semantic claim read model and recognized managed-header vocabulary
 
-**Status:** Accepted (operator instruction, 2026-11-06: execute the L9 Semantic Leverage Architecture Decision Pack, decisions D2 and D3, PR 2)
+**Status:** Accepted as a repository implementation decision (operator instruction, 2026-11-06, PR #42; amended by #46). This is not a formal freeze: the D2 read model implements freeze candidate L9-SEMANTIC-LEVERAGE-FREEZE/1.0, which is architecture-converged and authority-resolution-pending. The managed-header vocabulary (D3) is implemented but **not formally admitted** by a domain authority, and Semantic Foundation v3.27.0 admission remains unresolved.
 
 - **Decision owner:** Repository maintainers
 - **Scope:** `reconciliation/predicates.py` (policy 1.3.0), new `topology/claim_view.py`, `cli.py` (`query-claims`)

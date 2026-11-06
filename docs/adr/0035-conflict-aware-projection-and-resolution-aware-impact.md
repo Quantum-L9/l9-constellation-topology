@@ -1,6 +1,6 @@
 # ADR-0035: Conflict-aware canonical projection and resolution-aware impact
 
-**Status:** Accepted (operator instruction, 2026-11-06: execute the L9 Semantic Leverage Architecture Decision Pack, decision D5, PR 3)
+**Status:** Accepted as a repository implementation decision (operator instruction, 2026-11-06; revised per operator Option 2 to freeze candidate L9-SEMANTIC-LEVERAGE-FREEZE/1.0 D5a/D5b/F12, PRs #43 and #45). This is not a formal freeze: the candidate is architecture-converged and authority-resolution-pending.
 
 - **Decision owner:** Repository maintainers
 - **Scope:** `topology/claim_projection.py`, `topology/work_projection.py`, `topology/impact.py`, `topology/claim_view.py`, `cli.py` (`impact --resolution-aware`)
@@ -37,7 +37,7 @@ Rejected for now: the compiler's own impact stage and every existing caller rely
    - its conflict status is in `PROJECTION_WITHHELD_CONFLICT_STATUSES` (`possible`, `confirmed`), or it names a conflict id (`conflicted`).
 
    The rule compares the existing `ConflictStatus` enum, never strings. It is not a global authority gate. Relation-specific authority and endpoint identity requirements stay inside each projector, and an unconflicted claim projects exactly as before this decision.
-2. **Policy identity (freeze F12).** The rule is part of the predicate registry's policy view (`projection_eligibility`), and the registry moves to 1.4.0. Under the file-scope invariant (ADR-0052) the binding lands in a pull request stacked on this one, and the two merge together. That view is hashed into `TopologyPacket.policy_hashes["assertion_predicates"]` and into the compile idempotency key. A packet realized under a different rule therefore cannot share an identity. No packet field or schema changes.
+2. **Policy identity (freeze F12).** The rule is part of the predicate registry's policy view (`projection_eligibility`), and the registry moves to 1.4.0. The binding landed in #45, stacked on #43 under the file-scope invariant (ADR-0052), and merged into #43 before #43 reached `main`. That view is hashed into `TopologyPacket.policy_hashes["assertion_predicates"]` and into the compile idempotency key. A packet realized under a different rule therefore cannot share an identity. No packet field or schema changes.
 3. A conflicting claim stays a claim and a conflict record. The claim view reports it as `projection_status: withheld` with `projection_withheld_reason: conflicted`.
 4. **Resolved dependency impact (D5b)** is an explicit opt-in mode: `assess_impact(..., resolution_aware=True, observed_entity_ids=...)`, or `l9-topology impact --resolution-aware`. The default reachability traversal is unchanged.
    - It walks only `DEPENDENCY_EDGE_TYPES` (`DEPENDS_ON`, `BLOCKED_BY`). A caller-supplied edge set outside that set is refused.
