@@ -21,6 +21,7 @@ from l9_constellation_topology.packets.repository_model import (
     AssertionSourceRange,
     RepositoryModelAssertion,
 )
+from l9_constellation_topology.reconciliation import predicate_policy_hash, predicate_policy_view
 from l9_constellation_topology.topology.claim_projection import (
     eligible_for_canonical_projection,
     project_claims,
@@ -124,6 +125,39 @@ def test_no_global_authority_gate_sits_at_the_projection_boundary() -> None:
     edges = project_claims(state.semantic_claims).edges
     assert [edge.target_id for edge in edges] == ["package:fastapi"]
     assert edges[0].confidence.authority == claim.authority
+
+
+def test_the_conflict_rule_is_bound_into_the_predicate_policy_hash() -> None:
+    """F12: changing which conflict states withhold projection moves packet identity."""
+    import l9_constellation_topology.reconciliation.predicates as predicates
+
+    view = predicate_policy_view()
+    assert view["version"] == "1.4.0"
+    assert view["projection_eligibility"] == {
+        "decided_at": "individual-claim",
+        "withheld_conflict_statuses": ["confirmed", "possible"],
+        "withheld_when_conflict_ids_present": True,
+        "relation_authority": "decided-inside-each-projector",
+    }
+    before = predicate_policy_hash()
+    original = predicates.PROJECTION_WITHHELD_CONFLICT_STATUSES
+    try:
+        predicates.PROJECTION_WITHHELD_CONFLICT_STATUSES = frozenset({ConflictStatus.confirmed})
+        assert predicate_policy_hash() != before
+    finally:
+        predicates.PROJECTION_WITHHELD_CONFLICT_STATUSES = original
+    assert predicate_policy_hash() == before
+
+
+def test_compiled_packets_carry_the_bound_projection_policy() -> None:
+    from datetime import UTC, datetime
+
+    from l9_constellation_topology.compiler import compile_topology
+
+    result = compile_topology(ROOT, (SAMPLE,), created_at=datetime(2026, 7, 21, tzinfo=UTC))
+    assert result.materialized.packet.policy_hashes["assertion_predicates"] == (
+        predicate_policy_hash()
+    )
 
 
 def test_declaration_only_predicates_report_their_own_reason() -> None:

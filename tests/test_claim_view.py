@@ -166,7 +166,7 @@ def test_interpretation_keeps_the_five_readings_apart(predicate: str, interpreta
 
 def test_the_policy_view_names_the_managed_vocabulary_as_its_own_authority() -> None:
     view = predicate_policy_view()
-    assert view["version"] == "1.3.0"
+    assert view["version"] == "1.4.0"
     managed = view["managed_header_semantics"]
     assert isinstance(managed, dict)
     assert managed["vocabulary"] == MANAGED_HEADER_VOCABULARY
