@@ -331,6 +331,10 @@ def cmd_impact(args: argparse.Namespace) -> int:
         edge_types={EdgeType(value) for value in args.edge_type} if args.edge_type else None,
         minimum_confidence=ConfidenceLevel(args.minimum_confidence),
         resolution_aware=args.resolution_aware,
+        observed_entity_ids=frozenset(
+            record.repository_id for record in materialized.state.repository_records
+        )
+        | frozenset(record.artifact_id for record in materialized.state.artifact_records),
     )
     _print_json(result)
     return 0
@@ -349,6 +353,7 @@ def _claim_query(args: argparse.Namespace) -> ClaimQuery:
         source_path=args.source_path,
         minimum_locations=args.minimum_locations,
         limit=args.limit,
+        after=args.after,
     )
 
 
@@ -371,7 +376,10 @@ def cmd_query_claims(args: argparse.Namespace) -> int:
     """
     query = _claim_query(args)
     materialized, _ = load_topology_bundle(Path(args.input_bundle))
-    index = SemanticClaimIndex.from_state(materialized.state)
+    index = SemanticClaimIndex.from_state(
+        materialized.state,
+        packet_predicate_policy_hash=materialized.packet.policy_hashes.get("assertion_predicates"),
+    )
     policy_ref = interpretation_policy_ref()
     current_hash = policy_ref.rsplit("#", 1)[1]
     before = _packet_policy(materialized)
@@ -385,7 +393,12 @@ def cmd_query_claims(args: argparse.Namespace) -> int:
     }
     if args.compare_bundle:
         later_materialized, _ = load_topology_bundle(Path(args.compare_bundle))
-        later = SemanticClaimIndex.from_state(later_materialized.state)
+        later = SemanticClaimIndex.from_state(
+            later_materialized.state,
+            packet_predicate_policy_hash=later_materialized.packet.policy_hashes.get(
+                "assertion_predicates"
+            ),
+        )
         after = _packet_policy(later_materialized)
         output["before"] = before
         output["after"] = after
@@ -675,8 +688,9 @@ def build_parser() -> argparse.ArgumentParser:
         "--resolution-aware",
         action="store_true",
         help=(
-            "Answer dependency impact: do not traverse edges whose target is unresolved "
-            "or ambiguous, and report them in unresolved_edge_ids"
+            "Answer resolved dependency impact: walk only DEPENDS_ON and BLOCKED_BY, "
+            "judge each target by its producer's evidence, never cross an unresolved "
+            "or ambiguous target, and report such edges in unresolved_edge_ids"
         ),
     )
     impact_parser.set_defaults(handler=cmd_impact)
@@ -711,6 +725,9 @@ def build_parser() -> argparse.ArgumentParser:
     claims_parser.add_argument("--source-path")
     claims_parser.add_argument("--minimum-locations", type=int, default=0)
     claims_parser.add_argument("--limit", type=int, default=DEFAULT_QUERY_LIMIT)
+    claims_parser.add_argument(
+        "--after", help="Return the page after this claim_id (the previous page's next_after)"
+    )
     claims_parser.set_defaults(handler=cmd_query_claims)
 
     inspect_parser = commands.add_parser(

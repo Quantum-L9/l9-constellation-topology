@@ -253,7 +253,7 @@ def project_work_relations(
     for claim in sorted(claims, key=lambda item: item.claim_id):
         projection = _WORK_EDGE_PROJECTIONS.get(claim.predicate)
         # The shared projection-boundary decision (ADR-0035) applies here too:
-        # a conflicted or under-authorized work claim stays a claim.
+        # a conflicted work claim stays a claim.
         if projection is None or not eligible_for_canonical_projection(claim):
             continue
         edge_type, reverse = projection
