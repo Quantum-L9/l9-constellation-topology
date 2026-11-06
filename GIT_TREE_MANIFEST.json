@@ -3398,7 +3398,7 @@
       "path": "tests/test_workflow_contracts_v5.py"
     },
     {
-      "git_object_id": "9d2c4472e37fe823ee291422bec923fdcb807f8f",
+      "git_object_id": "48781af98a7c37b184539c223e2e0f9a176e8d78",
       "mode": "100644",
       "object_type": "blob",
       "path": "uv.lock"
@@ -3422,7 +3422,7 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:92baaa2073934c0a72edb0a9b83fe5c7a7067c68bb7438cc1fd542cb5a12e469",
+  "entries_sha256": "sha256:4354d10a773fce02255e9fd83c61f88b01f1f95813ae3cdff6c7afaf7c3bf5ae",
   "entry_count": 570,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
