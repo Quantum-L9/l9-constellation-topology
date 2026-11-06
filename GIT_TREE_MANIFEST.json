@@ -2972,7 +2972,7 @@
       "path": "tests/test_bridge_gap_renderer.py"
     },
     {
-      "git_object_id": "e0a45bcf224072039a8d094ab6a5bcdb166d4eb6",
+      "git_object_id": "9af27f1dc5e035dbe26a1c828d0d0d6f62df007e",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_claim_view.py"
@@ -3362,7 +3362,7 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:a142aa7297f59b04210044b47ac785494f211446ffa3a075fdc5e10a46c64f19",
+  "entries_sha256": "sha256:520e85b692f7ec24bb6ef110117b9f3c535d6c6cc1baa455808e94a03e51ec8e",
   "entry_count": 560,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
