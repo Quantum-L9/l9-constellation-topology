@@ -135,6 +135,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `docs/adr/0031-bind-repository-metadata-to-l9-meta-injector.md` — accepted architecture decision record
 - `docs/adr/0032-adopt-core-repository-execution-v2.md` — accepted architecture decision record
 - `docs/adr/0033-register-governed-header-predicates-as-declaration-only.md` — accepted architecture decision record
+- `docs/adr/0034-semantic-claim-read-model-and-managed-header-vocabulary.md` — accepted architecture decision record
 - `docs/adr/README.md` — ADR directory governance and navigation
 - `docs/architecture.md` — architecture, contract, deployment, recovery, or model documentation
 - `docs/archive/v4/01_SPEC_ATTACK.md` — superseded v4 historical artifact retained for migration evidence
@@ -372,6 +373,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `src/l9_constellation_topology/topology/candidates.py` — production Python package implementation
 - `src/l9_constellation_topology/topology/capability_builder.py` — production Python package implementation
 - `src/l9_constellation_topology/topology/claim_projection.py` — production Python package implementation
+- `src/l9_constellation_topology/topology/claim_view.py` — read-only semantic claim view, bounded claim query and snapshot differential (ADR-0034)
 - `src/l9_constellation_topology/topology/classifier.py` — production Python package implementation
 - `src/l9_constellation_topology/topology/corpus_model.py` — production Python package implementation
 - `src/l9_constellation_topology/topology/duplicates.py` — production Python package implementation
@@ -501,6 +503,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `tests/test_assessments_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_bridge_gap_projection.py` — bridge-gap lifecycle, intent, closure, and determinism regression tests
 - `tests/test_bridge_gap_renderer.py` — bridge-gap report and report-manifest integration tests
+- `tests/test_claim_view.py` — managed header vocabulary registration, semantic claim view, query and differential tests (ADR-0034)
 - `tests/test_cli_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_confirmed_findings_remediation.py` — adversarial regression tests for every confirmed audit finding
 - `tests/test_conflict_cardinality.py` — unit, contract, integration, regression, or governance test

@@ -70,7 +70,22 @@ PREDICATE_POLICY_ID = "l9-topology-assertion-predicates"
 #: carrier and schema claims are ``auxiliary``. None of them may project: the
 #: ledger's projection boundary admits no canonical relation from a header
 #: (ADR-0033).
-PREDICATE_POLICY_VERSION = "1.2.0"
+#:
+#: 1.3.0 (ADR-0034) recognizes the producer-owned managed header vocabulary and
+#: the producer's field-observation grammar. ``meta.managed.<category>.<field>``
+#: takes its meaning from the l9-meta-injector managed header (declared schema
+#: ``managed:l9-meta-injector``), not from the Foundation ledger: it is a
+#: separate namespace with a separate authority class, and recognizing it admits
+#: nothing as canonical. Every managed field the producer defines is scalar, so
+#: each reconciles as ``single`` and competing declarations stay conflicts. Only
+#: the fields the producer defines are registered; a future managed field stays
+#: ``unsupported`` until this registry declares it. The field-observation
+#: predicates (``meta.<ns>.unresolved_field``, ``meta.<ns>.unsupported_field``,
+#: ``meta.unversioned.field``) state that a key was declared without a usable
+#: value or without a governed meaning; they are ``auxiliary``, and
+#: :func:`predicate_interpretation` keeps them distinguishable from recognized
+#: declarations.
+PREDICATE_POLICY_VERSION = "1.3.0"
 
 #: The ledger every header predicate below takes its meaning from.
 HEADER_SEMANTICS_LEDGER = "l9.artifact-header-model/global@1"
@@ -146,11 +161,87 @@ def _header_declarations() -> dict[str, dict[str, str]]:
 #: class, authority, projection eligibility, conflict and unknown behavior.
 HEADER_DECLARATION_PREDICATES: dict[str, dict[str, str]] = _header_declarations()
 
+#: The producer-owned vocabulary every managed header predicate takes its meaning
+#: from: the managed ``l9:meta`` header l9-meta-injector writes and reads back.
+MANAGED_HEADER_VOCABULARY = "l9-meta-injector:managed-header"
+
+#: Declared schema the producer records on every managed declaration.
+MANAGED_DECLARED_SCHEMA = "managed:l9-meta-injector"
+
+#: ``(field, category, value_kind)`` exactly as the producer's managed vocabulary
+#: (``MANAGED_VOCABULARY`` in ``src/extractors/native_metadata.ts``) categorizes
+#: them, with the value kind its ``BaseHeader`` / ``ArtifactMeta`` types declare
+#: (``src/schema.ts``). Every one is scalar.
+MANAGED_HEADER_FIELDS: tuple[tuple[str, str, str], ...] = (
+    ("id", "identity", "label"),
+    ("title", "identity", "text"),
+    ("namespace", "identity", "label"),
+    ("source_path", "identity", "path"),
+    ("artifact_type", "classification", "label"),
+    ("family", "classification", "label"),
+    ("mcp_primitive", "classification", "label"),
+    ("callable", "classification", "boolean"),
+    ("retrievable", "classification", "boolean"),
+    ("injectable", "classification", "boolean"),
+    ("authority", "governance", "label"),
+    ("owner", "governance", "label"),
+    ("sharing_scope", "governance", "label"),
+)
+
+
+def _managed_declarations() -> dict[str, dict[str, str]]:
+    return {
+        f"meta.managed.{category}.{field}": {
+            "definition": f"{MANAGED_HEADER_VOCABULARY}#fields.{field}",
+            "subject_scope": "artifact",
+            "object_type": value_kind,
+            "cardinality": "single",
+            "support": "single",
+            "authority": (
+                "producer-declared source claim; the producer's own vocabulary, not "
+                "Foundation-governed; grants no ownership, identity, capability or "
+                "canonical status"
+            ),
+            "projection": "none",
+            "conflict": "preserve-all-and-conflict",
+            "unknown": "unresolved-or-out-of-vocabulary-fields-arrive-as-other-predicates",
+        }
+        for field, category, value_kind in MANAGED_HEADER_FIELDS
+    }
+
+
+#: Every managed header predicate the producer defines, with the same nine
+#: declaration properties a governed header predicate carries.
+MANAGED_DECLARATION_PREDICATES: dict[str, dict[str, str]] = _managed_declarations()
+
+#: Field-observation namespaces: the governed schemas plus the managed header.
+FIELD_OBSERVATION_NAMESPACES: tuple[str, ...] = (*HEADER_SCHEMA_NAMESPACES, "managed")
+
+#: A key declared with an Unknown, empty or null value: the source explicitly
+#: did not establish a value. Object is the key.
+UNRESOLVED_FIELD_PREDICATES: frozenset[str] = frozenset(
+    f"meta.{namespace}.unresolved_field" for namespace in FIELD_OBSERVATION_NAMESPACES
+)
+
+#: A key the producer could read but holds no meaning for: outside the schema's
+#: vocabulary, or declared under an absent or unrecognized schema. Object is the key.
+UNSUPPORTED_FIELD_PREDICATES: frozenset[str] = frozenset(
+    f"meta.{namespace}.unsupported_field" for namespace in FIELD_OBSERVATION_NAMESPACES
+) | {"meta.unversioned.field"}
+
+#: Field-observation predicates: recognized, multi-valued, never projected.
+FIELD_OBSERVATION_PREDICATES: frozenset[str] = (
+    UNRESOLVED_FIELD_PREDICATES | UNSUPPORTED_FIELD_PREDICATES
+)
+
 #: Predicates that are recognized for reconciliation but may never project,
 #: whatever their cardinality. ``is_projectable`` refuses them before the
 #: projection table is ever consulted.
 DECLARATION_ONLY_PREDICATES: frozenset[str] = (
-    frozenset(HEADER_DECLARATION_PREDICATES) | HEADER_STRUCTURE_PREDICATES
+    frozenset(HEADER_DECLARATION_PREDICATES)
+    | frozenset(MANAGED_DECLARATION_PREDICATES)
+    | HEADER_STRUCTURE_PREDICATES
+    | FIELD_OBSERVATION_PREDICATES
 )
 
 #: Predicates whose objects are simultaneously true. These aggregate.
@@ -186,34 +277,42 @@ SET_VALUED_PREDICATES: frozenset[str] = frozenset(
 )
 
 #: Predicates admitting at most one true object. Divergence here is a conflict.
-SINGLE_VALUED_PREDICATES: frozenset[str] = frozenset(
-    {
-        "authority.canonical_contract_count",
-        "package.build_backend",
-        "package.framework",
-        "package.name",
-        "package.packaging_system",
-        "package.python_constraint",
-        "package.server",
-        "package.version",
-        "repository.replaced_by",
-        "repository.status",
-        "service.name",
-        "service.version",
-        # A document has one title, is in one state, and is one kind of thing at
-        # a time. Two answers to any of these is a real contradiction: a plan
-        # declaring both `WIP` and `Complete` is the finding, and aggregating the
-        # two into a set would report it as two facts and lose it.
-        "document.title",
-        "work.status",
-        "work.kind",
-    }
-) | frozenset(
-    # Governed scalar header fields (1.2.0): one declared value per file, so a
-    # second, different declaration is a conflict and no winner is chosen.
-    predicate
-    for predicate, declaration in HEADER_DECLARATION_PREDICATES.items()
-    if declaration["cardinality"] == "single"
+SINGLE_VALUED_PREDICATES: frozenset[str] = (
+    frozenset(
+        {
+            "authority.canonical_contract_count",
+            "package.build_backend",
+            "package.framework",
+            "package.name",
+            "package.packaging_system",
+            "package.python_constraint",
+            "package.server",
+            "package.version",
+            "repository.replaced_by",
+            "repository.status",
+            "service.name",
+            "service.version",
+            # A document has one title, is in one state, and is one kind of thing at
+            # a time. Two answers to any of these is a real contradiction: a plan
+            # declaring both `WIP` and `Complete` is the finding, and aggregating the
+            # two into a set would report it as two facts and lose it.
+            "document.title",
+            "work.status",
+            "work.kind",
+        }
+    )
+    | frozenset(
+        # Governed scalar header fields (1.2.0): one declared value per file, so a
+        # second, different declaration is a conflict and no winner is chosen.
+        predicate
+        for predicate, declaration in HEADER_DECLARATION_PREDICATES.items()
+        if declaration["cardinality"] == "single"
+    )
+    | frozenset(
+        # Producer-owned managed header fields (1.3.0): each is scalar in the
+        # producer's schema, so a second, different declaration is a conflict.
+        MANAGED_DECLARATION_PREDICATES
+    )
 )
 
 #: Recognized multi-valued predicates that deliberately project to nothing.
@@ -225,6 +324,7 @@ AUXILIARY_PREDICATES: frozenset[str] = (
         }
     )
     | HEADER_STRUCTURE_PREDICATES
+    | FIELD_OBSERVATION_PREDICATES
 )
 
 _CLASSIFIED = (SET_VALUED_PREDICATES, SINGLE_VALUED_PREDICATES, AUXILIARY_PREDICATES)
@@ -259,6 +359,51 @@ def predicate_support(predicate: str) -> PredicateSupport:
     if predicate in AUXILIARY_PREDICATES:
         return "auxiliary"
     return "unsupported"
+
+
+#: How a consumer should read a claim, finer than its reconciliation support.
+#: Conflict state is orthogonal and lives on the claim, not here.
+PredicateInterpretation = Literal[
+    "declaration",
+    "auxiliary-observation",
+    "unresolved-value",
+    "unsupported-field",
+    "unsupported-predicate",
+]
+
+
+def predicate_interpretation(predicate: str) -> PredicateInterpretation:
+    """Return what a claim under ``predicate`` establishes, for a reader.
+
+    ``declaration``
+        A recognized statement with declared meaning and cardinality.
+    ``auxiliary-observation``
+        Recognized evidence that carries no topology relation.
+    ``unresolved-value``
+        The source declared a key and explicitly established no value for it.
+    ``unsupported-field``
+        The source declared a key the producer holds no meaning for.
+    ``unsupported-predicate``
+        This registry has no rule for the predicate at all.
+    """
+    if predicate in UNRESOLVED_FIELD_PREDICATES:
+        return "unresolved-value"
+    if predicate in UNSUPPORTED_FIELD_PREDICATES:
+        return "unsupported-field"
+    support = predicate_support(predicate)
+    if support == "unsupported":
+        return "unsupported-predicate"
+    if support == "auxiliary":
+        return "auxiliary-observation"
+    return "declaration"
+
+
+def predicate_definition(predicate: str) -> str | None:
+    """Return the vocabulary reference a predicate's meaning comes from, if declared."""
+    declaration = HEADER_DECLARATION_PREDICATES.get(
+        predicate
+    ) or MANAGED_DECLARATION_PREDICATES.get(predicate)
+    return declaration["definition"] if declaration is not None else None
 
 
 def predicate_cardinality(predicate: str) -> Cardinality:
@@ -304,6 +449,18 @@ def predicate_policy_view() -> dict[str, object]:
                 predicate: HEADER_DECLARATION_PREDICATES[predicate]
                 for predicate in sorted(HEADER_DECLARATION_PREDICATES)
             },
+        },
+        "managed_header_semantics": {
+            "vocabulary": MANAGED_HEADER_VOCABULARY,
+            "declared_schema": MANAGED_DECLARED_SCHEMA,
+            "declarations": {
+                predicate: MANAGED_DECLARATION_PREDICATES[predicate]
+                for predicate in sorted(MANAGED_DECLARATION_PREDICATES)
+            },
+        },
+        "field_observation_predicates": {
+            "unresolved_value": sorted(UNRESOLVED_FIELD_PREDICATES),
+            "unsupported_field": sorted(UNSUPPORTED_FIELD_PREDICATES),
         },
         "unsupported_predicate_behavior": "preserve-claim-evidence-and-emit-diagnostic",
     }
