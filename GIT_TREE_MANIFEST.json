@@ -236,7 +236,7 @@
       "path": "BUILD_SPECIFICATION.md"
     },
     {
-      "git_object_id": "78ee54729b59861551f5d53de6ed04546478f761",
+      "git_object_id": "d2fd8939012328d6b33e1fe19e9ddecb75f428d2",
       "mode": "100644",
       "object_type": "blob",
       "path": "CHANGELOG.md"
@@ -764,7 +764,7 @@
       "path": "docs/adr/0034-semantic-claim-read-model-and-managed-header-vocabulary.md"
     },
     {
-      "git_object_id": "89378b9ba4e5d5b23f33e8c8cfdfa0886158e575",
+      "git_object_id": "b7f98684b18bbf011646209a2697f7d8621d3fe9",
       "mode": "100644",
       "object_type": "blob",
       "path": "docs/adr/0035-conflict-aware-projection-and-resolution-aware-impact.md"
@@ -1436,7 +1436,7 @@
       "path": "src/l9_constellation_topology/cardinality.py"
     },
     {
-      "git_object_id": "179c39d39cf364c1028a2f5c93e607e95174621d",
+      "git_object_id": "845fbd5b2fed94e963ef790930a8bd526cd57678",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/cli.py"
@@ -2186,13 +2186,13 @@
       "path": "src/l9_constellation_topology/topology/capability_builder.py"
     },
     {
-      "git_object_id": "a765395aa1570167f653deab10dcce24c80c1b14",
+      "git_object_id": "85a55974332864c171a0954feee75100b3a068c7",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/topology/claim_projection.py"
     },
     {
-      "git_object_id": "300b8f0792d674d71fe486babf428f51d38d63f1",
+      "git_object_id": "9a1b7b6e4a73cf10ff82da0d79d1088cfa5b9be1",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/topology/claim_view.py"
@@ -2228,7 +2228,7 @@
       "path": "src/l9_constellation_topology/topology/graph_builder.py"
     },
     {
-      "git_object_id": "af7f8326c8be27ae8571743716d488170a54500a",
+      "git_object_id": "eefca6937e1968edc8201d4b080814ebb4b9ab4e",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/topology/impact.py"
@@ -2258,7 +2258,7 @@
       "path": "src/l9_constellation_topology/topology/risk.py"
     },
     {
-      "git_object_id": "4be35363b921cbbb277b9149d6da2c1ade8e8866",
+      "git_object_id": "4fbe447efc93377dadd9584980025d22f73d16d0",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/topology/work_projection.py"
@@ -3206,7 +3206,7 @@
       "path": "tests/test_publication_temporal.py"
     },
     {
-      "git_object_id": "54fdfcf393e29433a352cd3125c15b0f0fe52cfe",
+      "git_object_id": "9e5f4f3601f93f5333d5925ecfb06b9770b4b1d2",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_qualified_projection.py"
@@ -3362,7 +3362,7 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:50d6c6e53de0c47ce3dc6686bdb849b78a304b0a748fcf06edb5fefd5ca1df3d",
+  "entries_sha256": "sha256:e7cdc1ba37adc6a4da0c613dc7836a650f2e4c5a203ab4caaac4337536bed79f",
   "entry_count": 560,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
