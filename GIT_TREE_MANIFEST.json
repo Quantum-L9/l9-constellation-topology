@@ -818,13 +818,13 @@
       "path": "docs/adr/0033-register-governed-header-predicates-as-declaration-only.md"
     },
     {
-      "git_object_id": "ab92308be2c1760fe723915caa87556a46f676e9",
+      "git_object_id": "8fb2450d832502e4744a15e4e6acbe63e2764dbc",
       "mode": "100644",
       "object_type": "blob",
       "path": "docs/adr/0034-semantic-claim-read-model-and-managed-header-vocabulary.md"
     },
     {
-      "git_object_id": "29333addcbf441e9c1c5273612eb116b79659f3e",
+      "git_object_id": "55a7266470029d35537614f4641190cfe9eb708f",
       "mode": "100644",
       "object_type": "blob",
       "path": "docs/adr/0035-conflict-aware-projection-and-resolution-aware-impact.md"
@@ -3422,7 +3422,7 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:41f56ebebfcbc392fec8cc70b08bb2836d6695f6d2b073221b12f25799c632fb",
+  "entries_sha256": "sha256:b0734f87c4151bff2ee6a6f00e3ed81ecd5d3ee8140dbaddc992f23b465ba81a",
   "entry_count": 570,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
