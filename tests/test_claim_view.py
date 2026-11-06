@@ -35,6 +35,7 @@ from l9_constellation_topology.reconciliation import (
     predicate_policy_view,
     predicate_support,
 )
+from l9_constellation_topology.run.evidence import PdfLocator
 from l9_constellation_topology.stages.reconcile_assertions import run as reconcile_assertions
 from l9_constellation_topology.topology.claim_projection import project_claims
 from l9_constellation_topology.topology.claim_view import (
@@ -298,6 +299,43 @@ def test_corroboration_counts_distinct_source_locations() -> None:
     index = SemanticClaimIndex.from_state(state)
     assert index.query(ClaimQuery(minimum_locations=2)).total_matched == 1
     assert index.query(ClaimQuery(minimum_locations=3)).total_matched == 0
+
+
+def test_corroboration_distinguishes_structured_locators_without_lines() -> None:
+    """Two pages of one PDF are two places, though neither has a line number."""
+    state = _state(
+        (
+            _assertion("meta.managed.governance.owner", "platform", path="docs/plan.pdf", line=1),
+            _assertion("meta.managed.governance.owner", "platform", path="docs/plan.pdf", line=2),
+        )
+    )
+    claim = state.semantic_claims[0]
+    evidence = {
+        record.evidence_id: record.model_copy(
+            update={
+                "source_ref": record.source_ref.model_copy(
+                    update={
+                        "line_number": None,
+                        "locator": PdfLocator(page_number=page, block_index=0),
+                    }
+                )
+            }
+        )
+        for page, record in enumerate(state.evidence, start=1)
+    }
+    index = SemanticClaimIndex([claim_view(claim, evidence)])
+    assert index.query(ClaimQuery(minimum_locations=2)).total_matched == 1
+    assert index.query(ClaimQuery(minimum_locations=3)).total_matched == 0
+
+
+def test_differential_reports_a_confidence_only_re_reading() -> None:
+    owner = _assertion("meta.managed.governance.owner", "platform", line=2)
+    before = SemanticClaimIndex.from_state(_state((owner,)))
+    after = SemanticClaimIndex.from_state(
+        _state((owner.model_copy(update={"confidence": "high"}),))
+    )
+    changes = before.differential(after).changed
+    assert [change.changed_fields for change in changes] == [("confidence",)]
 
 
 def test_the_view_is_pure_and_reports_missing_evidence() -> None:

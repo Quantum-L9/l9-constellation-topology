@@ -57,13 +57,13 @@ Rejected for now: the view is derivable from data the packet already carries. Ad
   - a declared owner is retrievable with its source location and projects nothing (Case D);
   - injectable artifacts are discoverable with their evidence, and declared classification projects nothing (pack section 12);
   - filters narrow deterministically, prefixes match whole segments, and truncation is reported;
-  - corroboration counts distinct source locations;
+  - corroboration counts distinct source locations, including structured locators that carry no line number;
   - the view is pure and reports missing evidence;
-  - the differential reports added, removed and re-read claims;
+  - the differential reports added, removed and re-read claims, including a confidence-only change;
   - queries are bounded;
   - `query-claims` answers from a compiled bundle and compares a bundle with itself as unchanged.
 - `tests/test_header_predicates.py` now holds the three field-observation predicates as recognized auxiliary observations with no unknown, conflict or projection. Predicates with no rule still raise an unknown and a diagnostic.
-- `make fixtures-check` and `make hash-locality` pass after `make generated-update`; only the predicate policy hash and identities derived from it moved.
+- Generated artifacts are refreshed with `make generated-update` and checked with `make generated-check`. The reviewed diff of the `foundational-two-repo` golden and `HASH_LOCALITY_EVALUATION.json` moves only the predicate policy hash and identities derived from it. The captured run of record is the `validate` CI job on the head of the pull request that introduces this ADR; this document asserts no result of its own.
 
 ## Related artifacts
 
