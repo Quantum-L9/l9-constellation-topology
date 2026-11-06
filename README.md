@@ -87,9 +87,17 @@ uv run l9-topology query-claims \
 ```
 
 A declared header value such as `owner` or `injectable` is returned as a
-declaration, never as a verified owner or capability. For dependency impact
-that must not run through unresolved targets, add `--resolution-aware` to
-`impact` (ADR-0035).
+declaration, never as a verified owner or capability. Results page with
+`--limit` and `--after` (the previous page's `next_after`).
+
+`impact` without flags answers generic reachability. `impact --resolution-aware`
+answers qualified dependency impact instead (ADR-0035): only `DEPENDS_ON` and
+`BLOCKED_BY`, each target judged by its producer's evidence, and unresolved
+targets reported rather than crossed. See `RUNBOOK.md`.
+
+Every record these commands return is a derived Topology record. None is an
+admitted product topology record, and this repository admits none. The status
+of the decisions behind these commands is in `VALIDATION.md`.
 
 Render optional projections from the packet:
 
