@@ -340,16 +340,16 @@ def cmd_impact(args: argparse.Namespace) -> int:
         )
         | frozenset(record.artifact_id for record in materialized.state.artifact_records),
     )
-    if not args.resolution_aware:
+    if args.resolution_aware:
+        # Opt-in dependency impact is a different interpretation of the same graph
+        # (ADR-0035 decision 4), so its output names the interpretation that produced
+        # it. Presentation only: ImpactIndex and the stored impact_indexes are unchanged.
+        _print_json(
+            {"interpretation": RESOLUTION_AWARE_IMPACT_INTERPRETATION, **canonical_data(result)}
+        )
+    else:
         # Generic reachability: the bare ImpactIndex, byte-identical to before.
         _print_json(result)
-        return 0
-    # Opt-in dependency impact is a different interpretation of the same graph
-    # (ADR-0035 decision 4), so its output names the interpretation that produced
-    # it. Presentation only: ImpactIndex and the stored impact_indexes are unchanged.
-    _print_json(
-        {"interpretation": RESOLUTION_AWARE_IMPACT_INTERPRETATION, **canonical_data(result)}
-    )
     return 0
 
 
