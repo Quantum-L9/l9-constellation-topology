@@ -85,6 +85,7 @@ async def live_execute(action: str, payload: dict[str, Any]) -> dict[str, Any]:
     )
     body = packet.model_dump(mode="json")
     async with httpx.AsyncClient(timeout=60) as client:
+        # nosemgrep: gateclient-bypass-execute -- sealed 2026-08-02 evidence harness, never delivered or run by CI; it posts to Gate itself as the external originator, and rewriting it would break the provenance of the evidence it produced (ADR-0032)
         r = await client.post(f"{GATE_URL}/v1/execute", json=body)
         return {
             "http_status": r.status_code,

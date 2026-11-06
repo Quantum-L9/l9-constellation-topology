@@ -35,6 +35,9 @@ from l9_constellation_topology.domain.assessment import UnknownRecord
 from l9_constellation_topology.domain.claim import SemanticClaimRecord
 from l9_constellation_topology.domain.edge import Direction, EdgeRecord, EdgeType, GraphRecord
 from l9_constellation_topology.run.evidence import stable_id
+from l9_constellation_topology.topology.claim_projection import (
+    eligible_for_canonical_projection,
+)
 
 #: Prefix for a target a document named that this compile could not resolve to a
 #: single observed artifact. Deliberately not ``artifact:``: the whole point is
@@ -249,7 +252,9 @@ def project_work_relations(
 
     for claim in sorted(claims, key=lambda item: item.claim_id):
         projection = _WORK_EDGE_PROJECTIONS.get(claim.predicate)
-        if projection is None:
+        # The shared projection-boundary decision (ADR-0035) applies here too:
+        # a conflicted work claim stays a claim.
+        if projection is None or not eligible_for_canonical_projection(claim):
             continue
         edge_type, reverse = projection
         resolved, matches = index.resolve(claim.object)

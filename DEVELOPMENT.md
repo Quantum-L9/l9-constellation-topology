@@ -22,7 +22,7 @@ uv sync --frozen --extra dev
 ## Fast loop
 
 ```bash
-make test
+make unit
 make contracts
 make generated-check
 make architecture
@@ -47,16 +47,28 @@ After regeneration:
 1. Review every changed schema, packet, receipt, and manifest.
 2. Run `make generated-check` again.
 3. Run targeted tests for the changed generator or model.
-4. Run `make validate`.
+4. Run the full gate: `make setup validate check test`.
 5. Synchronize `MANIFEST.md`, `FINAL_TREE.md`, traceability records, validation evidence, and the commit-bound `GIT_TREE_MANIFEST.json` from the final staged tree.
 
 Do not use an update target inside validation or CI. Validation must detect drift without mutating tracked files.
 
 ## Full loop
 
+The root `Makefile` is the generated make-v1 facade from `Quantum-L9/l9-ci-core`
+(ADR-0032): never edit it by hand. Repository targets live in `Repo.mk`. The four
+phases together run the whole gate:
+
 ```bash
-make validate
+make setup validate check test
 ```
+
+`make validate`, `make check` and `make test` each run one phase. Plain pytest is
+`make unit`.
+
+`make setup` enforces uv 0.10.0 by version, not presence: when `uv` reports another
+version it installs the pin with pip, and it fails if `uv` still does not report
+0.10.0. To keep a different uv on `PATH`, point the gate at a pinned binary, for
+example `make setup validate check test UV=/path/to/uv-0.10.0`.
 
 ## Repository metadata
 
@@ -114,3 +126,7 @@ drill's negative controls are part of the contract, not optional extras.
 - Add tests for every behavioral change.
 - Record architecture changes as ADRs before implementation.
 - Keep generated artifacts synchronized through explicit update commands and read-only drift checks.
+- Expose source-backed claims through the claim read model (`topology/claim_view.py`, `query-claims`) rather than projecting a stronger relation; it is derived per read and never serialized into a packet (ADR-0034).
+- Gate every canonical projection through `projection_ineligibility` in `topology/claim_projection.py`, which withholds conflicted claims. A new projector keeps its own endpoint and authority rules inside the projector; there is no global authority gate (ADR-0035).
+- A new producer of `DEPENDS_ON` or `BLOCKED_BY` edges must give resolution-aware impact positive evidence for its targets (a recorded `target_resolution`, an explicit external endpoint kind, or an observed target). Without it, its edges are unresolved by design.
+- Changing the predicate registry, including the projection eligibility rule, moves `policy_hashes.assertion_predicates`: run `make generated-update` and review that only the policy hash and derived identities moved.

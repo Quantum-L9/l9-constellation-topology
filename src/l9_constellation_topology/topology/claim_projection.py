@@ -27,11 +27,15 @@ that turns ``package.framework`` into a service role, and no rule that equates
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from typing import Literal
 
 from l9_constellation_topology.domain.capability import CapabilityRecord
 from l9_constellation_topology.domain.claim import SemanticClaimRecord
 from l9_constellation_topology.domain.edge import Direction, EdgeRecord, EdgeType, GraphRecord
-from l9_constellation_topology.reconciliation import is_projectable
+from l9_constellation_topology.reconciliation import (
+    PROJECTION_WITHHELD_CONFLICT_STATUSES,
+    is_projectable,
+)
 from l9_constellation_topology.run.evidence import stable_id
 
 #: Prefix for a package identity named by a dependency claim. Deliberately not
@@ -49,6 +53,43 @@ CONTRACT_REFERENCE_PREFIX = "contract-reference"
 #: Prefixes for capabilities projected from claims.
 SERVICE_ACTION_PREFIX = "capability:service-action"
 HTTP_ROUTE_PREFIX = "capability:http-route"
+
+
+#: Why a claim did not qualify for canonical projection (ADR-0035).
+ProjectionIneligibility = Literal[
+    "predicate-not-projectable",
+    "conflicted",
+]
+
+
+def projection_ineligibility(claim: SemanticClaimRecord) -> ProjectionIneligibility | None:
+    """Return why ``claim`` may not project a canonical relation, or ``None``.
+
+    The claim-level projection-boundary decision every projector consults
+    (ADR-0035), before any projector-specific rule:
+
+    * the registry must permit projection for the predicate;
+    * the claim must carry no conflict, possible or confirmed, and name no
+      conflict id (``PROJECTION_WITHHELD_CONFLICT_STATUSES``, bound into the
+      predicate policy hash, freeze F12). A conflicting claim stays a claim and a conflict
+      record; a relation whose truth depends on choosing one competing value is
+      never emitted for any of them, and no value is elected.
+
+    This is deliberately *not* a global authority gate. Relation-specific
+    authority and endpoint identity requirements stay inside each projector:
+    an external package identity is a legitimate, explicitly-labelled endpoint
+    (Case H), and an unresolved work reference stays a labelled reference node.
+    """
+    if not is_projectable(claim.predicate):
+        return "predicate-not-projectable"
+    if claim.conflict_status in PROJECTION_WITHHELD_CONFLICT_STATUSES or claim.conflict_ids:
+        return "conflicted"
+    return None
+
+
+def eligible_for_canonical_projection(claim: SemanticClaimRecord) -> bool:
+    """Return whether ``claim`` passes the shared projection-boundary decision."""
+    return projection_ineligibility(claim) is None
 
 
 @dataclass(frozen=True)
@@ -267,8 +308,9 @@ def project_claims(claims: tuple[SemanticClaimRecord, ...]) -> ClaimProjection:
     for claim in sorted(claims, key=lambda item: item.claim_id):
         projector = _PROJECTORS.get(claim.predicate)
         # Auxiliary and unsupported predicates never project, even if a mapping
-        # were added by mistake: the registry is the gate, not this table.
-        if projector is None or not is_projectable(claim.predicate):
+        # were added by mistake: the registry is the gate, not this table. A
+        # conflicted claim never projects either (ADR-0035).
+        if projector is None or not eligible_for_canonical_projection(claim):
             continue
         claim_capabilities, claim_edges, claim_nodes = projector(claim)
         capabilities.extend(claim_capabilities)

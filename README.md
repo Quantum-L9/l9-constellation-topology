@@ -68,6 +68,37 @@ uv run l9-topology verify-determinism \
   --input-bundle tests/fixtures/repository_model_packets/l9-mcp-server
 ```
 
+Query the semantic claims a packet carries, at their evidentiary strength
+(ADR-0034). The command is read-only and bounded; each claim reports its
+interpretation (`declaration`, `auxiliary-observation`, `unresolved-value`,
+`unsupported-field`, `unsupported-predicate`), source locations, conflict state
+and projection status, and whether the packet was compiled under the same
+predicate registry:
+
+```bash
+uv run l9-topology query-claims \
+  --input-bundle outputs/fixture-topology \
+  --predicate-prefix package \
+  --conflict any \
+  --limit 100
+uv run l9-topology query-claims \
+  --input-bundle outputs/fixture-topology \
+  --compare-bundle outputs/other-topology
+```
+
+A declared header value such as `owner` or `injectable` is returned as a
+declaration, never as a verified owner or capability. Results page with
+`--limit` and `--after` (the previous page's `next_after`).
+
+`impact` without flags answers generic reachability. `impact --resolution-aware`
+answers qualified dependency impact instead (ADR-0035): only `DEPENDS_ON` and
+`BLOCKED_BY`, each target judged by its producer's evidence, and unresolved
+targets reported rather than crossed. See `RUNBOOK.md`.
+
+Every record these commands return is a derived Topology record. None is an
+admitted product topology record, and this repository admits none. The status
+of the decisions behind these commands is in `VALIDATION.md`.
+
 Render optional projections from the packet:
 
 ```bash
@@ -210,7 +241,7 @@ make fixtures-update
 make generated-update
 ```
 
-Review every generated diff, then rerun `make generated-check` and the full validation ladder. `make validate` includes the schema drift gate (`schemas-check`) and fails when a checked-in schema is missing or stale. Fixture packet drift is verified on demand with `make fixtures-check` (or `make generated-check`), which is kept out of `make validate` because fixture packets embed a wall-clock timestamp and the live repository revision; it becomes gate-eligible once fixture generation is deterministic.
+Review every generated diff, then rerun `make generated-check` and the full validation ladder (`make setup validate check test`, ADR-0032). The `validate` phase includes the schema drift gate (`schemas-check`) and fails when a checked-in schema is missing or stale. Fixture packet drift is verified on demand with `make fixtures-check` (or `make generated-check`), which is kept out of `make validate` because fixture packets embed a wall-clock timestamp and the live repository revision; it becomes gate-eligible once fixture generation is deterministic.
 
 ## Repository metadata
 

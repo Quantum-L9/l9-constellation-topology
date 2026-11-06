@@ -37,6 +37,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `.l9/packet-profile.yaml` — versioned compiler, policy, packet, output, or pipeline profile
 - `.l9/pipeline.yaml` — versioned compiler, policy, packet, output, or pipeline profile
 - `.l9/publication-policy.yaml` — versioned compiler, policy, packet, output, or pipeline profile
+- `.l9/repo-workflow.json` — Core repository execution V2 contract: `make-v1` facade, four required phases (ADR-0032)
 - `.l9/report-profile.yaml` — versioned compiler, policy, packet, output, or pipeline profile
 - `.l9/risk-profile.yaml` — versioned compiler, policy, packet, output, or pipeline profile
 - `.l9/topology-profile.yaml` — versioned compiler, policy, packet, output, or pipeline profile
@@ -64,7 +65,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `LICENSE` — proprietary repository license terms
 - `MAINTAINERS.md` — maintainer roles and ownership responsibilities
 - `MANIFEST.md` — complete delivery inventory and responsibility map
-- `Makefile` — canonical local validation and build command surface
+- `Makefile` — generated make-v1 repository execution facade from Quantum-L9/l9-ci-core; never hand-edited (ADR-0032)
 - `NOTICE.md` — third-party and generated-artifact notice
 - `QUALIFICATION.json` — governance, policy, or release documentation
 - `README.md` — repository overview and operator entrypoint
@@ -72,6 +73,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `RELEASING.md` — versioning, validation, build, and release procedure
 - `ROADMAP.md` — evidence-gated integration and deployment roadmap
 - `RUNBOOK.md` — operator execution, validation, and recovery procedures
+- `Repo.mk` — repository-owned execution implementation: the command surface and the make-v1 phase leaves (ADR-0032)
 - `SECURITY.md` — security reporting and implementation controls
 - `SPECIFICATION.md` — concise governing specification summary
 - `STUB_TODO_THIN_FILE_AUDIT.md` — no-incomplete-implementation audit evidence
@@ -131,6 +133,10 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `docs/adr/0029-authorize-a-bounded-github-native-direct-compile-seam.md` — accepted architecture decision record
 - `docs/adr/0030-accept-corpus-intelligence-v1-1-domains-not-run.md` — accepted architecture decision record
 - `docs/adr/0031-bind-repository-metadata-to-l9-meta-injector.md` — accepted architecture decision record
+- `docs/adr/0032-adopt-core-repository-execution-v2.md` — accepted architecture decision record
+- `docs/adr/0033-register-governed-header-predicates-as-declaration-only.md` — accepted architecture decision record
+- `docs/adr/0034-semantic-claim-read-model-and-managed-header-vocabulary.md` — accepted architecture decision record
+- `docs/adr/0035-conflict-aware-projection-and-resolution-aware-impact.md` — accepted architecture decision record
 - `docs/adr/README.md` — ADR directory governance and navigation
 - `docs/architecture.md` — architecture, contract, deployment, recovery, or model documentation
 - `docs/archive/v4/01_SPEC_ATTACK.md` — superseded v4 historical artifact retained for migration evidence
@@ -368,6 +374,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `src/l9_constellation_topology/topology/candidates.py` — production Python package implementation
 - `src/l9_constellation_topology/topology/capability_builder.py` — production Python package implementation
 - `src/l9_constellation_topology/topology/claim_projection.py` — production Python package implementation
+- `src/l9_constellation_topology/topology/claim_view.py` — read-only semantic claim view, bounded claim query and snapshot differential (ADR-0034)
 - `src/l9_constellation_topology/topology/classifier.py` — production Python package implementation
 - `src/l9_constellation_topology/topology/corpus_model.py` — production Python package implementation
 - `src/l9_constellation_topology/topology/duplicates.py` — production Python package implementation
@@ -497,6 +504,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `tests/test_assessments_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_bridge_gap_projection.py` — bridge-gap lifecycle, intent, closure, and determinism regression tests
 - `tests/test_bridge_gap_renderer.py` — bridge-gap report and report-manifest integration tests
+- `tests/test_claim_view.py` — managed header vocabulary registration, semantic claim view, query and differential tests (ADR-0034)
 - `tests/test_cli_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_confirmed_findings_remediation.py` — adversarial regression tests for every confirmed audit finding
 - `tests/test_conflict_cardinality.py` — unit, contract, integration, regression, or governance test
@@ -516,6 +524,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `tests/test_git_integrity.py` — Git path, mode, object-type, and blob-identity regression tests
 - `tests/test_graph_builder.py` — unit, contract, integration, regression, or governance test
 - `tests/test_hash_locality.py` — unit, contract, integration, regression, or governance test
+- `tests/test_header_predicates.py` — governed native-header predicate registry, reconciliation and projection-gate tests (ADR-0033)
 - `tests/test_impact.py` — unit, contract, integration, regression, or governance test
 - `tests/test_maturity.py` — unit, contract, integration, regression, or governance test
 - `tests/test_meta_generation_adapter.py` — automated regression and contract test suite
@@ -533,6 +542,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `tests/test_publication_plan_identity.py` — automated regression and contract test suite
 - `tests/test_publication_planning.py` — unit, contract, integration, regression, or governance test
 - `tests/test_publication_temporal.py` — proves observation time and publication time stay distinct coordinates
+- `tests/test_qualified_projection.py` — conflict-aware projection eligibility and resolution-aware impact tests (ADR-0035)
 - `tests/test_reasoning_router.py` — automated regression and contract test suite
 - `tests/test_oci_acceptance_drill_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_release_readiness.py` — unit, contract, integration, regression, or governance test
@@ -540,6 +550,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `tests/test_repo_scanner.py` — unit, contract, integration, regression, or governance test
 - `tests/test_report_projection_v5.py` — unit, contract, integration, regression, or governance test
 - `tests/test_repository_aggregation_v5.py` — unit, contract, integration, regression, or governance test
+- `tests/test_repository_execution.py` — Core repository execution V2 contract, facade, phase-leaf and former-gate coverage tests (ADR-0032)
 - `tests/test_repository_governance.py` — unit, contract, integration, regression, or governance test
 - `tests/test_repository_model_assertions.py` — unit, contract, integration, regression, or governance test
 - `tests/test_repository_model_readiness.py` — unit, contract, integration, regression, or governance test

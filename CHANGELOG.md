@@ -1,5 +1,91 @@
 # Changelog
 
+## Unreleased - claim query pagination and categorized differential (ADR-0034 amendment)
+
+- `ClaimQuery.after` / `query-claims --after` add deterministic keyset
+  pagination ordered by `claim_id`; each page reports `next_after`.
+  `total_matched` still counts every match.
+- The differential keeps the kinds of change apart: logical (added,
+  removed), evidence (`source_locations`), policy-interpretation (support,
+  cardinality: pure functions of predicate and policy), reconciliation
+  (authority, confidence, conflict: data-dependent), and projection. Each
+  re-read claim lists its `categories`. Both packets' recorded predicate
+  policy hashes are reported, and `caused_by_policy_change` is true only for
+  a policy-interpretation change between two known, different policies; a
+  reconciliation change is never attributed to a coinciding policy change.
+- Read-only and derived per read: no packet field, persisted view or second
+  claim model.
+
+## Unreleased - qualified projection and resolution-aware impact (ADR-0035, proposed)
+
+- Claim-level projection eligibility: a claim whose conflict status is
+  possible or confirmed, or which names a conflict, projects no canonical
+  relation in the claim or work projector. Competing `repository.replaced_by`
+  values no longer each produce a `SUPERSEDES` edge. There is no global
+  authority gate; relation-specific requirements stay in each projector.
+- The rule is bound into `policy_hashes.assertion_predicates` (predicate
+  policy 1.4.0, #45; freeze F12).
+- The claim view reports withheld claims with `projection_withheld_reason`.
+- `assess_impact(resolution_aware=True)` / `l9-topology impact
+  --resolution-aware` walks only `DEPENDS_ON` and `BLOCKED_BY`, judges each
+  target by its producer's evidence (an absent `target_resolution` is not
+  resolved), never crosses an unresolved target, and reports such edges in
+  `unresolved_edge_ids`. External package dependencies stay resolved. The
+  default traversal is unchanged.
+
+## Unreleased - semantic claim read model (ADR-0034)
+
+- Predicate policy 1.3.0 recognizes the 13 producer-owned managed header
+  fields (`meta.managed.<category>.<field>`, declared schema
+  `managed:l9-meta-injector`) as `single`, declaration-only claims whose meaning
+  comes from the producer's vocabulary, not the Foundation ledger. A managed
+  field the producer does not define stays `unsupported`. The producer's
+  field-observation predicates (`unresolved_field`, `unsupported_field`,
+  `unversioned.field`) are `auxiliary`.
+- `predicate_interpretation()` separates declarations, auxiliary observations,
+  unresolved values, unsupported fields and unsupported predicates.
+- New read model `topology/claim_view.py` and read-only CLI
+  `l9-topology query-claims`: bounded, deterministic claim queries with
+  evidence locations, interpretation, conflict and projection state, plus a
+  differential between two bundles. No packet field, edge type or projection
+  changes.
+- The `foundational-two-repo` golden and `HASH_LOCALITY_EVALUATION.json` change
+  only in the predicate policy hash and the identities derived from it.
+
+## Unreleased - governed native-header predicates (ADR-0033)
+
+- Predicate policy 1.2.0 registers the 60 native `L9_META` header predicates
+  whose meaning `l9.artifact-header-model/global@1` (Quantum-L9/.github
+  v3.27.0) governs: list fields as `set`, scalar fields as `single`, the carrier
+  and schema claims as `auxiliary`. Every one is declaration-only:
+  `is_projectable` refuses it, so no ownership, governance, dependency or
+  capability edge comes from a header. Fields without a governed meaning stay
+  `unsupported`.
+- The `foundational-two-repo` golden changes only in its predicate policy hash
+  and derived identities.
+
+## Unreleased - Core repository execution V2 (ADR-0032)
+
+- Added `.l9/repo-workflow.json` (`l9.repo-execution/v2`, `make-v1`). The root
+  `Makefile` is now Core's byte-identical `make-v1` facade, and `Repo.mk` holds
+  this repository's targets plus the `repo-setup`/`repo-validate`/`repo-check`/
+  `repo-test` phase leaves. This unblocks `Analyze (central Core)` repository
+  verification (issue #40).
+- `make validate` and `make test` now run single phases. The full gate is
+  `make setup validate check test`, which runs exactly the former
+  `make validate` command set. Plain pytest is `make unit`.
+- `.l9/runtime/` (Core's verification staging directory) is gitignored, and the
+  release-readiness scan skips it. Core stages its SDK source and venv there
+  before `make validate`, which the scan otherwise reported as 1653 blocking
+  findings.
+- `make setup` enforces the uv 0.10.0 pin by version: a different uv on `PATH`
+  is replaced by the pin, and setup fails if `UV` still does not report it.
+- The sealed 2026-08-02 live-qualify harness
+  (`evidence/live-qualify-2026-08-02/run_gate_qualify.py`) carries an inline
+  `nosemgrep: gateclient-bypass-execute` with its rationale. Core's Semgrep gate
+  blocks on it, and rewriting the harness would break the provenance of the
+  evidence it produced.
+
 ## Unreleased - repository metadata from l9-meta-injector
 
 - Added `.l9/meta-authority.yaml` (`l9.meta-authority/v1`, `central_manifest`
