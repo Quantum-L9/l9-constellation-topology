@@ -15,15 +15,9 @@ import pytest
 from l9_constellation_topology.cli import run
 from l9_constellation_topology.domain.confidence import ConflictStatus
 from l9_constellation_topology.domain.topology import TopologyState
-from l9_constellation_topology.packets.assertion_evidence import (
-    assertion_evidence_record,
-    assertion_semantic_inputs,
-)
 from l9_constellation_topology.packets.repository_model import (
     AssertionSourceRange,
     RepositoryModelAssertion,
-    RepositoryModelPacket,
-    RepositoryModelPayload,
 )
 from l9_constellation_topology.reconciliation import (
     DECLARATION_ONLY_PREDICATES,
@@ -35,7 +29,6 @@ from l9_constellation_topology.reconciliation import (
     predicate_policy_view,
     predicate_support,
 )
-from l9_constellation_topology.stages.reconcile_assertions import run as reconcile_assertions
 from l9_constellation_topology.topology.claim_projection import project_claims
 from l9_constellation_topology.topology.claim_view import (
     MAXIMUM_QUERY_LIMIT,
@@ -45,6 +38,7 @@ from l9_constellation_topology.topology.claim_view import (
     interpretation_policy_ref,
     subject_kind,
 )
+from tests.claim_fixtures import reconciled_state
 
 ROOT = Path(__file__).resolve().parents[1]
 SAMPLE = ROOT / "tests/fixtures/repository_model_packets/l9-assertion-sample"
@@ -96,25 +90,7 @@ def _assertion(
 
 
 def _state(assertions: tuple[RepositoryModelAssertion, ...]) -> TopologyState:
-    packet = RepositoryModelPacket(
-        packet_version="1.1.0",
-        packet_id="packet:fixture",
-        subject={"repository_id": "repo:sample"},
-        source_snapshot={"revision": "git:" + "0" * 40, "semantic_hash": "sha256:" + "b" * 64},
-        validation={"status": "passed"},
-        producer={"name": "fixture-producer", "version": "1.0.0"},
-        profile={"id": "p", "version": "1.0.0", "hash": "sha256:" + "c" * 64},
-        schema_hash="sha256:" + "d" * 64,
-        semantic_hash="sha256:" + "e" * 64,
-        payload=RepositoryModelPayload(assertions=assertions),
-    )
-    evidence = tuple(assertion_evidence_record(a, packet=packet) for a in assertions)
-    claims, conflicts, unknowns, _ = reconcile_assertions(
-        assertion_semantic_inputs(assertions), evidence
-    )
-    return TopologyState(
-        semantic_claims=claims, evidence=evidence, conflicts=conflicts, unknowns=unknowns
-    )
+    return reconciled_state(assertions)
 
 
 # ── D3: the managed vocabulary is recognized, conservatively ────────────────────
