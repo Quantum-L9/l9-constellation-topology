@@ -418,7 +418,7 @@ def test_keyset_pagination_walks_every_match_exactly_once() -> None:
     assert resumed.next_after == seen[5]
 
 
-def test_differential_separates_evidence_and_interpretation() -> None:
+def test_differential_separates_evidence_and_reconciliation() -> None:
     owner = _assertion("meta.managed.governance.owner", "platform", line=2)
     before = SemanticClaimIndex.from_state(
         _state((owner,)), packet_predicate_policy_hash="sha256:a"
@@ -432,7 +432,7 @@ def test_differential_separates_evidence_and_interpretation() -> None:
     evidence_only = before.differential(moved)
     assert [change.categories for change in evidence_only.changed] == [("evidence",)]
     assert evidence_only.predicate_policy_changed is False
-    assert evidence_only.changed[0].interpretation_under_changed_policy is False
+    assert evidence_only.changed[0].caused_by_policy_change is False
 
     rival = _assertion("meta.managed.governance.owner", "infra", line=3)
     conflicted = SemanticClaimIndex.from_state(
@@ -441,8 +441,8 @@ def test_differential_separates_evidence_and_interpretation() -> None:
     reconciled = before.differential(conflicted)
     original_id = before.views[0].claim_id
     changes = [change for change in reconciled.changed if change.claim_id == original_id]
-    assert [change.categories for change in changes] == [("interpretation",)]
-    assert changes[0].interpretation_under_changed_policy is False
+    assert [change.categories for change in changes] == [("reconciliation",)]
+    assert changes[0].caused_by_policy_change is False
     assert [view.raw_value for view in reconciled.added] == ["infra"]
 
 
@@ -463,13 +463,30 @@ def test_differential_attributes_interpretation_changes_to_a_policy_change() -> 
     assert differential.before_predicate_policy_hash == "sha256:old"
     assert differential.after_predicate_policy_hash == "sha256:new"
     change = differential.changed[0]
-    assert change.categories == ("interpretation",)
+    assert change.categories == ("policy-interpretation",)
     assert change.changed_fields == ("support", "cardinality")
-    assert change.interpretation_under_changed_policy is True
+    assert change.caused_by_policy_change is True
     # An unknown policy on either side never claims a policy change.
     assert (
         not SemanticClaimIndex.from_state(recompiled).differential(before).predicate_policy_changed
     )
+
+
+def test_a_conflict_coinciding_with_a_policy_change_is_not_attributed_to_it() -> None:
+    """A rival claim, not the new policy, caused this conflict."""
+    owner = _assertion("meta.managed.governance.owner", "platform", line=2)
+    rival = _assertion("meta.managed.governance.owner", "infra", line=3)
+    before = SemanticClaimIndex.from_state(
+        _state((owner,)), packet_predicate_policy_hash="sha256:old"
+    )
+    after = SemanticClaimIndex.from_state(
+        _state((owner, rival)), packet_predicate_policy_hash="sha256:new"
+    )
+    differential = before.differential(after)
+    assert differential.predicate_policy_changed is True
+    change = next(c for c in differential.changed if c.claim_id == before.views[0].claim_id)
+    assert change.categories == ("reconciliation",)
+    assert change.caused_by_policy_change is False
 
 
 def test_differential_reports_a_projection_change() -> None:

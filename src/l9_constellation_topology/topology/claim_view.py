@@ -330,9 +330,16 @@ class ClaimQueryResult(FrozenModel):
 
 
 #: What kind of difference a re-read claim shows between two snapshots. A claim
-#: added or removed is the fourth kind, a *logical* change, and is reported in
+#: added or removed is the *logical* kind and is reported in
 #: ``ClaimDifferential.added`` / ``removed`` rather than here.
-ChangeCategory = Literal["evidence", "interpretation", "projection"]
+#:
+#: ``policy-interpretation`` holds only fields that are a pure function of the
+#: predicate and the predicate policy (support, cardinality); for one claim they
+#: can change only when the policy did. ``reconciliation`` holds what
+#: reconciliation concluded from the evidence and the other claims (authority,
+#: confidence, conflict); those can change with the data alone, so they are
+#: never attributed to a policy change, even when one coincides.
+ChangeCategory = Literal["evidence", "policy-interpretation", "reconciliation", "projection"]
 
 
 class ClaimChange(FrozenModel):
@@ -344,20 +351,20 @@ class ClaimChange(FrozenModel):
     changed_fields: tuple[str, ...]
     #: Which kinds of difference ``changed_fields`` fall into, in fixed order.
     categories: tuple[ChangeCategory, ...]
-    #: True when this claim's interpretation changed *and* the two packets were
-    #: compiled under different predicate policies, so the change is attributable
-    #: to policy. False for an interpretation change under one policy (for
-    #: example a conflict that appeared because another claim did).
-    interpretation_under_changed_policy: bool = False
+    #: True only when a ``policy-interpretation`` field changed *and* both packets'
+    #: recorded predicate policies are known and differ: the one case where the
+    #: change is demonstrably caused by policy. A ``reconciliation`` change is
+    #: never attributed, even when it coincides with a policy change.
+    caused_by_policy_change: bool = False
 
 
 class ClaimDifferential(FrozenModel):
     """Logical claims added, removed and re-read between two packet snapshots.
 
     Claim identity is the logical claim — subject, predicate, object — so the same
-    statement in two snapshots is one claim even when its evidence moved. The four
-    kinds of change stay apart: logical (``added``/``removed``), evidence,
-    interpretation, and projection (``ClaimChange.categories``).
+    statement in two snapshots is one claim even when its evidence moved. The kinds
+    of change stay apart: logical (``added``/``removed``), evidence,
+    policy-interpretation, reconciliation, and projection (``ClaimChange.categories``).
     """
 
     added: tuple[SemanticClaimView, ...]
@@ -381,15 +388,13 @@ class ClaimDifferential(FrozenModel):
 #: build's registry, so it cannot differ for one claim. What the packets
 #: themselves recorded under their compile-time policy is compared instead.
 #:
-#: ``authority`` and ``confidence`` are interpretation, not evidence: they are what
+#: ``authority`` and ``confidence`` are reconciliation, not evidence: they are what
 #: reconciliation concluded from the evidence (the weakest supporting authority,
-#: a confidence lowered by a conflict), so they move whenever the reading moves.
+#: a confidence lowered by a conflict).
 _FIELDS_BY_CATEGORY: tuple[tuple[ChangeCategory, tuple[str, ...]], ...] = (
     ("evidence", ()),
-    (
-        "interpretation",
-        ("support", "cardinality", "authority", "confidence", "conflict_status", "conflict_ids"),
-    ),
+    ("policy-interpretation", ("support", "cardinality")),
+    ("reconciliation", ("authority", "confidence", "conflict_status", "conflict_ids")),
     ("projection", ("projection_status", "projection_withheld_reason", "projected_entity_ids")),
 )
 
@@ -518,8 +523,8 @@ class SemanticClaimIndex:
                         after=new,
                         changed_fields=tuple(fields),
                         categories=tuple(categories),
-                        interpretation_under_changed_policy=(
-                            policy_changed and "interpretation" in categories
+                        caused_by_policy_change=(
+                            policy_changed and "policy-interpretation" in categories
                         ),
                     )
                 )
