@@ -758,13 +758,13 @@
       "path": "docs/adr/0033-register-governed-header-predicates-as-declaration-only.md"
     },
     {
-      "git_object_id": "7972a9a0d15529361289a0396e8dbe17be95f57c",
+      "git_object_id": "7bd5b0c432c21082c882674563a68350e34ffbb8",
       "mode": "100644",
       "object_type": "blob",
       "path": "docs/adr/0034-semantic-claim-read-model-and-managed-header-vocabulary.md"
     },
     {
-      "git_object_id": "c15dd911eb6edc968422963ef771c3a4dc86d475",
+      "git_object_id": "89378b9ba4e5d5b23f33e8c8cfdfa0886158e575",
       "mode": "100644",
       "object_type": "blob",
       "path": "docs/adr/0035-conflict-aware-projection-and-resolution-aware-impact.md"
@@ -2192,7 +2192,7 @@
       "path": "src/l9_constellation_topology/topology/claim_projection.py"
     },
     {
-      "git_object_id": "a51310af19ce0add74e5865b3aa5656dcd85dd75",
+      "git_object_id": "300b8f0792d674d71fe486babf428f51d38d63f1",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/topology/claim_view.py"
@@ -2972,7 +2972,7 @@
       "path": "tests/test_bridge_gap_renderer.py"
     },
     {
-      "git_object_id": "9ff65d4344784ba86c81e4c45aa82856bc027d2e",
+      "git_object_id": "be91a9fee706f5a8c487ffca66276aad1bf798b6",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_claim_view.py"
@@ -3362,7 +3362,7 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:5b5afb573b1fd124e13e0befd45f98db56d96a4da165b9231d2db86e2074dfe0",
+  "entries_sha256": "sha256:50d6c6e53de0c47ce3dc6686bdb849b78a304b0a748fcf06edb5fefd5ca1df3d",
   "entry_count": 560,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
