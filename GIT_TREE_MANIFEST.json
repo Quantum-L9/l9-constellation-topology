@@ -332,7 +332,7 @@
       "path": "MAINTAINERS.md"
     },
     {
-      "git_object_id": "661bee095c240ceb6930a3952e9546149ed0a4cf",
+      "git_object_id": "3e37064270c290ebbca06715f67c3ba8145c1abc",
       "mode": "100644",
       "object_type": "blob",
       "path": "MANIFEST.md"
@@ -2366,6 +2366,12 @@
       "path": "tests/__init__.py"
     },
     {
+      "git_object_id": "48d9fd06a0bbb4cb3a4f4867e20ca2a2905759cd",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/claim_fixtures.py"
+    },
+    {
       "git_object_id": "2fa457155cc0e04e72b54fe8a396f0de80d5a6bd",
       "mode": "100644",
       "object_type": "blob",
@@ -2972,7 +2978,7 @@
       "path": "tests/test_bridge_gap_renderer.py"
     },
     {
-      "git_object_id": "9ff65d4344784ba86c81e4c45aa82856bc027d2e",
+      "git_object_id": "a4a03c6bdcd6e8c31e6e329e71f5b162c4324ff6",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_claim_view.py"
@@ -3206,7 +3212,7 @@
       "path": "tests/test_publication_temporal.py"
     },
     {
-      "git_object_id": "7ee362156786cd28f350ff747615cc0facb279be",
+      "git_object_id": "300f5e8b5a5ef66720ac52722afb20547e835fad",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_qualified_projection.py"
@@ -3362,8 +3368,8 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:12ae263e13e1a6cf5333d97eaae688a371667898f83496a81e789df4cb0e7edd",
-  "entry_count": 560,
+  "entries_sha256": "sha256:c42dd6464c443e0e0e23e189c692ddc6fe4d256530c69bd4c6f1bdf5acf87932",
+  "entry_count": 561,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
   ],
