@@ -111,7 +111,7 @@ def test_every_governed_header_predicate_declares_all_nine_properties() -> None:
 
 def test_the_policy_view_carries_the_header_semantics_it_applies() -> None:
     view = predicate_policy_view()
-    assert view["version"] == "1.3.0"
+    assert view["version"] == "1.4.0"
     assert view["declaration_only_predicates"] == sorted(DECLARATION_ONLY_PREDICATES)
     header = view["header_semantics"]
     assert isinstance(header, dict)

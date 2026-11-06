@@ -41,6 +41,7 @@ from __future__ import annotations
 
 from typing import Literal
 
+from l9_constellation_topology.domain.confidence import ConflictStatus
 from l9_constellation_topology.run.evidence import semantic_hash
 
 from .cardinality import Cardinality
@@ -85,7 +86,15 @@ PREDICATE_POLICY_ID = "l9-topology-assertion-predicates"
 #: value or without a governed meaning; they are ``auxiliary``, and
 #: :func:`predicate_interpretation` keeps them distinguishable from recognized
 #: declarations.
-PREDICATE_POLICY_VERSION = "1.3.0"
+#:
+#: 1.4.0 (ADR-0035) adds the claim-level projection eligibility rule: a claim
+#: whose conflict status is possible or confirmed, or which names a conflict,
+#: never projects, whatever its predicate permits. The registry already decides
+#: which predicates *may* project; this decides which individual claims do, so
+#: two packets whose claims were realized under different rules cannot share an
+#: identity (freeze invariant F12). Relation-specific authority and identity
+#: requirements stay inside each projector and are not part of this rule.
+PREDICATE_POLICY_VERSION = "1.4.0"
 
 #: The ledger every header predicate below takes its meaning from.
 HEADER_SEMANTICS_LEDGER = "l9.artifact-header-model/global@1"
@@ -350,6 +359,14 @@ UNSUPPORTED_PREDICATE_REASON = (
 UNSUPPORTED_PREDICATE_CODE = "assertion-predicate-unsupported"
 
 
+#: Conflict states that withhold canonical projection of an individual claim
+#: (1.4.0, ADR-0035). The claim and its conflict record are preserved; no
+#: competing value is elected.
+PROJECTION_WITHHELD_CONFLICT_STATUSES: frozenset[ConflictStatus] = frozenset(
+    {ConflictStatus.possible, ConflictStatus.confirmed}
+)
+
+
 def predicate_support(predicate: str) -> PredicateSupport:
     """Return how this registry classifies ``predicate``."""
     if predicate in SET_VALUED_PREDICATES:
@@ -461,6 +478,14 @@ def predicate_policy_view() -> dict[str, object]:
         "field_observation_predicates": {
             "unresolved_value": sorted(UNRESOLVED_FIELD_PREDICATES),
             "unsupported_field": sorted(UNSUPPORTED_FIELD_PREDICATES),
+        },
+        "projection_eligibility": {
+            "decided_at": "individual-claim",
+            "withheld_conflict_statuses": sorted(
+                status.value for status in PROJECTION_WITHHELD_CONFLICT_STATUSES
+            ),
+            "withheld_when_conflict_ids_present": True,
+            "relation_authority": "decided-inside-each-projector",
         },
         "unsupported_predicate_behavior": "preserve-claim-evidence-and-emit-diagnostic",
     }

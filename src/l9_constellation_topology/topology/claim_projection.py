@@ -31,9 +31,11 @@ from typing import Literal
 
 from l9_constellation_topology.domain.capability import CapabilityRecord
 from l9_constellation_topology.domain.claim import SemanticClaimRecord
-from l9_constellation_topology.domain.confidence import ConflictStatus
 from l9_constellation_topology.domain.edge import Direction, EdgeRecord, EdgeType, GraphRecord
-from l9_constellation_topology.reconciliation import is_projectable
+from l9_constellation_topology.reconciliation import (
+    PROJECTION_WITHHELD_CONFLICT_STATUSES,
+    is_projectable,
+)
 from l9_constellation_topology.run.evidence import stable_id
 
 #: Prefix for a package identity named by a dependency claim. Deliberately not
@@ -68,7 +70,8 @@ def projection_ineligibility(claim: SemanticClaimRecord) -> ProjectionIneligibil
 
     * the registry must permit projection for the predicate;
     * the claim must carry no conflict, possible or confirmed, and name no
-      conflict id. A conflicting claim stays a claim and a conflict
+      conflict id (``PROJECTION_WITHHELD_CONFLICT_STATUSES``, bound into the
+      predicate policy hash, freeze F12). A conflicting claim stays a claim and a conflict
       record; a relation whose truth depends on choosing one competing value is
       never emitted for any of them, and no value is elected.
 
@@ -79,7 +82,7 @@ def projection_ineligibility(claim: SemanticClaimRecord) -> ProjectionIneligibil
     """
     if not is_projectable(claim.predicate):
         return "predicate-not-projectable"
-    if claim.conflict_status is not ConflictStatus.none or claim.conflict_ids:
+    if claim.conflict_status in PROJECTION_WITHHELD_CONFLICT_STATUSES or claim.conflict_ids:
         return "conflicted"
     return None
 
