@@ -26,6 +26,7 @@ from l9_constellation_topology.reconciliation import (
     HEADER_SEMANTICS_LEDGER,
     UNSUPPORTED_PREDICATE_CODE,
     is_projectable,
+    predicate_interpretation,
     predicate_policy_hash,
     predicate_policy_view,
     predicate_support,
@@ -110,7 +111,7 @@ def test_every_governed_header_predicate_declares_all_nine_properties() -> None:
 
 def test_the_policy_view_carries_the_header_semantics_it_applies() -> None:
     view = predicate_policy_view()
-    assert view["version"] == "1.2.0"
+    assert view["version"] == "1.3.0"
     assert view["declaration_only_predicates"] == sorted(DECLARATION_ONLY_PREDICATES)
     header = view["header_semantics"]
     assert isinstance(header, dict)
@@ -183,11 +184,10 @@ def test_declarations_in_different_files_do_not_conflict() -> None:
 @pytest.mark.parametrize(
     "predicate",
     [
-        "meta.l9v1.unresolved_field",
-        "meta.l9v1.unsupported_field",
-        "meta.unversioned.field",
-        "meta.managed.governance.owner",
+        # A field the ledger files under another category: no rule exists.
         "meta.l9v1.identity.owner",
+        # A managed field the producer does not define (ADR-0034, Case F).
+        "meta.managed.classification.some_new_field",
     ],
 )
 def test_fields_without_a_governed_meaning_stay_unsupported(predicate: str) -> None:
@@ -197,6 +197,36 @@ def test_fields_without_a_governed_meaning_stay_unsupported(predicate: str) -> N
     assert conflicts == ()
     assert [unknown.field for unknown in unknowns] == [predicate]
     assert [diagnostic.code for diagnostic in diagnostics] == [UNSUPPORTED_PREDICATE_CODE]
+
+
+@pytest.mark.parametrize(
+    ("predicate", "interpretation"),
+    [
+        ("meta.l9v1.unresolved_field", "unresolved-value"),
+        ("meta.l9v1.unsupported_field", "unsupported-field"),
+        ("meta.unversioned.field", "unsupported-field"),
+    ],
+)
+def test_field_observations_are_recognized_without_gaining_meaning(
+    predicate: str, interpretation: str
+) -> None:
+    """Policy 1.3.0 (ADR-0034) supersedes the 1.2.0 reading of these three.
+
+    The producer's grammar defines them: the claim is that a key was declared
+    with no value, or with no governed meaning, and the object is the key. The
+    registry now recognizes that claim as an auxiliary observation, so it raises
+    no unsupported-predicate unknown; the key itself still gains no meaning, no
+    conflict, and no projection, and the reading stays distinguishable.
+    """
+    claims, conflicts, unknowns, diagnostics = _reconcile((_assertion(predicate, "role"),))
+    assert predicate_support(predicate) == "auxiliary"
+    assert predicate_interpretation(predicate) == interpretation
+    assert all(claim.support == "auxiliary" for claim in claims)
+    assert not is_projectable(predicate)
+    assert project_claims(claims).edges == ()
+    assert conflicts == ()
+    assert unknowns == ()
+    assert diagnostics == ()
 
 
 def test_governed_header_predicates_raise_no_unsupported_unknowns() -> None:

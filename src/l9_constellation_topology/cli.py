@@ -54,6 +54,7 @@ from l9_constellation_topology.packets.corpus_validator import (
 from l9_constellation_topology.packets.repository_bundle import (
     build_repository_model_bundle_artifacts,
 )
+from l9_constellation_topology.packets.topology_packet import MaterializedTopology
 from l9_constellation_topology.publication import (
     build_publication_plan_artifacts,
     plan_publication_from_repository,
@@ -67,6 +68,12 @@ from l9_constellation_topology.renderers import (
 )
 from l9_constellation_topology.run import canonical_json, semantic_hash
 from l9_constellation_topology.scanners.repository_model_scanner import scan_repository_model
+from l9_constellation_topology.topology.claim_view import (
+    DEFAULT_QUERY_LIMIT,
+    ClaimQuery,
+    SemanticClaimIndex,
+    interpretation_policy_ref,
+)
 from l9_constellation_topology.topology.impact import assess_impact
 from l9_constellation_topology.validation.topology_validator import validate_topology
 
@@ -325,6 +332,72 @@ def cmd_impact(args: argparse.Namespace) -> int:
         minimum_confidence=ConfidenceLevel(args.minimum_confidence),
     )
     _print_json(result)
+    return 0
+
+
+def _claim_query(args: argparse.Namespace) -> ClaimQuery:
+    return ClaimQuery(
+        subject_id=args.subject,
+        subject_kind=args.subject_kind,
+        predicate=args.predicate,
+        predicate_prefix=args.predicate_prefix,
+        value=args.value,
+        interpretation=args.interpretation,
+        conflict=args.conflict,
+        projection=args.projection,
+        source_path=args.source_path,
+        minimum_locations=args.minimum_locations,
+        limit=args.limit,
+    )
+
+
+def _packet_policy(materialized: MaterializedTopology) -> dict[str, object]:
+    packet = materialized.packet
+    recorded = packet.policy_hashes.get("assertion_predicates")
+    return {
+        "packet_id": packet.packet_id,
+        "semantic_hash": packet.semantic_hash,
+        "packet_predicate_policy_hash": recorded,
+    }
+
+
+def cmd_query_claims(args: argparse.Namespace) -> int:
+    """Answer a bounded query over the semantic claims one packet carries.
+
+    Read-only. The interpretation is this build's predicate registry; when the
+    packet was compiled under a different registry, ``matches_packet`` is false
+    and says so rather than presenting the reading as the packet's own.
+    """
+    query = _claim_query(args)
+    materialized, _ = load_topology_bundle(Path(args.input_bundle))
+    index = SemanticClaimIndex.from_state(materialized.state)
+    policy_ref = interpretation_policy_ref()
+    current_hash = policy_ref.rsplit("#", 1)[1]
+    before = _packet_policy(materialized)
+    query_view = {key: value for key, value in vars(query).items() if value is not None}
+    output: dict[str, object] = {
+        "interpretation_policy": {
+            "ref": policy_ref,
+            "matches_packet": before["packet_predicate_policy_hash"] == current_hash,
+        },
+        "query": query_view,
+    }
+    if args.compare_bundle:
+        later_materialized, _ = load_topology_bundle(Path(args.compare_bundle))
+        later = SemanticClaimIndex.from_state(later_materialized.state)
+        after = _packet_policy(later_materialized)
+        output["before"] = before
+        output["after"] = after
+        output["interpretation_policy"] = {
+            "ref": policy_ref,
+            "matches_packet": before["packet_predicate_policy_hash"] == current_hash
+            and after["packet_predicate_policy_hash"] == current_hash,
+        }
+        output["differential"] = index.differential(later, query).model_dump(mode="json")
+    else:
+        output["packet"] = before
+        output["result"] = index.query(query).model_dump(mode="json")
+    _print_json(output)
     return 0
 
 
@@ -598,6 +671,38 @@ def build_parser() -> argparse.ArgumentParser:
         "--minimum-confidence", choices=("low", "medium", "high"), default="low"
     )
     impact_parser.set_defaults(handler=cmd_impact)
+
+    claims_parser = commands.add_parser(
+        "query-claims",
+        help="Query semantic claims, with evidence and interpretation strength (read-only)",
+    )
+    claims_parser.add_argument("--input-bundle", required=True)
+    claims_parser.add_argument(
+        "--compare-bundle", help="Report logical claims added, removed and re-read"
+    )
+    claims_parser.add_argument("--subject")
+    claims_parser.add_argument("--subject-kind")
+    claims_parser.add_argument("--predicate")
+    claims_parser.add_argument("--predicate-prefix")
+    claims_parser.add_argument("--value")
+    claims_parser.add_argument(
+        "--interpretation",
+        choices=(
+            "declaration",
+            "auxiliary-observation",
+            "unresolved-value",
+            "unsupported-field",
+            "unsupported-predicate",
+        ),
+    )
+    claims_parser.add_argument("--conflict", choices=("any", "none", "conflicted"), default="any")
+    claims_parser.add_argument(
+        "--projection", choices=("any", "projected", "unprojected"), default="any"
+    )
+    claims_parser.add_argument("--source-path")
+    claims_parser.add_argument("--minimum-locations", type=int, default=0)
+    claims_parser.add_argument("--limit", type=int, default=DEFAULT_QUERY_LIMIT)
+    claims_parser.set_defaults(handler=cmd_query_claims)
 
     inspect_parser = commands.add_parser(
         "inspect-packet", help="Inspect packet identity and record counts"

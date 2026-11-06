@@ -1,5 +1,24 @@
 # Changelog
 
+## Unreleased - semantic claim read model (ADR-0034)
+
+- Predicate policy 1.3.0 recognizes the 13 producer-owned managed header
+  fields (`meta.managed.<category>.<field>`, declared schema
+  `managed:l9-meta-injector`) as `single`, declaration-only claims whose meaning
+  comes from the producer's vocabulary, not the Foundation ledger. A managed
+  field the producer does not define stays `unsupported`. The producer's
+  field-observation predicates (`unresolved_field`, `unsupported_field`,
+  `unversioned.field`) are `auxiliary`.
+- `predicate_interpretation()` separates declarations, auxiliary observations,
+  unresolved values, unsupported fields and unsupported predicates.
+- New read model `topology/claim_view.py` and read-only CLI
+  `l9-topology query-claims`: bounded, deterministic claim queries with
+  evidence locations, interpretation, conflict and projection state, plus a
+  differential between two bundles. No packet field, edge type or projection
+  changes.
+- The `foundational-two-repo` golden and `HASH_LOCALITY_EVALUATION.json` change
+  only in the predicate policy hash and the identities derived from it.
+
 ## Unreleased - governed native-header predicates (ADR-0033)
 
 - Predicate policy 1.2.0 registers the 60 native `L9_META` header predicates
