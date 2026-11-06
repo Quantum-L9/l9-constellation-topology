@@ -20,6 +20,36 @@
       "path": ".gitattributes"
     },
     {
+      "git_object_id": "1ef6dfbd35649e40ddf3b27b2a358720526ed789",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": ".github/CODEOWNERS"
+    },
+    {
+      "git_object_id": "3e93ceae14cc7b3688e9dc75036f71c81e5da905",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": ".github/ISSUE_TEMPLATE/1-bug.yml"
+    },
+    {
+      "git_object_id": "41df31162d4134e76ce7dee48dfd4fe2c584b3f7",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": ".github/ISSUE_TEMPLATE/2-feature.yml"
+    },
+    {
+      "git_object_id": "b7705f92961f52d149bf609748ece6b4d186525f",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": ".github/ISSUE_TEMPLATE/3-task.yml"
+    },
+    {
+      "git_object_id": "bf7247d2f9ed358b34990aadabc8cb6f1c503890",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": ".github/ISSUE_TEMPLATE/4-incident.yml"
+    },
+    {
       "git_object_id": "5e7934eda8879735eef8df9a979fed9c903a2824",
       "mode": "100644",
       "object_type": "blob",
@@ -32,16 +62,40 @@
       "path": ".github/ISSUE_TEMPLATE/bug_report.yml"
     },
     {
+      "git_object_id": "b93b02d6e1789ee8e2b0e6ad3214a6979bb1087f",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": ".github/ISSUE_TEMPLATE/ci-failure.yml"
+    },
+    {
       "git_object_id": "0683f82d2d5378e4a5ea9c376f4a6f8c2b3f9bf5",
       "mode": "100644",
       "object_type": "blob",
       "path": ".github/ISSUE_TEMPLATE/config.yml"
     },
     {
+      "git_object_id": "333b989292b7bff7eb22e74967d680dcd1f23ad5",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": ".github/ISSUE_TEMPLATE/gov-violation.yml"
+    },
+    {
       "git_object_id": "71db2352ee50e5ab5472996309d70255e11d5acf",
       "mode": "100644",
       "object_type": "blob",
       "path": ".github/PULL_REQUEST_TEMPLATE.md"
+    },
+    {
+      "git_object_id": "dc9145370919d59a901a564ee1a6967a7f318e5f",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": ".github/PULL_REQUEST_TEMPLATE/release.md"
+    },
+    {
+      "git_object_id": "f01b2b395c44c67546865a328ed3b833240cbeed",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": ".github/dependabot.yml"
     },
     {
       "git_object_id": "2d58873c8361729c82eddafff137cd6dd735ec3b",
@@ -90,6 +144,12 @@
       "mode": "100644",
       "object_type": "blob",
       "path": ".github/governance/waivers.yaml"
+    },
+    {
+      "git_object_id": "73e6f3f8741f56875e8351994c40a2dda9e65921",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": ".github/pull_request_template.md"
     },
     {
       "git_object_id": "b34ebf1999469fdddb1dfe3c7abc91ed57a9bd64",
@@ -290,7 +350,7 @@
       "path": "EFFECT_IDENTITY_MIGRATION_PREFLIGHT.json"
     },
     {
-      "git_object_id": "ce93ceb30ab8a2fed1dd86f0d1d1bce6a0adbae3",
+      "git_object_id": "8abd3c7bb9b1163fa506a829cbfb32aa0701119c",
       "mode": "100644",
       "object_type": "blob",
       "path": "FINAL_TREE.md"
@@ -332,7 +392,7 @@
       "path": "MAINTAINERS.md"
     },
     {
-      "git_object_id": "661bee095c240ceb6930a3952e9546149ed0a4cf",
+      "git_object_id": "563147d3eca7beedbb71ea980a46fa9151a8adb4",
       "mode": "100644",
       "object_type": "blob",
       "path": "MANIFEST.md"
@@ -1406,7 +1466,7 @@
       "path": "scripts/validate_nuclear_execution.py"
     },
     {
-      "git_object_id": "953833d8212afcd3c264c874f28b2412ca5bd745",
+      "git_object_id": "7baa779524fe40b3f94de72f0091b570d3b88ca2",
       "mode": "100755",
       "object_type": "blob",
       "path": "scripts/validate_release_readiness.py"
@@ -3362,8 +3422,8 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:b907f33227906ba861f82af6f6f72437e7ec5e61fbbeca03d6dc3d3fb635ccc8",
-  "entry_count": 560,
+  "entries_sha256": "sha256:41f56ebebfcbc392fec8cc70b08bb2836d6695f6d2b073221b12f25799c632fb",
+  "entry_count": 570,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
   ],
