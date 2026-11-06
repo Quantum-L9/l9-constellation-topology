@@ -40,6 +40,7 @@ changed decision requires a new ADR that explicitly supersedes the old record.
 | ADR-0032 | [Adopt Core repository execution V2 through the make-v1 facade](docs/adr/0032-adopt-core-repository-execution-v2.md) | Accepted |
 | ADR-0033 | [Register governed native-header predicates as declaration-only claims](docs/adr/0033-register-governed-header-predicates-as-declaration-only.md) | Accepted |
 | ADR-0034 | [Semantic claim read model and recognized managed-header vocabulary](docs/adr/0034-semantic-claim-read-model-and-managed-header-vocabulary.md) | Accepted |
+| ADR-0035 | [Conflict-aware canonical projection and resolution-aware impact](docs/adr/0035-conflict-aware-projection-and-resolution-aware-impact.md) | Accepted |
 
 ## Decision order
 

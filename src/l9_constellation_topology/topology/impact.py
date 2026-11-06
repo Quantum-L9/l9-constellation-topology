@@ -1,4 +1,21 @@
-"""Bounded upstream and downstream impact traversal."""
+"""Bounded upstream and downstream impact traversal.
+
+Two readings of one graph are offered, and they answer different questions.
+
+The default is generic reachability over the traversable edge taxonomy, the
+behaviour every existing caller and the compiler's own impact stage rely on.
+
+``resolution_aware=True`` answers the dependency-impact question instead (ADR-0035).
+A work relation whose target the compiler could not resolve to one observed
+artifact still exists as a canonical edge — dropping it would lose the
+declaration — but its endpoint is an explicitly-labelled reference node, not a
+thing whose blast radius is known. Such an edge is a *declared* dependency, not a
+*resolved* one. Resolution-aware impact does not traverse it and does not count
+its endpoint as affected; it reports the edge id in ``unresolved_edge_ids`` so the
+declaration stays visible. Every other edge is resolved for this purpose,
+including a dependency on an explicitly-labelled external package (Case H): that
+identity is exactly what the source named, and nothing was guessed to reach it.
+"""
 
 from __future__ import annotations
 
@@ -15,6 +32,23 @@ from l9_constellation_topology.compatibility.v4_models import (
 from l9_constellation_topology.domain import ConfidenceLevel, EdgeRecord, EdgeType, ImpactIndex
 from l9_constellation_topology.domain.edge import TRAVERSABLE_EDGE_TYPES
 
+#: The edge property a projector records when it had to resolve a target.
+TARGET_RESOLUTION_PROPERTY = "target_resolution"
+
+#: Recorded resolution states that cannot support a resolved impact conclusion.
+UNRESOLVED_TARGET_RESOLUTIONS: frozenset[str] = frozenset({"unresolved", "ambiguous"})
+
+
+def edge_is_resolved(edge: EdgeRecord) -> bool:
+    """Return whether ``edge`` can carry a resolved dependency-impact conclusion.
+
+    Only an edge whose projector recorded a target resolution of ``unresolved``
+    or ``ambiguous`` is unresolved. An edge with no recorded resolution named its
+    endpoint explicitly and is resolved for this purpose.
+    """
+    return edge.properties.get(TARGET_RESOLUTION_PROPERTY) not in UNRESOLVED_TARGET_RESOLUTIONS
+
+
 _CONFIDENCE_ORDER = {
     ConfidenceLevel.low: 0,
     ConfidenceLevel.medium: 1,
@@ -30,6 +64,7 @@ def assess_impact(
     maximum_depth: int = 10,
     edge_types: set[EdgeType] | None = None,
     minimum_confidence: ConfidenceLevel = ConfidenceLevel.low,
+    resolution_aware: bool = False,
 ) -> ImpactIndex:
     if direction not in {"upstream", "downstream", "both"}:
         raise ValueError(f"invalid impact direction: {direction}")
@@ -47,29 +82,39 @@ def assess_impact(
     outgoing: dict[str, list[tuple[str, str]]] = defaultdict(list)
     incoming: dict[str, list[tuple[str, str]]] = defaultdict(list)
     unresolved: list[str] = []
+    # Resolution-aware only: unresolved edges, kept apart so a traversal that
+    # reaches one of their endpoints can report it without crossing it.
+    unresolved_outgoing: dict[str, list[str]] = defaultdict(list)
+    unresolved_incoming: dict[str, list[str]] = defaultdict(list)
     for edge in edges:
         if edge.edge_type not in allowed_types:
             continue
         if _CONFIDENCE_ORDER[edge.confidence.level] < _CONFIDENCE_ORDER[minimum_confidence]:
             continue
+        if resolution_aware and not edge_is_resolved(edge):
+            unresolved_outgoing[edge.source_id].append(edge.edge_id)
+            unresolved_incoming[edge.target_id].append(edge.edge_id)
+            continue
         outgoing[edge.source_id].append((edge.target_id, edge.edge_id))
         incoming[edge.target_id].append((edge.source_id, edge.edge_id))
 
-    traversals: list[tuple[str, dict[str, list[tuple[str, str]]]]] = []
+    traversals: list[tuple[dict[str, list[tuple[str, str]]], dict[str, list[str]]]] = []
     if direction in {"upstream", "both"}:
-        traversals.append(("upstream", outgoing))
+        traversals.append((outgoing, unresolved_outgoing))
     if direction in {"downstream", "both"}:
-        traversals.append(("downstream", incoming))
+        traversals.append((incoming, unresolved_incoming))
 
     affected: set[str] = set()
     paths: set[tuple[str, ...]] = set()
-    for _, adjacency in traversals:
+    for adjacency, unresolved_adjacency in traversals:
         queue: deque[tuple[str, tuple[str, ...], int]] = deque([(subject_id, (subject_id,), 0)])
         visited = {subject_id}
         while queue:
             current, path, depth = queue.popleft()
             if depth >= maximum_depth:
                 continue
+            # A declared dependency the traversal reached but cannot cross.
+            unresolved.extend(unresolved_adjacency.get(current, ()))
             for target, _edge_id in sorted(adjacency.get(current, [])):
                 next_path = (*path, target)
                 paths.add(next_path)

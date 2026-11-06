@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased - qualified projection and resolution-aware impact (ADR-0035)
+
+- One projection-boundary decision, `projection_ineligibility`, gates both the
+  claim projector and the work projector: a claim with any conflict, or with
+  `candidate`/`unknown` authority, projects no canonical relation. Competing
+  `repository.replaced_by` values no longer each produce a `SUPERSEDES` edge.
+- The claim view reports such claims as `withheld` with the reason.
+- `assess_impact(resolution_aware=True)` / `l9-topology impact
+  --resolution-aware` does not traverse edges whose recorded
+  `target_resolution` is `unresolved` or `ambiguous`, and reports them in
+  `unresolved_edge_ids`. External package dependencies stay resolved. The
+  default traversal is unchanged.
+
 ## Unreleased - semantic claim read model (ADR-0034)
 
 - Predicate policy 1.3.0 recognizes the 13 producer-owned managed header

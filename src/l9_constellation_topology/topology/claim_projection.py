@@ -27,9 +27,11 @@ that turns ``package.framework`` into a service role, and no rule that equates
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from typing import Literal
 
 from l9_constellation_topology.domain.capability import CapabilityRecord
 from l9_constellation_topology.domain.claim import SemanticClaimRecord
+from l9_constellation_topology.domain.confidence import Authority, ConflictStatus
 from l9_constellation_topology.domain.edge import Direction, EdgeRecord, EdgeType, GraphRecord
 from l9_constellation_topology.reconciliation import is_projectable
 from l9_constellation_topology.run.evidence import stable_id
@@ -49,6 +51,54 @@ CONTRACT_REFERENCE_PREFIX = "contract-reference"
 #: Prefixes for capabilities projected from claims.
 SERVICE_ACTION_PREFIX = "capability:service-action"
 HTTP_ROUTE_PREFIX = "capability:http-route"
+
+
+#: Why a claim did not qualify for canonical projection (ADR-0035).
+ProjectionIneligibility = Literal[
+    "predicate-not-projectable",
+    "conflicted",
+    "insufficient-authority",
+]
+
+#: Authorities that cannot ground a canonical relation. A candidate is, by the
+#: topology's own layout, structurally unable to become canonical, and an
+#: unknown authority cannot be shown to be anything else.
+INSUFFICIENT_PROJECTION_AUTHORITIES: frozenset[Authority] = frozenset(
+    {Authority.candidate, Authority.unknown}
+)
+
+
+def projection_ineligibility(claim: SemanticClaimRecord) -> ProjectionIneligibility | None:
+    """Return why ``claim`` may not project a canonical relation, or ``None``.
+
+    This is the one projection-boundary decision every projector consults
+    (ADR-0035), applied before any projector-specific target rule:
+
+    * the registry must permit projection for the predicate;
+    * the claim must carry no conflict, confirmed or possible. A conflicting
+      claim stays a claim and a conflict record; a relation whose truth depends
+      on choosing one competing value is never emitted for any of them, and the
+      highest-confidence value is never selected;
+    * the claim's authority must be able to ground a canonical relation.
+
+    Target resolution is deliberately *not* decided here. Each projector owns
+    its own endpoint rule: an external package identity is a legitimate,
+    explicitly-labelled endpoint (Case H), and a work reference that resolved
+    to nothing is preserved as an explicitly-labelled reference node, whose
+    resolution state resolution-aware impact reads.
+    """
+    if not is_projectable(claim.predicate):
+        return "predicate-not-projectable"
+    if claim.conflict_status is not ConflictStatus.none or claim.conflict_ids:
+        return "conflicted"
+    if claim.authority in INSUFFICIENT_PROJECTION_AUTHORITIES:
+        return "insufficient-authority"
+    return None
+
+
+def eligible_for_canonical_projection(claim: SemanticClaimRecord) -> bool:
+    """Return whether ``claim`` passes the shared projection-boundary decision."""
+    return projection_ineligibility(claim) is None
 
 
 @dataclass(frozen=True)
@@ -267,8 +317,9 @@ def project_claims(claims: tuple[SemanticClaimRecord, ...]) -> ClaimProjection:
     for claim in sorted(claims, key=lambda item: item.claim_id):
         projector = _PROJECTORS.get(claim.predicate)
         # Auxiliary and unsupported predicates never project, even if a mapping
-        # were added by mistake: the registry is the gate, not this table.
-        if projector is None or not is_projectable(claim.predicate):
+        # were added by mistake: the registry is the gate, not this table. A
+        # conflicted or under-authorized claim never projects either (ADR-0035).
+        if projector is None or not eligible_for_canonical_projection(claim):
             continue
         claim_capabilities, claim_edges, claim_nodes = projector(claim)
         capabilities.extend(claim_capabilities)

@@ -55,15 +55,20 @@ from l9_constellation_topology.reconciliation import (
     PREDICATE_POLICY_ID,
     PREDICATE_POLICY_VERSION,
     PredicateInterpretation,
-    is_projectable,
     predicate_definition,
     predicate_interpretation,
     predicate_policy_hash,
 )
 from l9_constellation_topology.run.evidence import EvidenceRecord
+from l9_constellation_topology.topology.claim_projection import (
+    ProjectionIneligibility,
+    projection_ineligibility,
+)
 
 #: Whether a claim produced canonical topology, and whether it could have.
-ProjectionStatus = Literal["projected", "not-projected", "not-projectable"]
+#: ``withheld`` means the predicate may project but the shared projection
+#: boundary refused this claim (a conflict, or insufficient authority; ADR-0035).
+ProjectionStatus = Literal["projected", "not-projected", "not-projectable", "withheld"]
 
 #: Conflict filter a query accepts.
 ConflictFilter = Literal["any", "none", "conflicted"]
@@ -124,6 +129,8 @@ class SemanticClaimView(FrozenModel):
     #: packet is internally inconsistent; it is reported, never hidden.
     missing_evidence_refs: tuple[str, ...]
     projection_status: ProjectionStatus
+    #: Why the projection boundary refused the claim, when it did.
+    projection_withheld_reason: ProjectionIneligibility | None = None
     projected_entity_ids: tuple[str, ...]
     #: ``<policy id>@<version>#<hash>`` of the registry this view was read under.
     interpretation_policy_ref: str
@@ -165,7 +172,15 @@ def _location(evidence: EvidenceRecord) -> SourceLocation:
 def _projection_status(claim: SemanticClaimRecord) -> ProjectionStatus:
     if claim.projected:
         return "projected"
-    return "not-projected" if is_projectable(claim.predicate) else "not-projectable"
+    reason = projection_ineligibility(claim)
+    if reason == "predicate-not-projectable":
+        return "not-projectable"
+    return "withheld" if reason is not None else "not-projected"
+
+
+def _withheld_reason(claim: SemanticClaimRecord) -> ProjectionIneligibility | None:
+    reason = projection_ineligibility(claim)
+    return None if claim.projected or reason == "predicate-not-projectable" else reason
 
 
 def claim_view(
@@ -200,6 +215,7 @@ def claim_view(
         source_locations=locations,
         missing_evidence_refs=missing,
         projection_status=_projection_status(claim),
+        projection_withheld_reason=_withheld_reason(claim),
         projected_entity_ids=claim.projected_entity_ids,
         interpretation_policy_ref=policy_ref or interpretation_policy_ref(),
     )
@@ -321,6 +337,7 @@ _DIFFERENTIAL_FIELDS: tuple[str, ...] = (
     "conflict_status",
     "conflict_ids",
     "projection_status",
+    "projection_withheld_reason",
     "projected_entity_ids",
 )
 
