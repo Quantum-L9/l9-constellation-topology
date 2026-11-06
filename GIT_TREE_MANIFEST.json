@@ -206,7 +206,7 @@
       "path": ".python-version"
     },
     {
-      "git_object_id": "067d863878b4d806b187f0d2694534c961bdb25b",
+      "git_object_id": "2f1a22dc875ce73869096641f7dafd8688961604",
       "mode": "100644",
       "object_type": "blob",
       "path": "ADR_INDEX.md"
@@ -236,7 +236,7 @@
       "path": "BUILD_SPECIFICATION.md"
     },
     {
-      "git_object_id": "8bc6d088851591891012c886a8af5235d7409698",
+      "git_object_id": "e06d5347b6535684bc11cebb313dd11dbfcea676",
       "mode": "100644",
       "object_type": "blob",
       "path": "CHANGELOG.md"
@@ -308,7 +308,7 @@
       "path": "GOVERNANCE.md"
     },
     {
-      "git_object_id": "d5db00774b52ded24d916aa71c665229773a9967",
+      "git_object_id": "391c6a6bb80a10759e07dfb78b692edabe9bf793",
       "mode": "100644",
       "object_type": "blob",
       "path": "HASH_LOCALITY_EVALUATION.json"
@@ -332,7 +332,7 @@
       "path": "MAINTAINERS.md"
     },
     {
-      "git_object_id": "00a41f69350d50e96c1d6c27b35b4594478ab549",
+      "git_object_id": "3ecb7324e53daebc98e1d554db57f1716281fe6e",
       "mode": "100644",
       "object_type": "blob",
       "path": "MANIFEST.md"
@@ -756,6 +756,12 @@
       "mode": "100644",
       "object_type": "blob",
       "path": "docs/adr/0033-register-governed-header-predicates-as-declaration-only.md"
+    },
+    {
+      "git_object_id": "7972a9a0d15529361289a0396e8dbe17be95f57c",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "docs/adr/0034-semantic-claim-read-model-and-managed-header-vocabulary.md"
     },
     {
       "git_object_id": "3c2466071d4b3c021b1969946079823ae4bcfae7",
@@ -1424,7 +1430,7 @@
       "path": "src/l9_constellation_topology/cardinality.py"
     },
     {
-      "git_object_id": "49d3fe0690c3bc974ca6efcdf380bd511e204992",
+      "git_object_id": "983a3a03ffe9955d58bcc8381b805060bca348b0",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/cli.py"
@@ -1862,7 +1868,7 @@
       "path": "src/l9_constellation_topology/py.typed"
     },
     {
-      "git_object_id": "059568b055919b3e17e6d4a3ac9f92fab0b024ad",
+      "git_object_id": "1fd705bb80a5e7293b19ebc24506e0d9896af4ff",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/reconciliation/__init__.py"
@@ -1880,7 +1886,7 @@
       "path": "src/l9_constellation_topology/reconciliation/inputs.py"
     },
     {
-      "git_object_id": "301cc3afa8d26045f5612493383f55ac30bec0f8",
+      "git_object_id": "69209be24489d3366f7d3693401e185c721dced2",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/reconciliation/predicates.py"
@@ -2178,6 +2184,12 @@
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/topology/claim_projection.py"
+    },
+    {
+      "git_object_id": "cd93afeba2b39784216a817506100290a07339a2",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "src/l9_constellation_topology/topology/claim_view.py"
     },
     {
       "git_object_id": "94fe1e892a8fd0e143c9aac814ab330284dd0e35",
@@ -2786,13 +2798,13 @@
       "path": "tests/fixtures/semantic_assertion_repository/spec.yaml"
     },
     {
-      "git_object_id": "34612adb7fcb7bfdd47d7844e4a0958d570f2f28",
+      "git_object_id": "f0f956d0c847591f22f5f457c91eaf2d52ce90f9",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/topology_packets/foundational-two-repo/manifest.json"
     },
     {
-      "git_object_id": "f3914b0842f74b9cbe537a9b7ce969e4bdc75c6e",
+      "git_object_id": "378d47d53586785cca60952b567d14efa6aac1a3",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/topology_packets/foundational-two-repo/packet.json"
@@ -2918,7 +2930,7 @@
       "path": "tests/fixtures/topology_packets/foundational-two-repo/payload/unknowns.json"
     },
     {
-      "git_object_id": "840fe842b8dd61207fc93f6b9543aa1a4996b78c",
+      "git_object_id": "2fd3773373b259ccc15910b4bd9e1d3fb90a7204",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/topology_packets/foundational-two-repo/receipts/validation-receipt.json"
@@ -2952,6 +2964,12 @@
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_bridge_gap_renderer.py"
+    },
+    {
+      "git_object_id": "9ff65d4344784ba86c81e4c45aa82856bc027d2e",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/test_claim_view.py"
     },
     {
       "git_object_id": "b0d11717ee1a03a50fd73a369d81324bd7808f83",
@@ -3068,7 +3086,7 @@
       "path": "tests/test_hash_locality.py"
     },
     {
-      "git_object_id": "8a27de7c7176e3d0519755100937f8f3cd611227",
+      "git_object_id": "5a68d4cdf553900d0651853a044a9ad07175350a",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_header_predicates.py"
@@ -3332,8 +3350,8 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:5e19136063936a0430bc0a655e1b1964880d64b59ae0419a78944cbcbe50583e",
-  "entry_count": 555,
+  "entries_sha256": "sha256:4a8fbaa2f329a496fde57fc82189fa1f1f521339b1339da103e864f0e3ff074a",
+  "entry_count": 558,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
   ],
