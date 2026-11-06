@@ -135,6 +135,9 @@ MARKER_RE = re.compile(
     r"\b(?:TODO|FIXME|XXX|HACK|placeholder|stub|scaffold)\b|not\s+implemented",
     re.IGNORECASE,
 )
+#: GitHub issue-form attribute that renders example input text (see the
+#: issue-form entries in MARKER_EXEMPTIONS below).
+ISSUE_FORM_PLACEHOLDER = ("placeholder: ",)
 MARKER_EXEMPTIONS = {
     "scripts/validate_release_readiness.py": ("no-stub policy", "MARKER_RE ="),
     # Fixture input, not project source. The marker on this line is the thing the
@@ -153,9 +156,9 @@ MARKER_EXEMPTIONS = {
     # are exempt; any other marker in these files is still reported. Owner: the
     # org template seed; remove an entry when its form no longer uses
     # `placeholder:`.
-    ".github/ISSUE_TEMPLATE/3-task.yml": ("placeholder: ",),
-    ".github/ISSUE_TEMPLATE/4-incident.yml": ("placeholder: ",),
-    ".github/ISSUE_TEMPLATE/ci-failure.yml": ("placeholder: ",),
+    ".github/ISSUE_TEMPLATE/3-task.yml": ISSUE_FORM_PLACEHOLDER,
+    ".github/ISSUE_TEMPLATE/4-incident.yml": ISSUE_FORM_PLACEHOLDER,
+    ".github/ISSUE_TEMPLATE/ci-failure.yml": ISSUE_FORM_PLACEHOLDER,
 }
 MANIFEST_ENTRY_RE = re.compile(r"^- `([^`]+)`\s+—\s+[^\r\n]+")
 
