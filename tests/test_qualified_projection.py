@@ -12,7 +12,8 @@ from pathlib import Path
 
 import pytest
 
-from l9_constellation_topology.cli import run
+from l9_constellation_topology.cli import RESOLUTION_AWARE_IMPACT_INTERPRETATION, run
+from l9_constellation_topology.domain.assessment import ImpactIndex
 from l9_constellation_topology.domain.claim import SemanticClaimRecord
 from l9_constellation_topology.domain.confidence import ConflictStatus
 from l9_constellation_topology.domain.edge import EdgeRecord, EdgeType
@@ -346,3 +347,10 @@ def test_impact_cli_accepts_the_resolution_aware_flag(
     output = json.loads(capsys.readouterr().out)
     assert output["subject_id"] == "repo:l9-assertion-sample"
     assert "unresolved_edge_ids" in output
+    if flag:
+        # The opt-in reading names itself; the rest is exactly an ImpactIndex.
+        assert output.pop("interpretation") == RESOLUTION_AWARE_IMPACT_INTERPRETATION
+    else:
+        # Generic reachability keeps its established output: a bare ImpactIndex.
+        assert "interpretation" not in output
+    ImpactIndex.model_validate(output)

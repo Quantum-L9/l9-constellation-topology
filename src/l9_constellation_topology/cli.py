@@ -66,7 +66,7 @@ from l9_constellation_topology.renderers import (
     render_neo4j_candidate_artifact,
     render_reports,
 )
-from l9_constellation_topology.run import canonical_json, semantic_hash
+from l9_constellation_topology.run import canonical_data, canonical_json, semantic_hash
 from l9_constellation_topology.scanners.repository_model_scanner import scan_repository_model
 from l9_constellation_topology.topology.claim_view import (
     DEFAULT_QUERY_LIMIT,
@@ -321,6 +321,10 @@ def cmd_render_report(args: argparse.Namespace) -> int:
     return _commit_exit_code(receipt, stage="render-report")
 
 
+#: Label on ``impact --resolution-aware`` output. The default output carries none.
+RESOLUTION_AWARE_IMPACT_INTERPRETATION = "resolution-aware-dependency-impact"
+
+
 def cmd_impact(args: argparse.Namespace) -> int:
     materialized, _ = load_topology_bundle(Path(args.input_bundle))
     result = assess_impact(
@@ -336,7 +340,16 @@ def cmd_impact(args: argparse.Namespace) -> int:
         )
         | frozenset(record.artifact_id for record in materialized.state.artifact_records),
     )
-    _print_json(result)
+    if not args.resolution_aware:
+        # Generic reachability: the bare ImpactIndex, byte-identical to before.
+        _print_json(result)
+        return 0
+    # Opt-in dependency impact is a different interpretation of the same graph
+    # (ADR-0035 decision 4), so its output names the interpretation that produced
+    # it. Presentation only: ImpactIndex and the stored impact_indexes are unchanged.
+    _print_json(
+        {"interpretation": RESOLUTION_AWARE_IMPACT_INTERPRETATION, **canonical_data(result)}
+    )
     return 0
 
 
