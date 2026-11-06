@@ -35,6 +35,10 @@ The former root Makefile defined `test` (plain pytest) and an all-in-one `valida
 
 5. **Core's Semgrep gate.** Once repository verification passes, Core's SDK technical gate blocks on Semgrep findings. Its one blocking finding here, `AST-ROUTING-004` (raw `/execute` bypassing GateClient), is in `evidence/live-qualify-2026-08-02/run_gate_qualify.py`. That file is a sealed evidence harness: it is never packaged or run by CI, and it posts to Gate itself as the external originator. It carries an inline `nosemgrep: gateclient-bypass-execute` with that rationale instead of being rewritten, because rewriting it would break the provenance of the evidence it produced.
 
+### Amendment (2026-11-06): rule identities after SDK rule precision
+
+l9-ci-sdk `d09d396` (#108, its ADR-0019) rewrote AST-ROUTING-001/002 and AST-TRANSPORT-004 as taint rules over L9 destinations. The same call on line 89 of the harness, a POST to `GATE_URL` + `/v1/execute`, is now also reported as `httpx-direct-node-dispatch` and `raw-execute-dict-contract`, and Core's Semgrep gate blocked every pull request on them. The inline annotation now names all three rule ids. The rationale and scope are unchanged: one line of one sealed evidence harness, not a rule exclusion. A local run of the `d09d396` rules reports both findings on the unannotated line and none on the annotated line, and with `--disable-nosem` all three rules still match there.
+
 ## Consequences
 
 - `Analyze (central Core)` repository verification can pass here, which unblocks every pull request held by it, including #39.
