@@ -411,9 +411,11 @@ def test_keyset_pagination_walks_every_match_exactly_once() -> None:
     assert pages == 3
     assert seen == sorted(view.claim_id for view in index.views)
     assert len(set(seen)) == 7
-    assert index.query(ClaimQuery(limit=3, after=seen[2])) == index.query(
-        ClaimQuery(limit=3, after=seen[2])
-    )
+    # A cursor names its page exactly, on a freshly built index too.
+    rebuilt = SemanticClaimIndex.from_state(state)
+    resumed = rebuilt.query(ClaimQuery(limit=3, after=seen[2]))
+    assert [view.claim_id for view in resumed.claims] == seen[3:6]
+    assert resumed.next_after == seen[5]
 
 
 def test_differential_separates_evidence_and_interpretation() -> None:
