@@ -59,6 +59,7 @@ from l9_constellation_topology.reconciliation import (
     predicate_interpretation,
     predicate_policy_hash,
 )
+from l9_constellation_topology.run import canonical_json
 from l9_constellation_topology.run.evidence import EvidenceRecord
 from l9_constellation_topology.topology.claim_projection import (
     ProjectionIneligibility,
@@ -290,8 +291,24 @@ class ClaimQuery:
             yield lambda view: _distinct_locations(view) >= self.minimum_locations
 
 
+def _locator_key(location: SourceLocation) -> str | None:
+    """A stable, comparable form of a structured locator, or ``None`` when absent."""
+    return canonical_json(location.locator) if location.locator is not None else None
+
+
 def _distinct_locations(view: SemanticClaimView) -> int:
-    return len({(location.source_path, location.line_number) for location in view.source_locations})
+    """Count distinct places a claim was read: path, line, and structured locator.
+
+    The structured locator is part of the identity because non-line formats
+    (PDF pages, slides, workbook cells, document blocks) carry no line number:
+    without it, two places in one such file would collapse into one.
+    """
+    return len(
+        {
+            (location.source_path, location.line_number, _locator_key(location))
+            for location in view.source_locations
+        }
+    )
 
 
 class ClaimQueryResult(FrozenModel):
@@ -334,6 +351,7 @@ _DIFFERENTIAL_FIELDS: tuple[str, ...] = (
     "support",
     "cardinality",
     "authority",
+    "confidence",
     "conflict_status",
     "conflict_ids",
     "projection_status",
@@ -344,7 +362,7 @@ _DIFFERENTIAL_FIELDS: tuple[str, ...] = (
 
 def _support_signature(
     view: SemanticClaimView,
-) -> tuple[tuple[str | None, int | None, str | None, str | None], ...]:
+) -> tuple[tuple[str | None, int | None, str | None, str | None, str | None], ...]:
     """Where a claim's support was read, independent of the packet that carried it."""
     return tuple(
         sorted(
@@ -352,6 +370,7 @@ def _support_signature(
                 (
                     location.source_path,
                     location.line_number,
+                    _locator_key(location),
                     location.content_hash,
                     location.source_revision,
                 )
