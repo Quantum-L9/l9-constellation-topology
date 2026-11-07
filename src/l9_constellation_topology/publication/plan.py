@@ -12,6 +12,7 @@ from datetime import datetime
 from pathlib import Path
 
 from l9_constellation_topology.domain.claim import SemanticClaimRecord
+from l9_constellation_topology.domain.edge import EdgeRecord
 from l9_constellation_topology.packets.refs import PacketRef
 from l9_constellation_topology.packets.topology_packet import (
     MaterializedTopology,
@@ -211,6 +212,61 @@ def _lower_claims(
     return lowered, skipped
 
 
+def _skip_relationship(edge: EdgeRecord, reason: str) -> SkippedCandidate:
+    return SkippedCandidate(source_kind="relationship", source_id=edge.edge_id, reason=reason)
+
+
+def _lower_relationships(
+    edges: tuple[EdgeRecord, ...],
+    *,
+    policy: PublicationPolicy,
+    packet: TopologyPacket,
+    index: TopologyIndex,
+    published_at: datetime,
+    qualification_index: QualificationIndex | None,
+) -> tuple[list[LoweredCandidate], list[SkippedCandidate]]:
+    """Lower the selected relationships, recording every skip with its reason.
+
+    ``qualification_index`` is present under a strict policy (ADR-0036).
+    Qualification then runs first, so a relation skipped by selection is known
+    to be qualified, and an unqualified one is never reported as merely
+    unselected. Without it the pre-ADR-0036 path runs unchanged.
+    """
+    eligible_edge_types = set(policy.eligible_edge_types)
+    lowered: list[LoweredCandidate] = []
+    skipped: list[SkippedCandidate] = []
+    for edge in edges:
+        qualification = (
+            qualify_relation(edge, qualification_index) if qualification_index is not None else None
+        )
+        if qualification is not None and not qualification.qualified:
+            skipped.append(_skip_relationship(edge, qualification.reason))
+            continue
+        if str(edge.edge_type) not in eligible_edge_types:
+            skipped.append(_skip_relationship(edge, SKIP_EDGE_TYPE))
+            continue
+        # Legacy path: an explicit work relation publishes only when its target
+        # resolved to exactly one observed artifact. An ambiguous or unresolved
+        # target still produced a canonical edge — the declaration happened — but
+        # publishing it would state a *resolved* relation downstream. Under strict
+        # qualification the same rule is applied by `qualify_relation`.
+        resolution = edge.properties.get("target_resolution")
+        if qualification is None and resolution is not None and resolution != "exact-artifact":
+            skipped.append(_skip_relationship(edge, SKIP_UNRESOLVED_WORK_TARGET))
+            continue
+        lowered.append(
+            lower_relationship(
+                edge,
+                policy=policy,
+                packet=packet,
+                index=index,
+                published_at=published_at,
+                qualification=qualification.as_metadata() if qualification is not None else None,
+            )
+        )
+    return lowered, skipped
+
+
 def build_publication_plan(
     materialized: MaterializedTopology,
     policy: PublicationPolicy,
@@ -226,7 +282,6 @@ def build_publication_plan(
     index = TopologyIndex.build(state)
     context = EligibilityContext.build(policy=policy, packet=packet, state=state, index=index)
     eligible_entity_kinds = set(policy.eligible_entity_kinds)
-    eligible_edge_types = set(policy.eligible_edge_types)
 
     lowered: list[LoweredCandidate] = []
     skipped: list[SkippedCandidate] = []
@@ -283,69 +338,18 @@ def build_publication_plan(
         for record in state.artifact_records
     )
 
-    qualification_index = (
-        QualificationIndex.build(state) if policy.relation_qualification == "strict" else None
+    relationship_lowered, relationship_skipped = _lower_relationships(
+        state.edge_records,
+        policy=policy,
+        packet=packet,
+        index=index,
+        published_at=timestamp,
+        qualification_index=(
+            QualificationIndex.build(state) if policy.relation_qualification == "strict" else None
+        ),
     )
-    for edge in state.edge_records:
-        if qualification_index is not None:
-            # Strict: qualification first, so a relation skipped by selection is
-            # known to be structurally and evidentially qualified, and an
-            # unqualified one is never reported as merely unselected.
-            qualification = qualify_relation(edge, qualification_index)
-            if not qualification.qualified:
-                skipped.append(
-                    SkippedCandidate(
-                        source_kind="relationship",
-                        source_id=edge.edge_id,
-                        reason=qualification.reason,
-                    )
-                )
-                continue
-            if str(edge.edge_type) not in eligible_edge_types:
-                skipped.append(
-                    SkippedCandidate(
-                        source_kind="relationship", source_id=edge.edge_id, reason=SKIP_EDGE_TYPE
-                    )
-                )
-                continue
-            lowered.append(
-                lower_relationship(
-                    edge,
-                    policy=policy,
-                    packet=packet,
-                    index=index,
-                    published_at=timestamp,
-                    qualification=qualification.as_metadata(),
-                )
-            )
-            continue
-        if str(edge.edge_type) not in eligible_edge_types:
-            skipped.append(
-                SkippedCandidate(
-                    source_kind="relationship", source_id=edge.edge_id, reason=SKIP_EDGE_TYPE
-                )
-            )
-            continue
-        # An explicit work relation publishes only when its target resolved to
-        # exactly one observed artifact. An ambiguous or unresolved target still
-        # produced a canonical edge — the declaration happened — but publishing
-        # it would state a *resolved* relation downstream, and a consumer reading
-        # only the assertion cannot tell that the endpoint was never observed.
-        resolution = edge.properties.get("target_resolution")
-        if resolution is not None and resolution != "exact-artifact":
-            skipped.append(
-                SkippedCandidate(
-                    source_kind="relationship",
-                    source_id=edge.edge_id,
-                    reason=SKIP_UNRESOLVED_WORK_TARGET,
-                )
-            )
-            continue
-        lowered.append(
-            lower_relationship(
-                edge, policy=policy, packet=packet, index=index, published_at=timestamp
-            )
-        )
+    lowered.extend(relationship_lowered)
+    skipped.extend(relationship_skipped)
 
     # The non-canonical domains, recorded as held rather than left absent. None
     # of them has a lowering function and none can acquire one by accident: they
