@@ -148,6 +148,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `docs/adr/0034-semantic-claim-read-model-and-managed-header-vocabulary.md` — accepted architecture decision record
 - `docs/adr/0035-conflict-aware-projection-and-resolution-aware-impact.md` — accepted architecture decision record
 - `docs/adr/0036-evidence-qualified-relation-publication.md` — architecture decision record, accepted on merge (activation pending owner decision)
+- `docs/adr/0037-stop-promoting-artifact-classification-to-relations.md` — architecture decision record, accepted on merge (canonical identity change)
 - `docs/adr/README.md` — ADR directory governance and navigation
 - `docs/architecture.md` — architecture, contract, deployment, recovery, or model documentation
 - `docs/archive/v4/01_SPEC_ATTACK.md` — superseded v4 historical artifact retained for migration evidence

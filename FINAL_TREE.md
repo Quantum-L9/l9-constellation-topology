@@ -106,6 +106,7 @@ l9-constellation-topology/
 │   │   ├── 0034-semantic-claim-read-model-and-managed-header-vocabulary.md
 │   │   ├── 0035-conflict-aware-projection-and-resolution-aware-impact.md
 │   │   ├── 0036-evidence-qualified-relation-publication.md
+│   │   ├── 0037-stop-promoting-artifact-classification-to-relations.md
 │   │   └── README.md
 │   ├── archive
 │   │   └── v4

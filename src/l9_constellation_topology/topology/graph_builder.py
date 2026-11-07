@@ -50,19 +50,19 @@ def _edge(
     )
 
 
-#: Artifact types that also state a relationship, beyond mere containment.
-_ARTIFACT_RELATION_BY_TYPE = {
-    "architecture-decision": CanonicalEdgeType.governed_by,
-    "governance": CanonicalEdgeType.governed_by,
-    "documentation": CanonicalEdgeType.documented_by,
-    "ci-workflow": CanonicalEdgeType.validated_by,
-}
-
-
 def _artifact_graph(
     artifact: ArtifactRecord,
 ) -> tuple[CanonicalGraphRecord, tuple[CanonicalEdgeRecord, ...]]:
-    """Return the node and edges one artifact contributes."""
+    """Return the node and edges one artifact contributes.
+
+    An artifact contributes its node, its ``CONTAINS`` inventory edge, and an
+    ``IMPLEMENTS`` edge for each capability its own record lists. Its
+    ``artifact_type`` is a node property and nothing more (ADR-0037): the type
+    is a classification of the file, usually from its path, and says nothing
+    about whether the repository is governed, documented or validated by it.
+    Such a relation is canonical only when a producer declares it, through a
+    declared relationship or a projected claim, with evidence of its own.
+    """
     node = CanonicalGraphRecord(
         record_type="node",
         label="Artifact",
@@ -85,17 +85,6 @@ def _artifact_graph(
             confidence=artifact.confidence,
         )
     ]
-    semantic_type = _ARTIFACT_RELATION_BY_TYPE.get(artifact.artifact_type)
-    if semantic_type is not None:
-        relations.append(
-            _edge(
-                artifact.repository_id,
-                artifact.artifact_id,
-                semantic_type,
-                evidence_refs=artifact.evidence_refs,
-                confidence=artifact.confidence,
-            )
-        )
     relations.extend(
         _edge(
             artifact.artifact_id,

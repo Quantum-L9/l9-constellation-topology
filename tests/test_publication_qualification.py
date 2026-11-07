@@ -178,20 +178,51 @@ def test_every_pinned_edge_has_an_identified_producer(
         assert "unrecognized" not in {item.origin for item in _qualifications(topology).values()}
 
 
+def _promoted_edges(topology: MaterializedTopology) -> tuple[EdgeRecord, ...]:
+    """Recreate the graph-builder edges a pre-ADR-0037 compile promoted from artifact type.
+
+    Since ADR-0037 the compiler no longer emits them, but a packet compiled before
+    it still carries them, so qualification must keep naming them for what they are.
+    """
+    promotion = {
+        "architecture-decision": EdgeType.governed_by,
+        "governance": EdgeType.governed_by,
+        "documentation": EdgeType.documented_by,
+        "ci-workflow": EdgeType.validated_by,
+    }
+    return tuple(
+        EdgeRecord(
+            edge_id=f"edge:promoted:{artifact.artifact_id}",
+            source_id=artifact.repository_id,
+            target_id=artifact.artifact_id,
+            edge_type=promotion[artifact.artifact_type],
+            evidence_refs=artifact.evidence_refs,
+            confidence=artifact.confidence,
+        )
+        for artifact in topology.state.artifact_records
+        if artifact.artifact_type in promotion
+    )
+
+
 def test_artifact_type_promotion_is_classification_only(
     repository_topology: MaterializedTopology, corpus_topology: MaterializedTopology
 ) -> None:
+    for topology in (repository_topology, corpus_topology):
+        # The current compiler emits none (ADR-0037).
+        assert "artifact-classification" not in {
+            item.origin for item in _qualifications(topology).values()
+        }
     promoted = [
-        item
+        qualify_relation(edge, QualificationIndex.build(topology.state))
         for topology in (repository_topology, corpus_topology)
-        for item in _qualifications(topology).values()
-        if item.origin == "artifact-classification"
+        for edge in _promoted_edges(topology)
     ]
     assert {item.edge_type for item in promoted} == {
         "DOCUMENTED_BY",
         "GOVERNED_BY",
         "VALIDATED_BY",
     }
+    assert {item.origin for item in promoted} == {"artifact-classification"}
     assert {item.reason for item in promoted} == {q.REASON_CLASSIFICATION_ONLY}
 
 
@@ -409,10 +440,22 @@ def test_strict_effect_counts_on_pinned_packets(
             if item.candidate_id not in strict_ids
         )
 
-    # Nine classification-promoted relations and two auxiliary claims.
-    assert removed(repository_topology) == {"relationship": 9, "claim": 2}
-    # Fourteen classification-promoted DOCUMENTED_BY relations.
-    assert removed(corpus_topology) == {"relationship": 14}
+    # Two auxiliary claims. The classification-promoted relations strict used to
+    # skip here (nine and fourteen) are no longer compiled at all (ADR-0037).
+    assert removed(repository_topology) == {"claim": 2}
+    assert removed(corpus_topology) == {}
+
+    # Against a pre-ADR-0037 topology carrying them, strict still removes exactly those.
+    for topology, count in ((repository_topology, 9), (corpus_topology, 14)):
+        promoted = _promoted_edges(topology)
+        assert len(promoted) == count
+        legacy_shaped = MaterializedTopology(
+            packet=topology.packet,
+            state=topology.state.model_copy(
+                update={"edge_records": (*topology.state.edge_records, *promoted)}
+            ),
+        )
+        assert removed(legacy_shaped)["relationship"] == count
 
 
 def test_retained_facts_keep_fact_identity_and_rekey_only_by_policy_version(
