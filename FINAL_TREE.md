@@ -190,6 +190,12 @@ l9-constellation-topology/
 │       └── STACK-HEALTH-SNAPSHOT.json
 ├── outputs
 │   └── .gitkeep
+├── reports
+│   └── end-session
+│       ├── governance-handoff
+│       │   └── 2026-11-07-pr57-9b08dbb4cfe9.md
+│       └── session-handoff
+│           └── 2026-11-07-pr57-9b08dbb4cfe9.md
 ├── schemas
 │   ├── artifact-record.schema.json
 │   ├── bridge-gap-projection.schema.json

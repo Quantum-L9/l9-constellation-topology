@@ -223,6 +223,8 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `evidence/live-qualify-2026-08-02/run_gate_qualify.py` — live-qualification campaign evidence record
 - `outputs/.gitkeep` — tracked output-directory marker only
 - `pyproject.toml` — Python package metadata, entrypoints, and quality configuration
+- `reports/end-session/governance-handoff/2026-11-07-pr57-9b08dbb4cfe9.md` — governance end-session handoff report, published onto the PR branch by the Cursor-Governance report publisher (`ops/reports/publish.py`)
+- `reports/end-session/session-handoff/2026-11-07-pr57-9b08dbb4cfe9.md` — repository end-session handoff report, published onto the PR branch by the Cursor-Governance report publisher (`ops/reports/publish.py`)
 - `schemas/artifact-record.schema.json` — canonical or compatibility domain JSON Schema
 - `schemas/bridge-gap-projection.schema.json` — generated bridge-gap decision-support JSON Schema
 - `schemas/capability-record.schema.json` — canonical or compatibility domain JSON Schema
