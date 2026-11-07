@@ -1286,6 +1286,18 @@
       "path": "pyproject.toml"
     },
     {
+      "git_object_id": "3628a213de072a96b8c59b2d99230dd957e56b4d",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "reports/end-session/governance-handoff/2026-11-07-pr57-9b08dbb4cfe9.md"
+    },
+    {
+      "git_object_id": "fcadad0860edcdae69b042968b53482d318a5c24",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "reports/end-session/session-handoff/2026-11-07-pr57-9b08dbb4cfe9.md"
+    },
+    {
       "git_object_id": "0a395c9a9fa9d1d39b45ad6fb566e2eb8c7590d9",
       "mode": "100644",
       "object_type": "blob",
@@ -1940,7 +1952,7 @@
       "path": "src/l9_constellation_topology/publication/policy.py"
     },
     {
-      "git_object_id": "ed560adabe40d22851bcba5441813cb3e9128c09",
+      "git_object_id": "40033925c927035296a555d03132c8a6e6f92523",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/publication/qualification.py"
@@ -3284,7 +3296,7 @@
       "path": "tests/test_publication_planning.py"
     },
     {
-      "git_object_id": "91725cd0b4851f4d3f2eccb4c091db0d04c98440",
+      "git_object_id": "368fd210597f72739c76d8f64ca6802f31c2d7a5",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_publication_qualification.py"
@@ -3452,8 +3464,8 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:45bcc2d01f2784a514b3e6d638b0c8966540d1f61591d9cfceeaec08b7170014",
-  "entry_count": 575,
+  "entries_sha256": "sha256:a687fe76caffcd3297857867f849b64c0821619634f651b8d29cfa6aefa99ea7",
+  "entry_count": 577,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
   ],
