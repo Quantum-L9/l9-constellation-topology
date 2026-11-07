@@ -221,11 +221,20 @@ def _resolved_evidence(edge: EdgeRecord, index: QualificationIndex) -> tuple[Evi
 def _relation_field_evidence(
     edge: EdgeRecord, evidence: tuple[EvidenceRecord, ...]
 ) -> tuple[EvidenceRecord, ...]:
+    """Return the direct evidence that declares this relation about this edge.
+
+    The record must name the relation (its ``field``) *and* be about one of the
+    edge's own endpoints: a resolvable record with the right field about some
+    other subject states a different fact and does not support this edge.
+    """
     field = _relation_field(edge.edge_type)
+    endpoints = {edge.source_id, edge.target_id}
     return tuple(
         record
         for record in evidence
-        if record.field == field and str(record.evidence_class) in DIRECT_EVIDENCE_CLASSES
+        if record.field == field
+        and str(record.evidence_class) in DIRECT_EVIDENCE_CLASSES
+        and record.subject_id in endpoints
     )
 
 
@@ -344,9 +353,13 @@ def qualify_relation(edge: EdgeRecord, index: QualificationIndex) -> RelationQua
             return _result(edge, origin, "unqualified", blocked)
         return _result(edge, origin, "qualified", "projection-eligible-claim")
     if origin == "exact-duplicate":
-        if edge.properties.get("method") != EXACT_DUPLICATE_METHOD or not edge.properties.get(
-            "content_hash"
-        ):
+        content_hash = edge.properties.get("content_hash")
+        if edge.properties.get("method") != EXACT_DUPLICATE_METHOD or not content_hash:
+            return _result(edge, origin, "unqualified", REASON_EVIDENCE_MISSING)
+        # Byte identity is re-checked against both observed endpoints rather than
+        # taken from the edge: a hash no endpoint carries is not equality.
+        endpoints = (index.artifacts.get(edge.source_id), index.artifacts.get(edge.target_id))
+        if any(artifact is None or artifact.content_hash != content_hash for artifact in endpoints):
             return _result(edge, origin, "unqualified", REASON_EVIDENCE_MISSING)
         return _result(edge, origin, "qualified", "content-hash-equality")
     if origin == "producer-declared":
