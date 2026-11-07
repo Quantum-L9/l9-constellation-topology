@@ -673,8 +673,19 @@ def lower_relationship(
     packet: TopologyPacket,
     index: TopologyIndex,
     published_at: datetime,
+    qualification: dict[str, str] | None = None,
 ) -> LoweredCandidate:
-    """Lower a topology edge into a structured memory assertion."""
+    """Lower a topology edge into a structured memory assertion.
+
+    ``qualification`` is the ADR-0036 basis that admitted the edge under a strict
+    policy. It is recorded beside the relation's structured facts so a published
+    relationship states which producer evidence qualified it. It is absent under
+    a legacy policy, whose requests stay byte-identical to the pre-ADR-0036 plan,
+    and it never enters fact or effect identity.
+    """
+    relation = relation_metadata(record)
+    if qualification is not None:
+        relation["qualification"] = dict(qualification)
     predicate = str(record.edge_type)
     content = (
         f"Topology relationship: {record.source_id} {predicate} {record.target_id} "
@@ -700,7 +711,7 @@ def lower_relationship(
         source_fields=("source_id", "edge_type", "target_id", "direction"),
         extraction_method=RELATIONSHIP_EXTRACTION_METHOD,
         published_at=published_at,
-        relation=relation_metadata(record),
+        relation=relation,
     )
 
 

@@ -49,6 +49,46 @@ evidence to their downstream equivalents, and sets the fail-closed switches.
 Facts the policy does not select are recorded in `skipped_candidates` with a
 reason. Nothing is dropped silently.
 
+### Relation qualification and selective claims (ADR-0036, pending owner decision)
+
+Policy 2.0.0 sets `relation_qualification: strict`. Before an edge's type is
+checked against `eligible_edge_types`, `qualify_relation` asks whether the edge's
+own producer evidence proves the relation it states. It identifies the producer
+(work projector, claim projector, exact-duplicate detection, a producer-declared
+relationship, or the graph-builder record the edge mirrors) and applies that
+producer's rule, reusing ADR-0035 D5a (a conflicted originating claim never
+qualifies a relation) and D5b (a target is resolved only on the producer's own
+positive evidence). An unqualified edge is skipped under a `qualification.*`
+reason; `policy.edge_type_not_selected` under a strict policy therefore means the
+edge was qualified and only its type was not selected. A relationship lowered
+under strict records `topology_relation.qualification` (`origin`, `status`,
+`basis`) in its request metadata, outside fact and effect identity.
+
+| Skip reason | Meaning |
+|---|---|
+| `qualification.artifact_classification_only` | The edge's only evidence is an artifact's existence and path classification |
+| `qualification.evidence_origin_unsupported` | No producer the edge type admits can be identified from the edge |
+| `qualification.relation_evidence_missing` | The producer is known, but its mandatory evidence (resolved refs, originating claim, content hash) is absent |
+| `qualification.originating_claim_not_projectable` | The originating claim fails D5a |
+| `qualification.endpoint_kind_mismatch` | A claim-projected edge's endpoint kind does not match its family |
+| `qualification.endpoint_unresolved` | A graph-builder dependency target is not an observed repository |
+| `qualification.relation_type_unrecognized` | The edge type has no declared qualification rule |
+| `relation.work_target_not_exactly_resolved` | A work relation whose target did not resolve to exactly one artifact (unchanged) |
+
+`claim_publication: selective` lowers a claim only when its predicate is named in
+`eligible_claim_predicates` (otherwise `policy.claim_predicate_not_selected`).
+Declaration-only predicates — governed and managed header fields, header
+structure, field observations — are refused in that list and publish only when
+named in `declaration_only_claim_predicates` (otherwise
+`policy.declaration_only_claim_not_opted_in`). A predicate the registry does not
+declare is still lowered and held. A policy that uses none of the four
+qualification fields hashes exactly as it did before they existed;
+`tests/fixtures/publication_policies/legacy-v1` is the 1.0.0 policy and
+reproduces the pre-ADR-0036 plan byte for byte.
+
+Bumping the policy version re-keys every effect (ADR-0025). Whether plans under
+2.0.0 may be consumed is an owner decision recorded in ADR-0036.
+
 ## Eligibility
 
 Every candidate carries a status and the reasons behind it.

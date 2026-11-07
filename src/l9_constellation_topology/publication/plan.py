@@ -17,6 +17,7 @@ from l9_constellation_topology.packets.topology_packet import (
     MaterializedTopology,
     TopologyPacket,
 )
+from l9_constellation_topology.reconciliation.predicates import DECLARATION_ONLY_PREDICATES
 from l9_constellation_topology.run.evidence import utc_now
 
 from .contracts import (
@@ -28,6 +29,8 @@ from .contracts import (
 )
 from .eligibility import (
     SKIP_CANDIDATE_DOMAIN,
+    SKIP_CLAIM_PREDICATE,
+    SKIP_DECLARATION_ONLY_CLAIM,
     SKIP_EDGE_TYPE,
     SKIP_ENTITY_KIND,
     SKIP_READINESS_DOMAIN,
@@ -49,6 +52,7 @@ from .lowering import (
     lower_semantic_claim,
 )
 from .policy import PublicationPolicy, load_publication_policy
+from .qualification import QualificationIndex, qualify_relation
 
 PUBLICATION_PRODUCER_SUFFIX = "publication"
 
@@ -173,6 +177,21 @@ def _lower_claims(
                 )
             )
             continue
+        # Predicate selection (ADR-0036). Declaration-only metadata reaches durable
+        # memory only when the policy opts its predicate in by name.
+        if policy.claim_predicate_selection(record.predicate) is False:
+            skipped.append(
+                SkippedCandidate(
+                    source_kind="claim",
+                    source_id=record.claim_id,
+                    reason=(
+                        SKIP_DECLARATION_ONLY_CLAIM
+                        if record.predicate in DECLARATION_ONLY_PREDICATES
+                        else SKIP_CLAIM_PREDICATE
+                    ),
+                )
+            )
+            continue
         try:
             lowered.append(
                 lower_semantic_claim(
@@ -264,7 +283,42 @@ def build_publication_plan(
         for record in state.artifact_records
     )
 
+    qualification_index = (
+        QualificationIndex.build(state) if policy.relation_qualification == "strict" else None
+    )
     for edge in state.edge_records:
+        if qualification_index is not None:
+            # Strict: qualification first, so a relation skipped by selection is
+            # known to be structurally and evidentially qualified, and an
+            # unqualified one is never reported as merely unselected.
+            qualification = qualify_relation(edge, qualification_index)
+            if not qualification.qualified:
+                skipped.append(
+                    SkippedCandidate(
+                        source_kind="relationship",
+                        source_id=edge.edge_id,
+                        reason=qualification.reason,
+                    )
+                )
+                continue
+            if str(edge.edge_type) not in eligible_edge_types:
+                skipped.append(
+                    SkippedCandidate(
+                        source_kind="relationship", source_id=edge.edge_id, reason=SKIP_EDGE_TYPE
+                    )
+                )
+                continue
+            lowered.append(
+                lower_relationship(
+                    edge,
+                    policy=policy,
+                    packet=packet,
+                    index=index,
+                    published_at=timestamp,
+                    qualification=qualification.as_metadata(),
+                )
+            )
+            continue
         if str(edge.edge_type) not in eligible_edge_types:
             skipped.append(
                 SkippedCandidate(

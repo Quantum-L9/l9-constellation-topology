@@ -1,5 +1,22 @@
 # Changelog
 
+## Unreleased - evidence-qualified relation publication (ADR-0036, pending owner decision)
+
+- `publication/qualification.py` adds `qualify_relation`, one pure decision on
+  whether an edge's own producer evidence proves its relation. It reuses
+  ADR-0035 D5a and D5b and fails closed on unrecognized types, unidentified
+  producers and absent relation-specific evidence.
+- Publication policy 2.0.0 sets `relation_qualification: strict` and
+  `claim_publication: selective`. Graph-builder `GOVERNED_BY`, `DOCUMENTED_BY`
+  and `VALIDATED_BY` edges promoted from an artifact's type classification are
+  skipped as `qualification.artifact_classification_only`; auxiliary claims are
+  skipped as `policy.claim_predicate_not_selected`; declaration-only header
+  predicates publish only when explicitly opted in.
+- The Topology Packet, its schema and its identity are unchanged. The policy
+  version bump re-keys every retained effect (ADR-0025); candidate identities
+  of retained facts are unchanged. A policy using none of the new fields keeps
+  its 1.0.0 hash and plan byte for byte.
+
 ## Unreleased - claim query pagination and categorized differential (ADR-0034 amendment)
 
 - `ClaimQuery.after` / `query-claims --after` add deterministic keyset

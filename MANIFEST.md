@@ -147,6 +147,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `docs/adr/0033-register-governed-header-predicates-as-declaration-only.md` — accepted architecture decision record
 - `docs/adr/0034-semantic-claim-read-model-and-managed-header-vocabulary.md` — accepted architecture decision record
 - `docs/adr/0035-conflict-aware-projection-and-resolution-aware-impact.md` — accepted architecture decision record
+- `docs/adr/0036-evidence-qualified-relation-publication.md` — architecture decision record, accepted on merge (activation pending owner decision)
 - `docs/adr/README.md` — ADR directory governance and navigation
 - `docs/architecture.md` — architecture, contract, deployment, recovery, or model documentation
 - `docs/archive/v4/01_SPEC_ATTACK.md` — superseded v4 historical artifact retained for migration evidence
@@ -330,6 +331,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `src/l9_constellation_topology/publication/lowering.py` — topology fact to memory intent lowering
 - `src/l9_constellation_topology/publication/plan.py` — deterministic publication plan construction
 - `src/l9_constellation_topology/publication/policy.py` — versioned publication policy resolution
+- `src/l9_constellation_topology/publication/qualification.py` — pure evidence-qualified relation publication decision (ADR-0036)
 - `src/l9_constellation_topology/py.typed` — production Python package implementation
 - `src/l9_constellation_topology/reconciliation/__init__.py` — production Python package implementation
 - `src/l9_constellation_topology/reconciliation/cardinality.py` — production Python package implementation
@@ -456,6 +458,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `tests/fixtures/legacy_v4_outputs/risk_register.md` — deterministic packet, source, or regression fixture
 - `tests/fixtures/legacy_v4_outputs/topology_report.json` — deterministic packet, source, or regression fixture
 - `tests/fixtures/legacy_v4_outputs/topology_report.md` — deterministic packet, source, or regression fixture
+- `tests/fixtures/publication_policies/legacy-v1/.l9/publication-policy.yaml` — byte copy of the pre-ADR-0036 publication policy 1.0.0, for strict-versus-legacy plan comparison
 - `tests/fixtures/publication_identity/golden-vectors.json` — publication identity vectors generated from this producer and asserted by both this repository and l9-graphiti-memory
 - `tests/fixtures/repository_model_packets/l9-assertion-sample/manifest.json` — deterministic packet, source, or regression fixture
 - `tests/fixtures/repository_model_packets/l9-assertion-sample/packet.json` — deterministic packet, source, or regression fixture
@@ -550,6 +553,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `tests/test_publication_effect_identity.py` — unit, contract, integration, regression, or governance test
 - `tests/test_publication_identity_golden_vectors.py` — pins the publication identity algorithm against the cross-repository golden vectors
 - `tests/test_publication_plan_identity.py` — automated regression and contract test suite
+- `tests/test_publication_qualification.py` — evidence-qualified relation publication and predicate-selective claim tests (ADR-0036)
 - `tests/test_publication_planning.py` — unit, contract, integration, regression, or governance test
 - `tests/test_publication_temporal.py` — proves observation time and publication time stay distinct coordinates
 - `tests/test_qualified_projection.py` — conflict-aware projection eligibility and resolution-aware impact tests (ADR-0035)

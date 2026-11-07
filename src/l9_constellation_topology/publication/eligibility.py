@@ -51,6 +51,13 @@ SKIP_UNRESOLVED_WORK_TARGET = "relation.work_target_not_exactly_resolved"
 #: triple downstream. Recording it as skipped keeps it visible; letting the
 #: lowering error escape would fail the whole plan over one malformed claim.
 SKIP_UNSTATEABLE_CLAIM = "claim.not_expressible_as_assertion"
+#: Selective claim publication (ADR-0036): a registry-declared predicate the policy
+#: did not name. The claim stays in canonical topology; only its lowering is skipped.
+SKIP_CLAIM_PREDICATE = "policy.claim_predicate_not_selected"
+#: A declaration-only predicate (header metadata, field observation) the policy did
+#: not explicitly opt in. Recorded under its own reason so "not selected" and
+#: "metadata held back by default" stay distinguishable in plan diagnostics.
+SKIP_DECLARATION_ONLY_CLAIM = "policy.declaration_only_claim_not_opted_in"
 
 
 class PublicationEligibilityError(ValueError):

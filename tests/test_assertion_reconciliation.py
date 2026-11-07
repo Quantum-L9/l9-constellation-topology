@@ -317,6 +317,13 @@ def test_a_claim_that_cannot_be_stated_is_skipped_with_a_reason() -> None:
     )
     skipped = [item for item in plan.skipped_candidates if item.reason == SKIP_UNSTATEABLE_CLAIM]
     assert [item.source_id for item in skipped] == [state.semantic_claims[0].claim_id]
-    # Every other claim published normally.
+    # Every other claim the policy selects published normally; a claim it does
+    # not select is recorded under its own selection reason (ADR-0036).
+    policy = load_publication_policy(root)
+    selected = [
+        claim
+        for claim in state.semantic_claims
+        if policy.claim_predicate_selection(claim.predicate) is not False
+    ]
     claim_candidates = [item for item in plan.candidates if item.candidate_kind == "claim"]
-    assert len(claim_candidates) == len(state.semantic_claims) - 1
+    assert len(claim_candidates) == len(selected) - 1

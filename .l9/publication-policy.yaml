@@ -1,5 +1,8 @@
 id: foundational-topology-publication
-version: 1.0.0
+# 2.0.0 (ADR-0036): evidence-qualified relation publication and predicate-selective
+# claim publication. Under ADR-0025 a version bump re-keys every memory effect,
+# because Confidence.policy_version is part of the durable write requested.
+version: 2.0.0
 
 # Namespace root for every lowered memory intent. Deterministic and independent
 # of the checkout location: a namespace is never derived from a filesystem path.
@@ -98,6 +101,63 @@ hold_on_missing_required_evidence: true
 # rather than published: it is preserved, evidenced, and diagnosed, but what it
 # means is not something publication may decide on its own.
 hold_on_unsupported_predicate: true
+
+# Relation qualification (ADR-0036). `strict` publishes a selected edge only when
+# its own producer evidence proves the relation it states (`qualify_relation`):
+# an edge supported only by an artifact's existence or type classification, an
+# edge whose producer cannot be identified, and an edge missing its mandatory
+# relation-specific evidence are skipped under `qualification.*` reasons. `legacy`
+# is the pre-ADR-0036 behaviour.
+relation_qualification: strict
+
+# Claim publication (ADR-0036). `selective` lowers only the predicates named
+# below. A predicate the registry does not declare is still lowered and held
+# (`predicate.unsupported_by_registry`), so a registry gap stays visible.
+claim_publication: selective
+
+# Registry predicates with declared semantic meaning: every `set` or `single`
+# predicate that is not declaration-only. Auxiliary predicates (existence of a
+# claim elsewhere, unresolved references) are not selected.
+eligible_claim_predicates:
+  - authority.canonical_contract
+  - authority.canonical_contract_count
+  - contract.invariant
+  - document.heading
+  - document.title
+  - http.handler_body_marker
+  - http.route
+  - http.route_handler
+  - package.build_backend
+  - package.dependency
+  - package.framework
+  - package.name
+  - package.packaging_system
+  - package.python_constraint
+  - package.server
+  - package.version
+  - repository.disclaimed_role
+  - repository.replaced_by
+  - repository.self_described_role
+  - repository.status
+  - service.action
+  - service.name
+  - service.version
+  - work.blocked_by
+  - work.depends_on
+  - work.kind
+  - work.milestone
+  - work.references
+  - work.status
+  - work.superseded_by
+  - work.supersedes
+  - work.task.completed
+  - work.task.open
+
+# Declaration-only predicates (governed `L9_META` header fields, the managed
+# l9-meta-injector header, header structure and field observations) explicitly
+# opted in to durable semantic memory. None is: header metadata is a declaration a
+# file makes about itself (ADR-0033, ADR-0034) and is not lowered by default.
+declaration_only_claim_predicates: []
 
 # Upper bound on lowered evidence references per candidate. Truncation is
 # recorded on the lowering receipt and in plan diagnostics; it is never silent.

@@ -28,6 +28,7 @@ from l9_constellation_topology.publication import (
     build_publication_plan,
     load_publication_policy,
 )
+from l9_constellation_topology.publication.eligibility import SKIP_CLAIM_PREDICATE
 from l9_constellation_topology.reconciliation import SUPPORTED_PREDICATES
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -266,7 +267,16 @@ def test_claims_lower_to_structured_memory_assertions(state) -> None:
         result.materialized, load_publication_policy(ROOT), published_at=FIXED_TIME
     )
     claim_candidates = [item for item in plan.candidates if item.candidate_kind == "claim"]
-    assert len(claim_candidates) == len(state.semantic_claims)
+    policy = load_publication_policy(ROOT)
+    selected = tuple(
+        claim
+        for claim in state.semantic_claims
+        if policy.claim_predicate_selection(claim.predicate) is not False
+    )
+    # Predicate-selective publication (ADR-0036): the auxiliary claims are not
+    # selected, and every selected claim lowers.
+    assert len(selected) < len(state.semantic_claims)
+    assert len(claim_candidates) == len(selected)
     triples = set()
     for candidate in claim_candidates:
         assertion = candidate.memory_intent.request.assertion
@@ -279,9 +289,7 @@ def test_claims_lower_to_structured_memory_assertions(state) -> None:
         assert metadata["source_assertion_ids"]
         # Topology never fabricates a downstream record identity.
         assert candidate.memory_intent.request.supersedes == ()
-    assert triples == {
-        (claim.subject_id, claim.predicate, claim.object) for claim in state.semantic_claims
-    }
+    assert triples == {(claim.subject_id, claim.predicate, claim.object) for claim in selected}
 
 
 def test_conflicted_claims_are_held_rather_than_published(state) -> None:
@@ -306,10 +314,15 @@ def test_no_candidate_is_silently_skipped(state) -> None:
     decided = Counter(
         item.eligibility.status for item in plan.candidates if item.candidate_kind == "claim"
     )
-    assert sum(decided.values()) == len(state.semantic_claims)
-    assert all(item.eligibility.reasons for item in plan.candidates)
     skipped_claims = [item for item in plan.skipped_candidates if item.source_kind == "claim"]
-    assert skipped_claims == []
+    assert sum(decided.values()) + len(skipped_claims) == len(state.semantic_claims)
+    assert all(item.eligibility.reasons for item in plan.candidates)
+    # The only claims not lowered are the ones predicate selection did not name,
+    # each recorded under that reason (ADR-0036): here, the auxiliary predicate.
+    by_id = {claim.claim_id: claim for claim in state.semantic_claims}
+    assert skipped_claims
+    assert {item.reason for item in skipped_claims} == {SKIP_CLAIM_PREDICATE}
+    assert {by_id[item.source_id].support for item in skipped_claims} == {"auxiliary"}
 
 
 def test_a_sparse_1_0_0_constellation_invents_no_claims() -> None:
