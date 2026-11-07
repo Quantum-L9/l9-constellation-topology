@@ -170,6 +170,20 @@ and its derived identities. The run of record for each change is the
 `validate` CI job on its pull request head; this section records no result of
 its own.
 
+## Evidence-qualified relation publication
+
+| Item | Status |
+|---|---|
+| `qualify_relation` and publication policy 2.0.0 (`strict`, `selective`) (ADR-0036) | Pending owner decision. Implemented on its pull request; activation requires a repository-owner decision because the version bump re-keys every retained effect (ADR-0025) and current downstream durable state is Unknown. |
+
+Behavioral evidence: `tests/test_publication_qualification.py` compares plans
+built under the checked-in policy and under
+`tests/fixtures/publication_policies/legacy-v1` from identical pinned packets.
+The legacy policy reproduces the pre-ADR-0036 plan byte for byte; the Topology
+Packet is unchanged under both. `HASH_LOCALITY_EVALUATION.json` keeps every
+verdict and moves only its candidate counts and policy identity. This section
+records no result of its own.
+
 ## Direct compile seam
 
 `.github/workflows/compile.yml` is authorized by ADR-0029 as a bounded, stateless compile

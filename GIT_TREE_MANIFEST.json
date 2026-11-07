@@ -230,7 +230,7 @@
       "path": ".l9/pipeline.yaml"
     },
     {
-      "git_object_id": "7e72a604d9a2cd8c3f8b2ab6c1ba9ba10c5ce00b",
+      "git_object_id": "101cd0a61fc344e15e26e27d7571d9d9cc2b951a",
       "mode": "100644",
       "object_type": "blob",
       "path": ".l9/publication-policy.yaml"
@@ -266,7 +266,7 @@
       "path": ".python-version"
     },
     {
-      "git_object_id": "eec297f4beb100a467f02efb790d589aa2480992",
+      "git_object_id": "315993c793fb5b25d5dbdbc50b452dc239344bf9",
       "mode": "100644",
       "object_type": "blob",
       "path": "ADR_INDEX.md"
@@ -296,7 +296,7 @@
       "path": "BUILD_SPECIFICATION.md"
     },
     {
-      "git_object_id": "b54581ccb491cff13cbaf40ef60aff3b0064c1b5",
+      "git_object_id": "3ffaef63527dda2f59e5d92b2e5eace3ff91d012",
       "mode": "100644",
       "object_type": "blob",
       "path": "CHANGELOG.md"
@@ -350,7 +350,7 @@
       "path": "EFFECT_IDENTITY_MIGRATION_PREFLIGHT.json"
     },
     {
-      "git_object_id": "8abd3c7bb9b1163fa506a829cbfb32aa0701119c",
+      "git_object_id": "c25559f58fbcc0df688ab70160592c9a617a622e",
       "mode": "100644",
       "object_type": "blob",
       "path": "FINAL_TREE.md"
@@ -368,7 +368,7 @@
       "path": "GOVERNANCE.md"
     },
     {
-      "git_object_id": "01f6f93b7b3ac3c77ef9bb93b18921126a231ba3",
+      "git_object_id": "be780ef3fd8976684a99dc6a2881176ab7ac7e93",
       "mode": "100644",
       "object_type": "blob",
       "path": "HASH_LOCALITY_EVALUATION.json"
@@ -392,7 +392,7 @@
       "path": "MAINTAINERS.md"
     },
     {
-      "git_object_id": "563147d3eca7beedbb71ea980a46fa9151a8adb4",
+      "git_object_id": "4ea92f9614fec1b3f21c0fe170df213a8ab1f6cb",
       "mode": "100644",
       "object_type": "blob",
       "path": "MANIFEST.md"
@@ -494,7 +494,7 @@
       "path": "UNKNOWN_REGISTER.md"
     },
     {
-      "git_object_id": "9da9149e93d975f2b9c0ed1ec0d48a393d63d2fd",
+      "git_object_id": "af87486b6f02331a35ebf8cc009bf74193cf4901",
       "mode": "100644",
       "object_type": "blob",
       "path": "VALIDATION.md"
@@ -830,6 +830,12 @@
       "path": "docs/adr/0035-conflict-aware-projection-and-resolution-aware-impact.md"
     },
     {
+      "git_object_id": "01b34dd6a964d92544316baa791a901642493b6a",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "docs/adr/0036-evidence-qualified-relation-publication.md"
+    },
+    {
       "git_object_id": "3c2466071d4b3c021b1969946079823ae4bcfae7",
       "mode": "100644",
       "object_type": "blob",
@@ -950,7 +956,7 @@
       "path": "docs/packet-contracts.md"
     },
     {
-      "git_object_id": "8f96a61fc363bec276357124d6ac1b9bb7f9c295",
+      "git_object_id": "0153a97d056582ed5fb60fc34564428a086ebe5e",
       "mode": "100644",
       "object_type": "blob",
       "path": "docs/publication-boundary.md"
@@ -1406,7 +1412,7 @@
       "path": "scripts/compile_topology_packet.py"
     },
     {
-      "git_object_id": "d6ec7f18632a982e80f1dd72d3ce2c7f18266b08",
+      "git_object_id": "7f0ae6166ac1e6b6dd08ad4b79c787a9bf086d0a",
       "mode": "100644",
       "object_type": "blob",
       "path": "scripts/evaluate_hash_locality.py"
@@ -1880,7 +1886,7 @@
       "path": "src/l9_constellation_topology/packets/validator.py"
     },
     {
-      "git_object_id": "516a5f8a73f7b7d60b15147676ec826c47efea3f",
+      "git_object_id": "f2f60dc589d8252bfa20a9d6d494f248897300a7",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/publication/__init__.py"
@@ -1898,7 +1904,7 @@
       "path": "src/l9_constellation_topology/publication/contracts.py"
     },
     {
-      "git_object_id": "f7ff9c7efdd4b21f4a52f0102503c1fb37eb179a",
+      "git_object_id": "aa71bb399989aa0bc577d75e61fa63a163bb5c56",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/publication/eligibility.py"
@@ -1910,22 +1916,28 @@
       "path": "src/l9_constellation_topology/publication/identity.py"
     },
     {
-      "git_object_id": "de14b97e745bd2378adb99081e45c757a7c5ca1e",
+      "git_object_id": "8f210591fada07f32544a32f7ddcd107bbab61e5",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/publication/lowering.py"
     },
     {
-      "git_object_id": "7d0e990c67d4aa9879d598deb78aa917974dfead",
+      "git_object_id": "bf34e8727f4568e947478d254701607e21769dd6",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/publication/plan.py"
     },
     {
-      "git_object_id": "7ad5772ccfb83d7bf4d72be9f1b071964ae81ce9",
+      "git_object_id": "0b52b71d91176e3d194f10f5270cc7c3e2ab7e6e",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/publication/policy.py"
+    },
+    {
+      "git_object_id": "b907a76ebeee3842bb0a68946213850d2d48fa65",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "src/l9_constellation_topology/publication/qualification.py"
     },
     {
       "git_object_id": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
@@ -2690,6 +2702,12 @@
       "path": "tests/fixtures/publication_identity/golden-vectors.json"
     },
     {
+      "git_object_id": "7e72a604d9a2cd8c3f8b2ab6c1ba9ba10c5ce00b",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/fixtures/publication_policies/legacy-v1/.l9/publication-policy.yaml"
+    },
+    {
       "git_object_id": "9e750bf29029421c88e81d8a7e86d53dcb6ec1a7",
       "mode": "100644",
       "object_type": "blob",
@@ -3008,7 +3026,7 @@
       "path": "tests/test_architecture_boundary_v5.py"
     },
     {
-      "git_object_id": "61cdc3e3c5c08ddc32baba1ae619801a04ca8de7",
+      "git_object_id": "bfc22b11db8058d8181393203b304846df9b395e",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_assertion_reconciliation.py"
@@ -3254,10 +3272,16 @@
       "path": "tests/test_publication_plan_identity.py"
     },
     {
-      "git_object_id": "5bee7ec2552abf148924a0b8cad2b83a04c8e28c",
+      "git_object_id": "eb1e5bca554d47c5034134b3f3cb09bc6bdf4ce8",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_publication_planning.py"
+    },
+    {
+      "git_object_id": "ce1689616560f476c6b592af0a736db91ec7ec5d",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "tests/test_publication_qualification.py"
     },
     {
       "git_object_id": "2cdc3886c79bb86a08a59bb16b4054a0f7f51fe6",
@@ -3344,7 +3368,7 @@
       "path": "tests/test_scan_compatibility_path.py"
     },
     {
-      "git_object_id": "db5f98be093c5b1949e634d648d207fe13d072f2",
+      "git_object_id": "69f520e073b7b9de2536cb6ebd1df95a7ac1dd3c",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_semantic_claim_activation.py"
@@ -3422,8 +3446,8 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:4354d10a773fce02255e9fd83c61f88b01f1f95813ae3cdff6c7afaf7c3bf5ae",
-  "entry_count": 570,
+  "entries_sha256": "sha256:61a9a466754ed699040685e62944dfb36f2cf3f5452bfc5db622d84f661a4653",
+  "entry_count": 574,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
   ],

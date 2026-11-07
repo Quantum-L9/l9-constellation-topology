@@ -58,7 +58,10 @@ def _plan(materialized: MaterializedTopology, policy: PublicationPolicy, when: d
 
 
 def test_policy_resolves_with_stable_identity_and_hash(policy: PublicationPolicy) -> None:
-    assert policy.identity == "foundational-topology-publication/1.0.0"
+    assert policy.identity == "foundational-topology-publication/2.0.0"
+    assert policy.relation_qualification == "strict"
+    assert policy.claim_publication == "selective"
+    assert policy.declaration_only_claim_predicates == ()
     assert policy.policy_hash().startswith("sha256:")
     assert policy.policy_hash() == load_publication_policy(ROOT).policy_hash()
     assert "CONTAINS" not in policy.eligible_edge_types
@@ -508,13 +511,21 @@ def test_relationship_to_unknown_entity_is_rejected(
     )
     detached = eligible.model_copy(update={"target_id": "artifact:not-in-this-topology"})
     state = materialized.state.model_copy(update={"edge_records": (detached,)})
-    plan = build_publication_plan(
-        MaterializedTopology(packet=materialized.packet, state=state),
-        policy,
-        published_at=FIXED_TIME,
-    )
+    detached_topology = MaterializedTopology(packet=materialized.packet, state=state)
+
+    # The lineage rule itself, isolated from relation qualification.
+    legacy = policy.model_copy(update={"relation_qualification": "legacy"})
+    plan = build_publication_plan(detached_topology, legacy, published_at=FIXED_TIME)
     assert plan.rejected_candidates
     assert REASON_UNRESOLVED_ENTITY in plan.rejected_candidates[0].eligibility.reasons
+
+    # Under strict qualification (ADR-0036) the detached edge no longer mirrors
+    # any producer's record, so it never reaches lowering and is never admitted.
+    strict_plan = build_publication_plan(detached_topology, policy, published_at=FIXED_TIME)
+    assert not [item for item in strict_plan.candidates if item.candidate_kind == "relationship"]
+    assert [
+        item.reason for item in strict_plan.skipped_candidates if item.source_id == detached.edge_id
+    ] == ["qualification.evidence_origin_unsupported"]
 
 
 def test_artifact_entity_kind_is_unsupported_memory_semantics(

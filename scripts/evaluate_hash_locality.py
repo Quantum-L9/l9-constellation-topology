@@ -355,12 +355,21 @@ def build_matrix() -> dict[str, Any]:
     subject_repository = state.repository_records[0]
     repository_entities = (subject_repository.repository_id,)
 
+    # Only relationships the baseline plan actually publishes can be sampled: under
+    # a strict policy (ADR-0036) a selected edge type is not enough, the edge must
+    # also be qualified by its own producer evidence.
+    published_edge_ids = {
+        item.memory_intent.request.metadata["topology_relation"]["edge_id"]
+        for item in baseline.candidates
+        if item.candidate_kind == "relationship"
+    }
+
     # A relationship that does not involve the repository the repository-scoped
     # cases perturb, so "unaffected" genuinely means unaffected.
     unrelated_edge = next(
         edge
         for edge in sorted(state.edge_records, key=lambda item: item.edge_id)
-        if str(edge.edge_type) in set(policy.eligible_edge_types)
+        if edge.edge_id in published_edge_ids
         and subject_repository.repository_id not in (edge.source_id, edge.target_id)
     )
     unrelated_entities = (unrelated_edge.source_id, unrelated_edge.target_id)
@@ -369,7 +378,7 @@ def build_matrix() -> dict[str, Any]:
     asserted_edge = next(
         edge
         for edge in sorted(state.edge_records, key=lambda item: item.edge_id)
-        if str(edge.edge_type) in set(policy.eligible_edge_types)
+        if edge.edge_id in published_edge_ids
     )
     asserted_entities = (asserted_edge.source_id, asserted_edge.target_id)
 
@@ -493,12 +502,16 @@ def build_matrix() -> dict[str, Any]:
     reasserted[reasserted.index(asserted_edge)] = asserted_edge.model_copy(
         update={"edge_type": replacement_type}
     )
+    # The mutated edge type is backed by no producer evidence, so strict
+    # qualification would skip it and the case would measure qualification rather
+    # than identity. Its plan relaxes only the qualification mode: version and
+    # every identity input stay those of the baseline policy.
     add(
         "published_assertion",
         "change the predicate of the sampled published relationship",
         BOTH_IDENTITIES_MOVE,
         _recompile(packet, state.model_copy(update={"edge_records": tuple(reasserted)})),
-        policy,
+        policy.model_copy(update={"relation_qualification": "legacy"}),
         asserted_entities,
         AFFECTED_RELATIONSHIP,
         sampled_kind="relationship",

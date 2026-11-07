@@ -105,6 +105,7 @@ l9-constellation-topology/
 │   │   ├── 0033-register-governed-header-predicates-as-declaration-only.md
 │   │   ├── 0034-semantic-claim-read-model-and-managed-header-vocabulary.md
 │   │   ├── 0035-conflict-aware-projection-and-resolution-aware-impact.md
+│   │   ├── 0036-evidence-qualified-relation-publication.md
 │   │   └── README.md
 │   ├── archive
 │   │   └── v4
@@ -299,7 +300,8 @@ l9-constellation-topology/
 │       │   ├── identity.py
 │       │   ├── lowering.py
 │       │   ├── plan.py
-│       │   └── policy.py
+│       │   ├── policy.py
+│       │   └── qualification.py
 │       ├── reconciliation
 │       │   ├── __init__.py
 │       │   ├── cardinality.py
@@ -461,6 +463,10 @@ l9-constellation-topology/
 │   │   │   └── topology_report.md
 │   │   ├── publication_identity
 │   │   │   └── golden-vectors.json
+│   │   ├── publication_policies
+│   │   │   └── legacy-v1
+│   │   │       └── .l9
+│   │   │           └── publication-policy.yaml
 │   │   ├── repository_model_packets
 │   │   │   ├── l9-assertion-sample
 │   │   │   │   ├── receipts
@@ -587,6 +593,7 @@ l9-constellation-topology/
 │   ├── test_publication_identity_golden_vectors.py
 │   ├── test_publication_plan_identity.py
 │   ├── test_publication_planning.py
+│   ├── test_publication_qualification.py
 │   ├── test_publication_temporal.py
 │   ├── test_qualified_projection.py
 │   ├── test_reasoning_router.py

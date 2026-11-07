@@ -64,6 +64,7 @@ from .policy import (
     PublicationPolicyError,
     load_publication_policy,
 )
+from .qualification import QualificationIndex, RelationQualification, qualify_relation
 
 __all__ = [
     "EFFECT_IDENTITY_ALGORITHM_VERSION",
@@ -90,6 +91,8 @@ __all__ = [
     "PublicationPlan",
     "PublicationPolicy",
     "PublicationPolicyError",
+    "QualificationIndex",
+    "RelationQualification",
     "SkippedCandidate",
     "TopologyIndex",
     "build_publication_plan",
@@ -111,6 +114,7 @@ __all__ = [
     "plan_id",
     "plan_publication_from_repository",
     "publication_plan_bytes",
+    "qualify_relation",
     "require_publishable_topology",
     "validate_publication_plan",
 ]
