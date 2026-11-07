@@ -1934,7 +1934,7 @@
       "path": "src/l9_constellation_topology/publication/policy.py"
     },
     {
-      "git_object_id": "ed560adabe40d22851bcba5441813cb3e9128c09",
+      "git_object_id": "40033925c927035296a555d03132c8a6e6f92523",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/publication/qualification.py"
@@ -3278,7 +3278,7 @@
       "path": "tests/test_publication_planning.py"
     },
     {
-      "git_object_id": "0bc5635e49c8b8cf06b50df0006619ada58d38b1",
+      "git_object_id": "6abf6f9686257e5642bb99b176874a67f331540a",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_publication_qualification.py"
@@ -3446,7 +3446,7 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:2a8b87fcdfb9ea3070a10e287e104bb76e6e34279b8c39be5222c3dfe710d94c",
+  "entries_sha256": "sha256:842884759680de0d2b845cb25849550353e5535d1fccf3233682a3876da9c403",
   "entry_count": 574,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
