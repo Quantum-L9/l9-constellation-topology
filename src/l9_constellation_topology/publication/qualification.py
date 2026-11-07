@@ -31,6 +31,7 @@ Topology Packet identity.
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Literal
 
@@ -238,13 +239,8 @@ def _relation_field_evidence(
     )
 
 
-def relation_origin(edge: EdgeRecord, index: QualificationIndex) -> RelationOrigin:
-    """Identify the producer that emitted ``edge`` from the edge's own record.
-
-    Producers that record a property are recognized by it. Graph-builder edges
-    record none, so each of its rules is recognized by the topology record the
-    edge mirrors; an edge matching no rule is ``unrecognized``.
-    """
+def _recorded_origin(edge: EdgeRecord, index: QualificationIndex) -> RelationOrigin | None:
+    """Return the producer an edge names by what it records, if any."""
     properties = edge.properties
     if TARGET_RESOLUTION_PROPERTY in properties:
         return "work-projector"
@@ -256,41 +252,62 @@ def relation_origin(edge: EdgeRecord, index: QualificationIndex) -> RelationOrig
         return "corpus-scope"
     if _relation_field_evidence(edge, _resolved_evidence(edge, index)):
         return "producer-declared"
+    return None
 
-    source_repository = index.repositories.get(edge.source_id)
-    target_artifact = index.artifacts.get(edge.target_id)
-    if (
-        source_repository is not None
-        and target_artifact is not None
-        and target_artifact.repository_id == source_repository.repository_id
-        and not properties
-    ):
+
+def _repository_origin(edge: EdgeRecord, index: QualificationIndex) -> RelationOrigin | None:
+    """Return the graph-builder repository rule a property-less edge mirrors, if any."""
+    repository = index.repositories.get(edge.source_id)
+    if repository is None:
+        return None
+    artifact = index.artifacts.get(edge.target_id)
+    if artifact is not None and artifact.repository_id == repository.repository_id:
         if edge.edge_type is EdgeType.contains:
             return "artifact-containment"
         if edge.edge_type in CLASSIFICATION_PROMOTED_TYPES:
             return "artifact-classification"
-    if source_repository is not None and not properties:
-        if (
-            edge.edge_type is EdgeType.depends_on
-            and edge.target_id in source_repository.upstream_repository_ids
-        ):
-            return "repository-upstream"
-        if edge.edge_type is EdgeType.owned_by and edge.target_id in source_repository.owner_ids:
-            return "repository-owner"
+    if (
+        edge.edge_type is EdgeType.depends_on
+        and edge.target_id in repository.upstream_repository_ids
+    ):
+        return "repository-upstream"
+    if edge.edge_type is EdgeType.owned_by and edge.target_id in repository.owner_ids:
+        return "repository-owner"
+    return None
+
+
+def _capability_origin(edge: EdgeRecord, index: QualificationIndex) -> RelationOrigin | None:
+    """Return the capability or artifact record a property-less edge mirrors, if any."""
     capability = index.capabilities.get(edge.target_id)
-    if capability is not None and not properties:
-        if edge.edge_type is EdgeType.implements and edge.source_id in capability.implemented_by:
-            return "capability-record"
-        if edge.edge_type is EdgeType.exposes and edge.source_id in capability.exposed_by:
-            return "capability-record"
-        source_artifact = index.artifacts.get(edge.source_id)
-        if (
-            edge.edge_type is EdgeType.implements
-            and source_artifact is not None
-            and edge.target_id in source_artifact.capabilities
-        ):
-            return "artifact-capability"
-    return "unrecognized"
+    if capability is None:
+        return None
+    if edge.edge_type is EdgeType.implements and edge.source_id in capability.implemented_by:
+        return "capability-record"
+    if edge.edge_type is EdgeType.exposes and edge.source_id in capability.exposed_by:
+        return "capability-record"
+    artifact = index.artifacts.get(edge.source_id)
+    if (
+        edge.edge_type is EdgeType.implements
+        and artifact is not None
+        and edge.target_id in artifact.capabilities
+    ):
+        return "artifact-capability"
+    return None
+
+
+def relation_origin(edge: EdgeRecord, index: QualificationIndex) -> RelationOrigin:
+    """Identify the producer that emitted ``edge`` from the edge's own record.
+
+    Producers that record a property are recognized by it. Graph-builder edges
+    record none, so each of its rules is recognized by the topology record the
+    edge mirrors; an edge matching no rule is ``unrecognized``.
+    """
+    recorded = _recorded_origin(edge, index)
+    if recorded is not None:
+        return recorded
+    if edge.properties:
+        return "unrecognized"
+    return _repository_origin(edge, index) or _capability_origin(edge, index) or "unrecognized"
 
 
 def _result(
@@ -315,62 +332,103 @@ def _claim_gate(edge: EdgeRecord, index: QualificationIndex) -> str | None:
     return None
 
 
+#: One producer rule's verdict: a status and its basis or reason.
+_Verdict = tuple[QualificationStatus, str]
+
+
+def _qualified(basis: str) -> _Verdict:
+    return ("qualified", basis)
+
+
+def _unqualified(reason: str) -> _Verdict:
+    return ("unqualified", reason)
+
+
+def _work_projector_rule(edge: EdgeRecord, index: QualificationIndex) -> _Verdict:
+    blocked = _claim_gate(edge, index)
+    if blocked is not None:
+        return _unqualified(blocked)
+    if edge.properties.get(TARGET_RESOLUTION_PROPERTY) != RESOLVED_TARGET_RESOLUTION:
+        return _unqualified(REASON_WORK_TARGET_UNRESOLVED)
+    return _qualified("exact-artifact-resolution")
+
+
+def _claim_projector_rule(edge: EdgeRecord, index: QualificationIndex) -> _Verdict:
+    expected = CLAIM_PROJECTOR_ENDPOINT_BY_TYPE.get(edge.edge_type)
+    if edge.properties.get(ENDPOINT_KIND_PROPERTY) != expected:
+        return _unqualified(REASON_ENDPOINT_MISMATCH)
+    blocked = _claim_gate(edge, index)
+    if blocked is not None:
+        return _unqualified(blocked)
+    return _qualified("projection-eligible-claim")
+
+
+def _exact_duplicate_rule(edge: EdgeRecord, index: QualificationIndex) -> _Verdict:
+    content_hash = edge.properties.get("content_hash")
+    if edge.properties.get("method") != EXACT_DUPLICATE_METHOD or not content_hash:
+        return _unqualified(REASON_EVIDENCE_MISSING)
+    # Byte identity is re-checked against both observed endpoints rather than
+    # taken from the edge: a hash no endpoint carries is not equality.
+    endpoints = (index.artifacts.get(edge.source_id), index.artifacts.get(edge.target_id))
+    if any(artifact is None or artifact.content_hash != content_hash for artifact in endpoints):
+        return _unqualified(REASON_EVIDENCE_MISSING)
+    return _qualified("content-hash-equality")
+
+
+def _repository_upstream_rule(edge: EdgeRecord, index: QualificationIndex) -> _Verdict:
+    # D5b: a graph-builder dependency resolves only to an observed entity.
+    if edge.target_id not in index.repositories:
+        return _unqualified(REASON_ENDPOINT_UNRESOLVED)
+    return _qualified("observed-repository-target")
+
+
+def _always(basis: str) -> Callable[[EdgeRecord, QualificationIndex], _Verdict]:
+    def rule(_edge: EdgeRecord, _index: QualificationIndex) -> _Verdict:
+        return _qualified(basis)
+
+    return rule
+
+
+#: The rule each admissible producer is judged by, once its evidence resolves.
+_ORIGIN_RULES: dict[RelationOrigin, Callable[[EdgeRecord, QualificationIndex], _Verdict]] = {
+    "work-projector": _work_projector_rule,
+    "claim-projector": _claim_projector_rule,
+    "exact-duplicate": _exact_duplicate_rule,
+    "producer-declared": _always("relation-field-evidence"),
+    "repository-upstream": _repository_upstream_rule,
+    "repository-owner": _always("record-membership"),
+    "capability-record": _always("record-membership"),
+    "artifact-capability": _always("record-membership"),
+    "artifact-containment": _always("inventory"),
+    "corpus-scope": _always("inventory"),
+}
+
+
+def _admission(edge: EdgeRecord, origin: RelationOrigin, index: QualificationIndex) -> str | None:
+    """Return why ``edge`` fails before its producer's rule is consulted, if it does."""
+    admissible = ADMISSIBLE_ORIGINS.get(edge.edge_type)
+    if admissible is None:
+        return REASON_TYPE_UNRECOGNIZED
+    if origin == "artifact-classification":
+        # The only thing the evidence establishes is that the artifact exists and
+        # what kind of file it is. That is inventory, not this relation.
+        return REASON_CLASSIFICATION_ONLY
+    if origin not in admissible or origin not in _ORIGIN_RULES:
+        return REASON_ORIGIN_UNSUPPORTED
+    if not _resolved_evidence(edge, index):
+        return REASON_EVIDENCE_MISSING
+    return None
+
+
 def qualify_relation(edge: EdgeRecord, index: QualificationIndex) -> RelationQualification:
     """Decide whether ``edge``'s own evidence proves the relation it states.
 
     Pure and deterministic: the same edge over the same index always yields the
     same decision, and nothing is mutated.
     """
-    admissible = ADMISSIBLE_ORIGINS.get(edge.edge_type)
     origin = relation_origin(edge, index)
-    if admissible is None:
-        return _result(edge, origin, "unqualified", REASON_TYPE_UNRECOGNIZED)
-    if origin == "artifact-classification":
-        # The only thing the evidence establishes is that the artifact exists and
-        # what kind of file it is. That is inventory, not this relation.
-        return _result(edge, origin, "unqualified", REASON_CLASSIFICATION_ONLY)
-    if origin not in admissible:
-        return _result(edge, origin, "unqualified", REASON_ORIGIN_UNSUPPORTED)
-
-    evidence = _resolved_evidence(edge, index)
-    if not evidence:
-        return _result(edge, origin, "unqualified", REASON_EVIDENCE_MISSING)
-
-    if origin == "work-projector":
-        blocked = _claim_gate(edge, index)
-        if blocked is not None:
-            return _result(edge, origin, "unqualified", blocked)
-        if edge.properties.get(TARGET_RESOLUTION_PROPERTY) != RESOLVED_TARGET_RESOLUTION:
-            return _result(edge, origin, "unqualified", REASON_WORK_TARGET_UNRESOLVED)
-        return _result(edge, origin, "qualified", "exact-artifact-resolution")
-    if origin == "claim-projector":
-        if edge.properties.get(ENDPOINT_KIND_PROPERTY) != CLAIM_PROJECTOR_ENDPOINT_BY_TYPE.get(
-            edge.edge_type
-        ):
-            return _result(edge, origin, "unqualified", REASON_ENDPOINT_MISMATCH)
-        blocked = _claim_gate(edge, index)
-        if blocked is not None:
-            return _result(edge, origin, "unqualified", blocked)
-        return _result(edge, origin, "qualified", "projection-eligible-claim")
-    if origin == "exact-duplicate":
-        content_hash = edge.properties.get("content_hash")
-        if edge.properties.get("method") != EXACT_DUPLICATE_METHOD or not content_hash:
-            return _result(edge, origin, "unqualified", REASON_EVIDENCE_MISSING)
-        # Byte identity is re-checked against both observed endpoints rather than
-        # taken from the edge: a hash no endpoint carries is not equality.
-        endpoints = (index.artifacts.get(edge.source_id), index.artifacts.get(edge.target_id))
-        if any(artifact is None or artifact.content_hash != content_hash for artifact in endpoints):
-            return _result(edge, origin, "unqualified", REASON_EVIDENCE_MISSING)
-        return _result(edge, origin, "qualified", "content-hash-equality")
-    if origin == "producer-declared":
-        return _result(edge, origin, "qualified", "relation-field-evidence")
-    if origin == "repository-upstream":
-        # D5b: a graph-builder dependency resolves only to an observed entity.
-        if edge.target_id not in index.repositories:
-            return _result(edge, origin, "unqualified", REASON_ENDPOINT_UNRESOLVED)
-        return _result(edge, origin, "qualified", "observed-repository-target")
-    if origin in {"repository-owner", "capability-record", "artifact-capability"}:
-        return _result(edge, origin, "qualified", "record-membership")
-    if origin in {"artifact-containment", "corpus-scope"}:
-        return _result(edge, origin, "qualified", "inventory")
-    return _result(edge, origin, "unqualified", REASON_ORIGIN_UNSUPPORTED)  # pragma: no cover
+    refused = _admission(edge, origin, index)
+    if refused is not None:
+        return _result(edge, origin, "unqualified", refused)
+    status, reason = _ORIGIN_RULES[origin](edge, index)
+    return _result(edge, origin, status, reason)

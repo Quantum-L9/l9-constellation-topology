@@ -140,8 +140,9 @@ def test_strict_policy_states_its_qualification_fields(strict: PublicationPolicy
 def test_claim_selection_fails_closed_on_ambiguity(
     legacy: PublicationPolicy, update: dict[str, object], message: str
 ) -> None:
+    candidate = {**legacy.model_dump(), **update}
     with pytest.raises(ValueError, match=message):
-        PublicationPolicy.model_validate({**legacy.model_dump(), **update})
+        PublicationPolicy.model_validate(candidate)
 
 
 def test_policy_file_errors_surface_as_policy_errors(tmp_path: Path) -> None:
