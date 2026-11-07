@@ -298,6 +298,15 @@ def test_producer_declared_relation_needs_relation_field_evidence(
     assert qualify_relation(edge, index).reason == "relation-field-evidence"
     stripped = edge.model_copy(update={"evidence_refs": ("evidence:absent",)})
     assert qualify_relation(stripped, index).reason == q.REASON_ORIGIN_UNSUPPORTED
+    # The same relation-field evidence cited by an edge between other endpoints
+    # is about a different fact and does not qualify it.
+    other = next(
+        artifact_id
+        for artifact_id in index.artifacts
+        if artifact_id not in (edge.source_id, edge.target_id)
+    )
+    unrelated = edge.model_copy(update={"source_id": other})
+    assert not qualify_relation(unrelated, index).qualified
 
 
 def test_exact_duplicates_qualify_on_content_hash_equality(
@@ -308,6 +317,17 @@ def test_exact_duplicates_qualify_on_content_hash_equality(
     assert qualify_relation(edge, index).reason == "content-hash-equality"
     no_hash = edge.model_copy(update={"properties": {**edge.properties, "content_hash": ""}})
     assert qualify_relation(no_hash, index).reason == q.REASON_EVIDENCE_MISSING
+    # A non-empty hash that neither endpoint carries is not byte identity.
+    forged = edge.model_copy(
+        update={"properties": {**edge.properties, "content_hash": "sha256:" + "0" * 64}}
+    )
+    assert qualify_relation(forged, index).reason == q.REASON_EVIDENCE_MISSING
+    # Nor is one that only one endpoint carries.
+    target = index.artifacts[edge.target_id]
+    drifted = dict(index.artifacts)
+    drifted[edge.target_id] = target.model_copy(update={"content_hash": "sha256:" + "1" * 64})
+    detached = QualificationIndex(**{**index.__dict__, "artifacts": drifted})
+    assert qualify_relation(edge, detached).reason == q.REASON_EVIDENCE_MISSING
 
 
 def test_recognized_producer_without_resolvable_evidence_is_unqualified(
