@@ -42,6 +42,7 @@ changed decision requires a new ADR that explicitly supersedes the old record.
 | ADR-0034 | [Semantic claim read model and recognized managed-header vocabulary](docs/adr/0034-semantic-claim-read-model-and-managed-header-vocabulary.md) | Accepted |
 | ADR-0035 | [Conflict-aware canonical projection and resolution-aware impact](docs/adr/0035-conflict-aware-projection-and-resolution-aware-impact.md) | Accepted |
 | ADR-0036 | [Evidence-qualified relation publication and predicate-selective claims](docs/adr/0036-evidence-qualified-relation-publication.md) | Accepted on merge (activation pending owner decision) |
+| ADR-0037 | [Stop promoting artifact classification to canonical relations](docs/adr/0037-stop-promoting-artifact-classification-to-relations.md) | Accepted on merge (canonical identity change; owner decision) |
 
 ## Decision order
 

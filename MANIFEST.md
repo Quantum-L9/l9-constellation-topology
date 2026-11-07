@@ -148,6 +148,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `docs/adr/0034-semantic-claim-read-model-and-managed-header-vocabulary.md` — accepted architecture decision record
 - `docs/adr/0035-conflict-aware-projection-and-resolution-aware-impact.md` — accepted architecture decision record
 - `docs/adr/0036-evidence-qualified-relation-publication.md` — architecture decision record, accepted on merge (activation pending owner decision)
+- `docs/adr/0037-stop-promoting-artifact-classification-to-relations.md` — architecture decision record, accepted on merge (canonical identity change)
 - `docs/adr/README.md` — ADR directory governance and navigation
 - `docs/architecture.md` — architecture, contract, deployment, recovery, or model documentation
 - `docs/archive/v4/01_SPEC_ATTACK.md` — superseded v4 historical artifact retained for migration evidence
@@ -222,6 +223,8 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `evidence/live-qualify-2026-08-02/run_gate_qualify.py` — live-qualification campaign evidence record
 - `outputs/.gitkeep` — tracked output-directory marker only
 - `pyproject.toml` — Python package metadata, entrypoints, and quality configuration
+- `reports/end-session/governance-handoff/2026-11-07-pr57-9b08dbb4cfe9.md` — governance end-session handoff report, published onto the PR branch by the Cursor-Governance report publisher (`ops/reports/publish.py`)
+- `reports/end-session/session-handoff/2026-11-07-pr57-9b08dbb4cfe9.md` — repository end-session handoff report, published onto the PR branch by the Cursor-Governance report publisher (`ops/reports/publish.py`)
 - `schemas/artifact-record.schema.json` — canonical or compatibility domain JSON Schema
 - `schemas/bridge-gap-projection.schema.json` — generated bridge-gap decision-support JSON Schema
 - `schemas/capability-record.schema.json` — canonical or compatibility domain JSON Schema

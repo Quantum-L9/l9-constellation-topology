@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased - stop promoting artifact classification to relations (ADR-0037, pending owner decision)
+
+- The graph builder no longer emits repository `GOVERNED_BY`, `DOCUMENTED_BY`
+  or `VALIDATED_BY` edges to its own artifacts from `artifact_type`
+  (architecture-decision, governance, documentation, ci-workflow). The type
+  stays an artifact node property; producer-declared and claim-projected
+  relations of those types are unaffected.
+- Canonical change: the Topology Packet semantic hash moves wherever such an
+  artifact is present. Only `edge_records` and `graph_records` change; every
+  retained edge keeps its identity, no policy hash moves, and no publication
+  effect key moves under the ADR-0036 strict policy.
+
 ## Unreleased - evidence-qualified relation publication (ADR-0036, pending owner decision)
 
 - `publication/qualification.py` adds `qualify_relation`, one pure decision on

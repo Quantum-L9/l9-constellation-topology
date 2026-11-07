@@ -174,6 +174,7 @@ its own.
 
 | Item | Status |
 |---|---|
+| Graph builder stops promoting artifact classification to `GOVERNED_BY` / `DOCUMENTED_BY` / `VALIDATED_BY` (ADR-0037) | Pending owner decision. Canonical Topology Packet identity change; retained edge identities pinned in `tests/test_topology_graph_v5.py`. |
 | `qualify_relation` and publication policy 2.0.0 (`strict`, `selective`) (ADR-0036) | Pending owner decision. Implemented on its pull request; activation requires a repository-owner decision because the version bump re-keys every retained effect (ADR-0025) and current downstream durable state is Unknown. |
 
 Behavioral evidence: `tests/test_publication_qualification.py` compares plans

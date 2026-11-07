@@ -266,7 +266,7 @@
       "path": ".python-version"
     },
     {
-      "git_object_id": "315993c793fb5b25d5dbdbc50b452dc239344bf9",
+      "git_object_id": "df0a09922b464ddeb5edeb69c09e944631aa0ca7",
       "mode": "100644",
       "object_type": "blob",
       "path": "ADR_INDEX.md"
@@ -296,7 +296,7 @@
       "path": "BUILD_SPECIFICATION.md"
     },
     {
-      "git_object_id": "3ffaef63527dda2f59e5d92b2e5eace3ff91d012",
+      "git_object_id": "40214e5bae4b80eec364eca065fd7ec5f73b793b",
       "mode": "100644",
       "object_type": "blob",
       "path": "CHANGELOG.md"
@@ -350,7 +350,7 @@
       "path": "EFFECT_IDENTITY_MIGRATION_PREFLIGHT.json"
     },
     {
-      "git_object_id": "c25559f58fbcc0df688ab70160592c9a617a622e",
+      "git_object_id": "79c07948476273bc0320c2391609aaf22dd1af8f",
       "mode": "100644",
       "object_type": "blob",
       "path": "FINAL_TREE.md"
@@ -368,7 +368,7 @@
       "path": "GOVERNANCE.md"
     },
     {
-      "git_object_id": "be780ef3fd8976684a99dc6a2881176ab7ac7e93",
+      "git_object_id": "940dfe027f5f7d2a77c34e64c284cdae27631bc1",
       "mode": "100644",
       "object_type": "blob",
       "path": "HASH_LOCALITY_EVALUATION.json"
@@ -392,7 +392,7 @@
       "path": "MAINTAINERS.md"
     },
     {
-      "git_object_id": "4ea92f9614fec1b3f21c0fe170df213a8ab1f6cb",
+      "git_object_id": "1a0eb4b3d39f5eb84f391b0ee5f31a66f20b7355",
       "mode": "100644",
       "object_type": "blob",
       "path": "MANIFEST.md"
@@ -494,7 +494,7 @@
       "path": "UNKNOWN_REGISTER.md"
     },
     {
-      "git_object_id": "af87486b6f02331a35ebf8cc009bf74193cf4901",
+      "git_object_id": "95cfad0eca121f9201a3edb60823b938e8d3903a",
       "mode": "100644",
       "object_type": "blob",
       "path": "VALIDATION.md"
@@ -836,6 +836,12 @@
       "path": "docs/adr/0036-evidence-qualified-relation-publication.md"
     },
     {
+      "git_object_id": "becec277bb085139084c343bf5080d0631fdfef8",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "docs/adr/0037-stop-promoting-artifact-classification-to-relations.md"
+    },
+    {
       "git_object_id": "3c2466071d4b3c021b1969946079823ae4bcfae7",
       "mode": "100644",
       "object_type": "blob",
@@ -980,7 +986,7 @@
       "path": "docs/runbooks/merge-gate-enforcement.md"
     },
     {
-      "git_object_id": "9793d250c7089d95f3d202c75f1e89b134587359",
+      "git_object_id": "6664ccfa0531f57513d53fa18be0c91e82103241",
       "mode": "100644",
       "object_type": "blob",
       "path": "docs/topology-model.md"
@@ -1278,6 +1284,18 @@
       "mode": "100644",
       "object_type": "blob",
       "path": "pyproject.toml"
+    },
+    {
+      "git_object_id": "3628a213de072a96b8c59b2d99230dd957e56b4d",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "reports/end-session/governance-handoff/2026-11-07-pr57-9b08dbb4cfe9.md"
+    },
+    {
+      "git_object_id": "fcadad0860edcdae69b042968b53482d318a5c24",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "reports/end-session/session-handoff/2026-11-07-pr57-9b08dbb4cfe9.md"
     },
     {
       "git_object_id": "0a395c9a9fa9d1d39b45ad6fb566e2eb8c7590d9",
@@ -2294,7 +2312,7 @@
       "path": "src/l9_constellation_topology/topology/flow_builder.py"
     },
     {
-      "git_object_id": "1033d853aa0d9c91f4ea9341a98f8843948dad3d",
+      "git_object_id": "5a92993e21389345d8c5930c78012b5030732068",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/topology/graph_builder.py"
@@ -2882,13 +2900,13 @@
       "path": "tests/fixtures/semantic_assertion_repository/spec.yaml"
     },
     {
-      "git_object_id": "3683976dc660288094daeeeb937e0f323fba2acd",
+      "git_object_id": "3caeab694e75b18e57a98f4883294a4a5cf133b0",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/topology_packets/foundational-two-repo/manifest.json"
     },
     {
-      "git_object_id": "b11d39902cb60e0ffb50d5cdfd30326c80ce73e6",
+      "git_object_id": "777a8fad479c562ed4c9638c99fe075c00ac0931",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/topology_packets/foundational-two-repo/packet.json"
@@ -2936,7 +2954,7 @@
       "path": "tests/fixtures/topology_packets/foundational-two-repo/payload/diagnostics.json"
     },
     {
-      "git_object_id": "af4427de6cfaca6a6a551474bbd9673b8ab13c09",
+      "git_object_id": "6eb1b7e92003b5731ce6716ff690b61b499d5db1",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/topology_packets/foundational-two-repo/payload/edge-records.json"
@@ -2954,7 +2972,7 @@
       "path": "tests/fixtures/topology_packets/foundational-two-repo/payload/flow-records.json"
     },
     {
-      "git_object_id": "2e5969dde4be858f1cbbb1a99a5bb51cfdbc95be",
+      "git_object_id": "a25924626ce5bc915bd38860afd45ae7476f86df",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/topology_packets/foundational-two-repo/payload/graph-records.json"
@@ -3014,7 +3032,7 @@
       "path": "tests/fixtures/topology_packets/foundational-two-repo/payload/unknowns.json"
     },
     {
-      "git_object_id": "3bf61014c29080978e385e7bc7d4b7f077e23f6b",
+      "git_object_id": "cc5f9b0d3ab988a62d2ec0006f7229120397fffd",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/fixtures/topology_packets/foundational-two-repo/receipts/validation-receipt.json"
@@ -3278,7 +3296,7 @@
       "path": "tests/test_publication_planning.py"
     },
     {
-      "git_object_id": "ce1689616560f476c6b592af0a736db91ec7ec5d",
+      "git_object_id": "c9eefd060e4afaf4ac98ea5913c74e8ab6750f94",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_publication_qualification.py"
@@ -3386,7 +3404,7 @@
       "path": "tests/test_topology_compiler_v5.py"
     },
     {
-      "git_object_id": "62dbd4df9d03925ba8d5a06a1c08be642da33923",
+      "git_object_id": "397fc7de22d8048443e749151f6d48c5b378e534",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_topology_graph_v5.py"
@@ -3446,8 +3464,8 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:61a9a466754ed699040685e62944dfb36f2cf3f5452bfc5db622d84f661a4653",
-  "entry_count": 574,
+  "entries_sha256": "sha256:580f67cbeb1db8f10669d342a94a03dc2079e2f5ca735c75a2069e608d5f0fc2",
+  "entry_count": 577,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
   ],

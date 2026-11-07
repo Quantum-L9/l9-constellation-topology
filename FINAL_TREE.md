@@ -106,6 +106,7 @@ l9-constellation-topology/
 │   │   ├── 0034-semantic-claim-read-model-and-managed-header-vocabulary.md
 │   │   ├── 0035-conflict-aware-projection-and-resolution-aware-impact.md
 │   │   ├── 0036-evidence-qualified-relation-publication.md
+│   │   ├── 0037-stop-promoting-artifact-classification-to-relations.md
 │   │   └── README.md
 │   ├── archive
 │   │   └── v4
@@ -189,6 +190,12 @@ l9-constellation-topology/
 │       └── STACK-HEALTH-SNAPSHOT.json
 ├── outputs
 │   └── .gitkeep
+├── reports
+│   └── end-session
+│       ├── governance-handoff
+│       │   └── 2026-11-07-pr57-9b08dbb4cfe9.md
+│       └── session-handoff
+│           └── 2026-11-07-pr57-9b08dbb4cfe9.md
 ├── schemas
 │   ├── artifact-record.schema.json
 │   ├── bridge-gap-projection.schema.json
