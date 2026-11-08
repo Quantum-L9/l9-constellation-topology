@@ -5,7 +5,6 @@ import sys
 from pathlib import Path
 
 import pytest
-
 from scripts.git_tree_manifest import collect_tree_entries, load_manifest, write_manifest
 from scripts.validate_git_integrity import inspect_commit
 

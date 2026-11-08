@@ -3182,7 +3182,7 @@
       "path": "tests/test_generated_artifact_sync.py"
     },
     {
-      "git_object_id": "0ce4c331b990fdf835483437027844aff00e04f6",
+      "git_object_id": "144c1ae6757397da1b7a8cbe70b51fca6d937e01",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_git_integrity.py"
@@ -3476,7 +3476,7 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:49750cb5f4ff8ff7386e026f269fda30d6609995d31a6c21240c9260a21d8beb",
+  "entries_sha256": "sha256:35486a4ff802b8a678668a61db02cf979f963d89c6efe73b71e3e794530e4e57",
   "entry_count": 579,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
