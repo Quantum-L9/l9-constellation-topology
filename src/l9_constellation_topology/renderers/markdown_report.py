@@ -219,7 +219,12 @@ def _corpus_overview(state: TopologyState) -> list[str]:
 
 
 def _domain_empty_message(state: TopologyState, domain: str, completed_empty: str) -> str:
-    """Say whether an empty corpus domain completed or was explicitly skipped."""
+    """Say whether an empty corpus domain completed or was explicitly skipped.
+
+    The compiler stores each skipped domain as an unknown whose reason is already
+    the complete not-run sentence, producer reason included, so it is rendered
+    as stored rather than behind a second status prefix.
+    """
     corpus_ids = {record.corpus_id for record in state.corpus_records}
     reasons = sorted(
         unknown.reason
@@ -228,7 +233,7 @@ def _domain_empty_message(state: TopologyState, domain: str, completed_empty: st
     )
     if not reasons:
         return completed_empty
-    return f"Corpus analysis domain `{domain}` was not run: " + "; ".join(reasons)
+    return "; ".join(reasons)
 
 
 def _duplicate_section(state: TopologyState) -> list[str]:

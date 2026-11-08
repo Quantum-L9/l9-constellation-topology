@@ -52,6 +52,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `.l9/risk-profile.yaml` — versioned compiler, policy, packet, output, or pipeline profile
 - `.l9/topology-profile.yaml` — versioned compiler, policy, packet, output, or pipeline profile
 - `.python-version` — canonical Python runtime declaration
+- `.sonarcloud.properties` — SonarQube Cloud automatic-analysis scope; leaves the `evidence/` qualification record out of analysis
 - `ADR_INDEX.md` — accepted architecture decision index
 - `AGENTS.md` — agent operating constraints and architecture law
 - `ALIGNMENT_AUDIT.md` — architecture and repository alignment evidence
@@ -225,6 +226,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `pyproject.toml` — Python package metadata, entrypoints, and quality configuration
 - `reports/end-session/governance-handoff/2026-11-07-pr57-9b08dbb4cfe9.md` — governance end-session handoff report, published onto the PR branch by the Cursor-Governance report publisher (`ops/reports/publish.py`)
 - `reports/end-session/session-handoff/2026-11-07-pr57-9b08dbb4cfe9.md` — repository end-session handoff report, published onto the PR branch by the Cursor-Governance report publisher (`ops/reports/publish.py`)
+- `reports/gmp/GMP-Report-129-Remediate-l9-constellation-topology-issues-36-27-37-32.md` — GMP-129 execution report for the #36 #27 #37 #32 remediation (scope lock, baseline and validation evidence)
 - `schemas/artifact-record.schema.json` — canonical or compatibility domain JSON Schema
 - `schemas/bridge-gap-projection.schema.json` — generated bridge-gap decision-support JSON Schema
 - `schemas/capability-record.schema.json` — canonical or compatibility domain JSON Schema

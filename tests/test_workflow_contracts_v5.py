@@ -164,3 +164,105 @@ def test_publication_merged_back_into_compilation_is_rejected(tmp_path: Path) ->
     workflow.write_text(head + "\n", encoding="utf-8")
 
     assert "compile.yml: publication must be a separate job from compilation" in _errors(validator)
+
+
+def _workflow(validator: Path, name: str) -> Path:
+    return validator.parent.parent / ".github" / "workflows" / name
+
+
+def test_runtime_sync_that_refuses_the_project_is_rejected(tmp_path: Path) -> None:
+    """Issue #36: --no-build without --no-install-project refuses this project."""
+
+    validator = _clone_workflow_tree(tmp_path)
+    _mutate(
+        _workflow(validator, "l9-ingress.yml"),
+        "uv sync --frozen --no-build --no-dev --no-install-project",
+        "uv sync --frozen --no-build --no-dev --no-editable",
+    )
+
+    assert (
+        "l9-ingress.yml: uv sync with --no-build must also pass --no-install-project: "
+        "uv sync --frozen --no-build --no-dev --no-editable"
+    ) in _errors(validator)
+
+
+def test_stage_worker_without_separate_project_install_is_rejected(tmp_path: Path) -> None:
+    validator = _clone_workflow_tree(tmp_path)
+    install = 'uv pip install --no-deps --python "${RUNNER_TEMP}/l9-exact-worker-env/bin/python" .'
+    _mutate(_workflow(validator, "l9-stage-worker.yml"), f"          {install}\n", "")
+
+    assert f"l9-stage-worker.yml: missing exact-revision control {install}" in _errors(validator)
+
+
+def test_pull_request_branch_filter_on_validation_is_rejected(tmp_path: Path) -> None:
+    """Issue #27: a branch filter leaves stacked PRs with no native validation."""
+
+    validator = _clone_workflow_tree(tmp_path)
+    _mutate(
+        _workflow(validator, "l9-pr-validate.yml"),
+        "  pull_request:\n",
+        "  pull_request:\n    branches: [main]\n",
+    )
+
+    assert (
+        "l9-pr-validate.yml: pull_request must not filter on branches; "
+        "stacked PRs need validation too"
+    ) in _errors(validator)
+
+
+def test_unguarded_direct_compile_smoke_is_rejected(tmp_path: Path) -> None:
+    """With the trigger widened, an unguarded smoke would publish on stacked PRs."""
+
+    validator = _clone_workflow_tree(tmp_path)
+    _mutate(
+        _workflow(validator, "l9-pr-validate.yml"),
+        "    if: github.event_name != 'pull_request' || github.base_ref == 'main'\n",
+        "",
+    )
+
+    assert (
+        "l9-pr-validate.yml: direct-compile-smoke must be limited to pull requests into main"
+    ) in _errors(validator)
+
+
+def test_uv_run_that_may_resync_is_rejected(tmp_path: Path) -> None:
+    validator = _clone_workflow_tree(tmp_path)
+    _mutate(
+        _workflow(validator, "l9-pr-validate.yml"),
+        "uv run --no-sync python scripts/verify_determinism.py",
+        "uv run python scripts/verify_determinism.py",
+    )
+
+    assert any(
+        error.startswith("l9-pr-validate.yml: line ")
+        and error.endswith(": uv run must pass --no-sync")
+        for error in _errors(validator)
+    )
+
+
+def test_wheel_smoke_without_dependency_check_is_rejected(tmp_path: Path) -> None:
+    validator = _clone_workflow_tree(tmp_path)
+    _mutate(
+        _workflow(validator, "l9-pr-validate.yml"),
+        "          uv pip check --python .wheel-smoke/bin/python\n",
+        "",
+    )
+
+    assert (
+        "l9-pr-validate.yml: missing gate uv pip check --python .wheel-smoke/bin/python"
+        in _errors(validator)
+    )
+
+
+def test_npm_ci_running_lifecycle_scripts_is_rejected(tmp_path: Path) -> None:
+    validator = _clone_workflow_tree(tmp_path)
+    _mutate(_compile_workflow(validator), "npm ci --ignore-scripts", "npm ci")
+
+    assert "compile.yml: npm ci must pass --ignore-scripts: npm ci" in _errors(validator)
+
+
+def test_wheel_smoke_without_hash_pinning_is_rejected(tmp_path: Path) -> None:
+    validator = _clone_workflow_tree(tmp_path)
+    _mutate(_workflow(validator, "l9-pr-validate.yml"), "--require-hashes ", "")
+
+    assert "l9-pr-validate.yml: missing gate --require-hashes" in _errors(validator)

@@ -6,13 +6,16 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 import subprocess
+import sys
 from pathlib import Path
 from typing import Any
 
 MANIFEST_PATH = "GIT_TREE_MANIFEST.json"
 SCHEMA_VERSION = "l9.git-tree-manifest/1.0.0"
 EXCLUDED_PATHS = (MANIFEST_PATH,)
+OBJECT_ID = re.compile(r"[0-9a-f]{40}|[0-9a-f]{64}")
 
 
 def _git_bytes(root: Path, *args: str) -> bytes:
@@ -34,10 +37,26 @@ def _git_text(root: Path, *args: str) -> str:
     return _git_bytes(root, *args).decode("utf-8", "strict").strip()
 
 
+def resolve_tree(root: Path, treeish: str) -> str:
+    """Resolve a treeish to its tree object ID, refusing anything git would read as an option.
+
+    The treeish comes from the command line. A value starting with ``-`` reaches
+    git as an option, not a revision; ``--end-of-options`` stops that during
+    resolution, and only the resolved object ID is passed on to ``ls-tree``.
+    """
+
+    if not treeish or treeish.startswith("-"):
+        raise ValueError(f"treeish must name a revision or tree, not an option: {treeish!r}")
+    object_id = _git_text(root, "rev-parse", "--verify", "--end-of-options", f"{treeish}^{{tree}}")
+    if not OBJECT_ID.fullmatch(object_id):
+        raise ValueError(f"treeish did not resolve to a tree object ID: {treeish!r}")
+    return object_id
+
+
 def collect_tree_entries(root: Path, treeish: str) -> tuple[dict[str, str], ...]:
     """Return path, mode, object type, and Git object ID for one tree."""
 
-    output = _git_bytes(root, "ls-tree", "-r", "--full-tree", "-z", treeish)
+    output = _git_bytes(root, "ls-tree", "-r", "--full-tree", "-z", resolve_tree(root, treeish))
     entries: list[dict[str, str]] = []
     for raw_record in output.split(b"\0"):
         if not raw_record:
@@ -131,10 +150,38 @@ def load_manifest(root: Path) -> tuple[dict[str, str], ...]:
     return validate_manifest_shape(payload)
 
 
+#: Biome's defaults: tab indentation, measured as 2 columns, an 80-column line.
+_LINE_WIDTH = 80
+_TAB_WIDTH = 2
+_STRING_ARRAY = re.compile(
+    r'^(\t*)("[^"\n]*": )\[\n((?:\1\t"[^"\n]*",?\n)+)\1\](,?)$', re.MULTILINE
+)
+
+
+def render_manifest(payload: dict[str, Any]) -> str:
+    """Serialize the manifest exactly as Biome formats it.
+
+    The governed workspace gives JSON formatting to Biome, so the generated file
+    is written in Biome's default output: tab indentation, objects kept
+    expanded, and an array of strings that fits in 80 columns on one line.
+    """
+
+    text = json.dumps(payload, indent="\t", sort_keys=True)
+
+    def collapse(match: re.Match[str]) -> str:
+        indent, key, items, comma = match.groups()
+        values = [line.strip().rstrip(",") for line in items.splitlines()]
+        line = f"{indent}{key}[{', '.join(values)}]{comma}"
+        width = len(line.expandtabs(_TAB_WIDTH))
+        return line if width <= _LINE_WIDTH else match.group(0)
+
+    return _STRING_ARRAY.sub(collapse, text) + "\n"
+
+
 def write_manifest(root: Path, treeish: str) -> Path:
     destination = root / MANIFEST_PATH
     payload = build_manifest(root, treeish)
-    destination.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    destination.write_text(render_manifest(payload), encoding="utf-8")
     return destination
 
 
@@ -150,19 +197,21 @@ def main() -> int:
     root = args.root.resolve()
     # S8705: validate that root is a real git-tracked directory before passing to subprocess
     if not root.is_dir():
-        import sys
-
         sys.stderr.write(f"ERROR: --root is not a directory: {root}\n")
         return 1
-    if args.check:
-        expected = collect_tree_entries(root, args.treeish or "HEAD")
-        actual = load_manifest(root)
-        if actual != expected:
-            return 1
-        print(json.dumps({"status": "passed", "entry_count": len(actual)}, sort_keys=True))
-        return 0
-    treeish = args.treeish or _git_text(root, "write-tree")
-    destination = write_manifest(root, treeish)
+    try:
+        if args.check:
+            expected = collect_tree_entries(root, args.treeish or "HEAD")
+            actual = load_manifest(root)
+            if actual != expected:
+                return 1
+            print(json.dumps({"status": "passed", "entry_count": len(actual)}, sort_keys=True))
+            return 0
+        treeish = args.treeish or _git_text(root, "write-tree")
+        destination = write_manifest(root, treeish)
+    except ValueError as exc:
+        sys.stderr.write(f"ERROR: {exc}\n")
+        return 2
     print(destination)
     return 0
 
