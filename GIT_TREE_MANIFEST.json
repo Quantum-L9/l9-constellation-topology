@@ -266,6 +266,12 @@
       "path": ".python-version"
     },
     {
+      "git_object_id": "0721f93f80ec2cc3cc8cb6d3a5932a3b7687c40b",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": ".sonarcloud.properties"
+    },
+    {
       "git_object_id": "df0a09922b464ddeb5edeb69c09e944631aa0ca7",
       "mode": "100644",
       "object_type": "blob",
@@ -296,7 +302,7 @@
       "path": "BUILD_SPECIFICATION.md"
     },
     {
-      "git_object_id": "21f8440077066c0632f6ba44f1a6a25a185c91ca",
+      "git_object_id": "e2f3aa134bb03814aa151aca80f834d1511adc98",
       "mode": "100644",
       "object_type": "blob",
       "path": "CHANGELOG.md"
@@ -392,7 +398,7 @@
       "path": "MAINTAINERS.md"
     },
     {
-      "git_object_id": "86fd33045f1a5eaf52445ad017165c5ed7b49937",
+      "git_object_id": "3e69f472dce5de97b1a5b267180aacfa4b31fe81",
       "mode": "100644",
       "object_type": "blob",
       "path": "MANIFEST.md"
@@ -1298,7 +1304,7 @@
       "path": "reports/end-session/session-handoff/2026-11-07-pr57-9b08dbb4cfe9.md"
     },
     {
-      "git_object_id": "783bcc071fbdcb4d454a6a6f944613eab49f2512",
+      "git_object_id": "a29aec0ff3420c5602df001d2b8fbbe4bdaf301b",
       "mode": "100644",
       "object_type": "blob",
       "path": "reports/gmp/GMP-Report-129-Remediate-l9-constellation-topology-issues-36-27-37-32.md"
@@ -1460,7 +1466,7 @@
       "path": "scripts/generated_artifact_sync.py"
     },
     {
-      "git_object_id": "a71fdf8e44c485e6c9cbef40c24306b89b5db65d",
+      "git_object_id": "2f3903ed02566bce64fce3bcaf68547b90800926",
       "mode": "100755",
       "object_type": "blob",
       "path": "scripts/git_tree_manifest.py"
@@ -1484,7 +1490,7 @@
       "path": "scripts/validate_contracts.py"
     },
     {
-      "git_object_id": "211734964b72d660395d75ed778889958b198efe",
+      "git_object_id": "8646b18a4b6d473a62f188f8aa9f81edfb4b3c2c",
       "mode": "100755",
       "object_type": "blob",
       "path": "scripts/validate_git_integrity.py"
@@ -3176,7 +3182,7 @@
       "path": "tests/test_generated_artifact_sync.py"
     },
     {
-      "git_object_id": "689b05002a41cba30f8096d2255153e5b9183649",
+      "git_object_id": "0ce4c331b990fdf835483437027844aff00e04f6",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_git_integrity.py"
@@ -3470,8 +3476,8 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:3fa0e6ea8db059b062b7bbba85c1fcf2f22610a2cdf3640c826fb07d75e1292e",
-  "entry_count": 578,
+  "entries_sha256": "sha256:49750cb5f4ff8ff7386e026f269fda30d6609995d31a6c21240c9260a21d8beb",
+  "entry_count": 579,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
   ],

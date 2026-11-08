@@ -20,6 +20,13 @@
   `l9-pr-validate`, an unguarded `direct-compile-smoke`, a `uv run` without
   `--no-sync`, a wheel smoke without `uv pip check`, and `npm ci` without
   `--ignore-scripts`.
+- `scripts/git_tree_manifest.py` resolves `--treeish` through
+  `git rev-parse --verify --end-of-options` and refuses a value git would read
+  as an option; `scripts/validate_git_integrity.py` refuses an `--out` that
+  resolves outside the repository root (#37).
+- `.sonarcloud.properties` scopes automatic analysis to the code directories,
+  leaving the `evidence/` qualification record out, and analyses `tests/` as
+  test code (#37).
 - The Markdown report states a skipped corpus domain's stored reason once,
   without a second not-run prefix. Producer reason, unknown identity and the
   Topology Packet are unchanged (#32).

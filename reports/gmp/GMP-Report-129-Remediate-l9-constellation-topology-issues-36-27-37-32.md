@@ -37,8 +37,14 @@ Out of scope: `tests/fixtures/**`, `evidence/**`, CLI path-taint findings, Sonar
 | release readiness on a clean export of HEAD | passed, 0 blocking findings |
 | Full `pytest` suite (`make test`) | NOT RUN in session (governance reserves it for CI); runs in `l9-pr-validate` |
 
+## Follow-up in the same GMP (operator decisions, 2026-11-08)
+
+- `evidence/`: left byte-exact (credential included, operator decision) and taken out of SonarQube Cloud analysis by `.sonarcloud.properties`, which lists source directories because automatic analysis allows no wildcard patterns.
+- `tests/` is analysed as test code. Whether that clears the two findings in `tests/fixtures/sample_constellation/l9-gate-sdk/.github/workflows/ci.yml` is observable only after the main-branch re-analysis.
+- `--treeish` (S8705) now resolves through `git rev-parse --verify --end-of-options`, and a value starting with `-` is refused. `--out` (S8707) must resolve inside the repository root. Both are covered by tests in `tests/test_git_integrity.py`.
+
 ## Residual
 
-- #37 is partial. Still open: `tests/fixtures/sample_constellation/l9-gate-sdk/.github/workflows/ci.yml` (S8541, S8544), CLI path/argument taint in `scripts/git_tree_manifest.py`, `scripts/validate_git_integrity.py`, `worker/control_packet.py`, `worker/stage_runner.py` (S8705, S8707), and `evidence/live-qualify-2026-08-02/` (Dockerfile S8541, `odoo.conf` S2068 credential). Owner decisions.
-- Whether SonarCloud clears the workflow findings is observable only after merge to `main`.
+- `worker/control_packet.py` `--payload-file` and `worker/stage_runner.py` `--dispatch-file` (S8707) read operator-named input files, which is their contract. In the workflows these are `ingress-payload.json` in the checkout and `/tmp/l9-stage-dispatch.json`. Not changed.
+- SonarCloud reads `.sonarcloud.properties` and re-rates `main` only after merge.
 - The direct-compile drill (F001) still runs only for PRs into `main`, merge queue or dispatch, by design.

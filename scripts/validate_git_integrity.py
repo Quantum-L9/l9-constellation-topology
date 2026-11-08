@@ -127,15 +127,30 @@ def inspect_commit(root: Path = ROOT) -> dict[str, object]:
     }
 
 
+def _output_path(root: Path, out: str) -> Path:
+    """Resolve ``--out`` against the validated repository and keep it inside it.
+
+    The result is a repository-bound validation artifact (CI writes
+    ``validation/commit-bound-validation.json``), so a destination that resolves
+    outside ``root`` is refused rather than written.
+    """
+
+    destination = (root / out).resolve()
+    if not destination.is_relative_to(root):
+        raise SystemExit(f"--out must stay inside the repository root {root}: {out}")
+    return destination
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", type=Path, default=ROOT)
     parser.add_argument("--out")
     args = parser.parse_args()
-    result = inspect_commit(args.root)
+    root = args.root.resolve()
+    destination = _output_path(root, args.out) if args.out else None
+    result = inspect_commit(root)
     content = json.dumps(result, indent=2, sort_keys=True) + "\n"
-    if args.out:
-        destination = Path(args.out)
+    if destination is not None:
         destination.parent.mkdir(parents=True, exist_ok=True)
         destination.write_text(content, encoding="utf-8")
     print(content, end="")

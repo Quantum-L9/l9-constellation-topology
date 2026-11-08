@@ -52,6 +52,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `.l9/risk-profile.yaml` — versioned compiler, policy, packet, output, or pipeline profile
 - `.l9/topology-profile.yaml` — versioned compiler, policy, packet, output, or pipeline profile
 - `.python-version` — canonical Python runtime declaration
+- `.sonarcloud.properties` — SonarQube Cloud automatic-analysis scope; leaves the `evidence/` qualification record out of analysis
 - `ADR_INDEX.md` — accepted architecture decision index
 - `AGENTS.md` — agent operating constraints and architecture law
 - `ALIGNMENT_AUDIT.md` — architecture and repository alignment evidence
