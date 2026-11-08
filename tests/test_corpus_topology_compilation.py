@@ -314,7 +314,11 @@ def test_a_not_run_duplicate_domain_survives_and_does_not_render_as_none(
         corpus_packet_1_1.packet_id
     }
     report = render_topology_markdown(result.materialized)
-    assert "Corpus analysis domain `exact_duplicate_relations` was not run:" in report
+    # The domain section states the stored sentence as its own line, and no line
+    # repeats the not-run status (issue #32). The unknown register lists it too.
+    lines = report.splitlines()
+    assert unknown.reason in lines
+    assert not [line for line in lines if line.count("was not run:") > 1]
     assert "No byte-identical artifacts were observed." not in report
 
 
@@ -333,7 +337,9 @@ def test_another_not_run_domain_preserves_its_reason_and_report_wording(tmp_path
     )
     assert unknown.reason.endswith("metrics pass timed out")
     report = render_topology_markdown(result.materialized)
-    assert "Corpus analysis domain `readiness_evidence` was not run: " in report
+    lines = report.splitlines()
+    assert unknown.reason in lines
+    assert not [line for line in lines if line.count("was not run:") > 1]
     assert "No readiness evidence was compiled." not in report
 
 
@@ -349,7 +355,7 @@ def test_completed_empty_duplicate_analysis_still_reports_no_results(tmp_path: P
     ]
     report = render_topology_markdown(result.materialized)
     assert "No byte-identical artifacts were observed." in report
-    assert "Corpus analysis domain `exact_duplicate_relations` was not run:" not in report
+    assert "was not run:" not in report
 
 
 def test_duplicate_edges_do_not_contribute_to_dependency_impact(
