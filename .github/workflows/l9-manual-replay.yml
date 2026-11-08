@@ -45,12 +45,14 @@ jobs:
       # --no-build keeps third-party source distributions out of the runtime
       # environment, and it refuses this project's own source as well, so the
       # project is excluded from the locked sync and installed from its own tree
-      # next. --no-deps keeps that second step from resolving anything new.
+      # next, as l9-pr-validate and Repo.mk do. --no-deps keeps that second step
+      # from resolving anything new. Editable is safe here: this job checks out
+      # one revision and never replaces it.
       - name: Synchronize frozen runtime environment
         run: uv sync --frozen --no-build --no-dev --no-install-project
 
       - name: Install the project from its own tree
-        run: uv pip install --no-deps --python .venv/bin/python .
+        run: uv pip install --no-deps --editable .
 
       - name: Build replay payload
         env:

@@ -259,3 +259,10 @@ def test_npm_ci_running_lifecycle_scripts_is_rejected(tmp_path: Path) -> None:
     _mutate(_compile_workflow(validator), "npm ci --ignore-scripts", "npm ci")
 
     assert "compile.yml: npm ci must pass --ignore-scripts: npm ci" in _errors(validator)
+
+
+def test_wheel_smoke_without_hash_pinning_is_rejected(tmp_path: Path) -> None:
+    validator = _clone_workflow_tree(tmp_path)
+    _mutate(_workflow(validator, "l9-pr-validate.yml"), "--require-hashes ", "")
+
+    assert "l9-pr-validate.yml: missing gate --require-hashes" in _errors(validator)

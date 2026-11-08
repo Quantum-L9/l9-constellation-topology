@@ -92,13 +92,21 @@ jobs:
         run: uv build
 
       # Runtime dependencies come from the lock, not from a fresh resolution of
-      # the wheel metadata. uv pip check then proves the wheel's declared
-      # requirements are all satisfied, so a dependency missing from the wheel
-      # metadata still fails here.
+      # the wheel metadata. The wheel itself is installed by its sha256, so only
+      # the artifact this job built can be installed. uv pip check then proves
+      # the wheel's declared requirements are all satisfied, so a dependency
+      # missing from the wheel metadata still fails here.
       - name: Smoke-install wheel
         run: |
+          set -euo pipefail
+          wheels=(dist/*.whl)
+          test "${#wheels[@]}" -eq 1
+          wheel="${wheels[0]}"
+          printf 'l9-constellation-topology @ file://%s --hash=sha256:%s\n' \
+            "$PWD/$wheel" "$(sha256sum "$wheel" | cut -d' ' -f1)" > "$RUNNER_TEMP/wheel-lock.txt"
           UV_PROJECT_ENVIRONMENT=.wheel-smoke uv sync --frozen --no-build --no-dev --no-install-project
-          uv pip install --no-deps --no-build --python .wheel-smoke/bin/python dist/*.whl
+          uv pip install --no-deps --no-build --require-hashes --python .wheel-smoke/bin/python \
+            -r "$RUNNER_TEMP/wheel-lock.txt"
           uv pip check --python .wheel-smoke/bin/python
           .wheel-smoke/bin/l9-topology --help
           .wheel-smoke/bin/l9-topology-worker --help

@@ -241,6 +241,7 @@ def main() -> int:
             "scripts/verify_determinism.py",
             "uv build",
             "uv pip check --python .wheel-smoke/bin/python",
+            "--require-hashes",
         )
         for value in required:
             if value not in text:

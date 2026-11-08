@@ -4,15 +4,18 @@
 
 - `l9-ingress`, `l9-manual-replay` and both `l9-stage-worker` environments
   sync the locked dependencies with `--no-build --no-install-project`, then
-  install the project from its own tree with `uv pip install --no-deps`. uv
+  install the project from its own tree with `uv pip install --no-deps`
+  (editable, as in `l9-pr-validate`, except in `l9-stage-worker`, whose
+  workspace is re-checked-out after the trusted environment is built). uv
   0.10.0 refuses the project's own source under `--no-build`, which failed
   `l9-ingress` on every push to `main` (#36).
 - `l9-pr-validate` runs `validate` for pull requests into any base, so stacked
   PRs get the repository-native ladder. `direct-compile-smoke` publishes to GHCR
   and stays limited to pull requests into `main`, merge-queue and dispatch (#27).
 - `l9-pr-validate` passes `--no-sync` on every `uv run`, smoke-installs the
-  wheel with `--no-deps` into a lock-synced environment followed by
-  `uv pip check`, and `compile.yml` runs `npm ci --ignore-scripts`. These clear
+  wheel with `--no-deps --require-hashes` (pinned to the sha256 of the wheel
+  it just built) into a lock-synced environment followed by `uv pip check`,
+  and `compile.yml` runs `npm ci --ignore-scripts`. These clear
   the workflow findings behind the SonarCloud new-code security rating (#37,
   partial; fixture, CLI-path and committed-evidence findings remain).
 - `scripts/validate_workflows.py` rejects each regression: a `--no-build` sync
