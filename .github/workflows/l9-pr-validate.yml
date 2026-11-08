@@ -1,8 +1,10 @@
 name: l9-pr-validate
 
+# validate runs for every pull request, whatever its base, so a stacked PR
+# gets the repository-native ladder too. direct-compile-smoke publishes to
+# GHCR, so it stays limited to pull requests into main (see its if: below).
 on:
   pull_request:
-    branches: [main]
   merge_group:
     types: [checks_requested]
   workflow_dispatch:
@@ -43,53 +45,61 @@ jobs:
       - name: Install the project under validation from its own tree
         run: uv pip install --no-deps --editable .
 
+      # Each run step below passes --no-sync: the environment above is already the
+      # locked one, and an implicit re-sync would resolve and build again.
+
       - name: Compile sources
-        run: uv run python -m compileall src tests scripts -q
+        run: uv run --no-sync python -m compileall src tests scripts -q
 
       - name: Run tests with coverage gate
         run: >-
-          uv run pytest
+          uv run --no-sync pytest
           --cov=l9_constellation_topology
           --cov-report=term-missing
           --cov-report=xml
           -q
 
       - name: Check formatting
-        run: uv run ruff format --check .
+        run: uv run --no-sync ruff format --check .
 
       - name: Lint source and tests
-        run: uv run ruff check .
+        run: uv run --no-sync ruff check .
 
       - name: Enforce strict typing
-        run: uv run mypy src/l9_constellation_topology
+        run: uv run --no-sync mypy src/l9_constellation_topology
 
       - name: Validate contracts
-        run: uv run python scripts/validate_contracts.py
+        run: uv run --no-sync python scripts/validate_contracts.py
 
       - name: Validate GitHub workflow contracts
-        run: uv run python scripts/validate_workflows.py
+        run: uv run --no-sync python scripts/validate_workflows.py
 
       - name: Enforce architecture boundaries
-        run: uv run python scripts/architecture_boundary_check.py
+        run: uv run --no-sync python scripts/architecture_boundary_check.py
 
       - name: Validate release readiness and no-stub policy
-        run: uv run python scripts/validate_release_readiness.py
+        run: uv run --no-sync python scripts/validate_release_readiness.py
 
       - name: Bind validation to committed Git tree
         run: >-
-          uv run python scripts/validate_git_integrity.py
+          uv run --no-sync python scripts/validate_git_integrity.py
           --out validation/commit-bound-validation.json
 
       - name: Verify deterministic semantic identity
-        run: uv run python scripts/verify_determinism.py
+        run: uv run --no-sync python scripts/verify_determinism.py
 
       - name: Build distribution
         run: uv build
 
+      # Runtime dependencies come from the lock, not from a fresh resolution of
+      # the wheel metadata. uv pip check then proves the wheel's declared
+      # requirements are all satisfied, so a dependency missing from the wheel
+      # metadata still fails here.
       - name: Smoke-install wheel
         run: |
-          uv venv .wheel-smoke
-          uv pip install --no-build --python .wheel-smoke/bin/python dist/*.whl
+          UV_PROJECT_ENVIRONMENT=.wheel-smoke uv sync --frozen --no-build --no-dev --no-install-project
+          uv pip install --no-deps --no-build --python .wheel-smoke/bin/python dist/*.whl
+          uv pip check --python .wheel-smoke/bin/python
           .wheel-smoke/bin/l9-topology --help
           .wheel-smoke/bin/l9-topology-worker --help
 
@@ -110,6 +120,9 @@ jobs:
           retention-days: 14
 
   direct-compile-smoke:
+    # Publishes to GHCR, so it runs for merge-queue, dispatch and main-bound PR
+    # events only. A stacked PR is still validated by the validate job above.
+    if: github.event_name != 'pull_request' || github.base_ref == 'main'
     # Ceiling for the called workflow. compile.yml splits these further: its
     # compile job takes contents: read only, and packages: write reaches only
     # its publish job.

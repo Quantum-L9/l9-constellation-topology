@@ -31,6 +31,13 @@ EXPECTED = {
     _WF_COMPILE,
 }
 PINNED_ACTION = re.compile(r"^[^@\s]+@[0-9a-f]{40}$")
+# A `uv run` that may re-sync resolves and builds again outside the locked sync
+# step. Every run in the validation ladder uses the environment already synced.
+UV_RUN_WITHOUT_NO_SYNC = re.compile(r"\buv run (?!--no-sync\b)")
+# uv refuses this project's own source under --no-build (issue #36). A sync that
+# keeps --no-build must exclude the project and install it in a separate step.
+UV_SYNC_COMMAND = re.compile(r"\buv sync\b[^\n]*")
+NPM_CI_COMMAND = re.compile(r"\bnpm ci\b[^\n]*")
 # Consumer-owned organization CI ownership markers. Any of these in a workflow means
 # the repository is again selecting a Core or SDK revision for organization CI.
 ORG_CI_OWNERSHIP_MARKERS = (
@@ -120,6 +127,57 @@ def _check_compile_least_privilege(data: dict[str, object]) -> list[str]:
     return errors
 
 
+def _check_install_commands(name: str, text: str) -> list[str]:
+    """Reject install commands that refuse this project or run package scripts.
+
+    ``uv sync --no-build`` keeps third-party source distributions out, but uv
+    also refuses this project's own source under it, so such a sync must carry
+    ``--no-install-project`` and install the project in a separate step.
+    ``npm ci`` must not run dependency lifecycle scripts.
+    """
+
+    errors: list[str] = []
+    for match in UV_SYNC_COMMAND.finditer(text):
+        command = match.group(0)
+        if "--no-build" in command and "--no-install-project" not in command:
+            errors.append(
+                f"{name}: uv sync with --no-build must also pass --no-install-project: {command}"
+            )
+    for match in NPM_CI_COMMAND.finditer(text):
+        command = match.group(0)
+        if "--ignore-scripts" not in command:
+            errors.append(f"{name}: npm ci must pass --ignore-scripts: {command}")
+    return errors
+
+
+def _check_pr_validate_reach(data: dict[str, object]) -> list[str]:
+    """Validate every pull request, and keep GHCR publication main-bound.
+
+    A ``branches`` filter on ``pull_request`` left stacked PRs with no
+    repository-native validation (issue #27). ``direct-compile-smoke`` publishes
+    to GHCR, so it must stay limited to pull requests into ``main``.
+    """
+
+    errors: list[str] = []
+    triggers = data.get("on")
+    if not isinstance(triggers, dict) or "pull_request" not in triggers:
+        return [f"{_WF_PR_VALIDATE}: must trigger on pull_request"]
+    pull_request = triggers["pull_request"]
+    if isinstance(pull_request, dict):
+        for key in ("branches", "branches-ignore"):
+            if key in pull_request:
+                errors.append(
+                    f"{_WF_PR_VALIDATE}: pull_request must not filter on {key}; "
+                    "stacked PRs need validation too"
+                )
+    smoke = _job(data, "direct-compile-smoke")
+    if smoke is not None and "github.base_ref == 'main'" not in str(smoke.get("if", "")):
+        errors.append(
+            f"{_WF_PR_VALIDATE}: direct-compile-smoke must be limited to pull requests into main"
+        )
+    return errors
+
+
 def _steps(data: dict[str, object]) -> list[dict[str, str]]:
     jobs = data.get("jobs")
     if not isinstance(jobs, dict):
@@ -159,6 +217,7 @@ def main() -> int:
         text = path.read_text(encoding="utf-8")
         loaded[name] = (data, steps, text)
         errors.extend(_check_org_ci_ownership(name, text))
+        errors.extend(_check_install_commands(name, text))
         for step in steps:
             action = step.get("uses")
             # The exact loaded scalar is the contract. YAML comments are already
@@ -169,22 +228,27 @@ def main() -> int:
                 errors.append(f"{name}: action is not pinned to a full commit SHA: {action}")
 
     if _WF_PR_VALIDATE in loaded:
-        _, _, text = loaded[_WF_PR_VALIDATE]
+        data, _, text = loaded[_WF_PR_VALIDATE]
         required = (
             "uv sync --frozen --no-build --extra dev",
             "--cov=l9_constellation_topology",
-            "uv run ruff check .",
-            "uv run mypy src/l9_constellation_topology",
+            "uv run --no-sync ruff check .",
+            "uv run --no-sync mypy src/l9_constellation_topology",
             "scripts/validate_contracts.py",
             "scripts/validate_workflows.py",
             "scripts/architecture_boundary_check.py",
             "scripts/validate_release_readiness.py",
             "scripts/verify_determinism.py",
             "uv build",
+            "uv pip check --python .wheel-smoke/bin/python",
         )
         for value in required:
             if value not in text:
                 errors.append(f"{_WF_PR_VALIDATE}: missing gate {value}")
+        for match in UV_RUN_WITHOUT_NO_SYNC.finditer(text):
+            line = text.count("\n", 0, match.start()) + 1
+            errors.append(f"{_WF_PR_VALIDATE}: line {line}: uv run must pass --no-sync")
+        errors.extend(_check_pr_validate_reach(data))
 
     if _WF_INGRESS in loaded:
         _, _, text = loaded[_WF_INGRESS]
@@ -211,7 +275,9 @@ def main() -> int:
             errors.append(f"{_WF_STAGE_WORKER}: dispatch is used before authenticated preflight")
         for required in (
             "--preflight",
-            "uv sync --frozen --no-build --no-dev --no-editable",
+            "uv sync --frozen --no-build --no-dev --no-install-project",
+            'uv pip install --no-deps --python "${RUNNER_TEMP}/l9-trusted-worker-env/bin/python" .',
+            'uv pip install --no-deps --python "${RUNNER_TEMP}/l9-exact-worker-env/bin/python" .',
             "ref: ${{ steps.dispatch.outputs.revision }}",
         ):
             if required not in text:

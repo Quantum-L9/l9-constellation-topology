@@ -113,7 +113,7 @@ jobs:
       - name: Build exact Meta producer
         working-directory: meta
         run: |
-          npm ci
+          npm ci --ignore-scripts
           npm run build
 
       - name: Produce real Repository Model Packet

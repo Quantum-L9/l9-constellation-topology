@@ -35,7 +35,8 @@ jobs:
       - name: Build trusted preflight environment from lockfile
         run: |
           UV_PROJECT_ENVIRONMENT="${RUNNER_TEMP}/l9-trusted-worker-env" \
-            uv sync --frozen --no-build --no-dev --no-editable
+            uv sync --frozen --no-build --no-dev --no-install-project
+          uv pip install --no-deps --python "${RUNNER_TEMP}/l9-trusted-worker-env/bin/python" .
 
       - name: Decode dispatch packet without using its fields
         env:
@@ -83,7 +84,8 @@ jobs:
       - name: Build exact-revision worker environment from lockfile
         run: |
           UV_PROJECT_ENVIRONMENT="${RUNNER_TEMP}/l9-exact-worker-env" \
-            uv sync --frozen --no-build --no-dev --no-editable
+            uv sync --frozen --no-build --no-dev --no-install-project
+          uv pip install --no-deps --python "${RUNNER_TEMP}/l9-exact-worker-env/bin/python" .
 
       - name: Install ORAS 1.3.0
         if: steps.dispatch.outputs.uses_ghcr == 'true'
