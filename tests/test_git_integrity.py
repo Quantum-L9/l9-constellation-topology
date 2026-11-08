@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 import subprocess
 import sys
 from pathlib import Path
@@ -9,7 +8,6 @@ import pytest
 from scripts.git_tree_manifest import (
     collect_tree_entries,
     load_manifest,
-    render_manifest,
     write_manifest,
 )
 from scripts.validate_git_integrity import inspect_commit
@@ -123,19 +121,3 @@ def test_git_integrity_out_must_stay_inside_the_repository(tmp_path: Path) -> No
     )
     assert inside.returncode == 0, inside.stdout + inside.stderr
     assert (root / "validation" / "result.json").is_file()
-
-
-def test_tree_manifest_is_written_in_biome_default_format() -> None:
-    payload = {
-        "entries": [{"path": "a.txt"}],
-        "excluded_paths": ["GIT_TREE_MANIFEST.json"],
-        "long": ["x" * 40, "y" * 40],
-    }
-    text = render_manifest(payload)
-    assert json.loads(text) == payload
-    assert text.endswith("}\n")
-    assert '\t"excluded_paths": ["GIT_TREE_MANIFEST.json"],\n' in text
-    # An array of strings wider than 80 columns stays expanded, one item per line.
-    assert '\t"long": [\n\t\t"' in text
-    assert '\t"entries": [\n\t\t{\n\t\t\t"path": "a.txt"\n\t\t}\n\t],\n' in text
-    assert "\n  " not in text

@@ -36,6 +36,7 @@ l9-constellation-topology/
 │   └── pull_request_template.md
 ├── .l9
 │   ├── callback-policy.yaml
+│   ├── ci.json
 │   ├── maturity-profile.yaml
 │   ├── meta-authority.yaml
 │   ├── metadata-index.jsonl
@@ -191,11 +192,13 @@ l9-constellation-topology/
 ├── outputs
 │   └── .gitkeep
 ├── reports
-│   └── end-session
-│       ├── governance-handoff
-│       │   └── 2026-11-07-pr57-9b08dbb4cfe9.md
-│       └── session-handoff
-│           └── 2026-11-07-pr57-9b08dbb4cfe9.md
+│   ├── end-session
+│   │   ├── governance-handoff
+│   │   │   └── 2026-11-07-pr57-9b08dbb4cfe9.md
+│   │   └── session-handoff
+│   │       └── 2026-11-07-pr57-9b08dbb4cfe9.md
+│   └── gmp
+│       └── GMP-Report-129-Remediate-l9-constellation-topology-issues-36-27-37-32.md
 ├── schemas
 │   ├── artifact-record.schema.json
 │   ├── bridge-gap-projection.schema.json
@@ -562,6 +565,7 @@ l9-constellation-topology/
 │   ├── test_assessments_v5.py
 │   ├── test_bridge_gap_projection.py
 │   ├── test_bridge_gap_renderer.py
+│   ├── test_ci_consumer_contract.py
 │   ├── test_claim_view.py
 │   ├── test_cli_v5.py
 │   ├── test_confirmed_findings_remediation.py
@@ -633,10 +637,12 @@ l9-constellation-topology/
 ├── .gitattributes
 ├── .gitignore
 ├── .python-version
+├── .sonarcloud.properties
 ├── ADR_INDEX.md
 ├── AGENTS.md
 ├── ALIGNMENT_AUDIT.md
 ├── ARCHITECTURE.md
+├── biome.json
 ├── BUILD_SPECIFICATION.md
 ├── CHANGE_SUMMARY.md
 ├── CHANGELOG.md

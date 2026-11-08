@@ -5,14 +5,38 @@
   "type": "array",
   "items": {
     "type": "object",
-    "required": ["risk_id","repo_id","severity","category","description"],
+    "required": [
+      "risk_id",
+      "repo_id",
+      "severity",
+      "category",
+      "description"
+    ],
     "properties": {
-      "risk_id": {"type": "string"},
-      "repo_id": {"type": "string"},
-      "severity": {"type": "string", "enum": ["low","medium","high","critical"]},
-      "category": {"type": "string"},
-      "description": {"type": "string"},
-      "evidence": {"type": "array"}
+      "risk_id": {
+        "type": "string"
+      },
+      "repo_id": {
+        "type": "string"
+      },
+      "severity": {
+        "type": "string",
+        "enum": [
+          "low",
+          "medium",
+          "high",
+          "critical"
+        ]
+      },
+      "category": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      },
+      "evidence": {
+        "type": "array"
+      }
     }
   }
 }
