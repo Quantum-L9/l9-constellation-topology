@@ -152,31 +152,31 @@
       "path": ".github/pull_request_template.md"
     },
     {
-      "git_object_id": "b32927dd197b06e674e3e8202dcf276b4c4d582c",
+      "git_object_id": "6999ed14b6f3706716cb0bc4f8f1c2f2c21c96b5",
       "mode": "100644",
       "object_type": "blob",
       "path": ".github/workflows/compile.yml"
     },
     {
-      "git_object_id": "000bce6d69c90e14ff991925893cde3e09fd1669",
+      "git_object_id": "1ce0ddbd04eeafb23539d4985099f7e5633e40e4",
       "mode": "100644",
       "object_type": "blob",
       "path": ".github/workflows/l9-ingress.yml"
     },
     {
-      "git_object_id": "6c53ec0bcd2f84c47f92f0248fca75fe0cbcdc59",
+      "git_object_id": "3e5aaafad2d61df9ece810d32019487915005fc8",
       "mode": "100644",
       "object_type": "blob",
       "path": ".github/workflows/l9-manual-replay.yml"
     },
     {
-      "git_object_id": "fe4d1aed7709df4ec1c49309601a11eae7ee2eb6",
+      "git_object_id": "ae0ae74384ba873b5e4430b97eb4aee954f94708",
       "mode": "100644",
       "object_type": "blob",
       "path": ".github/workflows/l9-pr-validate.yml"
     },
     {
-      "git_object_id": "a1b241d90860e5bc88b525564d56491e21de97b3",
+      "git_object_id": "5229e016399848938dd65939fa9ce31f2dbea5d9",
       "mode": "100644",
       "object_type": "blob",
       "path": ".github/workflows/l9-stage-worker.yml"
@@ -296,7 +296,7 @@
       "path": "BUILD_SPECIFICATION.md"
     },
     {
-      "git_object_id": "40214e5bae4b80eec364eca065fd7ec5f73b793b",
+      "git_object_id": "21f8440077066c0632f6ba44f1a6a25a185c91ca",
       "mode": "100644",
       "object_type": "blob",
       "path": "CHANGELOG.md"
@@ -1496,7 +1496,7 @@
       "path": "scripts/validate_release_readiness.py"
     },
     {
-      "git_object_id": "bb04a3cdcffbe5114540b37330ab1a86792d24bc",
+      "git_object_id": "a1674afcd74ced142aa0da50321c3693f123a950",
       "mode": "100644",
       "object_type": "blob",
       "path": "scripts/validate_workflows.py"
@@ -2018,7 +2018,7 @@
       "path": "src/l9_constellation_topology/renderers/json_export.py"
     },
     {
-      "git_object_id": "118be328e4f3012285f809c93574a3d7293762ca",
+      "git_object_id": "06623579f04c4b985a51e25981b62b9ea25fc491",
       "mode": "100644",
       "object_type": "blob",
       "path": "src/l9_constellation_topology/renderers/markdown_report.py"
@@ -3116,7 +3116,7 @@
       "path": "tests/test_corpus_publication_containment.py"
     },
     {
-      "git_object_id": "44ba07442e48da20d360ae5d572b43cb63ea4b7e",
+      "git_object_id": "f9fc0b151288b69be36627f69caf88456172402f",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_corpus_topology_compilation.py"
@@ -3434,7 +3434,7 @@
       "path": "tests/test_worker_v5.py"
     },
     {
-      "git_object_id": "f3f2ea4ea1fdd476cc3268b11200c5c56ce66a79",
+      "git_object_id": "14fc1c94d66a6f48df19ed05cc0e6b93cd001ef0",
       "mode": "100644",
       "object_type": "blob",
       "path": "tests/test_workflow_contracts_v5.py"
@@ -3464,7 +3464,7 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:580f67cbeb1db8f10669d342a94a03dc2079e2f5ca735c75a2069e608d5f0fc2",
+  "entries_sha256": "sha256:7ac0c53013b203c80fe32a3d82068b49bca28cea3811ec41eac4ef32379fe067",
   "entry_count": 577,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"

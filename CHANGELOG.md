@@ -1,5 +1,29 @@
 # Changelog
 
+## Unreleased - workflow install split, stacked-PR validation, report wording (#36, #27, #37, #32)
+
+- `l9-ingress`, `l9-manual-replay` and both `l9-stage-worker` environments
+  sync the locked dependencies with `--no-build --no-install-project`, then
+  install the project from its own tree with `uv pip install --no-deps`. uv
+  0.10.0 refuses the project's own source under `--no-build`, which failed
+  `l9-ingress` on every push to `main` (#36).
+- `l9-pr-validate` runs `validate` for pull requests into any base, so stacked
+  PRs get the repository-native ladder. `direct-compile-smoke` publishes to GHCR
+  and stays limited to pull requests into `main`, merge-queue and dispatch (#27).
+- `l9-pr-validate` passes `--no-sync` on every `uv run`, smoke-installs the
+  wheel with `--no-deps` into a lock-synced environment followed by
+  `uv pip check`, and `compile.yml` runs `npm ci --ignore-scripts`. These clear
+  the workflow findings behind the SonarCloud new-code security rating (#37,
+  partial; fixture, CLI-path and committed-evidence findings remain).
+- `scripts/validate_workflows.py` rejects each regression: a `--no-build` sync
+  without `--no-install-project`, a `pull_request` branch filter on
+  `l9-pr-validate`, an unguarded `direct-compile-smoke`, a `uv run` without
+  `--no-sync`, a wheel smoke without `uv pip check`, and `npm ci` without
+  `--ignore-scripts`.
+- The Markdown report states a skipped corpus domain's stored reason once,
+  without a second not-run prefix. Producer reason, unknown identity and the
+  Topology Packet are unchanged (#32).
+
 ## Unreleased - stop promoting artifact classification to relations (ADR-0037, pending owner decision)
 
 - The graph builder no longer emits repository `GOVERNED_BY`, `DOCUMENTED_BY`
