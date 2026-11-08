@@ -1,5 +1,19 @@
 # Changelog
 
+## Unreleased - Biome configuration and CI consumer contract
+
+- `biome.json` (Biome 2.5.8 schema) enables Biome for JSON, which Organization CI then
+  runs blocking. Two-space indentation with `expand: always` matches the repository's
+  generators, so only five hand-written schemas under `schemas/` were reformatted
+  (whitespace only). `evidence/`, `tests/fixtures/`, `.l9/` and the compact
+  `HASH_LOCALITY_EVALUATION.json` are excluded as byte-exact records.
+- `GIT_TREE_MANIFEST.json` is written with `json.dumps(indent=2)` again, which this
+  configuration accepts; the tab layout from #58 is reverted.
+- `.l9/ci.json` declares the `l9.ci-consumer/v1` contract with `repo_class: python`
+  and no `product_kind`: the repository has not been promoted to a Constellation node,
+  so it is not held to the Gate routing rules. `tests/test_ci_consumer_contract.py`
+  guards that until the promotion change.
+
 ## Unreleased - workflow install split, stacked-PR validation, report wording (#36, #27, #37, #32)
 
 - `l9-ingress`, `l9-manual-replay` and both `l9-stage-worker` environments

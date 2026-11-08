@@ -150,38 +150,10 @@ def load_manifest(root: Path) -> tuple[dict[str, str], ...]:
     return validate_manifest_shape(payload)
 
 
-#: Biome's defaults: tab indentation, measured as 2 columns, an 80-column line.
-_LINE_WIDTH = 80
-_TAB_WIDTH = 2
-_STRING_ARRAY = re.compile(
-    r'^(\t*)("[^"\n]*": )\[\n((?:\1\t"[^"\n]*",?\n)+)\1\](,?)$', re.MULTILINE
-)
-
-
-def render_manifest(payload: dict[str, Any]) -> str:
-    """Serialize the manifest exactly as Biome formats it.
-
-    The governed workspace gives JSON formatting to Biome, so the generated file
-    is written in Biome's default output: tab indentation, objects kept
-    expanded, and an array of strings that fits in 80 columns on one line.
-    """
-
-    text = json.dumps(payload, indent="\t", sort_keys=True)
-
-    def collapse(match: re.Match[str]) -> str:
-        indent, key, items, comma = match.groups()
-        values = [line.strip().rstrip(",") for line in items.splitlines()]
-        line = f"{indent}{key}[{', '.join(values)}]{comma}"
-        width = len(line.expandtabs(_TAB_WIDTH))
-        return line if width <= _LINE_WIDTH else match.group(0)
-
-    return _STRING_ARRAY.sub(collapse, text) + "\n"
-
-
 def write_manifest(root: Path, treeish: str) -> Path:
     destination = root / MANIFEST_PATH
     payload = build_manifest(root, treeish)
-    destination.write_text(render_manifest(payload), encoding="utf-8")
+    destination.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return destination
 
 

@@ -92,6 +92,25 @@ governance `.cursor-commands` symlink, makes `apply` refuse with
 `check` to see drift. Afterwards regenerate
 `GIT_TREE_MANIFEST.json`, which records the index's blob.
 
+## JSON formatting and CI consumer metadata
+
+`biome.json` makes Biome the JSON formatter and linter. Organization CI runs
+`biome ci .` blocking whenever that file exists, so every tracked JSON file outside
+`evidence/`, `tests/fixtures/`, `.l9/` and the compact `HASH_LOCALITY_EVALUATION.json`
+must already be in Biome's format. The configuration (2-space indent, `expand: always`)
+matches what this repository's generators write with `json.dumps(indent=2)`, so
+`make schemas-update`, `make fixtures-update` and `make git-manifest` stay conformant.
+Check by hand with:
+
+```bash
+biome ci .
+```
+
+`.l9/ci.json` is the `l9.ci-consumer/v1` contract Core reads. It declares no
+`product_kind`: this repository has not been promoted to a Constellation node, and Core
+reads an absent kind as not a node, so the Gate routing rules stay non-blocking here.
+`tests/test_ci_consumer_contract.py` keeps it that way until the promotion change.
+
 ## Workflow changes
 
 `scripts/validate_workflows.py` is the workflow contract gate. It checks the exact loaded
