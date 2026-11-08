@@ -392,7 +392,7 @@
       "path": "MAINTAINERS.md"
     },
     {
-      "git_object_id": "1a0eb4b3d39f5eb84f391b0ee5f31a66f20b7355",
+      "git_object_id": "86fd33045f1a5eaf52445ad017165c5ed7b49937",
       "mode": "100644",
       "object_type": "blob",
       "path": "MANIFEST.md"
@@ -1296,6 +1296,12 @@
       "mode": "100644",
       "object_type": "blob",
       "path": "reports/end-session/session-handoff/2026-11-07-pr57-9b08dbb4cfe9.md"
+    },
+    {
+      "git_object_id": "783bcc071fbdcb4d454a6a6f944613eab49f2512",
+      "mode": "100644",
+      "object_type": "blob",
+      "path": "reports/gmp/GMP-Report-129-Remediate-l9-constellation-topology-issues-36-27-37-32.md"
     },
     {
       "git_object_id": "0a395c9a9fa9d1d39b45ad6fb566e2eb8c7590d9",
@@ -3464,8 +3470,8 @@
       "path": "validation/validation_report.yaml"
     }
   ],
-  "entries_sha256": "sha256:7ac0c53013b203c80fe32a3d82068b49bca28cea3811ec41eac4ef32379fe067",
-  "entry_count": 577,
+  "entries_sha256": "sha256:3fa0e6ea8db059b062b7bbba85c1fcf2f22610a2cdf3640c826fb07d75e1292e",
+  "entry_count": 578,
   "excluded_paths": [
     "GIT_TREE_MANIFEST.json"
   ],
