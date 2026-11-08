@@ -24,6 +24,9 @@
   `git rev-parse --verify --end-of-options` and refuses a value git would read
   as an option; `scripts/validate_git_integrity.py` refuses an `--out` that
   resolves outside the repository root (#37).
+- `GIT_TREE_MANIFEST.json` is written in Biome's default JSON format (tab
+  indentation, short string arrays on one line), the formatter the governed
+  workspace assigns to JSON. Content and `--check` semantics are unchanged.
 - `.sonarcloud.properties` scopes automatic analysis to the code directories,
   leaving the `evidence/` qualification record out, and analyses `tests/` as
   test code (#37).
