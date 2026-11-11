@@ -241,3 +241,51 @@ the fake-registry tests alone.
 The repository is suitable for an updated remediation pull request and architect re-review.
 It is not approved for production deployment until the external gates are attached to the exact
 release commit.
+
+## Release v2.0.0
+
+First tagged release. The release commit is `6b83cc6b037fb01f7e2f78c197297a7f7230556c`,
+the `main` tip on 2026-11-03, whose `pyproject.toml` and `__version__` declare `2.0.0`.
+Later commits on `main` are not part of this release.
+
+Ladder from `RELEASING.md`, run on a clean checkout of that commit on Python 3.12.13:
+
+| Check | Status | Evidence |
+|---|---|---|
+| `compileall src tests scripts` | PASS | no output |
+| `pytest --cov` | PASS | 689 passed, 2 skipped; coverage 86.46% (floor 80%) |
+| `ruff check .` | PASS | all checks passed |
+| `mypy src/l9_constellation_topology` | PASS | no issues in 154 source files |
+| `validate_contracts.py` | PASS | `status: passed`, no errors |
+| `validate_workflows.py` | PASS | `status: passed`, no errors |
+| `architecture_boundary_check.py` | PASS | `status: passed` |
+| `validate_release_readiness.py` | PASS | `status: passed` |
+| `validate_git_integrity.py` | PASS | committed `GIT_TREE_MANIFEST.json` matches the tree; no manifest error |
+| `verify_determinism.py` | PASS | `status: passed` |
+| `uv build` from a `git archive` of the commit | PASS | wheel and sdist below |
+| isolated wheel install | PASS | `__version__` is `2.0.0`; `l9-topology`, `l9-topology-worker`, `l9-topology-control-packet` `--help` exit 0 |
+
+The `GIT_TREE_MANIFEST.json` regeneration step was not re-run: the commit was already
+on `main`, and `validate_git_integrity.py` confirmed its committed manifest.
+
+Published references, verified against the host on 2026-11-11:
+
+| Reference | Value |
+|---|---|
+| Tag | `v2.0.0` → `6b83cc6b037fb01f7e2f78c197297a7f7230556c` |
+| Release | https://github.com/Quantum-L9/l9-constellation-topology/releases/tag/v2.0.0 (id `433385617`, not draft, not prerelease) |
+| `l9_constellation_topology-2.0.0-py3-none-any.whl` | sha256 `a1f7c723c9ddf8286b9df43dc4bd91469bd81f083aaf8f3d71055ae201b352b5` |
+| `l9_constellation_topology-2.0.0.tar.gz` | sha256 `0c2ec82283fbfcabda13a49ab66c7d476c51fdcaccd1ad790001a41ba8a9ff47` |
+| `SHA256SUMS` | sha256 `93af7c4e7c4668ec45002ee66c4f75e9861bf3e4232a82b2fcd0533de19334ad` |
+
+The host-reported asset digests equal the locally built hashes. The Cursor-Governance
+`l9-release-publication` checks returned `MATCH` for the tag, `RELEASE_VERIFIED` for the
+Release with all three assets, and `RELEASE_COMPLETE` for the completion loop.
+
+Deviation: `v2.0.0` is a lightweight tag created with the Release from the GitHub web UI.
+It is not a signed tag object, which `RELEASING.md` step 8 requires. The tag is published
+and is not replaced; a signed tag needs a new version.
+
+Not part of this release and still UNKNOWN: the external gates listed above (the ADR-0018
+registry acceptance drill, the `publish: false` permission boundary) and any package
+registry publication. Nothing was published to a package registry.
