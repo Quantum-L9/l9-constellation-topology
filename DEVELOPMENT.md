@@ -48,7 +48,7 @@ After regeneration:
 2. Run `make generated-check` again.
 3. Run targeted tests for the changed generator or model.
 4. Run the full gate: `make setup validate check test`.
-5. Synchronize `MANIFEST.md`, `FINAL_TREE.md`, traceability records, validation evidence, and the commit-bound `GIT_TREE_MANIFEST.json` from the final staged tree.
+5. Synchronize `MANIFEST.md`, `FINAL_TREE.md`, traceability records, and validation evidence. Do not generate or commit `GIT_TREE_MANIFEST.json` (ADR-0038).
 
 Do not use an update target inside validation or CI. Validation must detect drift without mutating tracked files.
 
@@ -81,16 +81,15 @@ repository root:
 # c53ef3a… is the v4.3.0 release commit; a tag can be moved, a commit cannot.
 npm install --prefix /tmp/meta github:Quantum-L9/l9-meta-injector#c53ef3aa0ccea04af2adfe67800ad09843b6e0fe
 /tmp/meta/node_modules/.bin/l9-meta-injector apply . \
-  --authority Quantum-L9 --namespace l9-constellation-topology \
-  --omit GIT_TREE_MANIFEST.json
+  --authority Quantum-L9 --namespace l9-constellation-topology
 ```
 
 Run it in a clean clone. Local wiring that points outside the tree, such as a
 governance `.cursor-commands` symlink, makes `apply` refuse with
 `DISCOVERY_INCOMPLETE`, and the producer skips git-ignored files, so local
 `.git/info/exclude` entries can change the index. Use the same flags with
-`check` to see drift. Afterwards regenerate
-`GIT_TREE_MANIFEST.json`, which records the index's blob.
+`check` to see drift. Commit the refreshed index; no content manifest is
+regenerated (ADR-0038).
 
 ## Workflow changes
 

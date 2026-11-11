@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""Bind validation to the exact commit, inventory, modes, and Git blob identities."""
+"""Bind validation to the exact commit, inventory, modes, and Git blob identities.
+
+Content identity comes from the commit itself (ADR-0038): the validated commit and
+tree SHAs, and the inventory digest computed from that tree, are written to the
+`--out` evidence file. No tracked manifest restates them, and a commit that tracks
+the retired `GIT_TREE_MANIFEST.json` fails.
+"""
 
 from __future__ import annotations
 
@@ -12,17 +18,15 @@ from pathlib import Path
 
 try:
     from scripts.git_tree_manifest import (
-        MANIFEST_PATH,
+        FORBIDDEN_TRACKED_PATH,
         collect_tree_entries,
         entries_sha256,
-        load_manifest,
     )
 except ModuleNotFoundError:  # Direct script execution places scripts/ on sys.path.
     from git_tree_manifest import (
-        MANIFEST_PATH,
+        FORBIDDEN_TRACKED_PATH,
         collect_tree_entries,
         entries_sha256,
-        load_manifest,
     )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -74,33 +78,13 @@ def inspect_commit(root: Path = ROOT) -> dict[str, object]:
     absent_from_commit = tuple(sorted(set(inventory_paths) - set(committed_paths)))
 
     committed_entries = collect_tree_entries(root, "HEAD")
-    try:
-        recorded_entries = load_manifest(root)
-        manifest_error = None
-    except ValueError as exc:
-        recorded_entries = ()
-        manifest_error = str(exc)
-
-    committed_by_path = {entry["path"]: entry for entry in committed_entries}
-    recorded_by_path = {entry["path"]: entry for entry in recorded_entries}
-    missing_from_git_tree_manifest = tuple(sorted(set(committed_by_path) - set(recorded_by_path)))
-    absent_from_git_tree = tuple(sorted(set(recorded_by_path) - set(committed_by_path)))
-    content_identity_mismatches = tuple(
-        sorted(
-            path
-            for path in set(committed_by_path) & set(recorded_by_path)
-            if committed_by_path[path] != recorded_by_path[path]
-        )
-    )
+    committed_tree_manifest = FORBIDDEN_TRACKED_PATH in committed_paths
 
     passed = not any(
         (
             missing_from_inventory,
             absent_from_commit,
-            manifest_error,
-            missing_from_git_tree_manifest,
-            absent_from_git_tree,
-            content_identity_mismatches,
+            committed_tree_manifest,
             status,
         )
     )
@@ -111,19 +95,15 @@ def inspect_commit(root: Path = ROOT) -> dict[str, object]:
         "working_tree_clean": not bool(status),
         "committed_file_count": len(committed_paths),
         "inventory_manifest_file_count": len(inventory_paths),
-        "git_tree_manifest_entry_count": len(recorded_entries),
         "inventory_manifest_sha256": _sha256(root / "MANIFEST.md"),
-        "git_tree_manifest_sha256": _sha256(root / MANIFEST_PATH),
+        "git_tree_entry_count": len(committed_entries),
         "git_tree_entries_sha256": entries_sha256(committed_entries),
         "missing_from_inventory_manifest": missing_from_inventory,
         "absent_from_commit": absent_from_commit,
-        "git_tree_manifest_error": manifest_error,
-        "missing_from_git_tree_manifest": missing_from_git_tree_manifest,
-        "absent_from_git_tree": absent_from_git_tree,
-        "content_identity_mismatches": content_identity_mismatches,
+        "committed_tree_manifest": committed_tree_manifest,
         "working_tree_status": tuple(status.splitlines()),
         "validation_tool": "scripts/validate_git_integrity.py",
-        "validation_tool_version": "2.0.0",
+        "validation_tool_version": "3.0.0",
     }
 
 

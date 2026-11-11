@@ -107,6 +107,7 @@ l9-constellation-topology/
 │   │   ├── 0035-conflict-aware-projection-and-resolution-aware-impact.md
 │   │   ├── 0036-evidence-qualified-relation-publication.md
 │   │   ├── 0037-stop-promoting-artifact-classification-to-relations.md
+│   │   ├── 0038-derive-content-identity-from-the-commit.md
 │   │   └── README.md
 │   ├── archive
 │   │   └── v4
@@ -649,7 +650,6 @@ l9-constellation-topology/
 ├── EFFECT_IDENTITY_MIGRATION_PREFLIGHT.json
 ├── FINAL_TREE.md
 ├── FIX_MAP.md
-├── GIT_TREE_MANIFEST.json
 ├── GOVERNANCE.md
 ├── HASH_LOCALITY_EVALUATION.json
 ├── INITIAL_COMMIT.md

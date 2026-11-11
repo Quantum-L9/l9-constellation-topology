@@ -60,33 +60,28 @@ Detailed structured evidence is in `validation/validation_checks.jsonl` and
 
 ## Commit-bound integrity model
 
-The repository contains two complementary manifests:
-
-- `MANIFEST.md` is the human-readable tracked-file inventory and responsibility map.
-- `GIT_TREE_MANIFEST.json` is the machine-readable content manifest. It records the path,
-  mode, object type, and Git object ID of every tracked entry except itself.
-
-Generation and validation are intentionally separate:
+`MANIFEST.md` is the human-readable tracked-file inventory and responsibility map. Content
+identity comes from the commit itself (ADR-0038): no machine-readable content manifest is
+committed, and `GIT_TREE_MANIFEST.json`, which used to restate the commit, is retired and
+git-ignored.
 
 ```bash
-git add -A
-PYTHONPATH=src python scripts/git_tree_manifest.py
-git add GIT_TREE_MANIFEST.json
 git commit -m "fix: close architect review blockers"
 PYTHONPATH=src python scripts/validate_git_integrity.py \
   --out /tmp/commit-bound-validation.json
 ```
 
-The final command verifies:
+The command verifies and reports:
 
 - exact commit SHA and root tree SHA;
 - clean worktree;
 - human inventory paths equal committed paths;
-- Git-native manifest paths, modes, object types, and blob IDs equal the committed tree;
-- deterministic manifest-entry digest.
+- the commit does not track `GIT_TREE_MANIFEST.json`;
+- the entry count and deterministic digest of the commit's tree inventory (path, mode,
+  object type, and Git object ID of every tracked entry), computed from `git ls-tree`.
 
-`GIT_TREE_MANIFEST.json` excludes itself because a file cannot contain its own final Git blob
-ID. CI produces the exact commit-bound report as a workflow artifact. A release claim without
+`scripts/git_tree_manifest.py` prints that inventory for any treeish and writes nothing.
+CI produces the exact commit-bound report as a workflow artifact. A release claim without
 that report is invalid.
 
 ## Generated-artifact drift guard
@@ -129,8 +124,8 @@ outside the validation ladder: no `make` target or CI job checks it, by
 operator decision, so the full gate passing says nothing about its
 freshness. Its own drift check is `l9-meta-injector check` with the flags in
 `DEVELOPMENT.md`, which reported `drift=0` on the commit that added it.
-`GIT_TREE_MANIFEST.json` is omitted from the index, so the commit-bound
-integrity model above is unaffected.
+The commit-bound integrity model above reads the commit, so the index is just
+one more tracked file to it.
 
 ## Claim read model and qualified impact
 

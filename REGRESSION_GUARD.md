@@ -28,9 +28,6 @@ PYTHONPATH=src python scripts/validate_contracts.py
 PYTHONPATH=src python scripts/validate_workflows.py
 PYTHONPATH=src python scripts/architecture_boundary_check.py
 PYTHONPATH=src python scripts/validate_release_readiness.py
-git add -A
-PYTHONPATH=src python scripts/git_tree_manifest.py
-git add GIT_TREE_MANIFEST.json
 PYTHONPATH=src python scripts/validate_git_integrity.py
 PYTHONPATH=src python scripts/verify_determinism.py
 ```

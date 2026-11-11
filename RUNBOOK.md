@@ -261,13 +261,12 @@ Before committing, synchronize repository evidence:
 ```bash
 # Update MANIFEST.md and FINAL_TREE.md for added or removed paths.
 # Refresh traceability and validation records for the new drift gate.
-git add -A
-PYTHONPATH=src python scripts/git_tree_manifest.py
-git add GIT_TREE_MANIFEST.json
+git add <changed paths>
+git commit
 PYTHONPATH=src python scripts/validate_git_integrity.py
 ```
 
-The Git tree manifest must be generated from the final staged tree. Any later tracked-file edit invalidates it.
+No content manifest is generated or committed (ADR-0038); the integrity check reads the commit.
 
 ## Repository metadata refresh
 
@@ -279,7 +278,7 @@ changing tracked files, when current metadata is wanted:
 2. Run the install and `apply` command in
    [`DEVELOPMENT.md`](DEVELOPMENT.md#repository-metadata) with its exact flags.
 3. Confirm the same flags with `check` report `drift=0`.
-4. Stage the index, regenerate `GIT_TREE_MANIFEST.json`, stage it, and commit.
+4. Stage the index and commit.
 
 ## Release-readiness validation
 
@@ -313,17 +312,15 @@ See [docs/recovery.md](docs/recovery.md) and [docs/deployment.md](docs/deploymen
 
 ## Commit-bound integrity validation
 
-Run after staging every intended file, including dot-directories:
+Run after committing every intended file, including dot-directories:
 
 ```bash
-git add -A
-PYTHONPATH=src python scripts/git_tree_manifest.py
-git add GIT_TREE_MANIFEST.json
+git add <changed paths>
 git commit -m "your bounded change"
 PYTHONPATH=src python scripts/validate_git_integrity.py
 ```
 
-`MANIFEST.md` is the human responsibility inventory. `GIT_TREE_MANIFEST.json` records every other tracked entry's Git mode, object type, and blob ID. The check fails when either inventory differs from `git ls-tree HEAD`, any recorded blob identity changes, or the worktree is dirty. CI emits the exact commit SHA, tree SHA, and both manifest digests.
+`MANIFEST.md` is the human responsibility inventory. The check fails when it differs from `git ls-tree HEAD`, when the commit tracks the retired `GIT_TREE_MANIFEST.json`, or when the worktree is dirty. Content identity comes from the commit itself (ADR-0038): CI emits the exact commit SHA, tree SHA, `MANIFEST.md` digest, and the digest of the commit's tree inventory. `scripts/git_tree_manifest.py` prints that inventory and writes nothing.
 
 ## Callback policy
 
