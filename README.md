@@ -252,8 +252,8 @@ Review every generated diff, then rerun `make generated-check` and the full vali
 under `.l9/meta-authority.yaml` (ADR-0031). It is not a compiler input and no CI
 job or `make` target refreshes it. It goes stale whenever a tracked file
 changes; refresh it by hand with the command in
-[`DEVELOPMENT.md`](DEVELOPMENT.md#repository-metadata), in a clean clone, then
-regenerate `GIT_TREE_MANIFEST.json`.
+[`DEVELOPMENT.md`](DEVELOPMENT.md#repository-metadata), in a clean clone, and
+commit it. No content manifest is regenerated (ADR-0038).
 
 ## Validation ladder
 

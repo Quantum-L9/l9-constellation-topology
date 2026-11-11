@@ -20,7 +20,6 @@ REQUIRED_ROOT_FILES = {
     "LICENSE",
     "INITIAL_COMMIT.md",
     "GOVERNANCE.md",
-    "GIT_TREE_MANIFEST.json",
     "DEVELOPMENT.md",
     "DEPENDENCY_POLICY.md",
     "CODE_OF_CONDUCT.md",
@@ -66,7 +65,6 @@ ROOT_DOC_SCAN_FILES = (
     "MAINTAINERS.md",
     "INITIAL_COMMIT.md",
     "GOVERNANCE.md",
-    "GIT_TREE_MANIFEST.json",
     "DEVELOPMENT.md",
     "DEPENDENCY_POLICY.md",
     "CODE_OF_CONDUCT.md",
@@ -101,9 +99,12 @@ EXCLUDED_PARTS = {
 #: scan must not report them as manifest omissions. `.l9/runtime/` is where
 #: central Core stages its SDK source, venv and verification evidence before it
 #: runs `make validate` (ADR-0032); it is git-ignored and never delivery.
+#: `.l9/agent-tasks/` holds the task record the governance worktree launcher
+#: writes; it is excluded through `.git/info/exclude`, never delivery.
 EXCLUDED_RELATIVE_PREFIXES = (
     ".claude/",
     ".cursor/",
+    ".l9/agent-tasks/",
     ".l9/autonomy/",
     ".l9/pr/",
     ".l9/runtime/",
@@ -113,7 +114,11 @@ EXCLUDED_RELATIVE_PREFIXES = (
 #: Repository-relative files in the same category as the prefixes above. A whole
 #: directory is not the right unit for the MCP server map, the locked-venv
 #: receipt, or the governance command link, each of which is one path.
-EXCLUDED_RELATIVE_FILES = frozenset({".cursor-commands", ".l9/uv-environment.lock", ".mcp.json"})
+#: `GIT_TREE_MANIFEST.json` is the retired committed manifest (ADR-0038): it is
+#: git-ignored, and a stray local copy is not delivery.
+EXCLUDED_RELATIVE_FILES = frozenset(
+    {".cursor-commands", ".l9/uv-environment.lock", ".mcp.json", "GIT_TREE_MANIFEST.json"}
+)
 ALLOWED_THIN_NAMES = {"__init__.py", "py.typed", ".gitkeep"}
 
 

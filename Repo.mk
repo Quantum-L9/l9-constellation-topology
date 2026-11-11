@@ -19,7 +19,7 @@ PYTHON ?= python
 # Pinned to the version .github/workflows/l9-pr-validate.yml installs.
 UV_VERSION ?= 0.10.0
 
-.PHONY: sync compile unit coverage lint type contracts workflows architecture readiness schemas-check schemas-update fixtures-check fixtures-update generated-check generated-update git-manifest git-integrity determinism hash-locality hash-locality-update build clean
+.PHONY: sync compile unit coverage lint type contracts workflows architecture readiness schemas-check schemas-update fixtures-check fixtures-update generated-check generated-update git-integrity determinism hash-locality hash-locality-update build clean
 .PHONY: repo-setup repo-validate repo-check repo-test
 
 sync:
@@ -76,9 +76,6 @@ hash-locality-update:
 generated-check: schemas-check fixtures-check hash-locality
 
 generated-update: schemas-update fixtures-update hash-locality-update
-
-git-manifest:
-	$(UV) run $(PYTHON) scripts/git_tree_manifest.py
 
 git-integrity:
 	$(UV) run $(PYTHON) scripts/validate_git_integrity.py

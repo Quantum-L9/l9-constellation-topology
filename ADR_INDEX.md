@@ -43,6 +43,7 @@ changed decision requires a new ADR that explicitly supersedes the old record.
 | ADR-0035 | [Conflict-aware canonical projection and resolution-aware impact](docs/adr/0035-conflict-aware-projection-and-resolution-aware-impact.md) | Accepted |
 | ADR-0036 | [Evidence-qualified relation publication and predicate-selective claims](docs/adr/0036-evidence-qualified-relation-publication.md) | Accepted on merge (activation pending owner decision) |
 | ADR-0037 | [Stop promoting artifact classification to canonical relations](docs/adr/0037-stop-promoting-artifact-classification-to-relations.md) | Accepted on merge (canonical identity change; owner decision) |
+| ADR-0038 | [Derive content identity from the commit, never a committed manifest](docs/adr/0038-derive-content-identity-from-the-commit.md) | Accepted on merge (owner direction 2026-11-11) |
 
 ## Decision order
 

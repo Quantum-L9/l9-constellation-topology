@@ -137,12 +137,13 @@ changes:
       - tests/test_worker_v5.py::test_callback_endpoint_rejects_encoded_separator_before_request
     status: implemented
   - id: REVIEW-002
-    source: MANIFEST.md, GIT_TREE_MANIFEST.json, scripts/git_tree_manifest.py, scripts/validate_git_integrity.py
+    source: MANIFEST.md, scripts/git_tree_manifest.py, scripts/validate_git_integrity.py
     defect: commit-bound validation proved tracked-path equality but did not prove per-file committed content identity
-    fix: retain MANIFEST.md as the human inventory and add a non-self-referential Git-native manifest covering path, mode, object type, and blob ID
+    fix: retain MANIFEST.md as the human inventory and report the commit's Git-native tree inventory (path, mode, object type, and object ID) as an entry count and digest computed from the validated commit; the committed GIT_TREE_MANIFEST.json that first carried it is retired and refused (ADR-0038)
     validation:
-      - tests/test_git_integrity.py::test_git_integrity_binds_paths_modes_and_blob_ids
-      - tests/test_git_integrity.py::test_git_integrity_rejects_same_paths_with_changed_blob
+      - tests/test_git_integrity.py::test_git_integrity_passes_without_a_committed_tree_manifest
+      - tests/test_git_integrity.py::test_git_integrity_digest_follows_committed_content
+      - tests/test_git_integrity.py::test_git_integrity_refuses_a_committed_tree_manifest
       - scripts/validate_git_integrity.py
     status: implemented
   - id: REVIEW-003

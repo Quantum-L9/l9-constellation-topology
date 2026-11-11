@@ -69,7 +69,6 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `EFFECT_IDENTITY_MIGRATION_PREFLIGHT.json` — governance, policy, or release documentation
 - `FINAL_TREE.md` — deterministic final repository tree
 - `FIX_MAP.md` — confirmed finding to fix and validation mapping
-- `GIT_TREE_MANIFEST.json` — Git-native mode, object-type, and blob-identity manifest
 - `GOVERNANCE.md` — authority, approval, ADR, branch, and release governance
 - `HASH_LOCALITY_EVALUATION.json` — recorded topology, candidate, and downstream-effect identity locality matrix
 - `INITIAL_COMMIT.md` — clean initial-commit and push handoff
@@ -150,6 +149,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `docs/adr/0035-conflict-aware-projection-and-resolution-aware-impact.md` — accepted architecture decision record
 - `docs/adr/0036-evidence-qualified-relation-publication.md` — architecture decision record, accepted on merge (activation pending owner decision)
 - `docs/adr/0037-stop-promoting-artifact-classification-to-relations.md` — architecture decision record, accepted on merge (canonical identity change)
+- `docs/adr/0038-derive-content-identity-from-the-commit.md` — architecture decision record: content identity comes from the commit; no committed tree manifest
 - `docs/adr/README.md` — ADR directory governance and navigation
 - `docs/architecture.md` — architecture, contract, deployment, recovery, or model documentation
 - `docs/archive/v4/01_SPEC_ATTACK.md` — superseded v4 historical artifact retained for migration evidence
@@ -253,7 +253,7 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - `scripts/generate_fixture_packets.py` — operator, build, generation, or validation command
 - `scripts/generate_schemas.py` — operator, build, generation, or validation command
 - `scripts/generated_artifact_sync.py` — shared read-only generated-artifact drift detection and explicit update support
-- `scripts/git_tree_manifest.py` — deterministic Git tree manifest generator and validator
+- `scripts/git_tree_manifest.py` — read-only Git tree inventory: prints path, mode, object type, and object ID of a treeish; writes nothing (ADR-0038)
 - `scripts/qualify_repository_model_assertions.py` — repository automation or validation script
 - `scripts/render_topology_reports.py` — operator, build, generation, or validation command
 - `scripts/validate_contracts.py` — operator, build, generation, or validation command
@@ -595,4 +595,4 @@ Complete final file inventory and responsibility map for the enriched v5 initial
 - No Git metadata, caches, local environments, build products, secrets, or nested archives.
 - `BUILD_SPECIFICATION.md` preserves the full source-aligned build authority.
 - `ADR_INDEX.md` indexes 20 accepted initial ADRs.
-- `FINAL_TREE.md` and this human inventory describe the packaged file set. `GIT_TREE_MANIFEST.json` independently binds exact Git modes, object types, and blob IDs.
+- `FINAL_TREE.md` and this human inventory describe the packaged file set. Exact Git modes, object types, and blob IDs are bound by the commit itself and reported by `scripts/validate_git_integrity.py` (ADR-0038).

@@ -23,9 +23,6 @@ uv run python scripts/validate_contracts.py
 uv run python scripts/validate_workflows.py
 uv run python scripts/architecture_boundary_check.py
 uv run python scripts/validate_release_readiness.py
-git add -A
-uv run python scripts/git_tree_manifest.py
-git add GIT_TREE_MANIFEST.json
 uv run python scripts/validate_git_integrity.py
 uv run python scripts/verify_determinism.py
 uv build
@@ -39,7 +36,7 @@ release environment remain explicitly blocked and cannot be reported as passed.
 1. Confirm the working tree contains only intended release changes.
 2. Update `CHANGELOG.md` and package version.
 3. Confirm affected ADR, specification, schema, and migration documents are current.
-4. Stage every intended path, regenerate `GIT_TREE_MANIFEST.json`, stage it, and commit.
+4. Stage every intended path and commit. Content identity is the commit itself (ADR-0038); no manifest is regenerated or committed.
 5. Run the complete validation ladder against the clean exact commit.
 6. Build wheel and source distribution from a clean checkout.
 7. Install the wheel into an isolated environment and run CLI smoke checks.
